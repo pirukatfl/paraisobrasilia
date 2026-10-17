@@ -203,18 +203,44 @@ export interface Media {
   };
 }
 /**
+ * Crie a festa, envie o flyer e clique em Publicar. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "parties".
  */
 export interface Party {
   id: number;
+  /**
+   * Nome da festa como aparece no site.
+   */
   title: string;
+  /**
+   * Gerado a partir do título. Só altere se souber o que está fazendo.
+   */
   slug: string;
+  /**
+   * Horário de Brasília.
+   */
   startsAt: string;
+  /**
+   * Opcional. Se vazio, a festa sai da página inicial 10 horas depois do início.
+   */
   endsAt?: string | null;
+  /**
+   * Envie o flyer no formato das redes: 1080×1080 (quadrado) ou 1080×1350 (vertical). JPG, PNG ou WebP até 15 MB.
+   */
   flyer: number | Media;
+  /**
+   * Escolha o mesmo formato do flyer enviado.
+   */
   flyerFormat: 'square' | 'portrait';
+  /**
+   * Uma frase curta (até 160 caracteres). Aparece na prévia do WhatsApp.
+   */
   summary?: string | null;
+  /**
+   * Valor da entrada por tipo de público (ex.: Casal — R$ 150).
+   */
   prices?:
     | {
         label: string;
@@ -225,7 +251,13 @@ export interface Party {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Ex.: Festa do Branco, Preto e vermelho.
+   */
   dressCode?: string | null;
+  /**
+   * DJs, shows e modelos da noite.
+   */
   attractions?:
     | {
         kind: 'dj' | 'show' | 'modelo' | 'outro';
@@ -233,6 +265,9 @@ export interface Party {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Texto com os detalhes da festa.
+   */
   details?: {
     root: {
       type: string;
@@ -258,6 +293,7 @@ export interface Party {
   };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -460,6 +496,7 @@ export interface PartiesSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

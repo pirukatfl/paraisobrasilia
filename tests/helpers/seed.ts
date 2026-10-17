@@ -81,6 +81,8 @@ export interface SeedPartyInput {
   attractions?: { kind: 'dj' | 'show' | 'modelo' | 'outro'; name: string }[]
   /** Plain text turned into a one-paragraph Lexical document */
   details?: string
+  /** Publication status (drafts exist from plan 01-09); default published */
+  status?: 'draft' | 'published'
 }
 
 /** Minimal Lexical editor state with one paragraph. */
@@ -122,9 +124,12 @@ export async function seedParty(payload: Payload, partial: SeedPartyInput) {
     filePath: path.join(FIXTURES, flyerFormat === 'square' ? 'flyer-square.jpg' : 'flyer-portrait.jpg'),
     overrideAccess: true,
   })
+  const status = partial.status ?? 'published'
   return payload.create({
     collection: 'parties',
+    draft: status === 'draft',
     data: {
+      _status: status,
       title: partial.title,
       startsAt: partial.startsAt ?? new Date(Date.now() + 3 * 86_400_000).toISOString(),
       ...(partial.endsAt ? { endsAt: partial.endsAt } : {}),

@@ -43,10 +43,16 @@ export const Parties: CollectionConfig = {
   labels: { singular: 'Festa', plural: 'Festas' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'startsAt'],
+    defaultColumns: ['title', 'startsAt', '_status'],
+    listSearchableFields: ['title'],
+    description:
+      'Crie a festa, envie o flyer e clique em Publicar. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.',
   },
+  // Publicar / Despublicar + history (T-01-28)
+  versions: { drafts: true, maxPerDoc: 20 },
   access: {
-    read: () => true,
+    // Visitors and anonymous API calls see only published parties (T-01-25)
+    read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }),
     create: isStaff,
     update: isStaff,
     delete: isStaff,
@@ -60,6 +66,7 @@ export const Parties: CollectionConfig = {
       type: 'text',
       required: true,
       label: 'Título',
+      admin: { description: 'Nome da festa como aparece no site.' },
     },
     {
       name: 'slug',
@@ -68,6 +75,10 @@ export const Parties: CollectionConfig = {
       unique: true,
       index: true,
       label: 'Endereço da página (slug)',
+      admin: {
+        description: 'Gerado a partir do título. Só altere se souber o que está fazendo.',
+        position: 'sidebar',
+      },
       hooks: { beforeValidate: [fillSlugFromTitle] },
     },
     {
@@ -75,13 +86,19 @@ export const Parties: CollectionConfig = {
       type: 'date',
       required: true,
       label: 'Data e hora de início',
-      admin: { date: { pickerAppearance: 'dayAndTime' } },
+      admin: {
+        description: 'Horário de Brasília.',
+        date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' },
+      },
     },
     {
       name: 'endsAt',
       type: 'date',
       label: 'Data e hora de término',
-      admin: { date: { pickerAppearance: 'dayAndTime' } },
+      admin: {
+        description: 'Opcional. Se vazio, a festa sai da página inicial 10 horas depois do início.',
+        date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' },
+      },
     },
     {
       name: 'flyer',
@@ -89,6 +106,10 @@ export const Parties: CollectionConfig = {
       relationTo: 'media',
       required: true,
       label: 'Flyer',
+      admin: {
+        description:
+          'Envie o flyer no formato das redes: 1080×1080 (quadrado) ou 1080×1350 (vertical). JPG, PNG ou WebP até 15 MB.',
+      },
     },
     {
       name: 'flyerFormat',
@@ -96,6 +117,7 @@ export const Parties: CollectionConfig = {
       required: true,
       defaultValue: 'portrait',
       label: 'Formato do flyer',
+      admin: { description: 'Escolha o mesmo formato do flyer enviado.' },
       options: [
         { label: 'Quadrado (1:1)', value: 'square' },
         { label: 'Vertical (4:5)', value: 'portrait' },
@@ -106,11 +128,13 @@ export const Parties: CollectionConfig = {
       type: 'textarea',
       maxLength: 160,
       label: 'Resumo',
+      admin: { description: 'Uma frase curta (até 160 caracteres). Aparece na prévia do WhatsApp.' },
     },
     {
       name: 'prices',
       type: 'array',
       label: 'Valores',
+      admin: { description: 'Valor da entrada por tipo de público (ex.: Casal — R$ 150).' },
       labels: { singular: 'Valor', plural: 'Valores' },
       // Preset rows (D-05); staff can fill, remove, add and reorder
       defaultValue: [
@@ -133,11 +157,13 @@ export const Parties: CollectionConfig = {
       name: 'dressCode',
       type: 'text',
       label: 'Dress code / tema',
+      admin: { description: 'Ex.: Festa do Branco, Preto e vermelho.' },
     },
     {
       name: 'attractions',
       type: 'array',
       label: 'Atrações',
+      admin: { description: 'DJs, shows e modelos da noite.' },
       labels: { singular: 'Atração', plural: 'Atrações' },
       fields: [
         {
@@ -159,6 +185,7 @@ export const Parties: CollectionConfig = {
       name: 'details',
       type: 'richText',
       label: 'Sobre a festa',
+      admin: { description: 'Texto com os detalhes da festa.' },
       // Text only: paragraphs, bold, italic, lists, links — no images, embeds or headings (T-01-18)
       editor: lexicalEditor({
         features: () => [

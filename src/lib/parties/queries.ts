@@ -43,7 +43,10 @@ export async function getUpcomingParties(now: Date = new Date()): Promise<PartyC
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'parties',
-    where: { endsAt: { greater_than: now.toISOString() } },
+    where: {
+      and: [{ _status: { equals: 'published' } }, { endsAt: { greater_than: now.toISOString() } }],
+    },
+    draft: false,
     sort: 'startsAt',
     depth: 1,
     limit: UPCOMING_LIMIT,
@@ -82,7 +85,8 @@ export async function getPartyBySlug(slug: string, now: Date = new Date()): Prom
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'parties',
-    where: { slug: { equals: slug } },
+    where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
+    draft: false,
     depth: 1,
     limit: 1,
   })
@@ -94,6 +98,8 @@ export async function getAllPartySlugs(): Promise<string[]> {
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'parties',
+    where: { _status: { equals: 'published' } },
+    draft: false,
     depth: 0,
     limit: 200,
     select: { slug: true },
