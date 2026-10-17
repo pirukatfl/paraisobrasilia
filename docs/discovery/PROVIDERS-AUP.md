@@ -41,3 +41,5 @@ Alternativas: HostGator Brasil (mesma situação da Locaweb) e Vultr (região S�
 **Descartados:** Hetzner e Contabo (termos proíbem material pornográfico), Vercel/Netlify, Cloudinary.
 
 Para os demais serviços: armazenamento em **Backblaze B2**; **Cloudflare** apenas como DNS/CDN (sem Stream/Images para mídia de assinantes); e-mail transacional em **Resend** só após confirmação do suporte (alternativa: Amazon SES, não verificado).
+
+Escolha do cliente: Hostinger VPS (2026-10-17) — aceita conteúdo adulto por escrito (suporte oficial).
