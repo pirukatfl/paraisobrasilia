@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 01-09-PLAN.md
-last_updated: "2026-10-17T21:02:14.254Z"
+last_updated: "2026-10-17T21:03:09.747Z"
 last_activity: 2026-10-17
 progress:
   total_phases: 7
@@ -65,6 +65,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 
 - [Phase 01]: Template test tooling removed; plan 01-03 installs approved vitest 5.0.5 / @playwright/test 1.64.1 — Template versions differ from the approved list; 01-03 owns the harness
 - [Phase 01]: DB env var is DATABASE_URI; @payloadcms/* pinned 3.91.0 incl. @payloadcms/ui from template — Matches .env.example contract; mismatched Payload versions break the admin
+- [Phase 01]: Migrations-first: schema push only when SITE_ENV=development; tests/staging/prod run src/migrations — Reproducible schema; payload migrate prompts if a DB was dev-pushed
+- [Phase 01]: Public queries cached with unstable_cache tags parties / party:{slug}; Payload hooks call revalidateTag(tag, { expire: 0 }) — Publish/edit/unpublish visible on the next request; 600 s window keeps time-based expiry
+- [Phase 01]: Client chose Hostinger VPS for staging/production (2026-10-17) — Recorded in docs/discovery/PROVIDERS-AUP.md
 
 ### Pending Todos
 
@@ -77,6 +80,8 @@ None yet.
 - AUP de VPS, registrador, e-mail e storage precisam ser lidas antes de contratar
 - Pendentes do cliente: endereço público, logo/identidade visual, planos e valores
 - docker-compose.yml not exercised (no Docker daemon during 01-01); confirm initdb creates paraiso_test on first Docker run
+- pnpm build prerenders /, /festas/* and /sitemap.xml from Postgres: the 01-10 Docker build needs DATABASE_URI reachable at build time (or those routes made on-demand)
+- The /mnt/project-files mount rewrites committed image files about 30 s after write, so the canonical working tree shows modified PNG/JPG/WebP; blobs in git are correct
 
 ## Deferred Items
 
