@@ -30,7 +30,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
   4. Equipe cria, edita e despublica uma festa com flyer no painel, sem ajuda técnica, e a festa passada some da home sozinha após a data
   5. Estão registrados: acesso (ou ausência de acesso) ao WordPress e plugin de assinantes, parecer jurídico sobre age gate, e AUP da hospedagem/e-mail/storage
 
-**Plans:** 2/10 plans executed
+**Plans:** 3/10 plans executed
 Plans:
 **Wave 1**
 
@@ -43,7 +43,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-04-PLAN.md — Brand shell: logo assets, dark tokens, header/footer, error pages (wave 3)
+- [x] 01-04-PLAN.md — Brand shell: logo assets, dark tokens, header/footer, error pages (wave 3)
 - [ ] 01-05-PLAN.md — Skeleton slice: Parties + Media, visibility rule, home flyer grid (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fundação e vitrine de festas | 2/10 | In Progress|  |
+| 1. Fundação e vitrine de festas | 3/10 | In Progress|  |
 | 2. Site aberto completo e mídia | 0/? | Not started | - |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
