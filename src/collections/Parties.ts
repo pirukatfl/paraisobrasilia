@@ -11,6 +11,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import type { CollectionBeforeChangeHook, CollectionConfig, FieldHook } from 'payload'
 
+import { revalidatePartyAfterChange, revalidatePartyAfterDelete } from '../lib/parties/revalidate'
 import { defaultEndsAt } from '../lib/parties/visibility'
 
 const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
@@ -59,6 +60,9 @@ export const Parties: CollectionConfig = {
   },
   hooks: {
     beforeChange: [fillDefaultEnd],
+    // Publish, edit and unpublish (updates of _status) show up on the site at once
+    afterChange: [revalidatePartyAfterChange],
+    afterDelete: [revalidatePartyAfterDelete],
   },
   fields: [
     {

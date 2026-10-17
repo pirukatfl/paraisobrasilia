@@ -1,6 +1,7 @@
 import 'server-only'
 
 import config from '@payload-config'
+import { unstable_cache } from 'next/cache'
 import { getPayload } from 'payload'
 
 import type { Media, Party } from '../../payload-types'
@@ -8,6 +9,27 @@ import type { FlyerFormat, FlyerImage, PartyCardDTO, PartyDetailDTO, RichTextSta
 import { isUpcoming } from './visibility'
 
 const UPCOMING_LIMIT = 50 // T-01-11: bounded list
+const CACHE_SECONDS = 600 // time-based window: ended parties drop off by themselves (FEST-04)
+
+/**
+ * Next data cache (unstable_cache: stable in Next 16.4 without enabling cacheComponents),
+ * tagged so Payload hooks can expire entries on publish/edit/unpublish.
+ * Outside a Next server (vitest, scripts) there is no incremental cache: call through.
+ */
+function cached<A extends unknown[], R>(
+  fn: (...args: A) => Promise<R>,
+  keyParts: string[],
+  tags: (...args: A) => string[],
+): (...args: A) => Promise<R> {
+  return async (...args: A) => {
+    try {
+      return await unstable_cache(fn, keyParts, { tags: tags(...args), revalidate: CACHE_SECONDS })(...args)
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('incrementalCache missing')) return fn(...args)
+      throw err
+    }
+  }
+}
 
 function toFlyerImage(flyer: Party['flyer'], format: FlyerFormat, title: string): FlyerImage {
   const media = (typeof flyer === 'object' && flyer ? flyer : null) as Media | null
@@ -38,8 +60,8 @@ export function toPartyCard(doc: Party): PartyCardDTO {
   }
 }
 
-/** Parties that have not ended yet, soonest first (FEST-01, FEST-04). */
-export async function getUpcomingParties(now: Date = new Date()): Promise<PartyCardDTO[]> {
+async function fetchUpcomingParties(nowIso: string): Promise<PartyCardDTO[]> {
+  const now = new Date(nowIso)
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'parties',
@@ -52,6 +74,16 @@ export async function getUpcomingParties(now: Date = new Date()): Promise<PartyC
     limit: UPCOMING_LIMIT,
   })
   return docs.map(toPartyCard)
+}
+
+const cachedUpcomingParties = cached(fetchUpcomingParties, ['parties:upcoming'], () => ['parties'])
+
+/** Published parties that have not ended yet, soonest first (FEST-01, FEST-04). */
+export async function getUpcomingParties(now: Date = new Date()): Promise<PartyCardDTO[]> {
+  // Rounded to the minute so cache entries roll over instead of one entry per request
+  const minute = new Date(Math.floor(now.getTime() / 60_000) * 60_000).toISOString()
+  const parties = await cachedUpcomingParties(minute)
+  return parties.filter((p) => isUpcoming(p, now))
 }
 
 /** Absolute URL (crawlers need it) of the og derivative; null when the flyer has none. */
@@ -80,8 +112,7 @@ export function toPartyDetail(doc: Party, now: Date = new Date()): PartyDetailDT
   }
 }
 
-/** One party by its page address, or null (→ 404). Past parties are still returned (shared links). */
-export async function getPartyBySlug(slug: string, now: Date = new Date()): Promise<PartyDetailDTO | null> {
+async function fetchPartyBySlug(slug: string): Promise<PartyDetailDTO | null> {
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'parties',
@@ -90,11 +121,19 @@ export async function getPartyBySlug(slug: string, now: Date = new Date()): Prom
     depth: 1,
     limit: 1,
   })
-  return docs[0] ? toPartyDetail(docs[0], now) : null
+  return docs[0] ? toPartyDetail(docs[0]) : null
 }
 
-/** Slugs prebuilt at build time (generateStaticParams). */
-export async function getAllPartySlugs(): Promise<string[]> {
+const cachedPartyBySlug = cached(fetchPartyBySlug, ['parties:by-slug'], (slug) => [`party:${slug}`])
+
+/** One published party by its page address, or null (→ 404). Past parties stay reachable (shared links). */
+export async function getPartyBySlug(slug: string, now: Date = new Date()): Promise<PartyDetailDTO | null> {
+  const party = await cachedPartyBySlug(slug)
+  // isPast depends on the clock, not on the cached data
+  return party ? { ...party, isPast: !isUpcoming(party, now) } : null
+}
+
+async function fetchAllPartySlugs(): Promise<string[]> {
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'parties',
@@ -106,3 +145,6 @@ export async function getAllPartySlugs(): Promise<string[]> {
   })
   return docs.map((d) => d.slug)
 }
+
+/** Published slugs prebuilt at build time (generateStaticParams). */
+export const getAllPartySlugs = cached(fetchAllPartySlugs, ['parties:slugs'], () => ['parties'])
