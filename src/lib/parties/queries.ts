@@ -34,6 +34,7 @@ export function toPartyCard(doc: Party): PartyCardDTO {
     endsAt: doc.endsAt ?? doc.startsAt,
     flyerFormat,
     flyer: toFlyerImage(doc.flyer, flyerFormat, doc.title),
+    updatedAt: doc.updatedAt,
   }
 }
 
@@ -71,7 +72,6 @@ export function toPartyDetail(doc: Party, now: Date = new Date()): PartyDetailDT
     dressCode: doc.dressCode?.trim() || null,
     attractions: (doc.attractions ?? []).map((a) => ({ kind: a.kind, name: a.name })),
     isPast: !isUpcoming(card, now),
-    updatedAt: doc.updatedAt,
     flyerOgUrl: toAbsoluteOgUrl(doc.flyer),
     meta: doc.meta ? { title: doc.meta.title ?? null, description: doc.meta.description ?? null } : null,
   }

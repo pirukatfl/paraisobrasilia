@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -5,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { PartyDetails } from '@/components/party/PartyDetails'
 import { formatPartyDate, formatPartyTime } from '@/lib/format/date'
 import { getAllPartySlugs, getPartyBySlug } from '@/lib/parties/queries'
+import { buildPartyMetadata } from '@/lib/seo/metadata'
 
 export const revalidate = 600
 
@@ -15,6 +17,13 @@ export async function generateStaticParams() {
 
 interface Props {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const party = await getPartyBySlug(slug)
+  if (!party) return { title: 'Página não encontrada' }
+  return buildPartyMetadata(party)
 }
 
 export default async function PartyPage({ params }: Props) {

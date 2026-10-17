@@ -16,6 +16,7 @@ export interface PartyCardDTO {
   endsAt: string
   flyerFormat: FlyerFormat
   flyer: FlyerImage
+  updatedAt: string
 }
 
 export interface PriceRow {
@@ -38,7 +39,6 @@ export interface PartyDetailDTO extends PartyCardDTO {
   dressCode: string | null
   attractions: Attraction[]
   isPast: boolean
-  updatedAt: string
   /** Absolute URL of the 1200x630 JPEG share image */
   flyerOgUrl: string | null
   /** Staff-editable SEO overrides (@payloadcms/plugin-seo) */

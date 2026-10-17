@@ -6,7 +6,23 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
+const isProduction = process.env.SITE_ENV === 'production'
+
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Staging/development must never be indexed (T-01-21)
+          ...(isProduction ? [] : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, // T-01-23
+        ],
+      },
+    ]
+  },
   images: {
     localPatterns: [
       {
