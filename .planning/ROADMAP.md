@@ -30,7 +30,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
   4. Equipe cria, edita e despublica uma festa com flyer no painel, sem ajuda técnica, e a festa passada some da home sozinha após a data
   5. Estão registrados: acesso (ou ausência de acesso) ao WordPress e plugin de assinantes, parecer jurídico sobre age gate, e AUP da hospedagem/e-mail/storage
 
-**Plans:** 6/10 plans executed
+**Plans:** 7/10 plans executed
 Plans:
 **Wave 1**
 
@@ -53,7 +53,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 01-08-PLAN.md — SEO and share previews: OG image, metadata, robots, sitemap (wave 5)
+- [x] 01-08-PLAN.md — SEO and share previews: OG image, metadata, robots, sitemap (wave 5)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fundação e vitrine de festas | 6/10 | In Progress|  |
+| 1. Fundação e vitrine de festas | 7/10 | In Progress|  |
 | 2. Site aberto completo e mídia | 0/? | Not started | - |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |

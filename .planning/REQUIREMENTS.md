@@ -7,9 +7,9 @@
 
 ### Área aberta — Festas (FEST)
 
-- [ ] **FEST-01**: Visitante vê na home as próximas festas como flyers no formato das redes sociais (1:1 e 4:5), que se adaptam ao celular
+- [x] **FEST-01**: Visitante vê na home as próximas festas como flyers no formato das redes sociais (1:1 e 4:5), que se adaptam ao celular
 - [x] **FEST-02**: Visitante clica no flyer e abre a página da festa com texto, data, horário e detalhes
-- [ ] **FEST-03**: Visitante compartilha a página da festa no WhatsApp/Instagram e a prévia mostra flyer e título corretos
+- [x] **FEST-03**: Visitante compartilha a página da festa no WhatsApp/Instagram e a prévia mostra flyer e título corretos
 - [ ] **FEST-04**: Festas passadas saem da home automaticamente após a data
 
 ### Área aberta — Espaço e modelos (MIDIA)
@@ -31,7 +31,7 @@
 - [ ] **INST-02**: Visitante vê endereço, mapa e botões "Como chegar" (Google Maps/Waze)
 - [ ] **INST-03**: Visitante fala com a casa por botão de WhatsApp e vê redes sociais oficiais
 - [x] **INST-04**: Visitante confirma ter 18+ ao entrar, sem cadastro (módulo trocável caso a lei exija verificação mais forte)
-- [ ] **INST-05**: Site tem título, descrição e prévia de compartilhamento corretos em todas as páginas abertas
+- [x] **INST-05**: Site tem título, descrição e prévia de compartilhamento corretos em todas as páginas abertas
 - [ ] **INST-06**: Site tem páginas de Termos de Uso e Política de Privacidade (LGPD)
 
 ### Assinantes (ASS)
@@ -102,12 +102,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FEST-01 | Fase 1 | Pending |
+| FEST-01 | Fase 1 | Complete |
 | FEST-02 | Fase 1 | Complete |
-| FEST-03 | Fase 1 | Pending |
+| FEST-03 | Fase 1 | Complete |
 | FEST-04 | Fase 1 | Pending |
 | INST-04 | Fase 1 | Complete |
-| INST-05 | Fase 1 | Pending |
+| INST-05 | Fase 1 | Complete |
 | PAINEL-01 | Fase 1 | Pending |
 | INST-01 | Fase 2 | Pending |
 | INST-02 | Fase 2 | Pending |
