@@ -4,7 +4,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import type { Media, Party } from '../../payload-types'
-import type { FlyerFormat, FlyerImage, PartyCardDTO } from './types'
+import type { FlyerFormat, FlyerImage, PartyCardDTO, PartyDetailDTO, RichTextState } from './types'
+import { isUpcoming } from './visibility'
 
 const UPCOMING_LIMIT = 50 // T-01-11: bounded list
 
@@ -47,4 +48,45 @@ export async function getUpcomingParties(now: Date = new Date()): Promise<PartyC
     limit: UPCOMING_LIMIT,
   })
   return docs.map(toPartyCard)
+}
+
+export function toPartyDetail(doc: Party, now: Date = new Date()): PartyDetailDTO {
+  const card = toPartyCard(doc)
+  return {
+    ...card,
+    summary: doc.summary?.trim() || null,
+    details: (doc.details as RichTextState | null | undefined) ?? null,
+    prices: (doc.prices ?? [])
+      .filter((row) => row.label && row.value)
+      .map((row) => ({ label: row.label, value: row.value })),
+    dressCode: doc.dressCode?.trim() || null,
+    attractions: (doc.attractions ?? []).map((a) => ({ kind: a.kind, name: a.name })),
+    isPast: !isUpcoming(card, now),
+    updatedAt: doc.updatedAt,
+    flyerOgUrl: null,
+  }
+}
+
+/** One party by its page address, or null (→ 404). Past parties are still returned (shared links). */
+export async function getPartyBySlug(slug: string, now: Date = new Date()): Promise<PartyDetailDTO | null> {
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({
+    collection: 'parties',
+    where: { slug: { equals: slug } },
+    depth: 1,
+    limit: 1,
+  })
+  return docs[0] ? toPartyDetail(docs[0], now) : null
+}
+
+/** Slugs prebuilt at build time (generateStaticParams). */
+export async function getAllPartySlugs(): Promise<string[]> {
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({
+    collection: 'parties',
+    depth: 0,
+    limit: 200,
+    select: { slug: true },
+  })
+  return docs.map((d) => d.slug)
 }

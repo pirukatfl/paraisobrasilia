@@ -17,3 +17,28 @@ export interface PartyCardDTO {
   flyerFormat: FlyerFormat
   flyer: FlyerImage
 }
+
+export interface PriceRow {
+  label: string
+  value: string
+}
+
+export interface Attraction {
+  kind: 'dj' | 'show' | 'modelo' | 'outro'
+  name: string
+}
+
+/** Lexical editor JSON as stored by Payload (rendered with @payloadcms/richtext-lexical/react). */
+export type RichTextState = import('@payloadcms/richtext-lexical/lexical').SerializedEditorState
+
+export interface PartyDetailDTO extends PartyCardDTO {
+  summary: string | null
+  details: RichTextState | null
+  prices: PriceRow[]
+  dressCode: string | null
+  attractions: Attraction[]
+  isPast: boolean
+  updatedAt: string
+  /** Absolute URL of the 1200x630 share image (filled in plan 01-08) */
+  flyerOgUrl: string | null
+}

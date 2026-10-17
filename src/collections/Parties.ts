@@ -1,3 +1,14 @@
+import {
+  BoldFeature,
+  FixedToolbarFeature,
+  InlineToolbarFeature,
+  ItalicFeature,
+  lexicalEditor,
+  LinkFeature,
+  OrderedListFeature,
+  ParagraphFeature,
+  UnorderedListFeature,
+} from '@payloadcms/richtext-lexical'
 import type { CollectionBeforeChangeHook, CollectionConfig, FieldHook } from 'payload'
 
 import { defaultEndsAt } from '../lib/parties/visibility'
@@ -89,6 +100,78 @@ export const Parties: CollectionConfig = {
         { label: 'Quadrado (1:1)', value: 'square' },
         { label: 'Vertical (4:5)', value: 'portrait' },
       ],
+    },
+    {
+      name: 'summary',
+      type: 'textarea',
+      maxLength: 160,
+      label: 'Resumo',
+    },
+    {
+      name: 'prices',
+      type: 'array',
+      label: 'Valores',
+      labels: { singular: 'Valor', plural: 'Valores' },
+      // Preset rows (D-05); staff can fill, remove, add and reorder
+      defaultValue: [
+        { label: 'Casal', value: '' },
+        { label: 'Mulher sozinha', value: '' },
+        { label: 'Homem sozinho', value: '' },
+      ],
+      fields: [
+        { name: 'label', type: 'text', required: true, label: 'Tipo' },
+        {
+          name: 'value',
+          type: 'text',
+          label: 'Valor',
+          // Optional so the preset rows never block saving; rows without a value are not shown
+          admin: { description: 'Ex.: R$ 150. Deixe em branco para não mostrar esta linha.' },
+        },
+      ],
+    },
+    {
+      name: 'dressCode',
+      type: 'text',
+      label: 'Dress code / tema',
+    },
+    {
+      name: 'attractions',
+      type: 'array',
+      label: 'Atrações',
+      labels: { singular: 'Atração', plural: 'Atrações' },
+      fields: [
+        {
+          name: 'kind',
+          type: 'select',
+          required: true,
+          label: 'Tipo',
+          options: [
+            { label: 'DJ', value: 'dj' },
+            { label: 'Show', value: 'show' },
+            { label: 'Modelo', value: 'modelo' },
+            { label: 'Outro', value: 'outro' },
+          ],
+        },
+        { name: 'name', type: 'text', required: true, label: 'Nome' },
+      ],
+    },
+    {
+      name: 'details',
+      type: 'richText',
+      label: 'Sobre a festa',
+      // Text only: paragraphs, bold, italic, lists, links — no images, embeds or headings (T-01-18)
+      editor: lexicalEditor({
+        features: () => [
+          ParagraphFeature(),
+          BoldFeature(),
+          ItalicFeature(),
+          UnorderedListFeature(),
+          OrderedListFeature(),
+          LinkFeature({ enabledCollections: [] }),
+          FixedToolbarFeature(),
+          InlineToolbarFeature(),
+        ],
+      }),
     },
   ],
 }

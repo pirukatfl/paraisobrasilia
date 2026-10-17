@@ -206,6 +206,40 @@ export interface Party {
   endsAt?: string | null;
   flyer: number | Media;
   flyerFormat: 'square' | 'portrait';
+  summary?: string | null;
+  prices?:
+    | {
+        label: string;
+        /**
+         * Ex.: R$ 150. Deixe em branco para não mostrar esta linha.
+         */
+        value?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  dressCode?: string | null;
+  attractions?:
+    | {
+        kind: 'dj' | 'show' | 'modelo' | 'outro';
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  details?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -374,6 +408,23 @@ export interface PartiesSelect<T extends boolean = true> {
   endsAt?: T;
   flyer?: T;
   flyerFormat?: T;
+  summary?: T;
+  prices?:
+    | T
+    | {
+        label?: T;
+        value?: T;
+        id?: T;
+      };
+  dressCode?: T;
+  attractions?:
+    | T
+    | {
+        kind?: T;
+        name?: T;
+        id?: T;
+      };
+  details?: T;
   updatedAt?: T;
   createdAt?: T;
 }
