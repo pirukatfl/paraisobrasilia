@@ -1,0 +1,51 @@
+# dependencies
+/node_modules
+node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+/.idea/*
+!/.idea/runConfigurations
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files (secrets) — only the examples are tracked
+.env
+.env.*
+!.env.example
+!.env.test.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# local uploads (dev only; staging/prod use object storage)
+/media
+
+# Claude Code / GSD tooling (local only)
+.claude/
