@@ -1,16 +1,66 @@
 import type { Metadata } from 'next'
+import { Inter, Josefin_Sans } from 'next/font/google'
 import React from 'react'
 
+import { Footer } from '@/components/Footer'
+import { Header } from '@/components/Header'
+
+import './globals.css'
+
+const josefin = Josefin_Sans({
+  weight: ['400', '600'],
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-josefin',
+  display: 'swap',
+})
+
+const inter = Inter({
+  weight: ['400', '600'],
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+const isProduction = process.env.SITE_ENV === 'production'
+
 export const metadata: Metadata = {
-  title: 'Paraíso Brasília',
-  description: 'Casa de festas Paraíso Brasília: próximas festas.',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'),
+  title: {
+    default: 'Paraíso Brasília — Casa de festas liberais',
+    template: '%s · Paraíso Brasília',
+  },
+  description:
+    'Festas liberais para casais e solteiros em Brasília. Veja a programação das próximas festas do Paraíso Brasília.',
+  openGraph: {
+    siteName: 'Paraíso Brasília',
+    locale: 'pt_BR',
+    type: 'website',
+    images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Paraíso Brasília' }],
+  },
+  twitter: { card: 'summary_large_image' },
+  // Staging and development must never be indexed (production flips this on).
+  robots: isProduction ? { index: true, follow: true } : { index: false, follow: false },
+  other: {
+    // Adult-content labels: generic rating + RTA label (CLAUDE.md age-gate/SEO directive)
+    rating: ['adult', 'RTA-5042-1996-1400-1577-RTA'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
-      <body>
-        <main>{children}</main>
+    <html lang="pt-BR" className={`${josefin.variable} ${inter.variable}`}>
+      <body className="flex min-h-dvh flex-col">
+        <a
+          href="#conteudo"
+          className="type-label sr-only z-50 bg-surface px-4 py-2 text-text focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center"
+        >
+          Pular para o conteúdo
+        </a>
+        <Header />
+        <main id="conteudo" className="mx-auto w-full max-w-[1200px] flex-1 px-4 pt-12 lg:px-8">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   )
