@@ -38,7 +38,7 @@ Preencher com fatos agregados. Não copiar e-mails, nomes de assinantes, dumps o
 | Perfis do ClassiSex (custom post type e campos) | _a preencher_ | Nome do post type, campos personalizados (meta keys), onde ficam as fotos |
 | Tamanho de wp-content/uploads | _a preencher_ (GB) | Gerenciador de arquivos da hospedagem ou `du -sh wp-content/uploads` via SSH |
 | URLs indexadas | _a preencher_ | Ver abaixo |
-| Hospedagem atual (provedor, plano, acesso a backup/dump) | _a preencher_ | Painel da hospedagem; confirmar se é possível baixar backup completo (arquivos + banco) |
+| Hospedagem atual (provedor, plano, acesso a backup/dump) | Hostinger (informado pelo cliente em 2026-10-17); plano e acesso a backup a confirmar no hPanel | Painel da hospedagem; confirmar se é possível baixar backup completo (arquivos + banco) |
 
 ### Tipo de hash
 
