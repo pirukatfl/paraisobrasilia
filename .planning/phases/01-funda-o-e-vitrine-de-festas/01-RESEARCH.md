@@ -77,7 +77,7 @@ The largest non-technical findings changed since project research: the ECA Digit
 | Capability | Primary Tier | Secondary Tier | Rationale |
 |------------|-------------|----------------|-----------|
 | Party CRUD, publish/unpublish | API / Backend (Payload admin + collection config) | Database | Payload owns validation, drafts, access control; staff never touch code |
-| Flyer resizing / derivatives | API / Backend (Payload upload + sharp) | Storage (local volume in Phase 1) | Derivatives generated once at upload, not per request |
+| Flyer resizing / derivatives | API / Backend (Payload upload + sharp) | Storage (B2 bucket on staging/prod; local disk on dev machines) | Derivatives generated once at upload, not per request |
 | Upcoming-party list (FEST-01, FEST-04) | Frontend Server (RSC + Local API query) | CDN (cached HTML) | Filter by `endsAt > now` server side; no client fetching |
 | Party detail page | Frontend Server (ISR) | CDN | Static HTML, revalidated on publish |
 | OG / metadata | Frontend Server (`generateMetadata`) | — | Crawlers (WhatsApp, Instagram) never run JS |
@@ -98,6 +98,7 @@ The largest non-technical findings changed since project research: the ECA Digit
 | @payloadcms/richtext-lexical | 3.91.0 | Rich text for party details | template default |
 | @payloadcms/translations | 3.91.0 | `pt` admin language — `dist/languages/pt.js` exists, export map `./languages/*` | [VERIFIED: package tarball inspected] |
 | @payloadcms/plugin-seo | 3.91.0 | `meta.title/description/image` fields on parties | [CITED: CLAUDE.md stack] |
+| @payloadcms/storage-s3 | 3.91.0 | Media in Backblaze B2 on staging/prod | [CITED: CLAUDE.md stack: "Always; do not store media on the VPS disk"] |
 | react / react-dom | 19.3.1 | UI | Next 16 requirement |
 | typescript | 5.9.3 (pin `~5.9`) | Types | CLAUDE.md: do not use 7.x |
 | graphql | 16.14.2 (pin `^16.8.1`) | Payload peer dependency | Payload peer is `^16.8.1`; latest is 17.0.2 — installing latest breaks peer resolution [VERIFIED: npm registry] |
@@ -115,7 +116,7 @@ The largest non-technical findings changed since project research: the ECA Digit
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| Local upload dir on a Docker volume (Phase 1) | `@payloadcms/storage-s3` + B2/R2 now | S3 adds a provider contract (AUP + purchase) before the first flyer; flyers are public SFW and few. Switch in Phase 2 (MIDIA) when galleries arrive. Keep `staticDir` on a named volume and back it up |
+| `@payloadcms/storage-s3` + Backblaze B2 on staging/prod; local `staticDir` only on dev machines | Docker volume on the VPS | Rejected by CLAUDE.md ("do not store media on the VPS disk"); B2 AUP permits legal adult content; plugin enabled by `S3_BUCKET` so dev/tests need no bucket |
 | Payload drafts for publish/unpublish | custom `published` checkbox | Drafts give "Publicar"/"Despublicar" buttons and version history for free |
 | Docker Compose + Caddy | Coolify | Coolify is nicer but adds a control plane to learn; Compose file is reusable by Coolify later |
 
@@ -134,7 +135,7 @@ slopcheck 0.x was installed, but its `install` subcommand installs packages afte
 |---------|----------|-----|-------------|-----------|-------------|
 | next | npm | since 2011 | github.com/vercel/next.js | not run [ASSUMED] | Approved (official) |
 | payload | npm | since 2015 | github.com/payloadcms/payload | not run [ASSUMED] | Approved |
-| @payloadcms/next, db-postgres, richtext-lexical, translations, plugin-seo | npm | 2022-2024 | github.com/payloadcms/payload (monorepo) | not run [ASSUMED] | Approved; no postinstall scripts |
+| @payloadcms/next, db-postgres, richtext-lexical, translations, plugin-seo, storage-s3 | npm | 2022-2024 | github.com/payloadcms/payload (monorepo) | not run [ASSUMED] | Approved; no postinstall scripts |
 | tailwindcss, @tailwindcss/postcss | npm | 2017 / 2024 | github.com/tailwindlabs/tailwindcss | not run [ASSUMED] | Approved |
 | sharp | npm | since 2013 | github.com/lovell/sharp | not run [ASSUMED] | Approved (no postinstall; prebuilt binaries via optional deps) |
 | graphql | npm | since 2015 | github.com/graphql/graphql-js | not run [ASSUMED] | Approved, pin v16 |
@@ -215,7 +216,7 @@ docs/discovery/ (or .planning/discovery/): WORDPRESS.md, AGE-GATE-LEGAL.md, PROV
 ```typescript
 // src/collections/Media.ts (sketch)
 upload: {
-  staticDir: 'media',                       // mounted on a Docker volume
+  staticDir: 'media',                       // dev machines/tests only; staging/prod use @payloadcms/storage-s3
   mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
   focalPoint: true, crop: true,
   imageSizes: [
@@ -294,7 +295,7 @@ Rendering: the overlay markup is rendered in the layout for everyone; a blocking
 ## Common Pitfalls
 
 ### Pitfall 1: Click-through age gate treated as final compliance
-**What goes wrong:** Decreto 12.880/2026 regulates the ECA Digital (Lei 15.211/2025) and ANPD guidance says self-declaration alone is insufficient for accessing content prohibited to minors [CITED: chambers.com article, 2026-06-23; jornaldebrasilia.com.br, 2026-01-06]. Whether a public area without nudity counts as such content is a legal question.
+**What goes wrong:** Decreto 12.880/2026 regulates the ECA Digital (Lei 15.211/2025) and ANPD guidance says self-declaration alone is insufficient for accessing content prohibited to minors [CITED: chambers.com article, 2026-06-23; jornaldebrasilia.com.br, 2026-01-07]. Whether a public area without nudity counts as such content is a legal question.
 **How to avoid:** Ship the self-declaration provider on staging only; record the legal brief and the lawyer's answer in `AGE-GATE-LEGAL.md`; keep the provider swappable via `AGE_GATE_PROVIDER`. Production launch (Phase 7) is gated on the opinion.
 **Warning signs:** no written opinion before launch; gate logic spread across pages instead of one module.
 
@@ -380,13 +381,13 @@ const revalidateParty: CollectionAfterChangeHook = ({ doc, previousDoc }) => {
 | A7 | Hetzner policy (forum statement by staff, not the T&C text itself) | Pitfall 7 | Client may pick a provider that suspends later |
 | A8 | Public area without nudity may or may not be "conteúdo impróprio" under the ECA Digital | Pitfall 1 | Legal exposure — needs lawyer |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Staging VPS provider and purchase** — What we know: Hetzner is reported to disallow porn; Phase 4 hosts explicit member media. Unclear: which provider the client accepts and who pays. Recommendation: plan a `checkpoint:human-action` for the client to buy/provide a VPS (2 vCPU, 4 GB RAM, 40 GB disk, Ubuntu 24.04) at a provider whose AUP allows legal adult content, plus a staging subdomain (e.g., `novo.swingbrasilia.com.br`) in DNS they control.
-2. **Legal opinion (ECA Digital / LGPD)** — needs a lawyer; plan writes the brief and records status; not blocking staging.
-3. **WordPress facts** — need the client to share access via a secure channel (D-08) or run the checks themselves; plan a human-action checkpoint and a template the client can fill.
-4. **Vector logo** — no SVG exists; Phase 1 uses optimized raster derivatives generated from `brand/logo-original.webp`; a true vector should come from the client's designer (or a traced version later). Ask the client if the original vector file (AI/CDR/PDF) exists.
-5. **Fonts** — logo typeface unknown; UI-SPEC picks a close Google Font.
+1. **Staging VPS provider and purchase** — RESOLVED (for planning): plan 01-10 has a `checkpoint:human-action` where the client provisions a VPS (2 vCPU, 4 GB RAM, 40 GB disk, Ubuntu 24.04) at a provider whose AUP allows legal adult content, chosen from the shortlist in `docs/discovery/PROVIDERS-AUP.md` (plan 01-02); until a subdomain exists, staging uses `<ip>.sslip.io`. Who pays and which provider remain client decisions recorded in that doc.
+2. **Legal opinion (ECA Digital / LGPD)** — RESOLVED (for planning): plan 01-02 writes the brief in `docs/discovery/AGE-GATE-LEGAL.md` and records status; the self-declaration provider ships on staging only; production launch (Phase 7) is gated on the written opinion.
+3. **WordPress facts** — RESOLVED (for planning): plan 01-02 writes `docs/discovery/WORDPRESS.md` with a checklist and a client checkpoint using a secure channel (D-08); whatever the client provides (or the absence of access) is recorded — success criterion 5 accepts "acesso (ou ausência de acesso)".
+4. **Vector logo** — RESOLVED: Phase 1 delivers optimized raster derivatives built by `scripts/brand/build-logo-assets.mjs` (plan 01-04); the original vector file is requested from the client in the "Pendências do cliente" list of `docs/discovery/README.md` (plan 01-02, D-03).
+5. **Fonts** — RESOLVED: UI-SPEC fixes Josefin Sans (display) + Inter (body) via `next/font/google`.
 
 ## Environment Availability
 
