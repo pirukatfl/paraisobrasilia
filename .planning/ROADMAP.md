@@ -30,7 +30,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
   4. Equipe cria, edita e despublica uma festa com flyer no painel, sem ajuda técnica, e a festa passada some da home sozinha após a data
   5. Estão registrados: acesso (ou ausência de acesso) ao WordPress e plugin de assinantes, parecer jurídico sobre age gate, e AUP da hospedagem/e-mail/storage
 
-**Plans:** 4/10 plans executed
+**Plans:** 5/10 plans executed
 Plans:
 **Wave 1**
 
@@ -48,7 +48,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 01-06-PLAN.md — Swappable 18+ age gate (self-declaration overlay) (wave 4)
+- [x] 01-06-PLAN.md — Swappable 18+ age gate (self-declaration overlay) (wave 4)
 - [ ] 01-07-PLAN.md — Party page with full details and pt-BR dates (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fundação e vitrine de festas | 4/10 | In Progress|  |
+| 1. Fundação e vitrine de festas | 5/10 | In Progress|  |
 | 2. Site aberto completo e mídia | 0/? | Not started | - |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |

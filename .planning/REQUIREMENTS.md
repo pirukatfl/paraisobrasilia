@@ -30,7 +30,7 @@
 - [ ] **INST-01**: Visitante acessa "Quem Somos" com submenus Normas, Regras e Dicas
 - [ ] **INST-02**: Visitante vê endereço, mapa e botões "Como chegar" (Google Maps/Waze)
 - [ ] **INST-03**: Visitante fala com a casa por botão de WhatsApp e vê redes sociais oficiais
-- [ ] **INST-04**: Visitante confirma ter 18+ ao entrar, sem cadastro (módulo trocável caso a lei exija verificação mais forte)
+- [x] **INST-04**: Visitante confirma ter 18+ ao entrar, sem cadastro (módulo trocável caso a lei exija verificação mais forte)
 - [ ] **INST-05**: Site tem título, descrição e prévia de compartilhamento corretos em todas as páginas abertas
 - [ ] **INST-06**: Site tem páginas de Termos de Uso e Política de Privacidade (LGPD)
 
@@ -106,7 +106,7 @@
 | FEST-02 | Fase 1 | Pending |
 | FEST-03 | Fase 1 | Pending |
 | FEST-04 | Fase 1 | Pending |
-| INST-04 | Fase 1 | Pending |
+| INST-04 | Fase 1 | Complete |
 | INST-05 | Fase 1 | Pending |
 | PAINEL-01 | Fase 1 | Pending |
 | INST-01 | Fase 2 | Pending |
