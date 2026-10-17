@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-10-17T20:00:10.515Z"
-last_activity: 2026-10-17 -- Phase 1 planning complete
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-10-17T20:13:35.789Z"
+last_activity: 2026-10-17 -- Completed 01-01-PLAN.md (scaffold)
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 10
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 10
 ---
 
 # Project State
@@ -26,31 +26,38 @@ See: .planning/PROJECT.md (updated 2026-10-17)
 ## Current Position
 
 Phase: 1 of 7 (Fundação e vitrine de festas)
-Plan: 0 of ? in current phase
-Status: Ready to execute
-Last activity: 2026-10-17 -- Phase 1 planning complete
+Plan: 1 of 10 in current phase
+Status: In progress
+Last activity: 2026-10-17 -- Completed 01-01-PLAN.md (scaffold)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 6 min
+- Total execution time: 0.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 1/10 | 6 min | 6 min |
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P01 | 6 min | 2 tasks | 32 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
+
+- [Phase 01]: Template test tooling removed; plan 01-03 installs approved vitest 5.0.5 / @playwright/test 1.64.1 — Template versions differ from the approved list; 01-03 owns the harness
+- [Phase 01]: DB env var is DATABASE_URI; @payloadcms/* pinned 3.91.0 incl. @payloadcms/ui from template — Matches .env.example contract; mismatched Payload versions break the admin
 
 ### Pending Todos
 
@@ -62,6 +69,7 @@ None yet.
 - Parecer jurídico sobre ECA Digital/LGPD necessário antes de fechar o age gate (módulo trocável)
 - AUP de VPS, registrador, e-mail e storage precisam ser lidas antes de contratar
 - Pendentes do cliente: endereço público, logo/identidade visual, planos e valores
+- docker-compose.yml not exercised (no Docker daemon during 01-01); confirm initdb creates paraiso_test on first Docker run
 
 ## Deferred Items
 
@@ -71,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-17T19:39:36.223Z
-Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/phases/01-funda-o-e-vitrine-de-festas/01-UI-SPEC.md
+Last session: 2026-10-17T20:13:27.103Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: None

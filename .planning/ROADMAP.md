@@ -30,11 +30,11 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
   4. Equipe cria, edita e despublica uma festa com flyer no painel, sem ajuda técnica, e a festa passada some da home sozinha após a data
   5. Estão registrados: acesso (ou ausência de acesso) ao WordPress e plugin de assinantes, parecer jurídico sobre age gate, e AUP da hospedagem/e-mail/storage
 
-**Plans:** 10 plans
+**Plans:** 1/10 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Scaffold Next.js 16 + Payload 3 + Postgres, Portuguese admin, local run (wave 1)
+- [x] 01-01-PLAN.md — Scaffold Next.js 16 + Payload 3 + Postgres, Portuguese admin, local run (wave 1)
 - [ ] 01-02-PLAN.md — Discovery records: WordPress, legal brief on age gate, provider AUPs (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fundação e vitrine de festas | 0/? | Not started | - |
+| 1. Fundação e vitrine de festas | 1/10 | In Progress|  |
 | 2. Site aberto completo e mídia | 0/? | Not started | - |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
