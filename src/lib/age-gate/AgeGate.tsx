@@ -14,7 +14,7 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
 const GATE_CSS = `html[data-age-ok] [data-age-gate]{display:none}`
 
 /**
- * 18+ overlay over the fully rendered page (INST-04). No redirect, no user-agent checks:
+ * 18+ overlay over the fully rendered page (INST-04). No redirect and no browser sniffing:
  * crawlers and link previews receive the same complete HTML as everyone else.
  */
 export function AgeGate() {
