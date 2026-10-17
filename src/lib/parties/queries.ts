@@ -50,6 +50,15 @@ export async function getUpcomingParties(now: Date = new Date()): Promise<PartyC
   return docs.map(toPartyCard)
 }
 
+/** Absolute URL (crawlers need it) of the og derivative; null when the flyer has none. */
+function toAbsoluteOgUrl(flyer: Party['flyer']): string | null {
+  const media = (typeof flyer === 'object' && flyer ? flyer : null) as Media | null
+  const url = media?.sizes?.og?.url
+  if (!url) return null
+  const base = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+  return url.startsWith('http') ? url : `${base}${url}`
+}
+
 export function toPartyDetail(doc: Party, now: Date = new Date()): PartyDetailDTO {
   const card = toPartyCard(doc)
   return {
@@ -58,12 +67,13 @@ export function toPartyDetail(doc: Party, now: Date = new Date()): PartyDetailDT
     details: (doc.details as RichTextState | null | undefined) ?? null,
     prices: (doc.prices ?? [])
       .filter((row) => row.label && row.value)
-      .map((row) => ({ label: row.label, value: row.value })),
+      .map((row) => ({ label: row.label, value: row.value as string })),
     dressCode: doc.dressCode?.trim() || null,
     attractions: (doc.attractions ?? []).map((a) => ({ kind: a.kind, name: a.name })),
     isPast: !isUpcoming(card, now),
     updatedAt: doc.updatedAt,
-    flyerOgUrl: null,
+    flyerOgUrl: toAbsoluteOgUrl(doc.flyer),
+    meta: doc.meta ? { title: doc.meta.title ?? null, description: doc.meta.description ?? null } : null,
   }
 }
 

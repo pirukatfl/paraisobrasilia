@@ -39,6 +39,8 @@ export interface PartyDetailDTO extends PartyCardDTO {
   attractions: Attraction[]
   isPast: boolean
   updatedAt: string
-  /** Absolute URL of the 1200x630 share image (filled in plan 01-08) */
+  /** Absolute URL of the 1200x630 JPEG share image */
   flyerOgUrl: string | null
+  /** Staff-editable SEO overrides (@payloadcms/plugin-seo) */
+  meta?: { title?: string | null; description?: string | null } | null
 }

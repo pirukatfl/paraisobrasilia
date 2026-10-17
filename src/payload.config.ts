@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { en } from '@payloadcms/translations/languages/en'
 import { pt } from '@payloadcms/translations/languages/pt'
@@ -49,5 +50,13 @@ export default buildConfig({
       fileSize: 15000000, // 15 MB
     },
   },
-  plugins: [],
+  plugins: [
+    seoPlugin({
+      collections: ['parties'],
+      uploadsCollection: 'media',
+      generateTitle: ({ doc }) => (doc as { title?: string })?.title ?? '',
+      generateDescription: ({ doc }) => (doc as { summary?: string })?.summary ?? '',
+      tabbedUI: false,
+    }),
+  ],
 })

@@ -39,6 +39,16 @@ export const Media: CollectionConfig = {
       { name: 'card', width: 640, formatOptions: webp },
       { name: 'square', width: 1080, height: 1080, formatOptions: webp },
       { name: 'portrait', width: 1080, height: 1350, formatOptions: webp },
+      // Share preview (FEST-03): whole flyer letterboxed on the brand black, JPEG for WhatsApp.
+      // The hex is a sharp data value, not a UI style.
+      {
+        name: 'og',
+        width: 1200,
+        height: 630,
+        fit: 'contain',
+        background: '#0B0908',
+        formatOptions: { format: 'jpeg', options: { quality: 82 } },
+      },
     ],
   },
 }

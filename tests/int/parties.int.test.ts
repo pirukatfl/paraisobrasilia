@@ -1,4 +1,6 @@
+import path from 'path'
 import type { Payload } from 'payload'
+import sharp from 'sharp'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { getUpcomingParties } from '../../src/lib/parties/queries'
@@ -37,5 +39,14 @@ describe('getUpcomingParties (FEST-01, FEST-04)', () => {
     expect(a.flyer.alt.length).toBeGreaterThan(0)
     expect(b.flyer.width).toBe(1080)
     expect(b.flyer.height).toBe(1080)
+  })
+  it('stores a 1200x630 JPEG share image for each flyer (og size)', async () => {
+    const { docs } = await payload.find({ collection: 'media', limit: 1, sort: '-createdAt' })
+    const og = docs[0].sizes?.og
+    expect(og?.width).toBe(1200)
+    expect(og?.height).toBe(630)
+    expect(og?.mimeType).toBe('image/jpeg')
+    const meta = await sharp(path.resolve('media', og!.filename!)).metadata()
+    expect([meta.format, meta.width, meta.height]).toEqual(['jpeg', 1200, 630])
   })
 })
