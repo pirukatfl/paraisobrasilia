@@ -6,17 +6,17 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 
 ## Phases
 
-- [ ] **Fase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico
-- [ ] **Fase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas
-- [ ] **Fase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe
-- [ ] **Fase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
-- [ ] **Fase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
-- [ ] **Fase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
-- [ ] **Fase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
+- [ ] **Phase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico
+- [ ] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas
+- [ ] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe
+- [ ] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
+- [ ] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
+- [ ] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
+- [ ] **Phase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
 
 ## Phase Details
 
-### Fase 1: Fundação e vitrine de festas
+### Phase 1: Fundação e vitrine de festas
 **Goal**: Visitante chega ao site novo (em staging), confirma 18+ e vê as próximas festas; a equipe publica festas sozinha, e as dúvidas de descoberta (WordPress, jurídico, hospedagem) ficam respondidas
 **Mode:** mvp
 **Depends on**: Nothing (first phase)
@@ -30,7 +30,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 **Plans**: TBD
 **UI hint**: yes
 
-### Fase 2: Site aberto completo e mídia
+### Phase 2: Site aberto completo e mídia
 **Goal**: Visitante entende a casa por inteiro: vê fotos e vídeos do espaço e das modelos, sabe chegar e falar com a casa, e lê Quem Somos e páginas legais
 **Mode:** mvp
 **Depends on**: Fase 1
@@ -44,7 +44,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 **Plans**: TBD
 **UI hint**: yes
 
-### Fase 3: Assinantes e controle de acesso
+### Phase 3: Assinantes e controle de acesso
 **Goal**: Assinante entra com e-mail e senha e acessa a área restrita até o vencimento; a equipe libera, renova e encerra assinaturas pelo painel
 **Mode:** mvp
 **Depends on**: Fase 2
@@ -58,7 +58,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 **Plans**: TBD
 **UI hint**: yes
 
-### Fase 4: ClassiSex e prévias de perfis
+### Phase 4: ClassiSex e prévias de perfis
 **Goal**: Assinante navega e abre perfis completos com fotos, vídeos e contato, cria o próprio perfil e a equipe modera; visitante vê só prévias sem contato
 **Mode:** mvp
 **Depends on**: Fase 3
@@ -72,7 +72,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 **Plans**: TBD
 **UI hint**: yes
 
-### Fase 5: Recados, mensagens e contos
+### Phase 5: Recados, mensagens e contos
 **Goal**: Assinantes trocam recados e mensagens com contato, leem contos completos, e visitantes veem só prévias com chamada para assinar
 **Mode:** mvp
 **Depends on**: Fase 4
@@ -86,7 +86,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 **Plans**: TBD
 **UI hint**: yes
 
-### Fase 6: Migração do WordPress
+### Phase 6: Migração do WordPress
 **Goal**: Assinantes e perfis atuais passam para o site novo sem perder tempo de assinatura, e links antigos continuam funcionando
 **Mode:** mvp
 **Depends on**: Fase 5 (esquema de dados estável) e acesso ao WordPress obtido na Fase 1
@@ -97,7 +97,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
   3. Links antigos importantes redirecionam para as páginas novas, sem 404 para o Google
 **Plans**: TBD
 
-### Fase 7: Lançamento e desempenho
+### Phase 7: Lançamento e desempenho
 **Goal**: Site novo vai ao ar em swingbrasilia.com.br e as páginas abertas abrem em menos de 2,5 s no celular
 **Mode:** mvp
 **Depends on**: Fase 6
