@@ -1,0 +1,120 @@
+# Roadmap: Paraíso Brasília — Site novo
+
+## Visão geral
+
+Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em staging) a vitrine de festas sobre uma fundação funcional, que é o Core Value. As fases seguintes completam o site aberto, liberam a área de assinantes, migram os dados do WordPress e fazem o lançamento. Descoberta do acesso ao WordPress, parecer jurídico (ECA Digital/LGPD) e leitura das políticas de uso (AUP) dos provedores começam na Fase 1; a migração só roda depois que o esquema de dados está estável (Fases 3 a 5).
+
+## Phases
+
+- [ ] **Fase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico
+- [ ] **Fase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas
+- [ ] **Fase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe
+- [ ] **Fase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
+- [ ] **Fase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
+- [ ] **Fase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
+- [ ] **Fase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
+
+## Phase Details
+
+### Fase 1: Fundação e vitrine de festas
+**Goal**: Visitante chega ao site novo (em staging), confirma 18+ e vê as próximas festas; a equipe publica festas sozinha, e as dúvidas de descoberta (WordPress, jurídico, hospedagem) ficam respondidas
+**Mode:** mvp
+**Depends on**: Nothing (first phase)
+**Requirements**: FEST-01, FEST-02, FEST-03, FEST-04, PAINEL-01, INST-04, INST-05
+**Success Criteria** (what must be TRUE):
+  1. Visitante entra, confirma ter 18+ sem cadastro e vê na home os flyers das próximas festas em 1:1 ou 4:5, adaptados ao celular
+  2. Visitante clica em um flyer e abre a página da festa com texto, data, horário e detalhes
+  3. Ao compartilhar a página da festa no WhatsApp/Instagram, a prévia mostra o flyer e o título corretos
+  4. Equipe cria, edita e despublica uma festa com flyer no painel, sem ajuda técnica, e a festa passada some da home sozinha após a data
+  5. Estão registrados: acesso (ou ausência de acesso) ao WordPress e plugin de assinantes, parecer jurídico sobre age gate, e AUP da hospedagem/e-mail/storage
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 2: Site aberto completo e mídia
+**Goal**: Visitante entende a casa por inteiro: vê fotos e vídeos do espaço e das modelos, sabe chegar e falar com a casa, e lê Quem Somos e páginas legais
+**Mode:** mvp
+**Depends on**: Fase 1
+**Requirements**: MIDIA-01, MIDIA-02, MIDIA-03, INST-01, INST-02, INST-03, INST-06, PAINEL-02, PAINEL-04
+**Success Criteria** (what must be TRUE):
+  1. Visitante vê galerias de fotos e vídeos do espaço e de fotos profissionais das modelos, que carregam rápido no celular
+  2. Visitante acessa Quem Somos com submenus Normas, Regras e Dicas
+  3. Visitante vê endereço, mapa, botões "Como chegar" (Google Maps/Waze), botão de WhatsApp e redes sociais oficiais
+  4. Visitante acessa Termos de Uso e Política de Privacidade (LGPD)
+  5. Equipe envia fotos e vídeos registrando a autorização de uso de imagem e edita Quem Somos, Normas, Regras, Dicas e contatos sem ajuda técnica
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 3: Assinantes e controle de acesso
+**Goal**: Assinante entra com e-mail e senha e acessa a área restrita até o vencimento; a equipe libera, renova e encerra assinaturas pelo painel
+**Mode:** mvp
+**Depends on**: Fase 2
+**Requirements**: ASS-01, ASS-02, ASS-03, ASS-04, ASS-05, PAINEL-05, PAINEL-06, PAINEL-08
+**Success Criteria** (what must be TRUE):
+  1. Assinante entra com e-mail e senha, continua logado entre visitas e redefine a senha por link enviado ao e-mail
+  2. Assinante vê até quando sua assinatura vale, e ao vencer perde o acesso ao conteúdo restrito automaticamente na data
+  3. Visitante vê na página "Assine Já" os planos e como pagar (pagamento manual)
+  4. Equipe libera, renova e encerra uma assinatura registrando o pagamento, e vê quais vencem nos próximos 7 dias
+  5. Toda ação da equipe sobre assinantes aparece em um registro com quem, quando e o quê
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 4: ClassiSex e prévias de perfis
+**Goal**: Assinante navega e abre perfis completos com fotos, vídeos e contato, cria o próprio perfil e a equipe modera; visitante vê só prévias sem contato
+**Mode:** mvp
+**Depends on**: Fase 3
+**Requirements**: CLAS-01, CLAS-02, CLAS-03, CLAS-04, CLAS-05, CLAS-06, PREV-01, PAINEL-07
+**Success Criteria** (what must be TRUE):
+  1. Assinante vê a lista de perfis com fotos e abre o perfil completo com fotos, vídeos e contato
+  2. Assinante cria e edita o próprio perfil, que só aparece após aprovação da equipe na fila de moderação
+  3. Assinante denuncia um perfil e a equipe vê a denúncia
+  4. Quem não é assinante, ao abrir o link direto de uma foto ou vídeo de perfil, não consegue acessá-lo
+  5. Visitante vê chamadas de perfis na área aberta sem nenhum contato ou dado identificável
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 5: Recados, mensagens e contos
+**Goal**: Assinantes trocam recados e mensagens com contato, leem contos completos, e visitantes veem só prévias com chamada para assinar
+**Mode:** mvp
+**Depends on**: Fase 4
+**Requirements**: REC-01, REC-02, REC-03, REC-04, PREV-02, PREV-03, PREV-04, PAINEL-03
+**Success Criteria** (what must be TRUE):
+  1. Assinante publica um recado, visível a outros assinantes só depois de aprovado pela equipe
+  2. Assinante envia mensagem a outro perfil e vê as respostas; também bloqueia ou denuncia quem enviou
+  3. Visitante vê chamadas de recados sem contato e lê o início de cada conto, com o restante só para assinantes
+  4. Toda prévia mostra uma chamada clara "Assine Já"
+  5. Equipe publica contos e define o trecho aberto sem ajuda técnica
+**Plans**: TBD
+**UI hint**: yes
+
+### Fase 6: Migração do WordPress
+**Goal**: Assinantes e perfis atuais passam para o site novo sem perder tempo de assinatura, e links antigos continuam funcionando
+**Mode:** mvp
+**Depends on**: Fase 5 (esquema de dados estável) e acesso ao WordPress obtido na Fase 1
+**Requirements**: MIG-01, MIG-02, MIG-03
+**Success Criteria** (what must be TRUE):
+  1. Assinante atual entra no site novo (com a senha antiga ou por link de nova senha) com o tempo de assinatura já pago preservado
+  2. Perfis atuais do ClassiSex aparecem no site novo com suas fotos, após ensaio em staging
+  3. Links antigos importantes redirecionam para as páginas novas, sem 404 para o Google
+**Plans**: TBD
+
+### Fase 7: Lançamento e desempenho
+**Goal**: Site novo vai ao ar em swingbrasilia.com.br e as páginas abertas abrem em menos de 2,5 s no celular
+**Mode:** mvp
+**Depends on**: Fase 6
+**Requirements**: MIG-04
+**Success Criteria** (what must be TRUE):
+  1. As páginas abertas carregam em menos de 2,5 s no celular em 4G (medido por Lighthouse/teste real)
+  2. O domínio swingbrasilia.com.br aponta para o site novo, com backups funcionando e teste de que anônimo não acessa mídia restrita
+**Plans**: TBD
+
+## Progress
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Fundação e vitrine de festas | 0/? | Not started | - |
+| 2. Site aberto completo e mídia | 0/? | Not started | - |
+| 3. Assinantes e controle de acesso | 0/? | Not started | - |
+| 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
+| 5. Recados, mensagens e contos | 0/? | Not started | - |
+| 6. Migração do WordPress | 0/? | Not started | - |
+| 7. Lançamento e desempenho | 0/? | Not started | - |

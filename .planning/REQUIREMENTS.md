@@ -102,12 +102,55 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (preenchido pelo roadmap) | | |
+| FEST-01 | Fase 1 | Pending |
+| FEST-02 | Fase 1 | Pending |
+| FEST-03 | Fase 1 | Pending |
+| FEST-04 | Fase 1 | Pending |
+| INST-04 | Fase 1 | Pending |
+| INST-05 | Fase 1 | Pending |
+| PAINEL-01 | Fase 1 | Pending |
+| INST-01 | Fase 2 | Pending |
+| INST-02 | Fase 2 | Pending |
+| INST-03 | Fase 2 | Pending |
+| INST-06 | Fase 2 | Pending |
+| MIDIA-01 | Fase 2 | Pending |
+| MIDIA-02 | Fase 2 | Pending |
+| MIDIA-03 | Fase 2 | Pending |
+| PAINEL-02 | Fase 2 | Pending |
+| PAINEL-04 | Fase 2 | Pending |
+| ASS-01 | Fase 3 | Pending |
+| ASS-02 | Fase 3 | Pending |
+| ASS-03 | Fase 3 | Pending |
+| ASS-04 | Fase 3 | Pending |
+| ASS-05 | Fase 3 | Pending |
+| PAINEL-05 | Fase 3 | Pending |
+| PAINEL-06 | Fase 3 | Pending |
+| PAINEL-08 | Fase 3 | Pending |
+| CLAS-01 | Fase 4 | Pending |
+| CLAS-02 | Fase 4 | Pending |
+| CLAS-03 | Fase 4 | Pending |
+| CLAS-04 | Fase 4 | Pending |
+| CLAS-05 | Fase 4 | Pending |
+| CLAS-06 | Fase 4 | Pending |
+| PAINEL-07 | Fase 4 | Pending |
+| PREV-01 | Fase 4 | Pending |
+| PAINEL-03 | Fase 5 | Pending |
+| PREV-02 | Fase 5 | Pending |
+| PREV-03 | Fase 5 | Pending |
+| PREV-04 | Fase 5 | Pending |
+| REC-01 | Fase 5 | Pending |
+| REC-02 | Fase 5 | Pending |
+| REC-03 | Fase 5 | Pending |
+| REC-04 | Fase 5 | Pending |
+| MIG-01 | Fase 6 | Pending |
+| MIG-02 | Fase 6 | Pending |
+| MIG-03 | Fase 6 | Pending |
+| MIG-04 | Fase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 44 total
-- Mapped to phases: 0
-- Unmapped: 44 ⚠️
+- Mapped to phases: 44
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-17*
