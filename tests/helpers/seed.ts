@@ -75,6 +75,37 @@ export interface SeedPartyInput {
   startsAt?: string
   endsAt?: string
   flyerFormat?: 'square' | 'portrait'
+  summary?: string
+  prices?: { label: string; value: string }[]
+  dressCode?: string
+  attractions?: { kind: 'dj' | 'show' | 'modelo' | 'outro'; name: string }[]
+  /** Plain text turned into a one-paragraph Lexical document */
+  details?: string
+}
+
+/** Minimal Lexical editor state with one paragraph. */
+export function lexicalParagraph(text: string) {
+  return {
+    root: {
+      type: 'root',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      children: [
+        {
+          type: 'paragraph',
+          format: '',
+          indent: 0,
+          version: 1,
+          direction: 'ltr',
+          textFormat: 0,
+          textStyle: '',
+          children: [{ type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 }],
+        },
+      ],
+    },
+  }
 }
 
 const FIXTURES = path.join(rootDir, 'tests/fixtures')
@@ -99,6 +130,11 @@ export async function seedParty(payload: Payload, partial: SeedPartyInput) {
       ...(partial.endsAt ? { endsAt: partial.endsAt } : {}),
       flyer: flyer.id,
       flyerFormat,
+      ...(partial.summary !== undefined ? { summary: partial.summary } : {}),
+      ...(partial.prices !== undefined ? { prices: partial.prices } : {}),
+      ...(partial.dressCode !== undefined ? { dressCode: partial.dressCode } : {}),
+      ...(partial.attractions !== undefined ? { attractions: partial.attractions } : {}),
+      ...(partial.details !== undefined ? { details: lexicalParagraph(partial.details) } : {}),
     } as never,
     overrideAccess: true,
   })
