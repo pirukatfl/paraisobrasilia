@@ -8,7 +8,7 @@
 ### Área aberta — Festas (FEST)
 
 - [ ] **FEST-01**: Visitante vê na home as próximas festas como flyers no formato das redes sociais (1:1 e 4:5), que se adaptam ao celular
-- [ ] **FEST-02**: Visitante clica no flyer e abre a página da festa com texto, data, horário e detalhes
+- [x] **FEST-02**: Visitante clica no flyer e abre a página da festa com texto, data, horário e detalhes
 - [ ] **FEST-03**: Visitante compartilha a página da festa no WhatsApp/Instagram e a prévia mostra flyer e título corretos
 - [ ] **FEST-04**: Festas passadas saem da home automaticamente após a data
 
@@ -103,7 +103,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FEST-01 | Fase 1 | Pending |
-| FEST-02 | Fase 1 | Pending |
+| FEST-02 | Fase 1 | Complete |
 | FEST-03 | Fase 1 | Pending |
 | FEST-04 | Fase 1 | Pending |
 | INST-04 | Fase 1 | Complete |
