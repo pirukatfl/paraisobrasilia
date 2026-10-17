@@ -37,13 +37,13 @@ Site da casa de festas Paraíso Brasília (swingbrasilia.com.br), refeito para s
 | VPS (Hetzner CX/CAX, or a BR VPS such as Contabo/Locaweb/HostGator VPS if latency matters) | Runs Next+Payload container and Postgres | ~US$5-10/mo, no per-request serverless billing, no platform content review. Confirm the chosen provider's AUP explicitly allows legal adult content before paying (see Hosting policy section) |
 | Coolify (or plain Docker Compose + Caddy) | Deploy, TLS, backups, git-push deploys | Gives a Heroku-like flow on the VPS; Caddy gives automatic HTTPS |
 | Cloudflare (DNS + proxy/CDN only, free plan) | DNS, caching of static assets and `/_next/static`, DDoS protection | Cloudflare terms we read contain no general adult-content ban for CDN; it is the standard fronting layer. Do NOT put gated media through public caching |
-| S3-compatible object storage: Backblaze B2 (or Cloudflare R2) | Photos/videos originals and derivatives | Payload `@payloadcms/storage-s3`. Backblaze AUP (read 2026-10) prohibits only CSAM and non-consensual intimate imagery, not legal adult content. R2 terms likewise show no explicit adult ban but reserve right to remove "harmful" content (MEDIUM/LOW). Cheap egress via Cloudflare in front of B2 (Bandwidth Alliance) |
-| Postgres backups: nightly `pg_dump` to B2 (via Coolify scheduled backup or `restic`) | Disaster recovery, LGPD obligations | Sensitive data; a lost DB means lost subscribers |
+| Local disk on the VPS (client decision 2026-10-17, instead of Backblaze B2) — Payload local upload storage in a named Docker volume | Photos/videos originals and derivatives | Members-only media must be served through an authenticated app route, never from a public static path. Backups must include the media volume and be stored off the server. Former option kept for reference: Payload `@payloadcms/storage-s3`. Backblaze AUP (read 2026-10) prohibits only CSAM and non-consensual intimate imagery, not legal adult content. R2 terms likewise show no explicit adult ban but reserve right to remove "harmful" content (MEDIUM/LOW). Cheap egress via Cloudflare in front of B2 (Bandwidth Alliance) |
+| Backups: nightly `pg_dump` + media volume to off-server storage (Hostinger backups/snapshots now; automated off-site backup in Phase 7) | Disaster recovery, LGPD obligations | Sensitive data; a lost DB means lost subscribers |
 | Transactional email: Resend or Amazon SES (sa-east-1) | Password reset, "access expiring" notices | Check their AUP: transactional mail to consenting members is usually fine, but declare the nature of the site when onboarding |
 ### Supporting Libraries
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| `@payloadcms/storage-s3` | match payload 3.91.x | Upload to B2/R2/S3 | Always; do not store media on the VPS disk |
+| `@payloadcms/storage-s3` | match payload 3.91.x | Upload to B2/R2/S3 | Not used: client chose local disk storage (2026-10-17). Only revisit if disk or bandwidth becomes a problem |
 | sharp | 0.35.x | Image resize/WebP/AVIF, flyer crops | Payload `imageSizes` (e.g. 1080x1080, 1080x1350, 1080x1920 story) and blur placeholders |
 | zod | 4.x | Validation for forms/route handlers (contact, story submission) | Any custom input |
 | `@node-rs/argon2` | 2.2.x | Password hash for imported users if custom logic needed | Payload hashes new passwords itself (PBKDF2); use argon2 only in the WordPress-import script if verifying legacy hashes (see Migration) |
@@ -103,7 +103,7 @@ Site da casa de festas Paraíso Brasília (swingbrasilia.com.br), refeito para s
 | Third-party comment/social embeds | Slow, tracking, off-brand | Plain links to Instagram |
 ## Hosting Policy Checklist (adult content)
 ## Stack Patterns by Variant
-- Skip a separate video service; MP4 on B2 behind Cloudflare is enough.
+- Skip a separate video service; MP4 served from the VPS (cache public SFW video at Cloudflare) is enough.
 - Add a Brazilian Pix provider (Asaas, Efi, Mercado Pago) after confirming it accepts the business category; webhook updates `expiresAt`. Data model already supports it.
 - Add a thin custom "Publish party" form view (Payload custom admin views) with only flyer + title + date + text.
 ## Version Compatibility

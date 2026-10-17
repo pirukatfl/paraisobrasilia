@@ -74,6 +74,8 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 | Painel para a equipe da casa publicar | Autonomia no dia a dia | — Pending |
 | Área aberta mostra só prévias, sem contato | Contato é o valor da assinatura | — Pending |
 | Stack técnica | A definir na pesquisa | — Pending |
+| Hospedagem: Hostinger VPS (mesma conta do site atual) | Aceita conteúdo adulto por escrito | — Pending |
+| Fotos e vídeos no disco da própria VPS, sem Backblaze B2 | Decisão do cliente (2026-10-17): menos contas e custos; backup precisa incluir a mídia | — Pending |
 
 ## Evolution
 
