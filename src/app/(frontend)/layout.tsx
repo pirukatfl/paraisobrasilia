@@ -4,6 +4,8 @@ import React from 'react'
 
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { AgeGate } from '@/lib/age-gate/AgeGate'
+import { AGE_HEAD_SCRIPT } from '@/lib/age-gate/head-script'
 
 import './globals.css'
 
@@ -48,8 +50,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${josefin.variable} ${inter.variable}`}>
+    // suppressHydrationWarning: the head script may add data-age-ok before hydration
+    <html lang="pt-BR" className={`${josefin.variable} ${inter.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Static constant, no user data (T-01-16) */}
+        <script dangerouslySetInnerHTML={{ __html: AGE_HEAD_SCRIPT }} />
+      </head>
       <body className="flex min-h-dvh flex-col">
+        <AgeGate />
         <a
           href="#conteudo"
           className="type-label sr-only z-50 bg-surface px-4 py-2 text-text focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center"
