@@ -7,6 +7,8 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { Media } from './collections/Media'
+import { Parties } from './collections/Parties'
 import { Users } from './collections/Users'
 
 const filename = fileURLToPath(import.meta.url)
@@ -23,8 +25,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  // Media and Parties are registered in plan 01-05.
-  collections: [Users],
+  collections: [Users, Media, Parties],
   editor: lexicalEditor(),
   i18n: {
     supportedLanguages: { pt, en },
@@ -38,6 +39,9 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    migrationDir: path.resolve(dirname, 'migrations'),
+    // Schema push only on developer machines; test, staging and production run migrations.
+    push: process.env.SITE_ENV === 'development',
   }),
   sharp,
   upload: {

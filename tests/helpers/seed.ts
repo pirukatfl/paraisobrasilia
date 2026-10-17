@@ -34,7 +34,11 @@ export async function getTestPayload(): Promise<Payload> {
         import('payload'),
         import('../../src/payload.config'),
       ])
-      return getPayload({ config })
+      const payload = await getPayload({ config })
+      // Test DB runs the committed migrations (no dev-mode schema push outside development).
+      const { migrations } = await import('../../src/migrations')
+      await payload.db.migrate({ migrations: migrations as never })
+      return payload
     })()
   }
   return payloadPromise
@@ -73,10 +77,29 @@ export interface SeedPartyInput {
   flyerFormat?: 'square' | 'portrait'
 }
 
-/** Creates a party with a flyer. Implemented once the parties collection exists (plan 01-05). */
-export async function seedParty(payload: Payload, partial: SeedPartyInput): Promise<unknown> {
+const FIXTURES = path.join(rootDir, 'tests/fixtures')
+
+/** Uploads the matching fixture flyer and creates a party through the Local API. */
+export async function seedParty(payload: Payload, partial: SeedPartyInput) {
   if (!payload.collections['parties' as keyof typeof payload.collections]) {
     throw new Error('parties collection not available')
   }
-  throw new Error(`seedParty not implemented yet (${partial.title})`)
+  const flyerFormat = partial.flyerFormat ?? 'portrait'
+  const flyer = await payload.create({
+    collection: 'media',
+    data: { alt: `Flyer da ${partial.title}` },
+    filePath: path.join(FIXTURES, flyerFormat === 'square' ? 'flyer-square.jpg' : 'flyer-portrait.jpg'),
+    overrideAccess: true,
+  })
+  return payload.create({
+    collection: 'parties',
+    data: {
+      title: partial.title,
+      startsAt: partial.startsAt ?? new Date(Date.now() + 3 * 86_400_000).toISOString(),
+      ...(partial.endsAt ? { endsAt: partial.endsAt } : {}),
+      flyer: flyer.id,
+      flyerFormat,
+    } as never,
+    overrideAccess: true,
+  })
 }
