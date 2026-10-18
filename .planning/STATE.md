@@ -80,7 +80,8 @@ None yet.
 - AUP de VPS, registrador, e-mail e storage precisam ser lidas antes de contratar
 - Pendentes do cliente: endereço público, logo/identidade visual, planos e valores
 - docker-compose.yml not exercised (no Docker daemon during 01-01); confirm initdb creates paraiso_test on first Docker run
-- pnpm build prerenders /, /festas/* and /sitemap.xml from Postgres: the 01-10 Docker build needs DATABASE_URI reachable at build time (or those routes made on-demand)
+- ~~pnpm build prerenders /, /festas/* and /sitemap.xml from Postgres~~ RESOLVED (01-10): / and sitemap render per request over the tagged data cache, party pages are ISR on first request; `pnpm build` passes with Postgres stopped
+- 01-10 deploy files prepared but never run under Docker (no daemon here): first real `docker build` happens in GitHub Actions or on the VPS
 - The /mnt/project-files mount rewrites committed image files about 30 s after write, so the canonical working tree shows modified PNG/JPG/WebP; blobs in git are correct
 
 ## Deferred Items
