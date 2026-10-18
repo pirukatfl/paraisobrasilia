@@ -9,6 +9,8 @@ const dirname = path.dirname(__filename)
 const isProduction = process.env.SITE_ENV === 'production'
 
 const nextConfig: NextConfig = {
+  // Self-contained server for the Docker image (.next/standalone/server.js)
+  output: 'standalone',
   async headers() {
     return [
       {

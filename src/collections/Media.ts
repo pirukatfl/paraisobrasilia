@@ -5,7 +5,10 @@ const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 // Every derivative is re-encoded by sharp (drops EXIF/GPS metadata from phone flyers).
 const webp = { format: 'webp' as const, options: { quality: 82 } }
 
-/** Public images (party flyers). Staging/production storage moves to object storage later (S3_BUCKET). */
+/**
+ * Public images (party flyers). Stored on the server disk (client decision 2026-10-17):
+ * the upload directory is set in payload.config.ts from MEDIA_DIR (a Docker volume in staging).
+ */
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Mídia', plural: 'Mídias' },
@@ -28,7 +31,6 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    staticDir: 'media',
     // No SVG: images only, re-encoded by sharp (T-01-09)
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     focalPoint: true,

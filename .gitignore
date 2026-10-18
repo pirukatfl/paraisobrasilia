@@ -36,6 +36,7 @@ yarn-error.log*
 .env.*
 !.env.example
 !.env.test.example
+!.env.staging.example
 
 # vercel
 .vercel
@@ -44,7 +45,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local uploads (dev only; staging/prod use object storage)
+# local uploads (dev only; staging/prod keep them in the Docker volume `media`)
 /media
 
 # Claude Code / GSD tooling (local only)
