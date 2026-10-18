@@ -2,7 +2,8 @@ import type { MetadataRoute } from 'next'
 
 import { getUpcomingParties } from '@/lib/parties/queries'
 
-export const revalidate = 600
+// Per request (no database at build); the party list comes from the tagged data cache.
+export const dynamic = 'force-dynamic'
 
 /** Home + upcoming party pages; past (and, from 01-09, unpublished) parties are excluded. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

@@ -1,8 +1,10 @@
 import { PartyGrid } from '@/components/PartyGrid'
 import { getUpcomingParties } from '@/lib/parties/queries'
 
-// Time-based ISR: ended parties drop off within 10 minutes without anyone acting (FEST-04).
-export const revalidate = 600
+// Rendered per request, never at build time: the Docker/CI build has no database.
+// The data itself stays in the Next data cache (unstable_cache, tag 'parties', 600 s),
+// so publish/edit/unpublish expire it instantly and ended parties drop off by time (FEST-04).
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const parties = await getUpcomingParties(new Date())

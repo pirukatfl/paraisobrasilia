@@ -5,14 +5,17 @@ import { notFound } from 'next/navigation'
 
 import { PartyDetails } from '@/components/party/PartyDetails'
 import { formatPartyDate, formatPartyTime } from '@/lib/format/date'
-import { getAllPartySlugs, getPartyBySlug } from '@/lib/parties/queries'
+import { getPartyBySlug } from '@/lib/parties/queries'
 import { buildPartyMetadata } from '@/lib/seo/metadata'
 
+// ISR on demand: no page is prerendered at build (the Docker/CI build has no database).
+// Each party page is generated on its first request, cached, and expired by the
+// 'party:{slug}' tag on publish/edit/unpublish or after 600 s.
 export const revalidate = 600
+export const dynamicParams = true
 
-export async function generateStaticParams() {
-  const slugs = await getAllPartySlugs()
-  return slugs.map((slug) => ({ slug }))
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
+  return []
 }
 
 interface Props {

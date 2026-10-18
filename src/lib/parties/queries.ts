@@ -146,5 +146,5 @@ async function fetchAllPartySlugs(): Promise<string[]> {
   return docs.map((d) => d.slug)
 }
 
-/** Published slugs prebuilt at build time (generateStaticParams). */
+/** All published slugs (not used at build time: party pages are generated on first request). */
 export const getAllPartySlugs = cached(fetchAllPartySlugs, ['parties:slugs'], () => ['parties'])
