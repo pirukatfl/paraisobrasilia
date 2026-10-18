@@ -1,0 +1,105 @@
+# Builds the staging images and pushes them to GHCR. The VPS pulls them by itself
+# (systemd timer installed by scripts/deploy/bootstrap-vps.sh, every 5 minutes):
+# nobody needs SSH access to deploy.
+#
+# Images (one package, two tag families):
+#   ghcr.io/<owner>/<repo>:staging            ghcr.io/<owner>/<repo>:sha-<commit>          (runner: the site)
+#   ghcr.io/<owner>/<repo>:migrate-staging    ghcr.io/<owner>/<repo>:migrate-sha-<commit>  (migrate: payload migrate)
+#
+# Required repository variable (Settings → Secrets and variables → Actions → Variables):
+#   STAGING_URL = https://novo.swingbrasilia.com.br   (baked into the build: og:image, sitemap)
+name: deploy-staging
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image name and build settings
+        id: meta
+        env:
+          STAGING_URL: ${{ vars.STAGING_URL }}
+        run: |
+          if [ -z "$STAGING_URL" ]; then
+            echo "::error::Set the repository variable STAGING_URL (e.g. https://novo.swingbrasilia.com.br)"
+            exit 1
+          fi
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "sha=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push migrations (migrate)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: migrate
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:migrate-sha-${{ steps.meta.outputs.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=migrate
+          cache-to: type=gha,mode=max,scope=migrate
+
+      - name: Build and push the site (runner)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runner
+          platforms: linux/amd64
+          push: true
+          build-args: |
+            NEXT_PUBLIC_SERVER_URL=${{ vars.STAGING_URL }}
+            NEXT_PUBLIC_AGE_GATE_PROVIDER=self-declaration
+            SITE_ENV=staging
+          tags: |
+            ${{ steps.meta.outputs.image }}:sha-${{ steps.meta.outputs.sha }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=runner
+          cache-to: type=gha,mode=max,scope=runner
+
+      # Move the moving tags only after both images exist, migrations first, so the
+      # server never pulls a site that expects migrations it cannot run yet.
+      - name: Point the staging tags at this commit
+        env:
+          IMAGE: ${{ steps.meta.outputs.image }}
+          SHA: ${{ steps.meta.outputs.sha }}
+        run: |
+          docker buildx imagetools create -t "$IMAGE:migrate-staging" "$IMAGE:migrate-sha-$SHA"
+          docker buildx imagetools create -t "$IMAGE:staging" "$IMAGE:sha-$SHA"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Imagens publicadas"
+            echo "- \`${{ steps.meta.outputs.image }}:staging\` (= \`sha-${{ steps.meta.outputs.sha }}\`)"
+            echo "- \`${{ steps.meta.outputs.image }}:migrate-staging\` (= \`migrate-sha-${{ steps.meta.outputs.sha }}\`)"
+            echo ""
+            echo "O servidor baixa a versão nova sozinho em até 5 minutos."
+          } >> "$GITHUB_STEP_SUMMARY"

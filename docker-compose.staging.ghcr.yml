@@ -1,0 +1,78 @@
+# Staging on the client's VPS — pull-based variant: images built by GitHub Actions
+# (.github/workflows/deploy-staging.yml) and pulled from GHCR. No source code on the server.
+# scripts/deploy/bootstrap-vps.sh installs this file as /opt/paraiso-site/docker-compose.yml
+# (keep both in sync: tests/unit/deploy-files.test.ts checks it).
+#
+#   docker compose --env-file .env.staging pull
+#   docker compose --env-file .env.staging run --rm migrate
+#   docker compose --env-file .env.staging up -d app caddy
+#
+# Data lives in named volumes on the server disk: pgdata (database), media (flyers),
+# caddy_data (TLS certificates). Backups must copy pgdata AND media off the server.
+name: paraiso-staging
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: paraiso
+      POSTGRES_DB: paraiso
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.staging}
+    # No `ports:` on purpose: the database is reachable only on the internal Docker network (T-01-29).
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U paraiso -d paraiso']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    image: ${GHCR_IMAGE:?set GHCR_IMAGE in .env.staging}:migrate-${IMAGE_TAG:-staging}
+    profiles: [tools]
+    env_file: .env.staging
+    environment:
+      DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
+      SITE_ENV: staging
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    image: ${GHCR_IMAGE:?set GHCR_IMAGE in .env.staging}:${IMAGE_TAG:-staging}
+    restart: unless-stopped
+    env_file: .env.staging
+    environment:
+      DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
+      SITE_ENV: staging
+      MEDIA_DIR: /app/media
+    volumes:
+      # Payload upload staticDir; the image creates /app/media owned by `node`
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    # No published ports: only Caddy talks to the app.
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      STAGING_DOMAIN: ${STAGING_DOMAIN:?set STAGING_DOMAIN in .env.staging}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  media:
+  caddy_data:
+  caddy_config:
