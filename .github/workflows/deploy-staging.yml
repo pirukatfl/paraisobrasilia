@@ -33,12 +33,9 @@ jobs:
       - name: Image name and build settings
         id: meta
         env:
-          STAGING_URL: ${{ vars.STAGING_URL }}
+          STAGING_URL: ${{ vars.STAGING_URL || 'https://novo.swingbrasilia.com.br' }}
         run: |
-          if [ -z "$STAGING_URL" ]; then
-            echo "::error::Set the repository variable STAGING_URL (e.g. https://novo.swingbrasilia.com.br)"
-            exit 1
-          fi
+          echo "url=$STAGING_URL" >> "$GITHUB_OUTPUT"
           echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
           echo "sha=${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
@@ -73,7 +70,7 @@ jobs:
           platforms: linux/amd64
           push: true
           build-args: |
-            NEXT_PUBLIC_SERVER_URL=${{ vars.STAGING_URL }}
+            NEXT_PUBLIC_SERVER_URL=${{ steps.meta.outputs.url }}
             NEXT_PUBLIC_AGE_GATE_PROVIDER=self-declaration
             SITE_ENV=staging
           tags: |

@@ -20,7 +20,7 @@
 set -euo pipefail
 
 # Preenchido pelo desenvolvedor antes de enviar ao cliente (ou passe GHCR_IMAGE=... no ambiente).
-GHCR_IMAGE="${GHCR_IMAGE:-ghcr.io/CHANGE-ME/paraiso-site}"
+GHCR_IMAGE="${GHCR_IMAGE:-ghcr.io/pirukatfl/paraisobrasilia}"
 APP_DIR="${APP_DIR:-/opt/paraiso-site}"
 
 say() { printf '\n\033[1;33m==> %s\033[0m\n' "$*"; }
