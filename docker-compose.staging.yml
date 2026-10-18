@@ -1,0 +1,86 @@
+# Staging on the client's VPS — build-on-server variant (scripts/deploy/deploy-staging.sh).
+# The GHCR (pull-based) variant with the same services is docker-compose.staging.ghcr.yml.
+#
+#   docker compose -f docker-compose.staging.yml --env-file .env.staging build
+#   docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm migrate
+#   docker compose -f docker-compose.staging.yml --env-file .env.staging up -d app caddy
+#
+# Data lives in named volumes on the server disk: pgdata (database), media (flyers),
+# caddy_data (TLS certificates). Backups must copy pgdata AND media off the server.
+name: paraiso-staging
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: paraiso
+      POSTGRES_DB: paraiso
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env.staging}
+    # No `ports:` on purpose: the database is reachable only on the internal Docker network (T-01-29).
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U paraiso -d paraiso']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrate:
+    build:
+      context: .
+      target: migrate
+    image: paraiso-site-migrate:staging
+    profiles: [tools]
+    env_file: .env.staging
+    environment:
+      DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
+      SITE_ENV: staging
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:?set NEXT_PUBLIC_SERVER_URL in .env.staging}
+        NEXT_PUBLIC_AGE_GATE_PROVIDER: ${NEXT_PUBLIC_AGE_GATE_PROVIDER:-self-declaration}
+        SITE_ENV: staging
+    image: paraiso-site:staging
+    restart: unless-stopped
+    env_file: .env.staging
+    environment:
+      DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
+      SITE_ENV: staging
+      MEDIA_DIR: /app/media
+    volumes:
+      # Payload upload staticDir; the image creates /app/media owned by `node`
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    # No published ports: only Caddy talks to the app.
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    environment:
+      STAGING_DOMAIN: ${STAGING_DOMAIN:?set STAGING_DOMAIN in .env.staging}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  media:
+  caddy_data:
+  caddy_config:

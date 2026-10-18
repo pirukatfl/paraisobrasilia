@@ -1,0 +1,23 @@
+# Keep the build context small and free of secrets (T-01-30).
+.git
+.github
+node_modules
+.next
+.planning
+.claude
+.vscode
+.idea
+tests
+test-results
+playwright-report
+coverage
+media
+docs
+scripts
+*.log
+# Secrets and local config: .env, .env.staging, .env.test ... (the image reads env at runtime)
+.env*
+Dockerfile
+.dockerignore
+docker-compose*.yml
+Caddyfile

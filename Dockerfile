@@ -1,71 +1,81 @@
-# To use this Dockerfile, you have to set `output: 'standalone'` in your next.config.mjs file.
-# From https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
+# syntax=docker/dockerfile:1
+#
+# Paraíso Brasília — imagem do site (Next.js standalone + Payload).
+#
+# Targets:
+#   runner  — the site (node server.js), non-root, ~200 MB
+#   migrate — full dependencies + source; runs `payload migrate` once per deploy
+#
+# The build needs NO database: pages that read parties render on request (plan 01-10).
+# Build args are public values only (they end up in the browser bundle); secrets come
+# from .env.staging at runtime and never enter the image (.dockerignore excludes .env*).
 
-FROM node:22.17.0-alpine AS base
+ARG NODE_IMAGE=node:22-bookworm-slim
 
-# Install dependencies only when needed
+# ---------------------------------------------------------------------------
+FROM ${NODE_IMAGE} AS base
+WORKDIR /app
+ENV PNPM_HOME=/pnpm \
+    COREPACK_HOME=/corepack \
+    NEXT_TELEMETRY_DISABLED=1
+ENV PATH=$PNPM_HOME:$PATH
+# pnpm version comes from package.json "packageManager"
+COPY package.json ./
+RUN corepack enable && corepack install && chmod -R a+rX /corepack
+
+# ---------------------------------------------------------------------------
 FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-WORKDIR /app
+COPY package.json pnpm-lock.yaml .npmrc ./
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store && \
+    pnpm install --frozen-lockfile
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm i --frozen-lockfile; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-
-# Rebuild the source code only when needed
+# ---------------------------------------------------------------------------
 FROM base AS builder
-WORKDIR /app
+ARG NEXT_PUBLIC_SERVER_URL
+ARG NEXT_PUBLIC_AGE_GATE_PROVIDER=self-declaration
+# SITE_ENV is read at build time by next.config.ts (X-Robots-Tag) and robots.ts:
+# staging images are never indexable.
+ARG SITE_ENV=staging
+ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL \
+    NEXT_PUBLIC_AGE_GATE_PROVIDER=$NEXT_PUBLIC_AGE_GATE_PROVIDER \
+    SITE_ENV=$SITE_ENV \
+    TZ=America/Sao_Paulo
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN test -n "$NEXT_PUBLIC_SERVER_URL" || (echo "Build arg NEXT_PUBLIC_SERVER_URL is required (e.g. https://novo.swingbrasilia.com.br)" >&2; exit 1)
+RUN pnpm build
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# ---------------------------------------------------------------------------
+# One-shot migrations: `docker compose run --rm migrate`
+FROM base AS migrate
+ENV NODE_ENV=production \
+    NODE_OPTIONS=--no-deprecation \
+    TZ=America/Sao_Paulo
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+USER node
+CMD ["node_modules/.bin/payload", "migrate"]
 
-RUN \
-  if [ -f yarn.lock ]; then yarn run build; \
-  elif [ -f package-lock.json ]; then npm run build; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable pnpm && pnpm run build; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
-
-# Production image, copy all the files and run next
-FROM base AS runner
+# ---------------------------------------------------------------------------
+FROM ${NODE_IMAGE} AS runner
 WORKDIR /app
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    TZ=America/Sao_Paulo \
+    PORT=3000 \
+    HOSTNAME=0.0.0.0 \
+    MEDIA_DIR=/app/media
 
-ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
+# Upload directory: the named volume `media` is mounted here. A new, empty volume takes
+# this directory's owner (node), so Payload can write flyers and their derivatives.
+RUN mkdir -p /app/media && chown node:node /app/media
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Remove this line if you do not have this folder
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
+USER node
 EXPOSE 3000
-
-ENV PORT 3000
-
-# server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD HOSTNAME="0.0.0.0" node server.js
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD ["node", "-e", "fetch('http://127.0.0.1:3000/robots.txt').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+CMD ["node", "server.js"]

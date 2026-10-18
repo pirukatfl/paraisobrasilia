@@ -1,0 +1,7 @@
+# Caddy: automatic HTTPS (Let's Encrypt) for the staging domain, proxy to the Next app.
+# STAGING_DOMAIN comes from .env.staging (passed to the caddy container by compose).
+{$STAGING_DOMAIN} {
+	encode zstd gzip
+	header Strict-Transport-Security "max-age=31536000"
+	reverse_proxy app:3000
+}
