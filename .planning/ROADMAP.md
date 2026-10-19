@@ -126,7 +126,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 03-01-PLAN.md — Acesso só da equipe, coleção assinantes, /entrar e área do assinante
 - [x] 03-02-PLAN.md — Planos e página Assine Já
 - [x] 03-03-PLAN.md — Períodos de assinatura e validade por data
-- [ ] 03-04-PLAN.md — Liberar, renovar, encerrar e registro de ações
+- [x] 03-04-PLAN.md — Liberar, renovar, encerrar e registro de ações
 - [ ] 03-05-PLAN.md — Troca de senha, senha provisória e link de nova senha
 - [ ] 03-06-PLAN.md — Vencem em 7 dias e testes de vazamento
 - [ ] 03-07-PLAN.md — Guias, deploy e conferência do cliente
@@ -199,7 +199,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
-| 3. Assinantes e controle de acesso | 3/7 | In Progress|  |
+| 3. Assinantes e controle de acesso | 4/7 | In Progress|  |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
 | 6. Migração do WordPress | 0/? | Not started | - |
