@@ -88,6 +88,11 @@ export async function staffApi(request: APIRequestContext) {
       }
       return changed
     },
+    /** Subscriber account created by staff (D-01); `whatsapp` optional. */
+    async createAssinante(data: { email: string; password: string; name: string; whatsapp?: string }) {
+      const res = await request.post('/api/assinantes', { headers, data })
+      return (await check(res, 'create assinante')).doc as { id: number; url?: string; filename?: string }
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

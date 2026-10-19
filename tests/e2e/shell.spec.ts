@@ -46,6 +46,7 @@ test('mobile menu opens, lists the sections and closes with Escape', async ({ pa
   const menu = page.getByRole('navigation', { name: 'Menu' })
   await expect(menu.getByRole('link', { name: 'Festas' })).toBeVisible()
   await expect(menu.getByRole('link', { name: 'Contato' })).toBeVisible()
+  await expect(menu.getByRole('link', { name: 'Área do assinante' })).toHaveAttribute('href', '/area-do-assinante')
   await page.keyboard.press('Escape')
   await expect(page.getByRole('button', { name: 'Abrir menu' })).toBeFocused()
   await expect(menu).toBeHidden()
@@ -57,6 +58,7 @@ test('desktop navigation is inline and marks the current page', async ({ page, i
   const nav = page.getByRole('navigation', { name: 'Principal' })
   await expect(nav.getByRole('link', { name: 'Festas' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'Contato' })).toHaveAttribute('aria-current', 'page')
+  await expect(nav.getByRole('link', { name: 'Área do assinante' })).toHaveAttribute('href', '/area-do-assinante')
 })
 
 test('footer shows address, WhatsApp, e-mail and the 18+ line', async ({ page }) => {

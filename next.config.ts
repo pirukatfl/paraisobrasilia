@@ -23,6 +23,11 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, // T-01-23
         ],
       },
+      // Members and auth pages are never indexed, also in production (T-03-05)
+      ...['/area-do-assinante', '/area-do-assinante/:path*', '/entrar', '/nova-senha'].map((source) => ({
+        source,
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      })),
     ]
   },
   images: {

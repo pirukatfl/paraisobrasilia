@@ -1,0 +1,77 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+
+import { FormField } from '@/components/assinantes/FormField'
+import { ExternalLink } from '@/components/ExternalLink'
+import { entrar } from '@/lib/assinantes/actions'
+import { safeNext } from '@/lib/assinantes/redirect'
+import { getAssinante } from '@/lib/assinantes/session'
+import { buildPageMetadata } from '@/lib/seo/metadata'
+import { whatsappUrl } from '@/lib/site/contact'
+import { getContact } from '@/lib/site/queries'
+
+// Reads the session cookie: rendered per request, never cached (T-03-05)
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  ...buildPageMetadata({ title: 'Entrar', description: 'Entrada da área de assinantes do Paraíso Brasília.', path: '/entrar' }),
+  robots: { index: false, follow: false },
+}
+
+const ERRORS: Record<string, string> = {
+  credenciais: 'E-mail ou senha incorretos.',
+  bloqueado: 'Muitas tentativas. Aguarde 10 minutos ou fale com a equipe pelo WhatsApp.',
+}
+
+export default async function EntrarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[]; erro?: string | string[] }>
+}) {
+  const params = await searchParams
+  const next = safeNext(typeof params.next === 'string' ? params.next : undefined)
+  if (await getAssinante()) redirect(next)
+
+  const erro = typeof params.erro === 'string' ? ERRORS[params.erro] : undefined
+  const contact = await getContact()
+
+  return (
+    <section aria-labelledby="titulo-entrar" className="max-w-[440px]">
+      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <h1 id="titulo-entrar" className="type-display mt-2">
+        Entrar
+      </h1>
+      {erro && (
+        <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">
+          {erro}
+        </p>
+      )}
+      {/* Plain form + server action: works without client JS */}
+      <form action={entrar} className="mt-6 flex flex-col gap-4">
+        <input type="hidden" name="next" value={next} />
+        <FormField id="email" name="email" type="email" label="E-mail" autoComplete="username" />
+        <FormField id="password" name="password" type="password" label="Senha" autoComplete="current-password" />
+        <button type="submit" className="btn-primary mt-2">
+          Entrar
+        </button>
+      </form>
+      <p className="mt-6 text-body text-muted">
+        Esqueceu a senha? Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova.{' '}
+        {contact.whatsapp && (
+          <ExternalLink
+            href={whatsappUrl(contact.whatsapp)}
+            className="text-accent underline underline-offset-4"
+          >
+            Chamar no WhatsApp
+          </ExternalLink>
+        )}
+      </p>
+      <p className="mt-4">
+        <Link href="/assine-ja" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
+          Ainda não é assinante? Assine Já
+        </Link>
+      </p>
+    </section>
+  )
+}
