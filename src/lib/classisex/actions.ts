@@ -1,0 +1,110 @@
+'use server'
+
+import config from '@payload-config'
+import { notFound, redirect } from 'next/navigation'
+import { getPayload } from 'payload'
+
+import { requireActiveSubscription, requireAssinante } from '../assinantes/session'
+import type { AdInput } from './rules'
+import { validateAdInput } from './rules'
+import { createAd, deleteAd, ServiceError, updateAd } from './service'
+
+const MEUS_ANUNCIOS = '/area-do-assinante/meus-anuncios'
+
+export type AdFormValues = {
+  euSou: string
+  cidade: string
+  texto: string
+  whatsapp: string
+  telegram: string
+  email: string
+}
+
+export type AdFormState = { errors: Record<string, string>; values: AdFormValues } | null
+
+const field = (formData: FormData, name: string) => {
+  const value = formData.get(name)
+  return typeof value === 'string' ? value : ''
+}
+
+/** What the subscriber typed. Never reads author or status from the form (T-04-04). */
+function readInput(formData: FormData): { input: AdInput; values: AdFormValues } {
+  const values: AdFormValues = {
+    euSou: field(formData, 'euSou'),
+    cidade: field(formData, 'cidade'),
+    texto: field(formData, 'texto'),
+    whatsapp: field(formData, 'whatsapp'),
+    telegram: field(formData, 'telegram'),
+    email: field(formData, 'email'),
+  }
+  const euSou = Number.parseInt(values.euSou, 10)
+  return {
+    values,
+    input: {
+      euSou: Number.isInteger(euSou) && euSou > 0 ? euSou : null,
+      cidade: values.cidade,
+      texto: values.texto,
+      whatsapp: values.whatsapp,
+      telegram: values.telegram,
+      email: values.email,
+      consent: field(formData, 'consent') === 'sim',
+    },
+  }
+}
+
+const INACTIVE = 'Sua assinatura não está ativa. Renove para publicar anúncios.'
+
+async function save(
+  formData: FormData,
+  path: string,
+  write: (assinanteId: number, input: AdInput) => Promise<unknown>,
+): Promise<AdFormState> {
+  // DAL guard first (T-04-05): only subscribers with active access create or edit
+  const check = await requireActiveSubscription(path)
+  const { input, values } = readInput(formData)
+  if (check.inactive) return { errors: { form: INACTIVE }, values }
+  const result = validateAdInput(input)
+  if (!result.ok) return { errors: result.errors as Record<string, string>, values }
+  try {
+    await write(check.assinante.id, input)
+  } catch (err) {
+    if (err instanceof ServiceError) {
+      if (err.code === 'nao-encontrado') notFound()
+      return { errors: (err.errors as Record<string, string> | undefined) ?? { form: err.message }, values }
+    }
+    throw err
+  }
+  // redirect() throws: keep it outside the try block
+  redirect(`${MEUS_ANUNCIOS}?ok=enviado`)
+}
+
+/** Novo anúncio (D-01, D-02, D-03): lands as 'pendente'. */
+export async function criarAnuncio(_prev: AdFormState, formData: FormData): Promise<AdFormState> {
+  const payload = await getPayload({ config })
+  return save(formData, `${MEUS_ANUNCIOS}/novo`, (assinanteId, input) =>
+    createAd(payload, { assinanteId, input, now: new Date() }),
+  )
+}
+
+/** Editar anúncio: back to 'pendente' until staff approve again (D-03). */
+export async function salvarAnuncio(_prev: AdFormState, formData: FormData): Promise<AdFormState> {
+  const id = field(formData, 'id')
+  const payload = await getPayload({ config })
+  return save(formData, `${MEUS_ANUNCIOS}/${encodeURIComponent(id)}/editar`, (assinanteId, input) =>
+    updateAd(payload, { assinanteId, id, input, now: new Date() }),
+  )
+}
+
+/** Apagar: needs only a login, so an expired subscriber can still delete their data (LGPD). */
+export async function apagarAnuncio(formData: FormData): Promise<void> {
+  const assinante = await requireAssinante(MEUS_ANUNCIOS)
+  const payload = await getPayload({ config })
+  let failed = false
+  try {
+    await deleteAd(payload, { assinanteId: assinante.id, id: field(formData, 'id') })
+  } catch (err) {
+    if (!(err instanceof ServiceError)) throw err
+    failed = true
+  }
+  redirect(`${MEUS_ANUNCIOS}?${failed ? 'erro=nao-encontrado' : 'ok=apagado'}`)
+}
