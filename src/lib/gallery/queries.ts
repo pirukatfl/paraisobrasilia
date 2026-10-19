@@ -3,9 +3,9 @@ import 'server-only'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
-import type { Media, SpaceItem, Video } from '../../payload-types'
+import type { Media, Model, SpaceItem, Video } from '../../payload-types'
 import { cached } from '../cache/cached'
-import type { GalleryImage, SpaceItemDTO } from './types'
+import type { GalleryImage, ModelDTO, SpaceItemDTO } from './types'
 
 const SPACE_LIMIT = 120 // bounded list
 export const SPACE_PHOTO_ALT = 'Foto do espaço do Paraíso Brasília'
@@ -65,4 +65,40 @@ export const getSpaceItems = cached(fetchSpaceItems, ['gallery:space'], () => ['
 /** Published space photos only (home teaser). */
 export async function getSpacePhotos(limit: number): Promise<SpaceItemDTO[]> {
   return (await getSpaceItems()).filter((i) => i.kind === 'photo').slice(0, limit)
+}
+
+const MODELS_LIMIT = 60 // bounded list
+const MAX_PHOTOS = 3
+
+export const modelAltFallback = (name: string) => `${name} — modelo do Paraíso Brasília`
+
+export function toModelDTO(doc: Model): ModelDTO | null {
+  const name = doc.name?.trim()
+  if (!name) return null
+  const photos = (doc.photos ?? [])
+    .slice(0, MAX_PHOTOS)
+    .map((row) => toGalleryImage(row.image, modelAltFallback(name)))
+    .filter((p): p is GalleryImage => p !== null)
+  return photos.length > 0 ? { id: String(doc.id), name, photos } : null
+}
+
+async function fetchPublishedModels(): Promise<ModelDTO[]> {
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({
+    collection: 'models',
+    where: { _status: { equals: 'published' } },
+    draft: false,
+    sort: ['order', 'name'],
+    depth: 2,
+    limit: MODELS_LIMIT,
+  })
+  return docs.map(toModelDTO).filter((d): d is ModelDTO => d !== null)
+}
+
+/** Published models with 1–3 photos, by `order` then name. Tag 'models'. */
+export const getPublishedModels = cached(fetchPublishedModels, ['gallery:models'], () => ['models'])
+
+/** Whether the Modelos section exists (nav, footer, sitemap, /modelos). Same tag 'models'. */
+export async function hasPublishedModels(): Promise<boolean> {
+  return (await getPublishedModels()).length > 0
 }

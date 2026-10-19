@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Media } from './collections/Media'
+import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
 import { SpaceItems } from './collections/SpaceItems'
 import { Parties } from './collections/Parties'
@@ -55,6 +56,7 @@ export default buildConfig({
     Parties,
     Pages,
     SpaceItems,
+    Models,
   ],
   globals: [Contact],
   editor: lexicalEditor(),

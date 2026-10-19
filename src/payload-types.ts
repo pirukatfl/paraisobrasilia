@@ -73,6 +73,7 @@ export interface Config {
     parties: Party;
     pages: Page;
     'space-items': SpaceItem;
+    models: Model;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     parties: PartiesSelect<false> | PartiesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     'space-items': SpaceItemsSelect<false> | SpaceItemsSelect<true>;
+    models: ModelsSelect<false> | ModelsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -422,6 +424,39 @@ export interface SpaceItem {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Nome artístico e até 3 fotos. Sem nudez explícita: esta galeria é aberta ao público.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "models".
+ */
+export interface Model {
+  id: number;
+  name: string;
+  /**
+   * De 1 a 3 fotos.
+   */
+  photos?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Números menores aparecem primeiro.
+   */
+  order?: number | null;
+  /**
+   * Recomendado, não obrigatório para publicar. Ex.: Enviou as fotos por WhatsApp para divulgação em 12/10/2026.
+   */
+  imageAuthorization?: {
+    date?: string | null;
+    note?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -468,6 +503,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'space-items';
         value: number | SpaceItem;
+      } | null)
+    | ({
+        relationTo: 'models';
+        value: number | Model;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -694,6 +733,29 @@ export interface SpaceItemsSelect<T extends boolean = true> {
   image?: T;
   video?: T;
   caption?: T;
+  order?: T;
+  imageAuthorization?:
+    | T
+    | {
+        date?: T;
+        note?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "models_select".
+ */
+export interface ModelsSelect<T extends boolean = true> {
+  name?: T;
+  photos?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
   order?: T;
   imageAuthorization?:
     | T

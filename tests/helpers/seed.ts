@@ -44,7 +44,7 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = ['models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -221,6 +221,36 @@ export async function seedSpaceVideo(
       kind: 'video',
       video: (video as { id: number }).id,
       order: input.order ?? 0,
+    } as never,
+    overrideAccess: true,
+  })
+}
+
+/** Creates a model with `photoCount` fixture photos (published by default). */
+export async function seedModel(
+  payload: Payload,
+  input: { name: string; photoCount: number; published?: boolean; order?: number; authorization?: { date?: string; note?: string } },
+) {
+  const photos = []
+  for (let i = 0; i < input.photoCount; i++) {
+    const media = await payload.create({
+      collection: 'media',
+      data: { alt: `${input.name} — foto ${i + 1}` },
+      filePath: path.join(FIXTURES, i % 2 ? 'flyer-square.jpg' : 'flyer-portrait.jpg'),
+      overrideAccess: true,
+    })
+    photos.push({ image: media.id })
+  }
+  const published = input.published ?? true
+  return payload.create({
+    collection: 'models' as never,
+    draft: !published,
+    data: {
+      _status: published ? 'published' : 'draft',
+      name: input.name,
+      photos,
+      order: input.order ?? 0,
+      ...(input.authorization ? { imageAuthorization: input.authorization } : {}),
     } as never,
     overrideAccess: true,
   })
