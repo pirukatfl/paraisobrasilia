@@ -22,10 +22,11 @@ describe('sitemap (INST-06, T-02-13)', () => {
         '/termos-de-uso',
         '/politica-de-privacidade',
         '/assine-ja',
+        '/classisex',
       ]),
     )
     expect(urls).not.toContain('/modelos')
-    expect(urls).toHaveLength(10)
+    expect(urls).toHaveLength(11)
   })
 
   it('includes /modelos and upcoming parties when present', () => {
@@ -40,6 +41,7 @@ describe('sitemap (INST-06, T-02-13)', () => {
   it('lists /assine-ja and never the members or auth pages (T-03-05)', () => {
     const urls = paths(buildSitemap({ base, parties: [], pages, hasModels: true }))
     expect(urls).toContain('/assine-ja')
+    expect(urls).toContain('/classisex') // public preview (PREV-01); the full board is members-only
     for (const url of urls) {
       expect(url).not.toMatch(/^\/(area-do-assinante|entrar|nova-senha)/)
     }
