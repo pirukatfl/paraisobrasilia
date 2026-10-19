@@ -1,9 +1,14 @@
 import Link from 'next/link'
 
+import { MobileMenu } from '@/components/MobileMenu'
+import { Nav } from '@/components/Nav'
+import { getNavItems } from '@/lib/site/nav'
+
 export function Header() {
+  const items = getNavItems({ hasModels: false })
   return (
-    <header className="header-line bg-bg">
-      <div className="mx-auto flex max-w-[1200px] items-center px-4 py-2 lg:px-8">
+    <header className="header-line relative z-30 bg-bg">
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 lg:px-8">
         <Link
           href="/"
           aria-label="Paraíso Brasília — página inicial"
@@ -20,6 +25,8 @@ export function Header() {
             />
           </picture>
         </Link>
+        <Nav items={items} />
+        <MobileMenu items={items} />
       </div>
     </header>
   )

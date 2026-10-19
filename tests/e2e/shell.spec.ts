@@ -33,3 +33,40 @@ test('unknown URL shows the not-found page', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Página não encontrada' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Ver próximas festas' })).toBeVisible()
 })
+
+// Phase 2 navigation shell (INST-03): header menu and contact footer on every page.
+test('mobile menu opens, lists the sections and closes with Escape', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'mobile disclosure menu')
+  await page.goto('/')
+  const button = page.getByRole('button', { name: 'Abrir menu' })
+  await expect(button).toHaveAttribute('aria-expanded', 'false')
+  await button.click()
+  const close = page.getByRole('button', { name: 'Fechar menu' })
+  await expect(close).toHaveAttribute('aria-expanded', 'true')
+  const menu = page.getByRole('navigation', { name: 'Menu' })
+  await expect(menu.getByRole('link', { name: 'Festas' })).toBeVisible()
+  await expect(menu.getByRole('link', { name: 'Contato' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('button', { name: 'Abrir menu' })).toBeFocused()
+  await expect(menu).toBeHidden()
+})
+
+test('desktop navigation is inline and marks the current page', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop inline navigation')
+  await page.goto('/contato')
+  const nav = page.getByRole('navigation', { name: 'Principal' })
+  await expect(nav.getByRole('link', { name: 'Festas' })).toBeVisible()
+  await expect(nav.getByRole('link', { name: 'Contato' })).toHaveAttribute('aria-current', 'page')
+})
+
+test('footer shows address, WhatsApp, e-mail and the 18+ line', async ({ page }) => {
+  await page.goto('/')
+  const footer = page.locator('footer')
+  await expect(footer).toContainText('Rua 15, Travessa 01, Chácara 02')
+  await expect(footer.getByRole('link', { name: 'Chamar no WhatsApp' })).toHaveAttribute(
+    'href',
+    'https://wa.me/5561999889772',
+  )
+  await expect(footer.locator('a[href="mailto:suporte@swingbrasilia.com.br"]')).toHaveCount(1)
+  await expect(footer).toContainText('Proibido para menores de 18 anos')
+})

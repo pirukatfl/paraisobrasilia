@@ -37,3 +37,31 @@ test('contato shows the address, directions, WhatsApp and the OpenStreetMap map'
   expect(html).not.toContain('facebook.com')
   expect(html).not.toContain('instagram.com')
 })
+
+test.describe('staff edits contacts (PAINEL-04)', () => {
+  test.skip(({ isMobile }) => isMobile, 'admin flow runs on desktop only')
+  test.use({ locale: 'pt-BR', timezoneId: 'America/Sao_Paulo' })
+
+  test('Instagram handle appears in the footer at once and disappears when cleared', async ({ page, context }) => {
+    test.setTimeout(180_000)
+    const { loginAsStaff } = await import('./helpers/staff')
+    await loginAsStaff(page)
+
+    const save = async (value: string) => {
+      await page.goto('/admin/globals/contact')
+      const field = page.locator('#field-instagram')
+      await field.fill(value)
+      await page.getByRole('button', { name: 'Salvar' }).click()
+      await expect(page.getByText(/atualizado com sucesso|salvo com sucesso/i).first()).toBeVisible()
+    }
+
+    await save('paraisobrasilia_teste')
+    const site = await context.newPage()
+    await site.goto('/contato')
+    await expect(site.locator('footer a[href="https://www.instagram.com/paraisobrasilia_teste/"]')).toHaveCount(1)
+
+    await save('')
+    await site.goto('/contato')
+    await expect(site.locator('a[href*="instagram.com"]')).toHaveCount(0)
+  })
+})

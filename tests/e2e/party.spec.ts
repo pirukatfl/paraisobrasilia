@@ -49,9 +49,11 @@ test('flyer opens the party page with all details', async ({ page }) => {
   await expect(attractions).toContainText('DJ Teste')
   await expect(page.getByText('Abertura da casa às 23h. Traje elegante.')).toBeVisible()
 
-  // D-06 / D-07: no per-party WhatsApp CTA, no address
-  await expect(page.locator('a[href*="wa.me"], a[href*="whatsapp" i]')).toHaveCount(0)
-  await expect(page.getByText('Endereço')).toHaveCount(0)
+  // D-06 / D-07: no per-party WhatsApp CTA, no address in the party content
+  // (the site-wide footer carries the house contacts from Phase 2 on)
+  const main = page.locator('main')
+  await expect(main.locator('a[href*="wa.me"], a[href*="whatsapp" i]')).toHaveCount(0)
+  await expect(main.getByText('Endereço')).toHaveCount(0)
 })
 
 test('a past party stays reachable and says it already happened', async ({ page }) => {
