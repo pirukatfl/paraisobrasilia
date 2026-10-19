@@ -206,6 +206,22 @@ export async function staffApi(request: APIRequestContext) {
       const res = await request.patch(`/api/ads/${id}`, { headers, data })
       return (await check(res, 'update ad')).doc
     },
+    /** Staff moderation actions (04-03): POST /api/ads/:id/aprovar|recusar|despublicar. */
+    async aprovar(id: number) {
+      const res = await request.post(`/api/ads/${id}/aprovar`, { headers, data: {} })
+      if (!res.ok()) throw new Error(`aprovar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; statusLabel: string }
+    },
+    async recusar(id: number, motivo: string) {
+      const res = await request.post(`/api/ads/${id}/recusar`, { headers, data: { motivo } })
+      if (!res.ok()) throw new Error(`recusar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; statusLabel: string }
+    },
+    async despublicar(id: number, motivo: string) {
+      const res = await request.post(`/api/ads/${id}/despublicar`, { headers, data: { motivo } })
+      if (!res.ok()) throw new Error(`despublicar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; statusLabel: string }
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)
