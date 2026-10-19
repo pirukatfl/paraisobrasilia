@@ -7,8 +7,10 @@ import { getPayload } from 'payload'
 import { requireActiveSubscription, requireAssinante } from '../assinantes/session'
 import type { AdInput } from './rules'
 import { validateAdInput } from './rules'
-import { createAd, deleteAd, removeMedia, ServiceError, setCover, updateAd } from './service'
+import { REPORT_MESSAGES } from './report-rules'
+import { createAd, deleteAd, removeMedia, reportAd, ServiceError, setCover, updateAd } from './service'
 
+const CLASSISEX = '/area-do-assinante/classisex'
 const MEUS_ANUNCIOS = '/area-do-assinante/meus-anuncios'
 
 export type AdFormValues = {
@@ -138,4 +140,34 @@ export async function removerMidia(formData: FormData): Promise<void> {
 export async function definirCapa(formData: FormData): Promise<void> {
   const payload = await getPayload({ config })
   await changeMedia(formData, (assinanteId, mediaId) => setCover(payload, { assinanteId, mediaId, now: new Date() }), 'capa')
+}
+
+export type ReportState = { ok: boolean; message: string } | null
+
+/**
+ * Denunciar (CLAS-05, D-08): active access, never the owner. The reporter is the session's
+ * account; the ad id is the only identifier read from the form (T-04-12).
+ */
+export async function denunciarAnuncio(_prev: ReportState, formData: FormData): Promise<ReportState> {
+  const rawId = field(formData, 'anuncio')
+  const adId = /^\d{1,12}$/.test(rawId) ? Number(rawId) : 0
+  const check = await requireActiveSubscription(`/area-do-assinante/classisex/${adId || ''}`)
+  if (check.inactive) return { ok: false, message: INACTIVE }
+  const payload = await getPayload({ config })
+  let hidden = false
+  try {
+    ;({ hidden } = await reportAd(payload, {
+      reporterId: check.assinante.id,
+      adId,
+      motivo: field(formData, 'motivo'),
+      detalhes: field(formData, 'detalhes'),
+      now: new Date(),
+    }))
+  } catch (err) {
+    if (err instanceof ServiceError) return { ok: false, message: err.message }
+    throw err
+  }
+  // A report of a minor takes the ad down at once, so this page no longer exists: confirm on the board
+  if (hidden) redirect(`${CLASSISEX}?denuncia=enviada`)
+  return { ok: true, message: REPORT_MESSAGES.enviada }
 }

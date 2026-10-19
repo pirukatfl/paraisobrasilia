@@ -57,3 +57,16 @@ export async function getMemberAd(id: string | number): Promise<MemberAdDTO | nu
   const payload = await getPayload({ config })
   return findMemberAd(payload, id, new Date())
 }
+
+/** True when the ad belongs to the subscriber (hides "Denunciar" on their own ad). */
+export async function isOwnAd(assinanteId: number, id: string | number): Promise<boolean> {
+  const payload = await getPayload({ config })
+  const numericId = Number(id)
+  if (!Number.isInteger(numericId) || numericId <= 0) return false
+  const { totalDocs } = await payload.count({
+    collection: 'ads',
+    where: { and: [{ id: { equals: numericId } }, { author: { equals: assinanteId } }] },
+    overrideAccess: true,
+  })
+  return totalDocs > 0
+}

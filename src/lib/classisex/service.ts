@@ -566,7 +566,8 @@ async function hideForMinor(
   })
 }
 
-export async function reportAd(payload: Payload, input: ReportInput): Promise<{ id: number }> {
+/** `hidden`: the ad was taken down at once (report of a minor), so the reporter's page is gone. */
+export async function reportAd(payload: Payload, input: ReportInput): Promise<{ id: number; hidden: boolean }> {
   const { reporterId, now } = input
   if (!isReportReason(input.motivo)) throw new ServiceError('invalido', REPORT_MESSAGES.motivo, 400)
   const detalhes = typeof input.detalhes === 'string' ? input.detalhes.replace(/\r\n/g, '\n').trim() : ''
@@ -617,8 +618,9 @@ export async function reportAd(payload: Payload, input: ReportInput): Promise<{ 
   })
   if (input.motivo === URGENT_REASON) {
     await hideForMinor(payload, ad, { reportId: created.id, reporterId, now })
+    return { id: created.id, hidden: true }
   }
-  return { id: created.id }
+  return { id: created.id, hidden: false }
 }
 
 export type ResolveAction = 'despublicar' | 'descartar'

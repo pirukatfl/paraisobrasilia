@@ -6,8 +6,9 @@ import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { ContactLinks } from '@/components/classisex/ContactLinks'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { MediaGallery } from '@/components/classisex/MediaGallery'
+import { ReportForm } from '@/components/classisex/ReportForm'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
-import { getMemberAd } from '@/lib/classisex/queries'
+import { getMemberAd, isOwnAd } from '@/lib/classisex/queries'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,8 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
   }
   const ad = await getMemberAd(id)
   if (!ad) notFound()
+  // Only a boolean reaches the client component, never the author (T-04-12)
+  const canReport = !(await isOwnAd(check.assinante.id, id))
   return (
     <article aria-labelledby="titulo-anuncio" className="max-w-[720px]">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
@@ -51,6 +54,7 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
         </h2>
         <ContactLinks contato={ad.contato} />
       </section>
+      {canReport && <ReportForm adId={ad.id} />}
       <p className="mt-10">
         <Link href="/area-do-assinante/classisex" className="type-label text-muted underline underline-offset-4 hover:text-accent">
           Voltar para o ClassiSex

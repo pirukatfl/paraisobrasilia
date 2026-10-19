@@ -8,8 +8,9 @@ import { getModerationCounts } from '../../../lib/classisex/service'
  */
 export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payload' | 'user'>) {
   if (!user || (user as { collection?: string }).collection !== 'users') return null
-  const { pendentes } = await getModerationCounts(payload)
+  const { pendentes, denunciasAbertas, urgentes } = await getModerationCounts(payload)
   const adminRoute = payload.config.routes.admin
+  const reportsLink = `${adminRoute}/collections/ad-reports?where[status][equals]=aberta`
   const queue = `${adminRoute}/collections/ads?where[status][equals]=pendente&sort=submittedAt`
 
   return (
@@ -33,8 +34,15 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
             ? '1 anúncio para aprovar'
             : `${pendentes} anúncios para aprovar`}
       </p>
+      <p style={{ margin: 'calc(var(--base) * 0.5) 0 0' }}>
+        {denunciasAbertas === 0
+          ? 'Nenhuma denúncia aberta.'
+          : `${denunciasAbertas} ${denunciasAbertas === 1 ? 'denúncia aberta' : 'denúncias abertas'}${
+              urgentes > 0 ? ` · ${urgentes} ${urgentes === 1 ? 'urgente' : 'urgentes'}` : ''
+            }`}
+      </p>
       <p style={{ margin: 'calc(var(--base) * 0.75) 0 0' }}>
-        <a href={queue}>Ver fila</a> · <a href={`${adminRoute}/collections/ads`}>Todos os anúncios</a>
+        <a href={queue}>Ver fila</a> · <a href={reportsLink}>Ver denúncias</a> · <a href={`${adminRoute}/collections/ads`}>Todos os anúncios</a>
       </p>
     </section>
   )

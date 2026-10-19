@@ -8,6 +8,7 @@ import { Pagination } from '@/components/classisex/Pagination'
 import { EmptyState } from '@/components/EmptyState'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { parseBoardFilters } from '@/lib/classisex/board'
+import { REPORT_MESSAGES } from '@/lib/classisex/report-rules'
 import { getActiveAdCategories, listMemberAds } from '@/lib/classisex/queries'
 
 export const dynamic = 'force-dynamic'
@@ -45,12 +46,19 @@ export default async function ClassisexPage({
     )
   }
 
-  const filters = parseBoardFilters(await searchParams)
+  const params = await searchParams
+  const filters = parseBoardFilters(params)
+  const reported = params.denuncia === 'enviada'
   const [result, categories] = await Promise.all([listMemberAds(filters), getActiveAdCategories()])
   const filtered = Boolean(filters.euSou || filters.cidade)
   return (
     <section aria-labelledby="titulo-classisex">
       {header}
+      {reported && (
+        <p role="status" className="mt-4 rounded-lg border border-line px-4 py-2 text-body text-text">
+          {REPORT_MESSAGES.enviada}
+        </p>
+      )}
       <p className="mt-4 max-w-[680px] text-body text-muted">
         Anúncios publicados pelos assinantes do Paraíso. Os contatos aparecem ao abrir o anúncio.
       </p>
