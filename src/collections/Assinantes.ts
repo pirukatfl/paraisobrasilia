@@ -66,6 +66,16 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
  * an ad cascades to its media files and detaches its reports.
  */
 const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  // Reports made by this account stay for the record, without the reporter (04-08)
+  await withRequestState(req, () =>
+    req.payload.update({
+      collection: 'ad-reports',
+      where: { reporter: { equals: id } },
+      data: { reporter: null },
+      overrideAccess: true,
+      req,
+    }),
+  )
   await withRequestState(req, () =>
     req.payload.delete({
       collection: 'ads',

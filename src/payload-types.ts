@@ -76,6 +76,7 @@ export interface Config {
     'ad-categories': AdCategory;
     ads: Ad;
     'ad-media': AdMedia;
+    'ad-reports': AdReport;
     media: Media;
     videos: Video;
     parties: Party;
@@ -94,6 +95,7 @@ export interface Config {
     };
     ads: {
       midias: 'ad-media';
+      denuncias: 'ad-reports';
     };
   };
   collectionsSelect: {
@@ -105,6 +107,7 @@ export interface Config {
     'ad-categories': AdCategoriesSelect<false> | AdCategoriesSelect<true>;
     ads: AdsSelect<false> | AdsSelect<true>;
     'ad-media': AdMediaSelect<false> | AdMediaSelect<true>;
+    'ad-reports': AdReportsSelect<false> | AdReportsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -351,7 +354,8 @@ export interface AuditLog {
     | 'senha-trocada-pelo-assinante'
     | 'anuncio-aprovado'
     | 'anuncio-recusado'
-    | 'anuncio-despublicado';
+    | 'anuncio-despublicado'
+    | 'denuncia-resolvida';
   actorType: 'equipe' | 'assinante' | 'sistema';
   actor?: (number | null) | User;
   actorLabel?: string | null;
@@ -435,6 +439,11 @@ export interface Ad {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  denuncias?: {
+    docs?: (number | AdReport)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
    * Use os botões do quadro Moderação.
    */
@@ -498,6 +507,39 @@ export interface AdMedia {
       filename?: string | null;
     };
   };
+}
+/**
+ * Denúncias feitas por assinantes. As urgentes (pessoa menor de idade) aparecem primeiro.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-reports".
+ */
+export interface AdReport {
+  id: number;
+  /**
+   * Fica vazio se o anúncio foi apagado; o resumo abaixo continua.
+   */
+  ad?: (number | null) | Ad;
+  adSnapshot?: string | null;
+  /**
+   * Só a equipe vê. Nunca é mostrado ao anunciante.
+   */
+  reporter?: (number | null) | Assinante;
+  motivo: 'contato-falso' | 'golpe-ou-cobranca' | 'ofensivo' | 'menor-de-idade' | 'sem-autorizacao-de-imagem' | 'outro';
+  detalhes?: string | null;
+  /**
+   * Marcada sozinha quando o motivo é pessoa menor de idade.
+   */
+  urgente?: boolean | null;
+  /**
+   * Use os botões do quadro Denúncia.
+   */
+  status: 'aberta' | 'resolvida' | 'descartada';
+  resolvidaPor?: (number | null) | User;
+  resolvidaEm?: string | null;
+  nota?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -854,6 +896,10 @@ export interface PayloadLockedDocument {
         value: number | AdMedia;
       } | null)
     | ({
+        relationTo: 'ad-reports';
+        value: number | AdReport;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1068,6 +1114,7 @@ export interface AdsSelect<T extends boolean = true> {
         email?: T;
       };
   midias?: T;
+  denuncias?: T;
   status?: T;
   motivo?: T;
   submittedAt?: T;
@@ -1114,6 +1161,24 @@ export interface AdMediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-reports_select".
+ */
+export interface AdReportsSelect<T extends boolean = true> {
+  ad?: T;
+  adSnapshot?: T;
+  reporter?: T;
+  motivo?: T;
+  detalhes?: T;
+  urgente?: T;
+  status?: T;
+  resolvidaPor?: T;
+  resolvidaEm?: T;
+  nota?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

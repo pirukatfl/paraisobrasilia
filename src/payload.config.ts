@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url'
 
 import { AdCategories } from './collections/AdCategories'
 import { AdMedia } from './collections/AdMedia'
+import { AdReports } from './collections/AdReports'
 import { Ads } from './collections/Ads'
 import { Assinantes } from './collections/Assinantes'
 import { AuditLog } from './collections/AuditLog'
@@ -79,6 +80,7 @@ export default buildConfig({
     AdCategories,
     Ads,
     { ...AdMedia, upload: { ...(typeof AdMedia.upload === 'object' ? AdMedia.upload : {}), staticDir: privateDir } },
+    AdReports,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

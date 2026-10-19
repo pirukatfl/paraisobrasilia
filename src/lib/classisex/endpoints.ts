@@ -1,7 +1,7 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
-import { approveAd, getModerationView, rejectAd, ServiceError, unpublishAd } from './service'
+import { approveAd, getModerationView, rejectAd, resolveReport, ServiceError, unpublishAd } from './service'
 
 /**
  * Staff-only moderation actions on an ad, used by the "Moderação" panel in /admin (PAINEL-07):
@@ -68,6 +68,24 @@ export const adEndpoints: Endpoint[] = [
       if (!isStaff({ req })) return forbidden()
       const body = await readBody(req)
       return run(() => unpublishAd(req, idOf(req), body.motivo, new Date()))
+    },
+  },
+]
+
+/**
+ * Staff-only: POST /api/ad-reports/:id/resolver { acao: 'despublicar' | 'descartar', nota? } (D-08).
+ * Only `acao` and `nota` are read from the body.
+ */
+export const reportEndpoints: Endpoint[] = [
+  {
+    path: '/:id/resolver',
+    method: 'post',
+    handler: async (req) => {
+      if (!isStaff({ req })) return forbidden()
+      const body = await readBody(req)
+      return run(() =>
+        resolveReport(req, idOf(req), { acao: body.acao as 'despublicar' | 'descartar', nota: body.nota }, new Date()),
+      )
     },
   },
 ]

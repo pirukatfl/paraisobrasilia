@@ -250,6 +250,20 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`get ad failed: ${res.status()}`)
       return (await res.json()) as { id: number; status: string; motivo?: string | null }
     },
+    /** Staff resolves a report (04-08): POST /api/ad-reports/:id/resolver. */
+    async resolverDenuncia(id: number, acao: 'despublicar' | 'descartar', nota?: string) {
+      const res = await request.post(`/api/ad-reports/${id}/resolver`, { headers, data: { acao, nota } })
+      if (!res.ok()) throw new Error(`resolver denuncia failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; closed: number }
+    },
+    /** Reports, urgent first (staff REST). */
+    async findReports(where = '') {
+      const res = await request.get(`/api/ad-reports?limit=100&depth=0&sort=-urgente,createdAt${where ? `&${where}` : ''}`, { headers })
+      if (!res.ok()) throw new Error(`find ad-reports failed: ${res.status()}`)
+      return ((await res.json()) as {
+        docs: { id: number; motivo: string; status: string; urgente: boolean; ad?: number | null; reporter?: number | null }[]
+      }).docs
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

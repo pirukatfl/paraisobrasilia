@@ -13,6 +13,7 @@ import * as migration_20261019_130455_audit_log from './20261019_130455_audit_lo
 import * as migration_20261019_185421_classisex_ads from './20261019_185421_classisex_ads';
 import * as migration_20261019_191255_classisex_moderation from './20261019_191255_classisex_moderation';
 import * as migration_20261019_194154_ad_media from './20261019_194154_ad_media';
+import * as migration_20261019_211202_ad_reports from './20261019_211202_ad_reports';
 
 export const migrations = [
   {
@@ -88,6 +89,11 @@ export const migrations = [
   {
     up: migration_20261019_194154_ad_media.up,
     down: migration_20261019_194154_ad_media.down,
-    name: '20261019_194154_ad_media'
+    name: '20261019_194154_ad_media',
+  },
+  {
+    up: migration_20261019_211202_ad_reports.up,
+    down: migration_20261019_211202_ad_reports.down,
+    name: '20261019_211202_ad_reports'
   },
 ];

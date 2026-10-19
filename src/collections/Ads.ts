@@ -93,8 +93,20 @@ const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, r
   return data
 }
 
-/** Photos and video go with the ad (Payload deletes each file; AdMedia removes the blurred twin). */
+/**
+ * Photos and video go with the ad (Payload deletes each file; AdMedia removes the blurred twin).
+ * Its reports stay for the record: they only lose the link (the snapshot keeps the summary).
+ */
 const removeMedia: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  await withRequestState(req, () =>
+    req.payload.update({
+      collection: 'ad-reports',
+      where: { ad: { equals: id } },
+      data: { ad: null },
+      overrideAccess: true,
+      req,
+    }),
+  )
   await withRequestState(req, () =>
     req.payload.delete({ collection: 'ad-media', where: { ad: { equals: id } }, overrideAccess: true, req }),
   )
@@ -139,7 +151,7 @@ export const Ads: CollectionConfig = {
   hooks: {
     beforeValidate: [normaliseAndCheckContacts],
     beforeChange: [computeDerived],
-    // Media files (04-05); 04-08 adds reports
+    // Media files (04-05) and report detaching (04-08)
     beforeDelete: [removeMedia],
     afterChange: [
       ({ doc }) => {
@@ -244,6 +256,15 @@ export const Ads: CollectionConfig = {
       on: 'ad',
       label: 'Fotos e vídeo',
       defaultSort: 'order',
+      admin: { allowCreate: false },
+    },
+    {
+      name: 'denuncias',
+      type: 'join',
+      collection: 'ad-reports',
+      on: 'ad',
+      label: 'Denúncias',
+      defaultSort: ['-urgente', 'createdAt'] as unknown as string,
       admin: { allowCreate: false },
     },
     {

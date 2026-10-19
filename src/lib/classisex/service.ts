@@ -5,12 +5,13 @@
  *
  * T-04-04: ownership is checked here on every write; author and status never come from the form.
  */
-import { APIError, type Payload, type PayloadRequest } from 'payload'
+import { APIError, createLocalReq, type Payload, type PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
 import { writeAudit, type AuditAction } from '../assinantes/audit'
 import { withRequestState } from '../assinantes/context'
 
+import { spDate, spMidnight } from '../assinantes/periods'
 import { accessStatusFor } from '../assinantes/status'
 import { uploadCodeFor, VIDEO_MIME_TYPES } from './media-messages'
 import {
@@ -25,6 +26,16 @@ import {
   type OwnerMediaDTO,
 } from './dto'
 import { redactContacts } from './redact'
+import {
+  DAILY_LIMIT,
+  DETAILS_MAX,
+  NOTE_MAX,
+  REPORT_MESSAGES,
+  URGENT_REASON,
+  isReportReason,
+  reasonLabel,
+} from './report-rules'
+import { visibleAdsWhere } from './visibility'
 import {
   ACTIVE_LIMIT,
   ACTIVE_STATUSES,
@@ -491,14 +502,207 @@ export const rejectAd = (req: PayloadRequest, id: number | string, motivo: unkno
 export const unpublishAd = (req: PayloadRequest, id: number | string, motivo: unknown, now: Date = new Date()) =>
   moderateAd(req, id, 'despublicar', { motivo, now })
 
-/** Dashboard queue (FilaClassisex). */
-export async function getModerationCounts(payload: Payload): Promise<{ pendentes: number }> {
-  const { totalDocs } = await payload.count({
+/** Dashboard queue (FilaClassisex): ads waiting for approval and open reports. */
+export async function getModerationCounts(
+  payload: Payload,
+): Promise<{ pendentes: number; denunciasAbertas: number; urgentes: number }> {
+  const [pendentes, abertas, urgentes] = await Promise.all([
+    payload.count({ collection: 'ads', where: { status: { equals: 'pendente' } }, overrideAccess: true }),
+    payload.count({ collection: 'ad-reports', where: { status: { equals: 'aberta' } }, overrideAccess: true }),
+    payload.count({
+      collection: 'ad-reports',
+      where: { and: [{ status: { equals: 'aberta' } }, { urgente: { equals: true } }] },
+      overrideAccess: true,
+    }),
+  ])
+  return { pendentes: pendentes.totalDocs, denunciasAbertas: abertas.totalDocs, urgentes: urgentes.totalDocs }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Reports (CLAS-05, D-08). Subscribers report through reportAd (after requireActiveSubscription);
+// staff resolve through resolveReport. The reporter always comes from the session (T-04-12).
+// ---------------------------------------------------------------------------------------------
+
+const SNAPSHOT_MAX = 140
+
+export type ReportInput = {
+  reporterId: number
+  adId: number | string
+  motivo: unknown
+  detalhes?: unknown
+  now: Date
+}
+
+/**
+ * Orchestrator decision on top of D-08 (T-04-17): a report of a minor hides the ad at once
+ * (back to 'despublicado' with a reason) and is written to the audit log as an automatic action;
+ * the report itself stays open and urgent for staff to confirm or discard.
+ */
+async function hideForMinor(
+  payload: Payload,
+  ad: AdDoc & { resumo?: string | null },
+  { reportId, reporterId, now }: { reportId: number; reporterId: number; now: Date },
+): Promise<void> {
+  const motivo = `Denúncia urgente: ${reasonLabel(URGENT_REASON).toLowerCase()}. A equipe vai analisar.`
+  const req = await createLocalReq({}, payload)
+  await payload.update({
     collection: 'ads',
-    where: { status: { equals: 'pendente' } },
+    id: ad.id,
+    data: { status: 'despublicado', motivo, moderatedAt: now.toISOString(), moderatedBy: null },
+    overrideAccess: true,
+    context: { moderation: 'despublicar', skipAudit: true },
+    req,
+  })
+  const authorId = relId(ad.author)
+  const author =
+    authorId === null
+      ? null
+      : await payload.findByID({ collection: 'assinantes', id: authorId, depth: 0, overrideAccess: true, disableErrors: true, req })
+  await writeAudit(req, {
+    action: 'anuncio-despublicado',
+    assinante: author ? { id: author.id, name: author.name, email: author.email } : null,
+    summary: `Anúncio #${ad.id} (${ad.resumo ?? ''}) despublicado automaticamente: denúncia de pessoa menor de idade`,
+    details: { anuncio: ad.id, motivo, denuncia: reportId, denunciante: reporterId, automatico: true },
+  })
+}
+
+export async function reportAd(payload: Payload, input: ReportInput): Promise<{ id: number }> {
+  const { reporterId, now } = input
+  if (!isReportReason(input.motivo)) throw new ServiceError('invalido', REPORT_MESSAGES.motivo, 400)
+  const detalhes = typeof input.detalhes === 'string' ? input.detalhes.replace(/\r\n/g, '\n').trim() : ''
+  if (detalhes.length > DETAILS_MAX) throw new ServiceError('invalido', REPORT_MESSAGES.detalhes, 400)
+  const adId = Number(input.adId)
+  if (!Number.isInteger(adId) || adId <= 0) throw notFound()
+
+  // Same visibility as the board: a hidden ad answers 404 like any unknown id (D-05)
+  const { docs } = await payload.find({
+    collection: 'ads',
+    where: { and: [{ id: { equals: adId } }, visibleAdsWhere(now)] },
+    depth: 0,
+    limit: 1,
     overrideAccess: true,
   })
-  return { pendentes: totalDocs }
+  const ad = docs[0] as unknown as (AdDoc & { resumo?: string | null }) | undefined
+  if (!ad) throw notFound()
+  if (relId(ad.author) === Number(reporterId)) throw new ServiceError('proprio', REPORT_MESSAGES.proprio, 400)
+
+  const open = await payload.count({
+    collection: 'ad-reports',
+    where: { and: [{ ad: { equals: ad.id } }, { reporter: { equals: reporterId } }, { status: { equals: 'aberta' } }] },
+    overrideAccess: true,
+  })
+  if (open.totalDocs > 0) throw new ServiceError('duplicada', REPORT_MESSAGES.duplicada, 409)
+
+  const today = await payload.count({
+    collection: 'ad-reports',
+    where: {
+      and: [{ reporter: { equals: reporterId } }, { createdAt: { greater_than_equal: spMidnight(spDate(now)).toISOString() } }],
+    },
+    overrideAccess: true,
+  })
+  if (today.totalDocs >= DAILY_LIMIT) throw new ServiceError('limite', REPORT_MESSAGES.limite, 429)
+
+  const created = await payload.create({
+    collection: 'ad-reports',
+    data: {
+      ad: ad.id,
+      adSnapshot: (ad.resumo ?? `Anúncio #${ad.id}`).slice(0, SNAPSHOT_MAX),
+      reporter: reporterId,
+      motivo: input.motivo,
+      detalhes: detalhes || null,
+      status: 'aberta',
+      createdAt: now.toISOString(),
+    },
+    overrideAccess: true,
+  })
+  if (input.motivo === URGENT_REASON) {
+    await hideForMinor(payload, ad, { reportId: created.id, reporterId, now })
+  }
+  return { id: created.id }
+}
+
+export type ResolveAction = 'despublicar' | 'descartar'
+
+type ReportDoc = {
+  id: number
+  ad?: unknown
+  adSnapshot?: string | null
+  reporter?: unknown
+  motivo: string
+  status: 'aberta' | 'resolvida' | 'descartada'
+}
+
+/** D-08: unpublish the ad (closing every open report of it) or discard this report. Audited. */
+export async function resolveReport(
+  req: PayloadRequest,
+  reportId: number | string,
+  { acao, nota }: { acao: ResolveAction; nota?: unknown },
+  now: Date = new Date(),
+): Promise<{ status: 'resolvida' | 'descartada'; closed: number }> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  if (acao !== 'despublicar' && acao !== 'descartar') throw new ServiceError('invalido', 'Escolha uma ação.', 400)
+  const text = typeof nota === 'string' ? nota.replace(/\s+/g, ' ').trim() : ''
+  if (text.length > NOTE_MAX) throw new ServiceError('nota', REPORT_MESSAGES.nota, 400)
+
+  const numericId = Number(reportId)
+  const report =
+    Number.isInteger(numericId) && numericId > 0
+      ? ((await withRequestState(req, () =>
+          req.payload.findByID({ collection: 'ad-reports', id: numericId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+        )) as unknown as ReportDoc | null)
+      : null
+  if (!report) throw new ServiceError('nao-encontrado', 'Denúncia não encontrada.', 404)
+  if (report.status !== 'aberta') throw new ServiceError('transicao', 'Esta denúncia já foi resolvida.', 409)
+
+  const staffId = (req.user as { id?: number } | null)?.id ?? null
+  const adId = relId(report.ad)
+  const closeWith = (id: number, status: 'resolvida' | 'descartada') =>
+    withRequestState(req, () =>
+      req.payload.update({
+        collection: 'ad-reports',
+        id,
+        data: { status, resolvidaPor: staffId, resolvidaEm: now.toISOString(), nota: text || null },
+        overrideAccess: true,
+        req,
+      }),
+    )
+
+  let ids = [report.id]
+  let hidden = false
+  if (acao === 'despublicar' && adId !== null) {
+    const ad = await withRequestState(req, () =>
+      req.payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+    )
+    if (ad && (ad.status === 'aprovado' || ad.status === 'pendente')) {
+      await unpublishAd(req, adId, text || `Denúncia: ${reasonLabel(report.motivo)}`, now)
+      hidden = true
+    }
+    const { docs } = await withRequestState(req, () =>
+      req.payload.find({
+        collection: 'ad-reports',
+        where: { and: [{ ad: { equals: adId } }, { status: { equals: 'aberta' } }] },
+        depth: 0,
+        limit: 200,
+        pagination: false,
+        overrideAccess: true,
+        req,
+      }),
+    )
+    ids = Array.from(new Set([report.id, ...docs.map((d) => d.id)]))
+  }
+  const finalStatus = acao === 'descartar' ? 'descartada' : 'resolvida'
+  for (const id of ids) await closeWith(id, finalStatus)
+
+  const reporterId = relId(report.reporter)
+  await writeAudit(req, {
+    action: 'denuncia-resolvida',
+    assinante: null,
+    summary: `Denúncia #${report.id} (${reasonLabel(report.motivo)}) sobre ${report.adSnapshot ?? 'anúncio'}: ${
+      acao === 'descartar' ? 'descartada' : hidden ? 'anúncio despublicado' : 'resolvida (anúncio já estava fora do ar)'
+    }${text ? ` — ${text}` : ''}`,
+    details: { denuncia: report.id, anuncio: adId, acao, motivo: report.motivo, nota: text || null, denunciante: reporterId, fechadas: ids.length },
+  })
+  return { status: finalStatus, closed: ids.length }
 }
 
 export type ModerationView = {

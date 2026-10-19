@@ -17,6 +17,7 @@ export type AuditAction =
   | 'anuncio-aprovado'
   | 'anuncio-recusado'
   | 'anuncio-despublicado'
+  | 'denuncia-resolvida'
 
 export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Conta criada', value: 'conta-criada' },
@@ -32,6 +33,7 @@ export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Anúncio aprovado', value: 'anuncio-aprovado' },
   { label: 'Anúncio recusado', value: 'anuncio-recusado' },
   { label: 'Anúncio despublicado', value: 'anuncio-despublicado' },
+  { label: 'Denúncia resolvida', value: 'denuncia-resolvida' },
 ]
 
 /** Never copied into the log (T-03-10). */
