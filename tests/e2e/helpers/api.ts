@@ -222,6 +222,21 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`despublicar failed: ${res.status()} ${await res.text()}`)
       return (await res.json()) as { status: string; statusLabel: string }
     },
+    /** ClassiSex photo/video uploaded by staff (multipart REST); the owner is the ad's author. */
+    async uploadAdMedia(adId: number, fixture: 'flyer-square.jpg' | 'flyer-portrait.jpg' | 'espaco.mp4', order = 0) {
+      const res = await request.post('/api/ad-media', {
+        headers,
+        multipart: {
+          _payload: JSON.stringify({ ad: adId, order }),
+          file: {
+            name: fixture,
+            mimeType: fixture.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg',
+            buffer: fs.readFileSync(path.join(FIXTURES, fixture)),
+          },
+        },
+      })
+      return (await check(res, 'upload ad-media')).doc as { id: number; filename?: string }
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

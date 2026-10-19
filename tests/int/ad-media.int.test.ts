@@ -39,6 +39,7 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
       collection: 'ad-media',
       data: { ad: adId, ...extra } as never,
       file: { data, mimetype, name, size: size ?? data.length },
+      depth: 0,
       overrideAccess: true,
     }) as unknown as Promise<MediaDoc>
 

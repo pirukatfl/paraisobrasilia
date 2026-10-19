@@ -403,3 +403,17 @@ export async function seedVisibleAd(
   const created = await seedAd(payload, { ...ad, author: author.id, status: 'aprovado' })
   return { author, ad: created }
 }
+
+/** Uploads a fixture (photo or espaco.mp4) to an ad through the Local API (staff path). */
+export async function seedAdMedia(
+  payload: Payload,
+  { ad, fixture = 'flyer-square.jpg', order = 0 }: { ad: number; fixture?: string; order?: number },
+) {
+  return payload.create({
+    collection: 'ad-media' as never,
+    data: { ad, order } as never,
+    filePath: path.join(FIXTURES, fixture),
+    depth: 0,
+    overrideAccess: true,
+  }) as Promise<{ id: number; kind: 'foto' | 'video'; filename: string; previa?: string | null }>
+}

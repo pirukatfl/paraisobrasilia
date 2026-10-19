@@ -17,6 +17,8 @@ export default async function globalSetup(): Promise<void> {
   for (const dir of ['.next/dev/cache/fetch-cache', '.next/dev/cache/images']) {
     fs.rmSync(path.resolve(dir), { recursive: true, force: true })
   }
+  // ClassiSex private files left by a previous run (the reset above deleted their documents)
+  fs.rmSync(path.resolve('private-media'), { recursive: true, force: true })
   await seedContact(payload)
   await seedPages(payload)
   // Same state as a fresh deploy: the four plans from the migration seed (D-03)

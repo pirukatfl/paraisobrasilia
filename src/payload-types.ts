@@ -75,6 +75,7 @@ export interface Config {
     'audit-log': AuditLog;
     'ad-categories': AdCategory;
     ads: Ad;
+    'ad-media': AdMedia;
     media: Media;
     videos: Video;
     parties: Party;
@@ -91,6 +92,9 @@ export interface Config {
       periodos: 'subscriptions';
       historico: 'audit-log';
     };
+    ads: {
+      midias: 'ad-media';
+    };
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
@@ -100,6 +104,7 @@ export interface Config {
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     'ad-categories': AdCategoriesSelect<false> | AdCategoriesSelect<true>;
     ads: AdsSelect<false> | AdsSelect<true>;
+    'ad-media': AdMediaSelect<false> | AdMediaSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -425,6 +430,11 @@ export interface Ad {
     telegram?: string | null;
     email?: string | null;
   };
+  midias?: {
+    docs?: (number | AdMedia)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
    * Use os botões do quadro Moderação.
    */
@@ -446,6 +456,48 @@ export interface Ad {
   consentAt?: string | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * Fotos e vídeos dos anúncios. Ficam fora da área pública: só a equipe, o anunciante e assinantes ativos abrem.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-media".
+ */
+export interface AdMedia {
+  id: number;
+  ad: number | Ad;
+  /**
+   * Preenchido com o autor do anúncio.
+   */
+  owner: number | Assinante;
+  kind: 'foto' | 'video';
+  /**
+   * Menor aparece primeiro.
+   */
+  order?: number | null;
+  durationSeconds?: number | null;
+  previa?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -798,6 +850,10 @@ export interface PayloadLockedDocument {
         value: number | Ad;
       } | null)
     | ({
+        relationTo: 'ad-media';
+        value: number | AdMedia;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1011,6 +1067,7 @@ export interface AdsSelect<T extends boolean = true> {
         telegram?: T;
         email?: T;
       };
+  midias?: T;
   status?: T;
   motivo?: T;
   submittedAt?: T;
@@ -1020,6 +1077,43 @@ export interface AdsSelect<T extends boolean = true> {
   consentAt?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-media_select".
+ */
+export interface AdMediaSelect<T extends boolean = true> {
+  ad?: T;
+  owner?: T;
+  kind?: T;
+  order?: T;
+  durationSeconds?: T;
+  previa?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { AdCategories } from './collections/AdCategories'
+import { AdMedia } from './collections/AdMedia'
 import { Ads } from './collections/Ads'
 import { Assinantes } from './collections/Assinantes'
 import { AuditLog } from './collections/AuditLog'
@@ -77,6 +78,7 @@ export default buildConfig({
     AuditLog,
     AdCategories,
     Ads,
+    { ...AdMedia, upload: { ...(typeof AdMedia.upload === 'object' ? AdMedia.upload : {}), staticDir: privateDir } },
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

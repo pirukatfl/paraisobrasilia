@@ -12,6 +12,7 @@ import * as migration_20261019_125108_subscriptions from './20261019_125108_subs
 import * as migration_20261019_130455_audit_log from './20261019_130455_audit_log';
 import * as migration_20261019_185421_classisex_ads from './20261019_185421_classisex_ads';
 import * as migration_20261019_191255_classisex_moderation from './20261019_191255_classisex_moderation';
+import * as migration_20261019_194154_ad_media from './20261019_194154_ad_media';
 
 export const migrations = [
   {
@@ -82,6 +83,11 @@ export const migrations = [
   {
     up: migration_20261019_191255_classisex_moderation.up,
     down: migration_20261019_191255_classisex_moderation.down,
-    name: '20261019_191255_classisex_moderation'
+    name: '20261019_191255_classisex_moderation',
+  },
+  {
+    up: migration_20261019_194154_ad_media.up,
+    down: migration_20261019_194154_ad_media.down,
+    name: '20261019_194154_ad_media'
   },
 ];

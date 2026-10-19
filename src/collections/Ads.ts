@@ -1,6 +1,7 @@
 import {
   ValidationError,
   type CollectionBeforeChangeHook,
+  type CollectionBeforeDeleteHook,
   type CollectionBeforeValidateHook,
   type CollectionConfig,
 } from 'payload'
@@ -92,6 +93,13 @@ const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, r
   return data
 }
 
+/** Photos and video go with the ad (Payload deletes each file; AdMedia removes the blurred twin). */
+const removeMedia: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  await withRequestState(req, () =>
+    req.payload.delete({ collection: 'ad-media', where: { ad: { equals: id } }, overrideAccess: true, req }),
+  )
+}
+
 const optionalText = (check: (v: string) => boolean, message: string) => (value: unknown) =>
   value === undefined || value === null || value === '' || check(String(value)) ? true : message
 
@@ -131,8 +139,8 @@ export const Ads: CollectionConfig = {
   hooks: {
     beforeValidate: [normaliseAndCheckContacts],
     beforeChange: [computeDerived],
-    // 04-05 (media files) and 04-08 (reports) add their cascades here
-    beforeDelete: [],
+    // Media files (04-05); 04-08 adds reports
+    beforeDelete: [removeMedia],
     afterChange: [
       ({ doc }) => {
         expire(['ads'])
@@ -228,6 +236,15 @@ export const Ads: CollectionConfig = {
           validate: optionalText(isValidEmail, AD_MESSAGES.email),
         },
       ],
+    },
+    {
+      name: 'midias',
+      type: 'join',
+      collection: 'ad-media',
+      on: 'ad',
+      label: 'Fotos e vídeo',
+      defaultSort: 'order',
+      admin: { allowCreate: false },
     },
     {
       name: 'status',
