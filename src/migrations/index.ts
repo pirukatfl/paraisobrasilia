@@ -9,6 +9,7 @@ import * as migration_20261019_032314_models from './20261019_032314_models';
 import * as migration_20261019_122821_assinantes from './20261019_122821_assinantes';
 import * as migration_20261019_123931_plans from './20261019_123931_plans';
 import * as migration_20261019_125108_subscriptions from './20261019_125108_subscriptions';
+import * as migration_20261019_130455_audit_log from './20261019_130455_audit_log';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20261019_125108_subscriptions.up,
     down: migration_20261019_125108_subscriptions.down,
-    name: '20261019_125108_subscriptions'
+    name: '20261019_125108_subscriptions',
+  },
+  {
+    up: migration_20261019_130455_audit_log.up,
+    down: migration_20261019_130455_audit_log.down,
+    name: '20261019_130455_audit_log'
   },
 ];

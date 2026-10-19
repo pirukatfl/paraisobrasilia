@@ -72,6 +72,7 @@ export interface Config {
     assinantes: Assinante;
     plans: Plan;
     subscriptions: Subscription;
+    'audit-log': AuditLog;
     media: Media;
     videos: Video;
     parties: Party;
@@ -86,6 +87,7 @@ export interface Config {
   collectionsJoins: {
     assinantes: {
       periodos: 'subscriptions';
+      historico: 'audit-log';
     };
   };
   collectionsSelect: {
@@ -93,6 +95,7 @@ export interface Config {
     assinantes: AssinantesSelect<false> | AssinantesSelect<true>;
     plans: PlansSelect<false> | PlansSelect<true>;
     subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
+    'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -216,6 +219,11 @@ export interface Assinante {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  historico?: {
+    docs?: (number | AuditLog)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
   /**
    * Marcado quando a equipe define a senha; some quando o assinante troca.
    */
@@ -310,6 +318,43 @@ export interface Plan {
    * Menor aparece primeiro.
    */
   order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Tudo o que a equipe faz com assinantes fica registrado aqui. Não é possível editar nem apagar.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log".
+ */
+export interface AuditLog {
+  id: number;
+  action:
+    | 'conta-criada'
+    | 'conta-editada'
+    | 'conta-excluida'
+    | 'acesso-liberado'
+    | 'acesso-renovado'
+    | 'acesso-encerrado'
+    | 'periodo-corrigido'
+    | 'senha-definida-pela-equipe'
+    | 'link-de-senha-gerado'
+    | 'senha-trocada-pelo-assinante';
+  actorType: 'equipe' | 'assinante' | 'sistema';
+  actor?: (number | null) | User;
+  actorLabel?: string | null;
+  assinante?: (number | null) | Assinante;
+  assinanteLabel?: string | null;
+  summary?: string | null;
+  details?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -652,6 +697,10 @@ export interface PayloadLockedDocument {
         value: number | Subscription;
       } | null)
     | ({
+        relationTo: 'audit-log';
+        value: number | AuditLog;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -761,6 +810,7 @@ export interface AssinantesSelect<T extends boolean = true> {
   staffNotes?: T;
   accessUntil?: T;
   periodos?: T;
+  historico?: T;
   mustChangePassword?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -816,6 +866,22 @@ export interface SubscriptionsSelect<T extends boolean = true> {
         note?: T;
       };
   summary?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "audit-log_select".
+ */
+export interface AuditLogSelect<T extends boolean = true> {
+  action?: T;
+  actorType?: T;
+  actor?: T;
+  actorLabel?: T;
+  assinante?: T;
+  assinanteLabel?: T;
+  summary?: T;
+  details?: T;
   updatedAt?: T;
   createdAt?: T;
 }

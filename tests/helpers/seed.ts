@@ -44,7 +44,7 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['subscriptions', 'assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = ['audit-log', 'subscriptions', 'assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -55,6 +55,8 @@ export async function resetDatabase(payload: Payload): Promise<void> {
       collection: slug as never,
       where: { id: { exists: true } },
       overrideAccess: true,
+      // Test cleanup is not a staff action: no audit rows
+      context: { skipAudit: true },
     })
   }
 }

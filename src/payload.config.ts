@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Assinantes } from './collections/Assinantes'
+import { AuditLog } from './collections/AuditLog'
 import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
@@ -54,6 +55,7 @@ export default buildConfig({
     Assinantes,
     Plans,
     Subscriptions,
+    AuditLog,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

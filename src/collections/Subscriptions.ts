@@ -9,9 +9,11 @@ import {
 } from 'payload'
 
 import { isStaff } from '../access/roles'
+import { diffForAudit, writeAudit, type AuditAction } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
 import { accessUntilOf, addDaysToDate, type PeriodLike, spDate, spMidnight } from '../lib/assinantes/periods'
 import { formatShortDate } from '../lib/format/date'
+import { formatBRL } from '../lib/format/money'
 
 export const PAYMENT_METHODS = [
   { label: 'Pix', value: 'pix' },
@@ -126,6 +128,107 @@ const syncAccessUntilAfterDelete: CollectionAfterDeleteHook = async ({ doc, req 
   return doc
 }
 
+const methodLabel = (value: unknown) => PAYMENT_METHODS.find((m) => m.value === value)?.label ?? String(value ?? '')
+
+type PeriodDoc = {
+  id: number | string
+  assinante: unknown
+  plan?: unknown
+  startsAt: string
+  endsAt: string
+  status?: string | null
+  summary?: string | null
+  payment?: { amount?: number | null; method?: string | null; paidAt?: string | null; note?: string | null } | null
+}
+
+async function loadAccount(req: PayloadRequest, id: number | string) {
+  return withRequestState(req, () =>
+    req.payload.findByID({ collection: 'assinantes', id, depth: 0, overrideAccess: true, req, disableErrors: true }),
+  )
+}
+
+/** Did the subscriber already have access running into this new period? (renewal vs first grant) */
+async function hadAccessBefore(req: PayloadRequest, doc: PeriodDoc): Promise<boolean> {
+  const start = new Date(doc.startsAt).getTime()
+  const now = Date.now()
+  const { docs } = await withRequestState(req, () =>
+    req.payload.find({
+      collection: 'subscriptions',
+      where: { and: [{ assinante: { equals: relId(doc.assinante) } }, { id: { not_equals: doc.id } }] },
+      depth: 0,
+      limit: 500,
+      pagination: false,
+      overrideAccess: true,
+      req,
+    }),
+  )
+  return docs.some((p) => {
+    if (p.status === 'encerrada' || !p.endsAt) return false
+    const s = new Date(p.startsAt).getTime()
+    const e = new Date(p.endsAt).getTime()
+    return (s <= start && e >= start) || (s <= now && now < e)
+  })
+}
+
+/** PAINEL-08: grants, renewals, endings and corrections, with the payment record (D-06). */
+const auditPeriod: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
+  if (req.context?.skipAudit) return doc
+  const period = doc as PeriodDoc
+  const assinanteId = relId(period.assinante)
+  const account = assinanteId === null ? null : await loadAccount(req, assinanteId)
+  const plan = await loadPlan(req, period.plan)
+  const planName = plan?.name ?? NO_PLAN_LABEL
+  const lastDay = formatShortDate(new Date(new Date(period.endsAt).getTime() - 1).toISOString())
+  const subject = account ? { id: account.id, name: account.name, email: account.email } : null
+
+  if (operation === 'create') {
+    const contextAction = req.context?.auditAction as AuditAction | undefined
+    const action: AuditAction =
+      contextAction ?? ((await hadAccessBefore(req, period)) ? 'acesso-renovado' : 'acesso-liberado')
+    const amount = period.payment?.amount
+    const forma = methodLabel(period.payment?.method)
+    await writeAudit(req, {
+      action,
+      assinante: subject,
+      summary: `${action === 'acesso-renovado' ? 'Acesso renovado' : 'Acesso liberado'}: ${planName} até ${lastDay} — ${forma}${typeof amount === 'number' ? ` ${formatBRL(amount)}` : ''}`,
+      details: {
+        periodo: { inicio: period.startsAt, fim: period.endsAt },
+        pagamento: {
+          plano: planName,
+          valor: typeof amount === 'number' ? amount : null,
+          forma,
+          data: period.payment?.paidAt ?? null,
+          observação: period.payment?.note ?? null,
+        },
+      },
+    })
+    return doc
+  }
+
+  if (period.status === 'encerrada' && previousDoc?.status !== 'encerrada') {
+    await writeAudit(req, {
+      action: 'acesso-encerrado',
+      assinante: subject,
+      summary: `Acesso encerrado: ${period.summary ?? planName}`,
+      details: { motivo: (req.context?.reason as string | undefined) ?? null, periodo: period.summary ?? null },
+    })
+    return doc
+  }
+
+  const pick = (p: Record<string, unknown> | undefined | null) =>
+    p ? { plan: relId(p.plan), startsAt: p.startsAt, endsAt: p.endsAt, status: p.status, payment: p.payment } : null
+  const diff = diffForAudit(pick(previousDoc), pick(doc) as Record<string, unknown>)
+  if (Object.keys(diff).length > 0) {
+    await writeAudit(req, {
+      action: 'periodo-corrigido',
+      assinante: subject,
+      summary: `Período corrigido: ${period.summary ?? planName}`,
+      details: diff,
+    })
+  }
+  return doc
+}
+
 /**
  * Subscription periods with the payment record (D-05, D-06). Access is computed from these
  * periods on every request; nothing flips a flag. Periods are never deleted through the API:
@@ -152,7 +255,7 @@ export const Subscriptions: CollectionConfig = {
   hooks: {
     beforeValidate: [fillAndValidateDates],
     beforeChange: [fillSummaryAndClosedAt],
-    afterChange: [syncAccessUntil],
+    afterChange: [syncAccessUntil, auditPeriod],
     afterDelete: [syncAccessUntilAfterDelete],
   },
   fields: [

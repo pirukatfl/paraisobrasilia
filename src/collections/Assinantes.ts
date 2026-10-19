@@ -1,12 +1,15 @@
 import {
   APIError,
   Forbidden,
+  type CollectionAfterChangeHook,
+  type CollectionAfterDeleteHook,
   type CollectionBeforeDeleteHook,
   type CollectionBeforeOperationHook,
   type CollectionConfig,
 } from 'payload'
 
 import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
+import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
 
 export const MIN_PASSWORD_LENGTH = 8
@@ -66,6 +69,53 @@ const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
   req.context = { ...req.context, periodosRemovidos: removed }
 }
 
+const FIELD_LABELS: Record<string, string> = {
+  name: 'nome',
+  email: 'e-mail',
+  whatsapp: 'WhatsApp',
+  staffNotes: 'observações',
+  mustChangePassword: 'senha provisória',
+  accessUntil: 'acesso até',
+}
+
+/** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
+const auditAccount: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
+  if (req.context?.skipAudit) return doc
+  if (operation === 'create') {
+    await writeAudit(req, {
+      action: 'conta-criada',
+      assinante: doc,
+      summary: `Conta criada: ${assinanteLabel(doc)}`,
+      details: diffForAudit(null, doc),
+    })
+    return doc
+  }
+  const diff = diffForAudit(previousDoc ?? null, doc)
+  const fields = Object.keys(diff)
+  if (fields.length > 0) {
+    await writeAudit(req, {
+      action: 'conta-editada',
+      assinante: doc,
+      summary: `Conta editada (${fields.map((f) => FIELD_LABELS[f] ?? f).join(', ')})`,
+      details: diff,
+    })
+  }
+  return doc
+}
+
+const auditAccountDeleted: CollectionAfterDeleteHook = async ({ doc, req }) => {
+  if (req.context?.skipAudit) return doc
+  // The account no longer exists: keep the "Nome <e-mail>" snapshot, relation empty
+  await writeAudit(req, {
+    action: 'conta-excluida',
+    assinante: null,
+    assinanteLabel: assinanteLabel(doc),
+    summary: `Conta excluída: ${assinanteLabel(doc)}`,
+    details: { periodosRemovidos: Number(req.context?.periodosRemovidos ?? 0) },
+  })
+  return doc
+}
+
 /**
  * Subscriber accounts (ASS-01, D-01). Created by staff after checking the payment receipt; an
  * account can exist without access (access comes from subscription periods).
@@ -107,6 +157,8 @@ export const Assinantes: CollectionConfig = {
   hooks: {
     beforeOperation: [guardOperations],
     beforeDelete: [removePeriods],
+    afterChange: [auditAccount],
+    afterDelete: [auditAccountDeleted],
   },
   fields: [
     // email and password are added by `auth`
@@ -154,6 +206,15 @@ export const Assinantes: CollectionConfig = {
       on: 'assinante',
       label: 'Períodos e pagamentos',
       defaultSort: '-startsAt',
+      admin: { allowCreate: false },
+    },
+    {
+      name: 'historico',
+      type: 'join',
+      collection: 'audit-log',
+      on: 'assinante',
+      label: 'Histórico',
+      defaultSort: '-createdAt',
       admin: { allowCreate: false },
     },
     {
