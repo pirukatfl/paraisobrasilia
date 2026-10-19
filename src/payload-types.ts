@@ -89,8 +89,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    contact: Contact;
+  };
+  globalsSelect: {
+    contact: ContactSelect<false> | ContactSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -537,6 +541,70 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Dados exibidos no rodapé, na página Contato e na página inicial.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact".
+ */
+export interface Contact {
+  id: number;
+  /**
+   * Rua, travessa e número (ex.: Rua 15, Travessa 01, Chácara 02).
+   */
+  addressLine: string;
+  /**
+   * Bairro, cidade e UF.
+   */
+  addressDetail: string;
+  postalCode?: string | null;
+  /**
+   * Opcional. Para acertar o pino do mapa: no Google Maps, clique com o botão direito no portão da chácara e copie os números.
+   */
+  lat?: number | null;
+  /**
+   * Opcional. Para acertar o pino do mapa: no Google Maps, clique com o botão direito no portão da chácara e copie os números.
+   */
+  lng?: number | null;
+  /**
+   * Só números, com 55 e DDD (ex.: 5561999889772).
+   */
+  whatsapp: string;
+  /**
+   * Como aparece no site (ex.: (61) 99988-9772).
+   */
+  phone?: string | null;
+  email: string;
+  /**
+   * Opcional. Só o nome do perfil, sem @. Se ficar vazio, o Instagram não aparece no site.
+   */
+  instagram?: string | null;
+  /**
+   * Opcional (ex.: Abrimos às 22h e seguimos até por volta das 5h).
+   */
+  hours?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact_select".
+ */
+export interface ContactSelect<T extends boolean = true> {
+  addressLine?: T;
+  addressDetail?: T;
+  postalCode?: T;
+  lat?: T;
+  lng?: T;
+  whatsapp?: T;
+  phone?: T;
+  email?: T;
+  instagram?: T;
+  hours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
