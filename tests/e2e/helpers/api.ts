@@ -256,6 +256,11 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`resolver denuncia failed: ${res.status()} ${await res.text()}`)
       return (await res.json()) as { status: string; closed: number }
     },
+    /** Report written by staff REST (the member flow goes through the server action instead). */
+    async createReport(data: { ad: number; reporter: number; motivo: string; adSnapshot?: string }) {
+      const res = await request.post('/api/ad-reports', { headers, data: { adSnapshot: 'Resumo de teste', ...data } })
+      return (await check(res, 'create report')).doc
+    },
     /** Reports, urgent first (staff REST). */
     async findReports(where = '') {
       const res = await request.get(`/api/ad-reports?limit=100&depth=0&sort=-urgente,createdAt${where ? `&${where}` : ''}`, { headers })
