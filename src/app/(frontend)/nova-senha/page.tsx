@@ -1,0 +1,85 @@
+import config from '@payload-config'
+import type { Metadata } from 'next'
+import { getPayload } from 'payload'
+
+import { FormField } from '@/components/assinantes/FormField'
+import { ExternalLink } from '@/components/ExternalLink'
+import { definirNovaSenha } from '@/lib/assinantes/actions'
+import { passwordLinkIsValid } from '@/lib/assinantes/service'
+import { whatsappUrl } from '@/lib/site/contact'
+import { getContact } from '@/lib/site/queries'
+
+// Token in the URL: per request, noindex, no third-party resources on this page (T-03-11)
+export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = {
+  title: 'Criar nova senha',
+  robots: { index: false, follow: false },
+}
+
+const ERRORS: Record<string, string> = {
+  curta: 'A nova senha precisa ter pelo menos 8 caracteres.',
+  diferente: 'As senhas não conferem.',
+}
+
+export default async function NovaSenhaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ token?: string | string[]; erro?: string | string[] }>
+}) {
+  const params = await searchParams
+  const token = typeof params.token === 'string' ? params.token : ''
+  const erro = typeof params.erro === 'string' ? params.erro : ''
+  const payload = await getPayload({ config })
+  const valid = Boolean(token) && erro !== 'expirado' && (await passwordLinkIsValid(payload, token))
+
+  if (!valid) {
+    const contact = await getContact()
+    return (
+      <section aria-labelledby="titulo-nova-senha" className="max-w-[440px]">
+        <p className="type-eyebrow text-muted">Área do assinante</p>
+        <h1 id="titulo-nova-senha" className="type-display mt-2">
+          Criar nova senha
+        </h1>
+        <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">
+          Este link expirou ou já foi usado. Peça um novo para a equipe pelo WhatsApp.
+        </p>
+        {contact.whatsapp && (
+          <ExternalLink href={whatsappUrl(contact.whatsapp)} className="btn-primary mt-6">
+            Chamar no WhatsApp
+          </ExternalLink>
+        )}
+      </section>
+    )
+  }
+
+  const message = ERRORS[erro]
+  return (
+    <section aria-labelledby="titulo-nova-senha" className="max-w-[440px]">
+      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <h1 id="titulo-nova-senha" className="type-display mt-2">
+        Criar nova senha
+      </h1>
+      {message && (
+        <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">
+          {message}
+        </p>
+      )}
+      <form action={definirNovaSenha} className="mt-6 flex flex-col gap-4">
+        <input type="hidden" name="token" value={token} />
+        <FormField id="nova" name="nova" type="password" label="Nova senha" autoComplete="new-password" />
+        <FormField
+          id="confirmacao"
+          name="confirmacao"
+          type="password"
+          label="Repita a nova senha"
+          autoComplete="new-password"
+        />
+        <p className="type-label text-muted">Use pelo menos 8 caracteres.</p>
+        <button type="submit" className="btn-primary mt-2">
+          Salvar e entrar
+        </button>
+      </form>
+    </section>
+  )
+}

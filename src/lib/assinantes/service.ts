@@ -217,3 +217,58 @@ export async function getSituacao(payload: Payload, assinanteId: number | string
     })),
   }
 }
+
+const LINK_HOURS = 48
+
+const siteBase = () => (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(/\/$/, '')
+
+/**
+ * "Gerar link de nova senha" (D-04, no e-mail): Payload's forgot-password token with e-mail
+ * disabled, valid 48 h, single use; a newer link replaces the previous one. The token only
+ * travels in the returned URL — never in the audit log or server logs (T-03-11).
+ */
+export async function createPasswordLink(
+  payload: Payload,
+  input: { assinanteId: number | string; req: PayloadRequest },
+): Promise<{ url: string; expiresAt: string; assinante: { id: number; name: string; email: string; whatsapp: string | null } }> {
+  const { req } = input
+  const account = await withRequestState(req, () => loadAssinante(payload, input.assinanteId, req))
+  const token = await withRequestState(req, () =>
+    payload.forgotPassword({
+      collection: 'assinantes',
+      data: { email: account.email },
+      disableEmail: true,
+      // Only this service may mint tokens (beforeOperation guard, T-03-03)
+      context: { staffPasswordLink: true },
+      req,
+    }),
+  )
+  if (!token) throw new ServiceError('Não foi possível gerar o link.')
+  const expiresAt = new Date(Date.now() + LINK_HOURS * 3600_000).toISOString()
+  await writeAudit(req, {
+    action: 'link-de-senha-gerado',
+    assinante: account,
+    summary: `Link de nova senha gerado (vale ${LINK_HOURS} h)`,
+    details: { validoAte: expiresAt },
+  })
+  return {
+    url: `${siteBase()}/nova-senha?token=${encodeURIComponent(token)}`,
+    expiresAt,
+    assinante: { id: account.id, name: account.name, email: account.email, whatsapp: account.whatsapp ?? null },
+  }
+}
+
+/** True while a staff link is unused and not expired (the /nova-senha page checks before showing the form). */
+export async function passwordLinkIsValid(payload: Payload, token: string): Promise<boolean> {
+  if (!/^[0-9a-f]{20,128}$/i.test(token)) return false
+  const doc = await payload.db.findOne({
+    collection: 'assinantes',
+    where: {
+      and: [
+        { resetPasswordToken: { equals: token } },
+        { resetPasswordExpiration: { greater_than: new Date().toISOString() } },
+      ],
+    },
+  })
+  return Boolean(doc)
+}

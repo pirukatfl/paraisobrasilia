@@ -4,10 +4,11 @@ import config from '@payload-config'
 import { logout } from '@payloadcms/next/auth'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { AuthenticationError, getPayload, LockedAuth, ValidationError } from 'payload'
+import { AuthenticationError, createLocalReq, getPayload, LockedAuth, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
 
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
+import { writeAudit } from './audit'
 import { safeNext } from './redirect'
 import { requireAssinante } from './session'
 
@@ -107,6 +108,53 @@ export async function trocarSenha(formData: FormData): Promise<void> {
     overrideAccess: true,
     // The authenticated subscriber (with its session id): audit actor and the session kept
     user: assinante,
+  })
+  redirect('/area-do-assinante?ok=senha')
+}
+
+const novaSenhaUrl = (token: string, erro: string) =>
+  `/nova-senha?token=${encodeURIComponent(token)}&erro=${erro}`
+
+/**
+ * /nova-senha form: consumes the staff-generated link (single use, 48 h), logs the subscriber
+ * in and records the change. Payload's resetPassword writes through the database adapter (no
+ * hooks), so the audit row is written here (Pitfall 6).
+ */
+export async function definirNovaSenha(formData: FormData): Promise<void> {
+  const token = field(formData, 'token')
+  const nova = field(formData, 'nova')
+  const confirmacao = field(formData, 'confirmacao')
+  if (!token) redirect('/nova-senha?erro=expirado')
+  if (nova.length < MIN_PASSWORD_LENGTH) redirect(novaSenhaUrl(token, 'curta'))
+  if (nova !== confirmacao) redirect(novaSenhaUrl(token, 'diferente'))
+
+  const payload = await getPayload({ config })
+  let result: Awaited<ReturnType<typeof payload.resetPassword>> | null = null
+  try {
+    result = await payload.resetPassword({
+      collection: 'assinantes',
+      data: { token, password: nova },
+      overrideAccess: true,
+    })
+  } catch {
+    result = null
+  }
+  if (!result?.token || !result.user) redirect('/nova-senha?erro=expirado')
+
+  await setAuthCookie(result.token)
+  const user = result.user as unknown as { id: number; name: string; email: string }
+  await payload.update({
+    collection: 'assinantes',
+    id: user.id,
+    data: { mustChangePassword: false },
+    overrideAccess: true,
+    context: { skipAudit: true },
+  })
+  const req = await createLocalReq({ user: { ...user, collection: 'assinantes' } as never }, payload)
+  await writeAudit(req, {
+    action: 'senha-trocada-pelo-assinante',
+    assinante: user,
+    summary: 'Senha criada pelo link enviado pela equipe',
   })
   redirect('/area-do-assinante?ok=senha')
 }

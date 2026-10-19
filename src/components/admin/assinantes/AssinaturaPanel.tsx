@@ -110,6 +110,10 @@ export function AssinaturaPanel() {
   const [status, setStatus] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  const [link, setLink] = useState<{ url: string; whatsappUrl: string | null } | null>(null)
+  const [linkStatus, setLinkStatus] = useState<string | null>(null)
+  const [linkError, setLinkError] = useState<string | null>(null)
+
   const [version, setVersion] = useState(0)
   const reload = () => setVersion((v) => v + 1)
 
@@ -207,6 +211,31 @@ export function AssinaturaPanel() {
       setError((err as Error).message)
     } finally {
       setBusy(false)
+    }
+  }
+
+  const gerarLink = async () => {
+    setBusy(true)
+    setLinkError(null)
+    setLinkStatus(null)
+    try {
+      const result = await post('link-senha', {})
+      setLink({ url: String(result.url), whatsappUrl: (result.whatsappUrl as string | null) ?? null })
+      setLinkStatus('Link gerado. Links anteriores deixaram de valer.')
+    } catch (err) {
+      setLinkError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const copiar = async () => {
+    if (!link) return
+    try {
+      await navigator.clipboard.writeText(link.url)
+      setLinkStatus('Link copiado.')
+    } catch {
+      setLinkStatus('Selecione o link e copie manualmente.')
     }
   }
 
@@ -323,6 +352,66 @@ export function AssinaturaPanel() {
               {error}
             </p>
           )}
+
+          <div
+            role="group"
+            aria-labelledby="assinatura-senha-titulo"
+            style={{ marginTop: 'calc(var(--base) * 1.5)', borderTop: '1px solid var(--theme-elevation-150)' }}
+          >
+            <h4 id="assinatura-senha-titulo" style={{ margin: 'calc(var(--base) * 1) 0 0' }}>
+              Senha
+            </h4>
+            <p style={{ margin: 'calc(var(--base) * 0.5) 0 0' }}>
+              Para definir uma senha provisória, use o campo Senha desta ficha.
+            </p>
+            <div style={row}>
+              <button type="button" onClick={gerarLink} disabled={busy} style={buttonStyle('secondary')}>
+                Gerar link de nova senha
+              </button>
+            </div>
+            {link && (
+              <>
+                <div style={row}>
+                  <label style={{ ...fieldStyle, flex: '1 1 100%' }} htmlFor="assinatura-link">
+                    Link de nova senha
+                    <input
+                      id="assinatura-link"
+                      readOnly
+                      value={link.url}
+                      onFocus={(e) => e.target.select()}
+                      style={inputStyle}
+                    />
+                  </label>
+                </div>
+                <div style={row}>
+                  <button type="button" onClick={copiar} style={buttonStyle('secondary')}>
+                    Copiar
+                  </button>
+                  {link.whatsappUrl && (
+                    <a
+                      href={link.whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ ...buttonStyle('secondary'), textDecoration: 'none' }}
+                    >
+                      Enviar pelo WhatsApp
+                    </a>
+                  )}
+                </div>
+                <p style={{ margin: 'calc(var(--base) * 0.75) 0 0' }}>Vale por 48 horas e só pode ser usado uma vez.</p>
+              </>
+            )}
+            {linkStatus && (
+              <p role="status" style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
+                {linkStatus}
+              </p>
+            )}
+            {linkError && (
+              <p role="alert" style={{ marginTop: 'calc(var(--base) * 0.75)', color: 'var(--theme-error-500)' }}>
+                {linkError}
+              </p>
+            )}
+          </div>
         </>
       )}
     </section>

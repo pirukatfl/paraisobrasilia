@@ -134,6 +134,23 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`liberar failed: ${res.status()} ${await res.text()}`)
       return (await res.json()) as { subscriptionId: number; startsAt: string; endsAt: string; validUntilLabel: string }
     },
+    /** Staff REST GET (JSON). */
+    async get(path: string) {
+      const res = await request.get(path, { headers })
+      if (!res.ok()) throw new Error(`GET ${path} failed: ${res.status()}`)
+      return (await res.json()) as { docs: unknown[] } & Record<string, unknown>
+    },
+    /** Staff action "Gerar link de nova senha" (48 h, single use). */
+    async linkSenha(id: number) {
+      const res = await request.post(`/api/assinantes/${id}/link-senha`, { headers, data: {} })
+      if (!res.ok()) throw new Error(`link-senha failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { url: string; expiresAt: string; whatsappUrl: string | null }
+    },
+    /** Staff sets a temporary password (field Senha on the subscriber page). */
+    async setPassword(id: number, password: string) {
+      const res = await request.patch(`/api/assinantes/${id}`, { headers, data: { password } })
+      return (await check(res, 'set password')).doc
+    },
     async encerrar(id: number, reason: string) {
       const res = await request.post(`/api/assinantes/${id}/encerrar`, { headers, data: { reason } })
       if (!res.ok()) throw new Error(`encerrar failed: ${res.status()} ${await res.text()}`)
