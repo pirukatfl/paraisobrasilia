@@ -82,3 +82,24 @@ test('published photos and video appear as tiles', async ({ page, request, isMob
   expect(res.headers()['content-range']).toMatch(/^bytes 0-99\//)
   expect(res.headers()['accept-ranges']).toBe('bytes')
 })
+
+test('a 12-photo gallery stays under 600 KB on a phone before interaction (MIDIA-03)', async ({
+  page,
+  request,
+  isMobile,
+}) => {
+  test.skip(!isMobile, 'mobile budget')
+  test.setTimeout(180_000)
+  const api = await staffApi(request)
+  await api.deleteAll('space-items')
+  for (let i = 0; i < 12; i++) {
+    await api.createSpacePhoto({ order: i, alt: `Ambiente ${i + 1}`, fixture: i % 2 ? 'flyer-square.jpg' : 'flyer-portrait.jpg' })
+  }
+
+  const { measureWeight } = await import('./helpers/weight')
+  await page.goto('/espaco')
+  await expect(page.locator('main ul[role="list"] > li')).toHaveCount(12)
+  const weight = await measureWeight(page)
+  console.log(`[budget] /espaco 12 photos: ${Math.round(weight.total / 1024)} KB without JS`, weight.byType)
+  expect(weight.total).toBeLessThanOrEqual(600 * 1024)
+})
