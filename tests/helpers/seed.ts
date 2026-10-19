@@ -44,9 +44,9 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['parties', 'media', 'users'] as const
+const RESET_ORDER = ['pages', 'parties', 'media', 'users'] as const
 
-/** Deletes every document in parties, media and users (collections not registered yet are skipped). */
+/** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
   assertTestDatabase()
   for (const slug of RESET_ORDER) {
@@ -67,6 +67,12 @@ export async function seedContact(payload: Payload, overrides: Record<string, un
     data: { ...CONTACT_SEED, ...overrides } as never,
     overrideAccess: true,
   })
+}
+
+/** Creates the six institutional pages (published) when missing — same function the migration runs. */
+export async function seedPages(payload: Payload) {
+  const { seedPages: seed } = await import('../../src/migrations/seed/markdown-to-lexical')
+  return seed(payload)
 }
 
 export async function seedStaffUser(

@@ -105,6 +105,83 @@
     cursor: pointer;
   }
 
+  /* Institutional pages rich text (UI-SPEC Phase 2 Typography): H2 = Heading, H3 = Label uppercase */
+  .rich-text {
+    max-width: 680px;
+    font-size: var(--text-body);
+    line-height: 1.5;
+  }
+  .rich-text > :first-child {
+    margin-top: 0;
+  }
+  .rich-text h2 {
+    margin-top: 32px;
+    font-family: var(--font-display);
+    font-size: var(--text-heading);
+    line-height: 1.2;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .rich-text h3 {
+    margin-top: 24px;
+    font-size: var(--text-label);
+    line-height: 1.4;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text);
+  }
+  .rich-text p {
+    margin-top: 16px;
+  }
+  .rich-text ul,
+  .rich-text ol {
+    margin-top: 16px;
+    padding-left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rich-text ul {
+    list-style: disc;
+  }
+  .rich-text ol {
+    list-style: decimal;
+  }
+  .rich-text a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .rich-text strong {
+    font-weight: 600;
+  }
+
+  /* Secondary button (UI-SPEC Phase 2): transparent, 1px line border, accent border on hover/focus */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--color-line);
+    background-color: transparent;
+    color: var(--color-text);
+    font-size: var(--text-label);
+    line-height: 1.4;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn-secondary:hover,
+  .btn-secondary:focus-visible {
+    border-color: var(--color-accent);
+  }
+
   .header-line {
     border-top: 2px solid transparent;
     border-image: linear-gradient(90deg, var(--color-accent), var(--color-brand-red)) 1;

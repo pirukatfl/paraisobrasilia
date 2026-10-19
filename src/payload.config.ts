@@ -9,6 +9,7 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { Media } from './collections/Media'
+import { Pages } from './collections/Pages'
 import { Parties } from './collections/Parties'
 import { Users } from './collections/Users'
 import { Contact } from './globals/Contact'
@@ -46,6 +47,7 @@ export default buildConfig({
     Users,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     Parties,
+    Pages,
   ],
   globals: [Contact],
   editor: lexicalEditor(),
@@ -73,10 +75,12 @@ export default buildConfig({
   },
   plugins: [
     seoPlugin({
-      collections: ['parties'],
+      collections: ['parties', 'pages'],
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => (doc as { title?: string })?.title ?? '',
-      generateDescription: ({ doc }) => (doc as { summary?: string })?.summary ?? '',
+      // Parties describe themselves with `summary`, pages with `intro`
+      generateDescription: ({ doc }) =>
+        (doc as { summary?: string; intro?: string })?.summary ?? (doc as { intro?: string })?.intro ?? '',
       tabbedUI: false,
     }),
   ],

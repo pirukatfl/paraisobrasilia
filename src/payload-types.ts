@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     parties: Party;
+    pages: Page;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -300,6 +302,50 @@ export interface Party {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Textos de Quem Somos, Normas, Regras, Dicas, Termos e Política de Privacidade. Edite e clique em Publicar.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * Define o endereço da página. Não pode repetir.
+   */
+  key: 'quem-somos' | 'normas' | 'regras' | 'dicas' | 'termos' | 'privacidade';
+  title: string;
+  /**
+   * Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp.
+   */
+  intro?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -334,6 +380,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'parties';
         value: number | Party;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -491,6 +541,26 @@ export interface PartiesSelect<T extends boolean = true> {
         id?: T;
       };
   details?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  key?: T;
+  title?: T;
+  intro?: T;
+  body?: T;
   meta?:
     | T
     | {
