@@ -131,6 +131,39 @@ test('drafts are never exposed to anonymous visitors', async ({ playwright }) =>
   await anon.dispose()
 })
 
+// Plan 03-07: Phase 3 public surface (read-only)
+test('Assine Já lists the plans', async ({ page, context, baseURL }) => {
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const res = await page.goto('/assine-ja')
+  expect(res?.status()).toBe(200)
+  await expect(page.getByRole('heading', { name: 'Assine Já', level: 1 })).toBeVisible()
+  const plans = page.locator('section[aria-labelledby="titulo-planos"] li')
+  expect(await plans.count()).toBeGreaterThan(0)
+})
+
+test('subscriber login is noindex and the members area asks for it', async ({ playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: BASE })
+  const entrar = await anon.get('/entrar')
+  expect(entrar.status()).toBe(200)
+  expect(entrar.headers()['x-robots-tag']).toContain('noindex')
+
+  const area = await anon.get('/area-do-assinante', { maxRedirects: 0 })
+  expect([302, 303, 307, 308]).toContain(area.status())
+  expect(area.headers()['location']).toMatch(/\/entrar(\?|$)/)
+  await anon.dispose()
+})
+
+test('subscriber data is closed to anonymous visitors', async ({ playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: BASE })
+  for (const path of ['/api/assinantes', '/api/subscriptions', '/api/audit-log']) {
+    const res = await anon.get(path)
+    const body = await res.text()
+    if (res.status() === 200) expect((JSON.parse(body) as { docs?: unknown[] }).docs ?? []).toHaveLength(0)
+    else expect([401, 403]).toContain(res.status())
+  }
+  await anon.dispose()
+})
+
 test('database port 5432 is closed to the internet', async () => {
   const host = process.env.STAGING_HOST || new URL(BASE!).hostname
   expect(await tcpOpens(host, 5432, 3_000)).toBe(false)

@@ -90,3 +90,33 @@ describe('Phase 2 runbook and staff guide (plan 02-06)', () => {
     },
   )
 })
+
+describe('Phase 3 staff guide and runbook (plan 03-07)', () => {
+  it('the staff guide has every Assinantes section', () => {
+    const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+    expect(guide).toMatch(/^## Assinantes$/m)
+    for (const heading of [
+      'Novo assinante',
+      'Liberar ou renovar',
+      'Encerrar acesso',
+      'Senha provisória e link de nova senha',
+      'Vencem nos próximos 7 dias',
+      'Registro de ações',
+      'Planos e links do PagBank',
+      'Testar o login de um assinante',
+    ]) {
+      expect(guide).toMatch(new RegExp(`^### ${heading}$`, 'm'))
+    }
+    expect(guide).toContain('janela anônima')
+    expect(guide).toContain('48 horas')
+  })
+
+  it('the runbook covers the Phase 3 notes', () => {
+    const runbook = read('docs/deploy/STAGING.md')
+    expect(runbook).toContain('assinantes')
+    expect(runbook).toContain('sem e-mail')
+    expect(runbook).toContain('janela anônima')
+    expect(runbook).toContain('audit_log')
+    expect(runbook).toContain('first-register')
+  })
+})

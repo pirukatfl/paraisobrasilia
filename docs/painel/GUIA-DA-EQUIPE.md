@@ -1,7 +1,8 @@
-# Guia da equipe — painel do site (Fase 2)
+# Guia da equipe — painel do site (Fases 2 e 3)
 
 Este guia explica, passo a passo, como a equipe mantém sozinha a parte aberta do site: fotos e vídeos do espaço,
-modelos, textos, contato e pedidos de remoção de imagem.
+modelos, textos, contato e pedidos de remoção de imagem — e, desde a Fase 3, os assinantes (contas, pagamentos,
+senhas e vencimentos).
 
 **Onde fica o painel:** `https://novo.swingbrasilia.com.br/admin` (staging) — entre com o seu e-mail e senha.
 Cada pessoa da equipe tem o seu próprio usuário.
@@ -137,6 +138,107 @@ imagem do site nunca causa problema.
    - **Modelos**: tire a foto da lista e **Publicar**; se era a modelo inteira, **⋯** → **Excluir**.
 5. Confira no celular que a imagem sumiu da página. Cópias reduzidas guardadas pelo site somem sozinhas em algumas horas.
 6. Responda à pessoa confirmando a remoção.
+
+---
+
+## Assinantes
+
+Tudo sobre assinantes fica no menu **Assinantes** do painel: **Assinantes** (as contas), **Planos**,
+**Assinaturas e pagamentos** e **Registro de ações**. O site **não manda e-mail**: tudo o que o assinante precisa
+receber (senha, link, aviso de vencimento) vai pelo **WhatsApp da casa**, direto para o WhatsApp do próprio assinante.
+
+### Novo assinante
+
+1. Confira o comprovante de pagamento que chegou no WhatsApp (valor, data, nome).
+2. No painel, abra **Assinantes** → **Criar novo**.
+3. Preencha **Nome ou apelido**, **E-mail** (é o login do assinante) e **WhatsApp** (só números, com 55 e DDD,
+   ex.: 5561999998888).
+4. Em **Senha**, escreva uma **senha provisória** com pelo menos 8 caracteres.
+5. Clique em **Salvar**.
+
+A conta pode ficar criada sem acesso: ela só entra na área do assinante depois que você liberar (próximo passo).
+Mande para o assinante, **só no WhatsApp dele**, o e-mail de login e a senha provisória. No primeiro acesso o site
+mostra o aviso "Você está usando uma senha provisória" e pede para ele trocar.
+
+### Liberar ou renovar
+
+1. Abra a ficha do assinante (**Assinantes** → clique no nome).
+2. No quadro **Assinatura**, veja a **Situação** (Sem assinatura, Ativa, Vencida ou Encerrada).
+3. Escolha o **Plano**. O **Valor pago** é preenchido com o preço do plano; corrija se o assinante pagou outro valor.
+   Para dar dias de presente, escolha **Cortesia / outro prazo** e escreva os **Dias de acesso**.
+4. Escolha a **Forma de pagamento** (Pix, PagBank, Dinheiro, Transferência, Cortesia, Outro), a **Data do pagamento**
+   e, se quiser, uma **Observação** (ex.: "comprovante recebido no WhatsApp em 19/10").
+5. Confira a linha **Acesso até …** — é a data que o assinante vai ver.
+6. Clique em **Liberar acesso** (primeira vez) ou **Renovar** (quando ainda está ativa).
+
+A renovação conta **a partir do fim atual**: quem renova antes de vencer não perde nenhum dia. Quem já venceu
+recomeça a partir de hoje. As datas são sempre calculadas pelo site; não é preciso mexer em data nenhuma.
+
+### Encerrar acesso
+
+Use quando o acesso precisa acabar antes da data (pedido do assinante, problema com o pagamento, regra da casa).
+
+1. Na ficha do assinante, quadro **Assinatura**, clique em **Encerrar acesso agora**.
+2. Escreva o **motivo** e confirme.
+
+O acesso acaba na hora (na próxima página que ele abrir). O período pago **continua no histórico** da ficha e no
+Registro de ações — nada é apagado.
+
+### Senha provisória e link de nova senha
+
+Quando o assinante esquece a senha, há dois jeitos:
+
+- **Link de nova senha (preferido):** na ficha, quadro **Assinatura** → **Senha** → **Gerar link de nova senha**.
+  Clique em **Enviar pelo WhatsApp** (abre a conversa com o assinante já com a mensagem) ou em **Copiar** e cole
+  na conversa dele. O link **vale por 48 horas e só pode ser usado uma vez**; gerar um link novo cancela o anterior.
+  O assinante abre o link, escolhe a senha nova e já entra.
+- **Senha provisória:** escreva uma senha nova (8+ caracteres) no campo **Senha** da ficha e clique em **Salvar**.
+  O assinante sai de todos os aparelhos e, ao entrar com a senha provisória, o site pede para trocar.
+
+Cuidados: mande senha ou link **só para o WhatsApp do próprio assinante**, nunca em grupo nem para outra pessoa.
+Na dúvida se é mesmo ele, confirme pelo número cadastrado na ficha.
+
+### Vencem nos próximos 7 dias
+
+É o primeiro quadro da página inicial do painel. Mostra quem vence nos próximos 7 dias, do mais próximo para o mais
+distante, com a data e quantos dias faltam.
+
+- **WhatsApp** abre a conversa com uma mensagem pronta lembrando do vencimento e de como renovar.
+- **Abrir** leva para a ficha do assinante (para renovar quando o comprovante chegar).
+- **Ver todos por vencimento** abre a lista completa de assinantes ordenada pela data de fim.
+
+Quem já renovou ou foi encerrado sai da lista sozinho.
+
+### Registro de ações
+
+Menu **Assinantes** → **Registro de ações**. Cada linha diz **quem** fez (pessoa da equipe ou o próprio assinante),
+**quando** e **o quê**: conta criada, editada ou excluída, acesso liberado, renovado ou encerrado (com plano, valor,
+forma de pagamento e motivo), senha definida pela equipe, senha trocada pelo assinante, link de nova senha gerado.
+
+**Ninguém edita nem apaga o registro** — nem a equipe. Senhas e links nunca aparecem nele. Também dá para ver o
+histórico de um assinante só, no fim da ficha dele.
+
+### Planos e links do PagBank
+
+Menu **Assinantes** → **Planos**. Cada plano tem nome, dias de acesso, preço, preço promocional (opcional), link de
+pagamento do PagBank e a opção **Mostrar na página Assine Já** (só os marcados aparecem no site).
+
+- Os preços em uso são os confirmados pela casa: Mensal R$ 30, Trimestral R$ 75, Semestral R$ 135, Anual R$ 240.
+- **Ao mudar o preço, gere um link novo no PagBank** com o valor novo e cole no campo do link — o link antigo
+  cobra o valor antigo.
+- Sem link, o site mostra **Combinar pelo WhatsApp** no lugar do botão **Pagar**.
+- Para tirar um plano do site sem apagar o histórico de quem já pagou por ele, desmarque **Mostrar na página Assine Já**.
+
+### Testar o login de um assinante
+
+Sempre teste numa **janela anônima** (no celular: aba anônima/privada; no computador: Ctrl+Shift+N). O mesmo
+navegador só guarda um login de cada vez — o do painel **ou** o do assinante. Testando na janela normal, você sai do
+painel ou vê a área do assinante com o usuário errado.
+
+1. Abra uma janela anônima e vá em `/entrar`.
+2. Entre com o e-mail e a senha do assinante de teste.
+3. Confira **Minha assinatura** e a página **Conteúdo exclusivo**.
+4. Feche a janela anônima ao terminar. Exclua o assinante de teste depois (o Registro de ações guarda o que aconteceu).
 
 ---
 

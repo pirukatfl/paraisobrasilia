@@ -193,6 +193,23 @@ Vídeo ocupa muito mais espaço que foto, então:
 - **Backup:** os **snapshots da Hostinger** copiam o disco inteiro, inclusive o volume `media` com as fotos e os vídeos.
   Crie um snapshot antes de mudanças grandes (hPanel → **VPS** → servidor → **Snapshots e backups**).
 
+### 7.2 Assinantes (Fase 3)
+
+- **Migrações:** a Fase 3 traz quatro migrações (`assinantes`, `plans` com os quatro planos iniciais,
+  `subscriptions`, `audit_log`). O timer roda `migrate` antes de reiniciar o site, como sempre; não há SQL manual.
+  Os planos só são criados se a tabela estiver vazia.
+- **Sem e-mail:** o site funciona **sem e-mail** configurado (decisão D-04). Não existe "esqueci minha senha" público:
+  a troca de senha é feita pela equipe (senha provisória ou link de nova senha de 48 horas, enviado pelo WhatsApp).
+  O aviso "No email adapter provided" no log é esperado.
+- **Sessões:** o login do assinante dura 30 dias. Cinco senhas erradas seguidas bloqueiam a conta por 10 minutos.
+- **Primeiro assinante:** ninguém cria conta de fora (o cadastro público e o `first-register` estão fechados para
+  `assinantes`). A equipe cria as contas no painel, como em `GUIA-DA-EQUIPE.md` → Assinantes.
+- **GraphQL desligado:** o site e o painel usam só a API REST; `/api/graphql` responde 404.
+- **`NEXT_PUBLIC_SERVER_URL`** precisa ser o endereço público do site: monta o link de nova senha e a lista de
+  origens aceitas para o cookie de login.
+- **Testar login de assinante:** sempre numa **janela anônima** — o mesmo navegador guarda só um login (painel ou
+  assinante).
+
 ---
 
 ## 8. Jeito B — publicar por SSH (alternativa)
@@ -223,7 +240,9 @@ E2E_BASE_URL=https://novo.swingbrasilia.com.br pnpm exec playwright test tests/e
 
 Confere: HTTPS com cadeado e `noindex`, `robots.txt` bloqueando tudo, confirmação 18+, flyer e imagem de compartilhamento
 servidos pelo próprio site, rascunhos invisíveis para visitantes, as páginas da Fase 2 (Quem somos, Normas, Regras, Dicas,
-Termos, Privacidade, Contato com o link do WhatsApp, Espaço) e a porta do banco (5432) fechada. Não cria nem altera nada.
+Termos, Privacidade, Contato com o link do WhatsApp, Espaço), as páginas da Fase 3 (Assine Já com os planos, Entrar com
+`noindex`, área do assinante pedindo login, dados de assinantes fechados para visitantes) e a porta do banco (5432)
+fechada. Não cria nem altera nada.
 
 ---
 
