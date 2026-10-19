@@ -2,11 +2,20 @@ import Link from 'next/link'
 
 import { ExternalLink } from '@/components/ExternalLink'
 import { WhatsAppIcon } from '@/components/icons'
+import { hasPublishedModels } from '@/lib/gallery/queries'
 import { pathForKey } from '@/lib/pages/keys'
 import { type ContactDTO, instagramUrl, telUrl, whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 
 const linkClass = 'type-label inline-flex min-h-11 items-center text-muted hover:text-text'
+
+async function modelsVisible(): Promise<boolean> {
+  try {
+    return await hasPublishedModels()
+  } catch {
+    return false
+  }
+}
 
 async function loadContact(): Promise<ContactDTO | null> {
   try {
@@ -47,7 +56,7 @@ function LinkList({ links }: { links: FooterLink[] }) {
 /** Site footer (UI-SPEC Global — Footer): Contato · Navegue · Legal + the 18+ line. */
 export async function Footer() {
   const year = new Date().getFullYear()
-  const contact = await loadContact()
+  const [contact, hasModels] = await Promise.all([loadContact(), modelsVisible()])
   const instagram = instagramUrl(contact?.instagram)
   const navigate: FooterLink[] = [
     { href: '/', label: 'Festas' },
@@ -56,6 +65,7 @@ export async function Footer() {
     { href: pathForKey('regras'), label: 'Regras' },
     { href: pathForKey('dicas'), label: 'Dicas' },
     { href: '/espaco', label: 'Espaço' },
+    ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     { href: '/contato', label: 'Contato' },
   ]
   const legal: FooterLink[] = [

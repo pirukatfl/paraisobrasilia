@@ -47,7 +47,7 @@ export const Models: CollectionConfig = {
       label: 'Fotos',
       labels: { singular: 'Foto', plural: 'Fotos' },
       minRows: 1,
-      maxRows: MAX_MODEL_PHOTOS,
+      maxRows: 3, // MAX_MODEL_PHOTOS
       admin: { description: 'De 1 a 3 fotos.' },
       validate: (value: unknown) => {
         const count = Array.isArray(value) ? value.length : 0

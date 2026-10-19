@@ -8,7 +8,7 @@ import { pathForKey } from '../pages/keys'
 
 export type NavItem = { href: string; label: string; children?: NavItem[] }
 
-export function getNavItems(_opts: { hasModels: boolean } = { hasModels: false }): NavItem[] {
+export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels: false }): NavItem[] {
   return [
     { href: '/', label: 'Festas' },
     {
@@ -21,6 +21,8 @@ export function getNavItems(_opts: { hasModels: boolean } = { hasModels: false }
       ],
     },
     { href: '/espaco', label: 'Espaço' },
+    // D-08: secondary section, listed only while at least one model is published
+    ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     { href: '/contato', label: 'Contato' },
   ]
 }
