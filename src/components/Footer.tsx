@@ -66,6 +66,7 @@ export async function Footer() {
     { href: pathForKey('dicas'), label: 'Dicas' },
     { href: '/espaco', label: 'Espaço' },
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
+    { href: '/classisex', label: 'ClassiSex' },
     { href: '/contato', label: 'Contato' },
     { href: '/assine-ja', label: 'Assine Já' },
     { href: '/area-do-assinante', label: 'Área do assinante' },

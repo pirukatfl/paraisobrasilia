@@ -9,12 +9,13 @@ test.describe.configure({ mode: 'serial' })
 const DAY = 86_400_000
 const NINA = { email: 'nina.conta@teste.local', name: 'Nina Sobrenome Secreto', password: 'senha-nina-12345' }
 const OTTO = { email: 'otto.conta@teste.local', name: 'Otto Vencido Secreto', password: 'senha-otto-12345' }
-const TEXTO_NINA = 'Casal liberal, chama no zap 61 99988-9772 ou nina@exemplo.com'
+// Not 99988-9772 (the plan's example): that is the house's own WhatsApp, shown in the footer
+const TEXTO_NINA = 'Casal liberal, chama no zap 61 98877-6655 ou nina@exemplo.com'
 const TEXTO_OTTO = 'Texto do Otto que venceu ontem.'
 const TEXTO_PENDENTE = 'Texto pendente secreto'
 const SECRETS = [
-  '99988',
-  '-9772', // (a bare 4-digit string could match a build hash)
+  '98877',
+  '-6655', // (a bare 4-digit string could match a build hash)
   'nina@exemplo.com',
   '5561977776666',
   'nina_bsb',
