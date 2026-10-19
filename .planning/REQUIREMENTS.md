@@ -48,7 +48,7 @@
 - [x] **CLAS-02**: Assinante abre o perfil completo com fotos, vídeos e contato
 - [x] **CLAS-03**: Assinante cria e edita o próprio perfil (fotos, vídeos, texto, contato)
 - [x] **CLAS-04**: Perfil novo ou editado só aparece depois de aprovado pela equipe
-- [ ] **CLAS-05**: Assinante denuncia um perfil
+- [x] **CLAS-05**: Assinante denuncia um perfil
 - [x] **CLAS-06**: Fotos e vídeos dos perfis nunca abrem por link direto para quem não é assinante
 
 ### Recados e mensagens (REC)
@@ -130,7 +130,7 @@
 | CLAS-02 | Fase 4 | Complete |
 | CLAS-03 | Fase 4 | Complete |
 | CLAS-04 | Fase 4 | Complete |
-| CLAS-05 | Fase 4 | Pending |
+| CLAS-05 | Fase 4 | Complete |
 | CLAS-06 | Fase 4 | Complete |
 | PAINEL-07 | Fase 4 | Complete |
 | PREV-01 | Fase 4 | Complete |
