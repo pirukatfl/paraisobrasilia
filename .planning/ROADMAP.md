@@ -149,7 +149,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 > Nesta fase "perfis" = **anúncios** (04-CONTEXT D-01: o ClassiSex continua um mural de anúncios curtos).
 
 **Plans**: 10 plans
-- [ ] 04-01-PLAN.md — Regras puras: tirar contatos do texto e ler/limpar vídeos MP4/MOV (wave 1)
+- [x] 04-01-PLAN.md — Regras puras: tirar contatos do texto e ler/limpar vídeos MP4/MOV (wave 1)
 - [ ] 04-02-PLAN.md — Anúncios do assinante: opções "Eu sou", coleção ads, Meus anúncios, tudo em análise (wave 1)
 - [ ] 04-03-PLAN.md — Fila de moderação da equipe: aprovar, recusar, despublicar e registro (wave 2)
 - [ ] 04-04-PLAN.md — ClassiSex do assinante: lista com filtros, anúncio com contatos, vencimento esconde (wave 3)
@@ -212,7 +212,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
-| 4. ClassiSex e prévias de perfis | 0/10 | Planned | - |
+| 4. ClassiSex e prévias de perfis | 1/10 | In Progress|  |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
 | 6. Migração do WordPress | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |
