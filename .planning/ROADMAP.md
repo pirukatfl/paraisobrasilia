@@ -116,13 +116,20 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 **Requirements**: ASS-01, ASS-02, ASS-03, ASS-04, ASS-05, PAINEL-05, PAINEL-06, PAINEL-08
 **Success Criteria** (what must be TRUE):
 
-  1. Assinante entra com e-mail e senha, continua logado entre visitas e redefine a senha por link enviado ao e-mail
+  1. Assinante entra com e-mail e senha, continua logado entre visitas e troca a senha (senha provisória ou link de uso único gerado pela equipe e enviado pelo WhatsApp; e-mail adiado, D-04)
   2. Assinante vê até quando sua assinatura vale, e ao vencer perde o acesso ao conteúdo restrito automaticamente na data
   3. Visitante vê na página "Assine Já" os planos e como pagar (pagamento manual)
   4. Equipe libera, renova e encerra uma assinatura registrando o pagamento, e vê quais vencem nos próximos 7 dias
   5. Toda ação da equipe sobre assinantes aparece em um registro com quem, quando e o quê
 
-**Plans**: TBD
+**Plans**: 7 plans
+- [ ] 03-01-PLAN.md — Acesso só da equipe, coleção assinantes, /entrar e área do assinante
+- [ ] 03-02-PLAN.md — Planos e página Assine Já
+- [ ] 03-03-PLAN.md — Períodos de assinatura e validade por data
+- [ ] 03-04-PLAN.md — Liberar, renovar, encerrar e registro de ações
+- [ ] 03-05-PLAN.md — Troca de senha, senha provisória e link de nova senha
+- [ ] 03-06-PLAN.md — Vencem em 7 dias e testes de vazamento
+- [ ] 03-07-PLAN.md — Guias, deploy e conferência do cliente
 **UI hint**: yes
 
 ### Phase 4: ClassiSex e prévias de perfis

@@ -37,7 +37,7 @@
 ### Assinantes (ASS)
 
 - [ ] **ASS-01**: Assinante entra com e-mail e senha e continua logado entre visitas
-- [ ] **ASS-02**: Assinante redefine a senha por link enviado ao e-mail
+- [ ] **ASS-02**: Assinante redefine a senha por link enviado ao e-mail (v1: link/senha provisória gerados pela equipe e enviados pelo WhatsApp; e-mail adiado — decisão do cliente 2026-10-19)
 - [ ] **ASS-03**: Assinante vê até quando sua assinatura vale
 - [ ] **ASS-04**: Assinatura vencida perde acesso ao conteúdo restrito automaticamente na data
 - [ ] **ASS-05**: Visitante vê na página "Assine Já" os planos e como pagar (pagamento manual)
