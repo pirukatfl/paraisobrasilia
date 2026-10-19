@@ -5,7 +5,15 @@
  */
 import type { Payload, Where } from 'payload'
 
-import { relId, toMemberAdDTO, type AdDocLike, type MemberAdDTO } from './dto'
+import {
+  relId,
+  toMemberAdDTO,
+  toPublicAdDTO,
+  type AdDocLike,
+  type AdMediaDocLike,
+  type MemberAdDTO,
+  type PublicAdDTO,
+} from './dto'
 import { CIDADE_MAX, normaliseCidade } from './rules'
 import { categoryLabels, mediaByAd } from './service'
 import { visibleAdsWhere } from './visibility'
@@ -101,4 +109,37 @@ export async function findMemberAd(payload: Payload, id: number | string, now: D
   if (!doc) return null
   const [labels, media] = await Promise.all([categoryLabels(payload), mediaByAd(payload, [doc.id])])
   return toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) })
+}
+
+/**
+ * Open-area preview (PREV-01, D-04, D-07): same visibility, order, filters and page size as the
+ * members board, but only the public DTO leaves this function. Media: only id/kind/order/previa
+ * are read (never filenames).
+ */
+export async function findPublicAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<PublicAdDTO>> {
+  const { items, labels, ...rest } = await findVisibleAdDocs(payload, filters, now)
+  const ids = items.map((d) => d.id)
+  const byAd = new Map<number, AdMediaDocLike[]>()
+  if (ids.length) {
+    const { docs } = await payload.find({
+      collection: 'ad-media',
+      where: { ad: { in: ids } },
+      select: { ad: true, kind: true, order: true, previa: true },
+      sort: 'order',
+      depth: 0,
+      limit: ids.length * 6,
+      pagination: false,
+      overrideAccess: true,
+    })
+    for (const doc of docs as unknown as AdMediaDocLike[]) {
+      const adId = relId(doc.ad)
+      if (adId !== null) byAd.set(adId, [...(byAd.get(adId) ?? []), doc])
+    }
+  }
+  return {
+    ...rest,
+    items: items.map((doc) =>
+      toPublicAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: byAd.get(doc.id) }),
+    ),
+  }
 }

@@ -11,6 +11,7 @@ import {
 import { isStaff } from '../access/roles'
 import { diffForAudit, writeAudit, type AuditAction } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
+import { expire } from '../lib/cache/expire'
 import { accessUntilOf, addDaysToDate, type PeriodLike, spDate, spMidnight } from '../lib/assinantes/periods'
 import { formatShortDate } from '../lib/format/date'
 import { formatBRL } from '../lib/format/money'
@@ -119,12 +120,15 @@ export async function recomputeAccessUntil(req: PayloadRequest, assinanteId: num
 const syncAccessUntil: CollectionAfterChangeHook = async ({ doc, previousDoc, req }) => {
   const ids = new Set([relId(doc.assinante), relId(previousDoc?.assinante)].filter((v) => v !== null))
   for (const id of ids) await recomputeAccessUntil(req, id as number | string)
+  // D-06: the author's ads appear/disappear with the access period (public preview cache)
+  expire(['ads'])
   return doc
 }
 
 const syncAccessUntilAfterDelete: CollectionAfterDeleteHook = async ({ doc, req }) => {
   const id = relId(doc.assinante)
   if (id !== null && !req.context?.assinanteBeingDeleted) await recomputeAccessUntil(req, id)
+  expire(['ads'])
   return doc
 }
 

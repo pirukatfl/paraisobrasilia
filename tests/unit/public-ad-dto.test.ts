@@ -55,8 +55,9 @@ describe('toPublicAdDTO (PREV-01, D-04)', () => {
       'casal@gmail.com',
       'Nome Real',
       'real@x.com',
-      'contato',
-      'author',
+      // the key, not the word: the redaction label itself says "[contato só para assinantes]"
+      '"contato"',
+      '"author"',
       '/area-do-assinante/midia',
       '/api/ad-media',
       'filename',

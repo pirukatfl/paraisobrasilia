@@ -12,6 +12,7 @@ import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
 import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
+import { expire } from '../lib/cache/expire'
 
 export const MIN_PASSWORD_LENGTH = 8
 export const PASSWORD_TOO_SHORT = 'A senha precisa ter pelo menos 8 caracteres.'
@@ -97,6 +98,12 @@ const FIELD_LABELS: Record<string, string> = {
 }
 
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
+/** D-06: a new access end date moves the author's ads on/off the public preview. */
+const expireAdsOnAccessChange: CollectionAfterChangeHook = ({ doc, previousDoc }) => {
+  if ((doc.accessUntil ?? null) !== (previousDoc?.accessUntil ?? null)) expire(['ads'])
+  return doc
+}
+
 const auditAccount: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
   if (req.context?.skipAudit) return doc
   const passwordSetBy = req.context?.passwordSetBy as 'equipe' | 'assinante' | undefined
@@ -195,7 +202,7 @@ export const Assinantes: CollectionConfig = {
   hooks: {
     beforeOperation: [guardOperations],
     beforeDelete: [removePeriods],
-    afterChange: [auditAccount],
+    afterChange: [auditAccount, expireAdsOnAccessChange],
     afterDelete: [auditAccountDeleted],
   },
   fields: [

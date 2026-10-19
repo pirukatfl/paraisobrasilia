@@ -4,6 +4,7 @@
  */
 import { formatShortDate } from '../format/date'
 import { whatsappUrl } from '../site/contact'
+import { redactContacts } from './redact'
 import type { AdStatus } from './rules'
 
 export type AdContatoDTO = { whatsapp: string | null; telegram: string | null; email: string | null }
@@ -71,6 +72,7 @@ export type AdMediaDocLike = {
   kind: 'foto' | 'video'
   order?: number | null
   durationSeconds?: number | null
+  previa?: string | null
   width?: number | null
   height?: number | null
   sizes?: { card?: { width?: number | null; height?: number | null } | null } | null
@@ -198,5 +200,42 @@ export function toMemberAdDTO(
     },
     fotos,
     video,
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Open-area preview (PREV-01, D-04). T-04-01: contacts and the author never leave the server for
+// the public area — this DTO is built from the redacted text only, and photos are the blurred
+// derivatives served by /classisex/previa/{id} (never the originals).
+// ---------------------------------------------------------------------------------------------
+
+export type PublicAdDTO = {
+  id: number
+  euSou: string
+  cidade: string | null
+  texto: string
+  publishedLabel: string
+  fotos: { previewUrl: string }[]
+  hasVideo: boolean
+}
+
+export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
+
+export function toPublicAdDTO(
+  doc: AdDocLike,
+  { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
+): PublicAdDTO {
+  const cidade = doc.cidade ? redactContacts(doc.cidade).text.trim() : ''
+  return {
+    id: doc.id,
+    euSou: euSouLabel,
+    cidade: cidade || null,
+    texto: redactContacts(doc.texto).text,
+    publishedLabel: doc.publishedAt ? formatShortDate(doc.publishedAt) : '',
+    fotos: media
+      .filter((m) => m.kind === 'foto' && m.previa)
+      .sort(byOrder)
+      .map((m) => ({ previewUrl: previewUrl(m.id) })),
+    hasVideo: media.some((m) => m.kind === 'video'),
   }
 }
