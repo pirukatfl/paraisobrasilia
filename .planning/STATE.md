@@ -86,6 +86,11 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 - [Phase 1] Client to confirm legal brief sent to lawyer (AGE-GATE-LEGAL.md: Pendente, 2026-10-19)
 - [Phase 1] Turn on Hostinger VPS backups/snapshots (pgdata + media live on the VPS disk)
 
+- [Phase 2] Client: confirm days/audiences (sexta só casais e mulheres; homens só com reserva) and hours 22h–5h in Regras (02-CONTENT.md §5)
+- [Phase 2] Client: confirm map pin −15.5936421/−47.9771526 (taken from old site's Google place link) and new Instagram handle
+- [Phase 2] Client/lawyer: razão social, CNPJ, DPO and review of Termos/Política drafts ("[VALIDAR" markers must be gone before production, Phase 7)
+- [Phase 2] If 02-WP-TEXTS.md (from the WordPress DB backup) lands, plan 02-02 merges its original wording into the seed texts
+
 ### Blockers/Concerns
 
 - [Phase 1→6] WordPress: hosted at Hostinger, client has wp-admin and hosting access but has not shared it yet (2026-10-19); blocks Phase 6 (fallback: re-cadastro por convite)
