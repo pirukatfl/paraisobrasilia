@@ -14,7 +14,7 @@
 
 ### Área aberta — Espaço e modelos (MIDIA)
 
-- [ ] **MIDIA-01**: Visitante vê galeria de fotos e vídeos do espaço
+- [x] **MIDIA-01**: Visitante vê galeria de fotos e vídeos do espaço
 - [ ] **MIDIA-02**: Visitante vê galeria de fotos profissionais das modelos da casa
 - [ ] **MIDIA-03**: Fotos e vídeos carregam rápido no celular (formatos modernos, carregamento sob demanda)
 
@@ -113,7 +113,7 @@
 | INST-02 | Fase 2 | Complete |
 | INST-03 | Fase 2 | Complete |
 | INST-06 | Fase 2 | Complete |
-| MIDIA-01 | Fase 2 | Pending |
+| MIDIA-01 | Fase 2 | Complete |
 | MIDIA-02 | Fase 2 | Pending |
 | MIDIA-03 | Fase 2 | Pending |
 | PAINEL-02 | Fase 2 | Pending |

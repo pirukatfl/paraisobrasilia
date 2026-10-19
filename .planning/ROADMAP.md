@@ -79,7 +79,7 @@ Plans:
   4. Visitante acessa Termos de Uso e Política de Privacidade (LGPD)
   5. Equipe envia fotos e vídeos registrando a autorização de uso de imagem e edita Quem Somos, Normas, Regras, Dicas e contatos sem ajuda técnica
 
-**Plans:** 2/6 plans executed
+**Plans:** 3/6 plans executed
 Plans:
 **Wave 1**
 
@@ -91,7 +91,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-03-PLAN.md — Space gallery: photos + MP4 videos on MEDIA_DIR, lightbox, empty state, non-blocking image authorization (wave 3)
+- [x] 02-03-PLAN.md — Space gallery: photos + MP4 videos on MEDIA_DIR, lightbox, empty state, non-blocking image authorization (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -191,7 +191,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
-| 2. Site aberto completo e mídia | 2/6 | In Progress|  |
+| 2. Site aberto completo e mídia | 3/6 | In Progress|  |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |

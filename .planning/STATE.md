@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-10-19T03:08:59.663Z"
-last_activity: 2026-10-19 -- Completed 02-02 (pages collection, Quem Somos, legal pages)
+stopped_at: Completed 02-03-PLAN.md
+last_updated: "2026-10-19T03:22:26.611Z"
+last_activity: 2026-10-19 -- Completed 02-03 (space gallery, videos, lightbox)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 12
-  percent: 75
+  completed_plans: 13
+  percent: 81
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: 2 of 6 complete
+Plan: 3 of 6 complete
 Status: In progress
-Last activity: 2026-10-19 -- Completed 02-02 (pages collection, Quem Somos, legal pages)
+Last activity: 2026-10-19 -- Completed 02-03 (space gallery, videos, lightbox)
 
-Progress: 12/16 planned plans (75%); Phase 2: 2/6 plans
+Progress: 13/16 planned plans (81%); Phase 2: 3/6 plans
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: 12/16 planned plans (75%); Phase 2: 2/6 plans
 | Phase 01 P10 | ~60 min (+ client wait) | 3 tasks | 20 files |
 | Phase 02 P01 | 18 min | 2 tasks | 32 files |
 | Phase 02 P02 | 11 min | 2 tasks | 33 files |
+| Phase 02 P03 | 12 min | 2 tasks | 27 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: Shared cache helpers in src/lib/cache (cached, expire); tags contact, pages/page:{key}, space, models
 - [Phase 02]: Seed data in src/migrations/seed/* applied by migrations only when missing (staff edits never overwritten)
 - [Phase 02]: 02-WP-TEXTS.md original wording merged into Quem somos/Normas/Regras seeds; Termos/Privacidade drafts keep [VALIDAR markers
+- [Phase 02]: Payload 3.91 file route serves byte ranges (206): videos use /api/videos/file/*, no fallback route
+- [Phase 02]: e2e data changes go through the staff REST API (cache tags expire); global setup clears .next/dev/cache
 
 ### Pending Todos
 
@@ -115,6 +118,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T03:08:59.634Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-10-19T03:22:26.580Z
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
