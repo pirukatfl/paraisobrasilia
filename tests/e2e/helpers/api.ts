@@ -165,6 +165,47 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`encerrar failed: ${res.status()} ${await res.text()}`)
       return (await res.json()) as { ended: number }
     },
+    /** ClassiSex "Eu sou" options (seeded by global setup). */
+    async findAdCategories() {
+      const res = await request.get('/api/ad-categories?limit=50&depth=0&sort=order', { headers })
+      if (!res.ok()) throw new Error(`find ad-categories failed: ${res.status()}`)
+      return ((await res.json()) as { docs: { id: number; name: string; active?: boolean }[] }).docs
+    },
+    /** ClassiSex ad written by staff (REST is staff-only); euSou defaults to the first option. */
+    async createAd(data: {
+      author: number
+      euSou?: number
+      cidade?: string
+      texto?: string
+      contato?: { whatsapp?: string; telegram?: string; email?: string }
+      status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+      publishedAt?: string
+    }) {
+      let euSou = data.euSou
+      if (euSou === undefined) {
+        const res = await request.get('/api/ad-categories?limit=1&depth=0&sort=order', { headers })
+        euSou = ((await res.json()) as { docs: { id: number }[] }).docs[0].id
+      }
+      const status = data.status ?? 'pendente'
+      const res = await request.post('/api/ads', {
+        headers,
+        data: {
+          cidade: 'Brasília',
+          texto: 'Anúncio de teste criado pela equipe.',
+          contato: { whatsapp: '5561999990000' },
+          submittedAt: new Date().toISOString(),
+          ...(status === 'aprovado' ? { publishedAt: data.publishedAt ?? new Date().toISOString() } : {}),
+          ...data,
+          euSou,
+          status,
+        },
+      })
+      return (await check(res, 'create ad')).doc
+    },
+    async updateAd(id: number, data: Record<string, unknown>) {
+      const res = await request.patch(`/api/ads/${id}`, { headers, data })
+      return (await check(res, 'update ad')).doc
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

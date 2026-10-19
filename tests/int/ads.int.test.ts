@@ -133,3 +133,122 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
     expect((await payload.count({ collection: 'subscriptions', overrideAccess: true })).totalDocs).toBe(0)
   })
 })
+
+describe('owner service (CLAS-03, CLAS-04, D-02, D-03, T-04-04)', () => {
+  let payload: Payload
+  let owner: { id: number }
+  let other: { id: number }
+  let casal: number
+  const NOW = new Date('2026-10-19T18:00:00.000Z')
+
+  const input = (over: Partial<import('../../src/lib/classisex/rules').AdInput> = {}) => ({
+    euSou: casal,
+    cidade: 'Brasília',
+    texto: 'Casal simpático procura amigos.',
+    whatsapp: '5561988887777',
+    telegram: '',
+    email: '',
+    consent: true,
+    ...over,
+  })
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    await seedAdCategories(payload)
+    owner = await seedAssinante(payload, { email: 'dono2@teste.local', password: 'senha-dono-1234', name: 'Dono' })
+    other = await seedAssinante(payload, { email: 'outro@teste.local', password: 'senha-outro-1234', name: 'Outro' })
+    const cats = await payload.find({ collection: 'ad-categories', sort: 'order', overrideAccess: true })
+    casal = cats.docs[0].id as number
+  })
+
+  it('creates as pendente with submittedAt/consentAt and the owner as author', async () => {
+    const { createAd } = await import('../../src/lib/classisex/service')
+    const { id } = await createAd(payload, { assinanteId: owner.id, input: input(), now: NOW })
+    const ad = await payload.findByID({ collection: 'ads', id, depth: 0, overrideAccess: true })
+    expect(ad.status).toBe('pendente')
+    expect(ad.author).toBe(owner.id)
+    expect(ad.submittedAt).toBe(NOW.toISOString())
+    expect(ad.consentAt).toBe(NOW.toISOString())
+  })
+
+  it('refuses a 4th active ad; a refused ad does not count', async () => {
+    const { createAd, ServiceError } = await import('../../src/lib/classisex/service')
+    await seedAd(payload, { author: owner.id, status: 'recusado' })
+    for (let i = 0; i < 3; i++) await createAd(payload, { assinanteId: owner.id, input: input(), now: NOW })
+    const err = await createAd(payload, { assinanteId: owner.id, input: input(), now: NOW }).catch((e) => e)
+    expect(err).toBeInstanceOf(ServiceError)
+    expect(err.code).toBe('limite')
+    expect(err.status).toBe(409)
+    expect(err.message).toBe('Você já tem 3 anúncios ativos. Apague um para publicar outro.')
+  })
+
+  it('editing an approved ad sends it back to pendente, clears motivo, keeps publishedAt', async () => {
+    const { updateAd } = await import('../../src/lib/classisex/service')
+    const ad = await seedAd(payload, { author: owner.id, status: 'aprovado', publishedAt: '2026-10-10T12:00:00.000Z', motivo: 'antigo' })
+    await updateAd(payload, { assinanteId: owner.id, id: ad.id, input: input({ texto: 'Texto novo' }), now: NOW })
+    const after = await payload.findByID({ collection: 'ads', id: ad.id, depth: 0, overrideAccess: true })
+    expect(after.status).toBe('pendente')
+    expect(after.motivo ?? null).toBeNull()
+    expect(after.publishedAt).toBe('2026-10-10T12:00:00.000Z')
+    expect(after.texto).toBe('Texto novo')
+    expect(after.submittedAt).toBe(NOW.toISOString())
+  })
+
+  it("does not let a subscriber edit or delete another subscriber's ad", async () => {
+    const { deleteAd, updateAd } = await import('../../src/lib/classisex/service')
+    const ad = await seedAd(payload, { author: other.id })
+    for (const call of [
+      updateAd(payload, { assinanteId: owner.id, id: ad.id, input: input(), now: NOW }),
+      deleteAd(payload, { assinanteId: owner.id, id: ad.id }),
+    ]) {
+      const err = await call.catch((e) => e)
+      expect(err.code).toBe('nao-encontrado')
+      expect(err.status).toBe(404)
+    }
+    expect((await payload.count({ collection: 'ads', overrideAccess: true })).totalDocs).toBe(1)
+  })
+
+  it('refuses to resubmit a refused ad while 3 are active', async () => {
+    const { updateAd } = await import('../../src/lib/classisex/service')
+    for (let i = 0; i < 3; i++) await seedAd(payload, { author: owner.id })
+    const refused = await seedAd(payload, { author: owner.id, status: 'recusado' })
+    const err = await updateAd(payload, { assinanteId: owner.id, id: refused.id, input: input(), now: NOW }).catch((e) => e)
+    expect(err.code).toBe('limite')
+  })
+
+  it('deletes own ads', async () => {
+    const { deleteAd } = await import('../../src/lib/classisex/service')
+    const ad = await seedAd(payload, { author: owner.id })
+    await deleteAd(payload, { assinanteId: owner.id, id: ad.id })
+    expect((await payload.count({ collection: 'ads', overrideAccess: true })).totalDocs).toBe(0)
+  })
+
+  it('lists only own ads with owner-facing labels', async () => {
+    const { listOwnAds } = await import('../../src/lib/classisex/service')
+    await seedAd(payload, { author: owner.id, status: 'pendente' })
+    await seedAd(payload, { author: owner.id, status: 'aprovado' })
+    await seedAd(payload, { author: owner.id, status: 'recusado', motivo: 'Contato no texto' })
+    await seedAd(payload, { author: owner.id, status: 'despublicado' })
+    await seedAd(payload, { author: other.id })
+    // owner has no active period: the approved ad is off the board
+    const list = await listOwnAds(payload, owner.id, NOW)
+    expect(list).toHaveLength(4)
+    expect(list.map((a) => a.statusLabel).sort()).toEqual(
+      ['Despublicado pela equipe', 'Em análise pela equipe', 'Fora do ar: assinatura vencida', 'Recusado'].sort(),
+    )
+    expect(list.find((a) => a.status === 'recusado')?.motivo).toBe('Contato no texto')
+    expect(list[0].euSou).toBe('Casal')
+
+    await seedSubscription(payload, {
+      assinanteId: owner.id,
+      startsAt: new Date(NOW.getTime() - 86_400_000).toISOString(),
+      endsAt: new Date(NOW.getTime() + 10 * 86_400_000).toISOString(),
+    })
+    const active = await listOwnAds(payload, owner.id, NOW)
+    expect(active.find((a) => a.status === 'aprovado')?.statusLabel).toBe('Publicado')
+  })
+})
