@@ -164,9 +164,10 @@ Tudo fica **no disco do servidor**, em volumes do Docker (decisão de 17/10/2026
 |---|---|
 | `paraiso-staging_pgdata` | banco de dados: festas, usuários da equipe, textos |
 | `paraiso-staging_media` | flyers, fotos do espaço e das modelos enviados pelo painel (e as versões reduzidas geradas automaticamente); vídeos na pasta `/app/media/videos` |
+| `paraiso-staging_private_media` | fotos e vídeos dos anúncios do ClassiSex (Fase 4), em `/app/private-media`; nunca públicos |
 | `paraiso-staging_caddy_data` | certificados HTTPS (se perder, o Caddy pede outros sozinho) |
 
-**Importante:** como as fotos estão no disco do servidor, **o backup precisa incluir os volumes `pgdata` e `media` e ficar
+**Importante:** como as fotos estão no disco do servidor, **o backup precisa incluir os volumes `pgdata`, `media` e `private_media` e ficar
 fora do servidor** — se o servidor quebrar, um backup guardado nele mesmo se perde junto.
 
 **Agora (staging):** ative os backups da Hostinger: hPanel → **VPS** → servidor → **Snapshots e backups** → ative os
@@ -209,6 +210,50 @@ Vídeo ocupa muito mais espaço que foto, então:
   origens aceitas para o cookie de login.
 - **Testar login de assinante:** sempre numa **janela anônima** — o mesmo navegador guarda só um login (painel ou
   assinante).
+
+### 7.3 ClassiSex (Fase 4)
+
+- **Migrações:** a Fase 4 traz quatro migrações (`classisex_ads` com as opções "Eu sou" iniciais, `classisex_moderation`,
+  `ad_media`, `ad_reports`). O timer roda `migrate` antes de reiniciar o site; não há SQL manual.
+- **Volume novo `private_media`**, montado em `/app/private-media`: guarda as fotos e vídeos dos anúncios. O Caddy nunca
+  serve esses arquivos; só o site, depois de conferir o login (um link de foto copiado não abre fora da área do assinante).
+- **Passo único (cliente): rodar o `bootstrap-vps.sh` mais uma vez.** O servidor foi preparado antes da Fase 4 e o
+  `docker-compose.yml` dele ainda não tem o volume. O script pode rodar de novo sem risco: **mantém** as senhas do
+  `.env.staging`, o banco (`pgdata`), as fotos do site (`media`) e os certificados; só reescreve o `docker-compose.yml` e o
+  `Caddyfile` (novo volume e limite de 110 MB por envio), reinicia o site e recarrega o Caddy. No Terminal do navegador
+  (hPanel → VPS → Terminal), cole **o bloco inteiro** e aperte Enter (o token não aparece enquanto você digita; use um token
+  do GitHub com permissão de ler o repositório e `read:packages`):
+
+  ```bash
+  read -rsp 'Cole o token do GitHub e aperte Enter: ' GH_TOKEN; echo
+  curl -fsSL -H "Authorization: token $GH_TOKEN" -o /root/bootstrap-vps.sh \
+    https://raw.githubusercontent.com/pirukatfl/paraisobrasilia/main/scripts/deploy/bootstrap-vps.sh
+  DOMAIN=novo.swingbrasilia.com.br GHCR_USER=pirukatfl GHCR_TOKEN="$GH_TOKEN" bash /root/bootstrap-vps.sh
+  unset GH_TOKEN
+  ```
+
+  Depois confira (cada comando tem uma resposta esperada):
+
+  ```bash
+  docker volume ls | grep private_media        # uma linha: paraiso-staging_private_media
+  cd /opt/paraiso-site && docker compose --env-file .env.staging exec app sh -c 'echo $PRIVATE_MEDIA_DIR'   # /app/private-media
+  journalctl -u paraiso-update -n 50           # mostra as migrações da Fase 4
+  ```
+
+  Enquanto o passo não for feito, o envio de fotos e vídeos responde **"Envio de fotos indisponível no momento."** e nada
+  é gravado dentro do container.
+- **Espaço em disco:** vídeos e fotos dos anúncios ocupam o volume novo. De vez em quando:
+
+  ```bash
+  df -h /                                      # espaço livre do disco
+  docker system df -v | grep private_media     # quanto o volume do ClassiSex já ocupa
+  ```
+
+  Passou de ~80% do disco? Avise o desenvolvedor.
+- **Vídeos sem conversão:** o site guarda o vídeo como foi enviado (MP4 ou MOV, até 60 segundos e 100 MB). Não há
+  conversão no servidor; se algum celular não tocar o vídeo de outro, conte ao desenvolvedor qual aparelho.
+- **Backup:** precisa copiar `pgdata`, `media` **e** `private_media` para fora do servidor (backup automatizado na Fase 7).
+  Ative os backups e crie um snapshot da Hostinger agora.
 
 ---
 

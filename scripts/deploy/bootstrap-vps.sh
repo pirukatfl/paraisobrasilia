@@ -324,6 +324,11 @@ say "6/6 Primeira publicação (baixar imagens, migrar banco, subir o site)"
 "$APP_DIR/update.sh" --force
 systemctl start paraiso-update.timer
 
+# Re-run: the Caddyfile is a bind mount rewritten in place, and compose does not recreate caddy when only
+# that file changes. Reload it so a new Caddyfile (e.g. the upload size cap) takes effect (harmless otherwise).
+docker compose --env-file "$ENV_FILE" exec -T caddy caddy reload --config /etc/caddy/Caddyfile --force >/dev/null 2>&1 ||
+  warn "não consegui recarregar o Caddy; se o Caddyfile mudou, rode: cd $APP_DIR && docker compose --env-file .env.staging restart caddy"
+
 # The image carries the URL it was built for (GitHub variable STAGING_URL): warn on mismatch
 sleep 5
 if ! docker compose --env-file "$ENV_FILE" exec -T app node -e \

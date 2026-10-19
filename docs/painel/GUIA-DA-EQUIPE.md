@@ -1,4 +1,4 @@
-# Guia da equipe — painel do site (Fases 2 e 3)
+# Guia da equipe — painel do site (Fases 2 a 4)
 
 Este guia explica, passo a passo, como a equipe mantém sozinha a parte aberta do site: fotos e vídeos do espaço,
 modelos, textos, contato e pedidos de remoção de imagem — e, desde a Fase 3, os assinantes (contas, pagamentos,
@@ -239,6 +239,76 @@ painel ou vê a área do assinante com o usuário errado.
 2. Entre com o e-mail e a senha do assinante de teste.
 3. Confira **Minha assinatura** e a página **Conteúdo exclusivo**.
 4. Feche a janela anônima ao terminar. Exclua o assinante de teste depois (o Registro de ações guarda o que aconteceu).
+
+---
+
+## ClassiSex
+
+No site novo o ClassiSex é um **mural de anúncios** — o roteiro antigo chamava de "perfis". O assinante com acesso ativo
+escreve o anúncio, com fotos e um vídeo curto; **nada vai ao ar sem a sua aprovação**. Quem não é assinante vê só uma
+prévia, com as fotos desfocadas e sem nenhum contato.
+
+### Fila de moderação
+
+1. No painel inicial, a caixa **ClassiSex** mostra "N anúncios para aprovar" e "N denúncias abertas".
+2. Clique em **Ver fila**: os anúncios em análise aparecem, **os mais antigos primeiro**.
+3. Quando o anunciante edita um anúncio já aprovado, ele **volta para a fila** e sai do ar até você aprovar de novo.
+
+### Aprovar, recusar ou despublicar
+
+1. Abra o anúncio. No topo está o quadro **Moderação**.
+2. Confira **Como aparece na área aberta**: é exatamente o que o visitante vai ver (telefones, e-mails e links são trocados
+   por "[contato só para assinantes]"). Confira também as fotos e o vídeo em **Fotos e vídeo**.
+3. Se estiver tudo certo, clique em **Aprovar**. Você pode corrigir o texto antes de aprovar.
+4. **Recusar** (anúncio em análise) e **Despublicar** (anúncio que já está no ar) pedem sempre um **motivo**, e o
+   anunciante lê esse motivo em Meus anúncios. Escreva de forma simples: "Telefone escrito no texto", "Foto de outra pessoa".
+5. Tudo o que você faz fica no **Registro de ações**.
+
+### O que recusar
+
+- contato escrito no texto ou dentro das fotos (telefone, @, link);
+- foto ou vídeo de outra pessoa, sem autorização dela;
+- **qualquer sinal de menor de idade**;
+- golpe ou cobrança;
+- ofensas e conteúdo ofensivo.
+
+**Na dúvida, recuse e explique o motivo.** O anunciante pode corrigir e enviar de novo.
+
+### Denúncias
+
+1. Assinantes podem denunciar um anúncio (botão **Denunciar este anúncio** no anúncio completo). Na caixa ClassiSex do
+   painel inicial aparece "N denúncias abertas"; clique em **Ver denúncias**. As **Urgentes** aparecem primeiro.
+2. Abra a denúncia: o quadro **Denúncia** mostra o motivo, os detalhes e o link para o anúncio.
+3. **Despublicar o anúncio** tira o anúncio do ar e fecha **todas** as denúncias abertas dele (a nota, se você escrever uma,
+   vira o motivo que o anunciante lê). **Descartar** fecha só aquela denúncia, sem mexer no anúncio.
+4. **Urgente = "Pessoa menor de idade".** Nesse caso o site **despublica o anúncio sozinho, na mesma hora**, antes de
+   qualquer pessoa da equipe olhar, e registra isso no Registro de ações ("Anúncio despublicado", feito por Sistema). A
+   denúncia continua aberta para você decidir:
+   - **confirmar:** abra a denúncia e clique em **Despublicar o anúncio** (o anúncio fica fora do ar; avise o responsável
+     da casa e, se houver menor de idade de fato, não aprove de novo);
+   - **descartar:** se a denúncia não tem fundamento, clique em **Descartar** (com uma nota) e depois abra o anúncio e
+     clique em **Aprovar** para ele voltar ao ar — descartar sozinho **não** reaparece o anúncio.
+5. As demais denúncias não tiram o anúncio do ar sozinhas: decida você.
+6. O anunciante nunca vê quem denunciou.
+
+### Opções "Eu sou"
+
+Em **ClassiSex → Opções "Eu sou"** você edita o nome, a ordem e se a opção está ativa (Casal, Solteiro, Solteira…).
+Para parar de usar uma opção, **desative**; **não apague** uma opção que já está em uso.
+
+### Fotos e vídeos dos anúncios
+
+- Ficam **fora da área pública**: só a equipe, o dono do anúncio e assinantes ativos abrem. O visitante vê apenas a
+  versão desfocada das fotos, e um link de foto copiado não abre fora da área do assinante.
+- **Pedido de remoção** (como em Remoção de imagem): em até **24 horas**, abra o anúncio, apague a foto ou o vídeo em
+  **ClassiSex → Mídias de anúncios → ⋯ → Excluir**, ou **Excluir o anúncio inteiro**. Na dúvida, remova.
+- Quando a pessoa pede para apagar a conta, **Excluir** a conta do assinante apaga também os anúncios, as fotos e os vídeos.
+
+### Testar como assinante
+
+Sempre numa **janela anônima** (no celular: aba anônima/privada), como em "Testar o login de um assinante". Entre em
+`/entrar`, abra **ClassiSex** e confira os anúncios. Para testar o link direto de uma foto, copie o endereço da foto e
+abra numa **outra janela anônima, sem login**: ela **não** deve abrir. É o esperado.
 
 ---
 
