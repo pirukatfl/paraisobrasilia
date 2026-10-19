@@ -5,7 +5,11 @@
  *
  * T-04-04: ownership is checked here on every write; author and status never come from the form.
  */
-import type { Payload } from 'payload'
+import type { Payload, PayloadRequest } from 'payload'
+
+import { isStaff } from '../../access/roles'
+import { writeAudit, type AuditAction } from '../assinantes/audit'
+import { withRequestState } from '../assinantes/context'
 
 import { accessStatusFor } from '../assinantes/status'
 import { relId, toOwnerAdDTO, type AdDocLike, type OwnerAdDTO } from './dto'
@@ -215,4 +219,117 @@ export async function getOwnAdFormValues(
     if (err instanceof ServiceError && err.code === 'nao-encontrado') return null
     throw err
   }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Staff moderation (PAINEL-07, D-03). Called by the staff-only endpoints (endpoints.ts).
+// Dates come from the server clock; status and dates in the request body are never read.
+// ---------------------------------------------------------------------------------------------
+
+export const STAFF_STATUS_LABELS: Record<AdStatus, string> = {
+  pendente: 'Em análise',
+  aprovado: 'Publicado',
+  recusado: 'Recusado',
+  despublicado: 'Despublicado',
+}
+
+const STATE_WORDS: Record<AdStatus, string> = {
+  pendente: 'em análise',
+  aprovado: 'publicado',
+  recusado: 'recusado',
+  despublicado: 'despublicado',
+}
+
+export const MOTIVO_MAX = 300
+export const MOTIVO_MESSAGE = 'Escreva o motivo (até 300 caracteres).'
+
+type Moderation = 'aprovar' | 'recusar' | 'despublicar'
+
+const TRANSITIONS: Record<Moderation, { from: AdStatus[]; to: AdStatus; action: AuditAction; verb: string }> = {
+  aprovar: { from: ['pendente', 'recusado', 'despublicado'], to: 'aprovado', action: 'anuncio-aprovado', verb: 'aprovado' },
+  recusar: { from: ['pendente'], to: 'recusado', action: 'anuncio-recusado', verb: 'recusado' },
+  despublicar: { from: ['aprovado', 'pendente'], to: 'despublicado', action: 'anuncio-despublicado', verb: 'despublicado' },
+}
+
+function cleanMotivo(motivo: unknown): string {
+  const text = typeof motivo === 'string' ? motivo.replace(/\s+/g, ' ').trim() : ''
+  if (text.length < 3 || text.length > MOTIVO_MAX) throw new ServiceError('motivo', MOTIVO_MESSAGE, 400)
+  return text
+}
+
+async function loadAdForStaff(req: PayloadRequest, id: number | string): Promise<AdDoc & { resumo?: string | null }> {
+  const numericId = Number(id)
+  const ad = Number.isInteger(numericId) && numericId > 0
+    ? ((await withRequestState(req, () =>
+        req.payload.findByID({ collection: 'ads', id: numericId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+      )) as (AdDoc & { resumo?: string | null }) | null)
+    : null
+  if (!ad) throw notFound()
+  return ad
+}
+
+/** Applies one moderation transition and writes the audit row (T-04-13), in the same request. */
+export async function moderateAd(
+  req: PayloadRequest,
+  id: number | string,
+  kind: Moderation,
+  { motivo, now, auditDetails }: { motivo?: unknown; now: Date; auditDetails?: Record<string, unknown> },
+): Promise<{ status: AdStatus; statusLabel: string }> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  const t = TRANSITIONS[kind]
+  const ad = await loadAdForStaff(req, id)
+  if (!t.from.includes(ad.status)) {
+    throw new ServiceError('transicao', `Este anúncio já está ${STATE_WORDS[ad.status]}.`, 409)
+  }
+  const reason = kind === 'aprovar' ? null : cleanMotivo(motivo)
+  const staffId = (req.user as { id?: number } | null)?.id ?? null
+  await withRequestState(req, () =>
+    req.payload.update({
+      collection: 'ads',
+      id: ad.id,
+      data: {
+        status: t.to,
+        motivo: reason,
+        moderatedAt: now.toISOString(),
+        moderatedBy: staffId,
+        ...(kind === 'aprovar' ? { publishedAt: now.toISOString() } : {}),
+      },
+      overrideAccess: true,
+      context: { moderation: kind },
+      req,
+    }),
+  )
+  const authorId = relId(ad.author)
+  const author =
+    authorId === null
+      ? null
+      : await withRequestState(req, () =>
+          req.payload.findByID({ collection: 'assinantes', id: authorId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+        )
+  await writeAudit(req, {
+    action: t.action,
+    assinante: author ? { id: author.id, name: author.name, email: author.email } : null,
+    summary: `Anúncio #${ad.id} (${ad.resumo ?? ''}) ${t.verb}${reason ? `: ${reason}` : ''}`,
+    details: { anuncio: ad.id, motivo: reason, ...(auditDetails ?? {}) },
+  })
+  return { status: t.to, statusLabel: STAFF_STATUS_LABELS[t.to] }
+}
+
+export const approveAd = (req: PayloadRequest, id: number | string, now: Date = new Date()) =>
+  moderateAd(req, id, 'aprovar', { now })
+
+export const rejectAd = (req: PayloadRequest, id: number | string, motivo: unknown, now: Date = new Date()) =>
+  moderateAd(req, id, 'recusar', { motivo, now })
+
+export const unpublishAd = (req: PayloadRequest, id: number | string, motivo: unknown, now: Date = new Date()) =>
+  moderateAd(req, id, 'despublicar', { motivo, now })
+
+/** Dashboard queue (FilaClassisex). */
+export async function getModerationCounts(payload: Payload): Promise<{ pendentes: number }> {
+  const { totalDocs } = await payload.count({
+    collection: 'ads',
+    where: { status: { equals: 'pendente' } },
+    overrideAccess: true,
+  })
+  return { pendentes: totalDocs }
 }

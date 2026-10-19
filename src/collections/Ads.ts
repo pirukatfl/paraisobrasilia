@@ -8,6 +8,7 @@ import {
 import { isStaff } from '../access/roles'
 import { withRequestState } from '../lib/assinantes/context'
 import { expire } from '../lib/cache/expire'
+import { adEndpoints } from '../lib/classisex/endpoints'
 import {
   AD_MESSAGES,
   CIDADE_MAX,
@@ -125,6 +126,8 @@ export const Ads: CollectionConfig = {
     update: isStaff,
     delete: isStaff,
   },
+  // Staff-only moderation actions for the Moderação panel (src/lib/classisex/endpoints.ts)
+  endpoints: adEndpoints,
   hooks: {
     beforeValidate: [normaliseAndCheckContacts],
     beforeChange: [computeDerived],

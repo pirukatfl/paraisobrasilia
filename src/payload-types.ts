@@ -343,7 +343,10 @@ export interface AuditLog {
     | 'periodo-corrigido'
     | 'senha-definida-pela-equipe'
     | 'link-de-senha-gerado'
-    | 'senha-trocada-pelo-assinante';
+    | 'senha-trocada-pelo-assinante'
+    | 'anuncio-aprovado'
+    | 'anuncio-recusado'
+    | 'anuncio-despublicado';
   actorType: 'equipe' | 'assinante' | 'sistema';
   actor?: (number | null) | User;
   actorLabel?: string | null;
