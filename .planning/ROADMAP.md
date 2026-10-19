@@ -157,7 +157,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 04-06-PLAN.md — Fotos e vídeo: envio pelo assinante e exibição no ClassiSex (wave 5)
 - [x] 04-07-PLAN.md — Prévia pública /classisex sem contatos, fotos desfocadas, menu e sitemap (wave 6)
 - [x] 04-08-PLAN.md — Denúncias: assinante denuncia, equipe resolve ou despublica (wave 7)
-- [ ] 04-09-PLAN.md — Matriz de vazamento: mídia, contatos, APIs e cabeçalhos (wave 8)
+- [x] 04-09-PLAN.md — Matriz de vazamento: mídia, contatos, APIs e cabeçalhos (wave 8)
 - [ ] 04-10-PLAN.md — Guia, runbook, smoke, deploy, volume na VPS e conferência do cliente (wave 9)
 **UI hint**: yes
 
@@ -212,7 +212,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
-| 4. ClassiSex e prévias de perfis | 8/10 | In Progress|  |
+| 4. ClassiSex e prévias de perfis | 9/10 | In Progress|  |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
 | 6. Migração do WordPress | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |
