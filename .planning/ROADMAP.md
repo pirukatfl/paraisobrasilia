@@ -103,7 +103,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 02-06-PLAN.md — Runbook + staff guide, push to main (deploy + migrations on the VPS), client check on staging (wave 6)
+- [ ] 02-06-PLAN.md — Runbook + staff guide, push to main (deploy + migrations on the VPS), client check on staging (wave 6) — Task 1 done (pushed 93fcccd, run 39198530631 green); awaiting client check
 
 Cross-cutting constraints: schema-changing plans run in sequential waves (Payload migration snapshots); every public query is published-only, cached with tags and revalidated on staff changes; media stays on the VPS disk (MEDIA_DIR).
 **UI hint**: yes

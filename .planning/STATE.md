@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-10-19T03:45:53.645Z"
-last_activity: 2026-10-19 -- Completed 02-05 (home without parties, SEO, budgets)
+status: awaiting-client-check
+stopped_at: 02-06 Task 2 (client checkpoint on staging)
+last_updated: "2026-10-19T04:20:00.000Z"
+last_activity: 2026-10-19 -- 02-06 Task 1 done: Phase 2 pushed (93fcccd, deploy-staging run 39198530631 green); awaiting client check
 progress:
   total_phases: 7
   completed_phases: 1
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: 5 of 6 complete
-Status: In progress
-Last activity: 2026-10-19 -- Completed 02-05 (home without parties, SEO, budgets)
+Plan: 5 of 6 complete; 02-06 Task 1 done, Task 2 (client check) pending
+Status: Awaiting client check (02-06 Task 2, blocking)
+Last activity: 2026-10-19 -- 02-06 Task 1 done: Phase 2 pushed (93fcccd, deploy-staging run 39198530631 green); awaiting client check
 
 Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 
@@ -63,6 +63,7 @@ Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 | Phase 02 P03 | 12 min | 2 tasks | 27 files |
 | Phase 02 P04 | 9 min | 2 tasks | 16 files |
 | Phase 02 P05 | 12 min | 2 tasks | 24 files |
+| Phase 02 P06 | ~35 min (Task 1; + client wait) | 1/2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: Modelos section (route, nav, footer, sitemap) exists only while a model is published (hasPublishedModels, tag models)
 - [Phase 02]: Home works without parties (D-10); budgets: home 344 KB incl. JS in production, /contato 138 KB, /quem-somos 146 KB
 - [Phase 02]: Fonts preload latin subset only; favicon 15 KB
+- [Phase 02]: Phase 2 on main at 93fcccd; staff guide docs/painel/GUIA-DA-EQUIPE.md; image removal = Excluir the file (Despublicar keeps it)
 
 ### Pending Todos
 
@@ -102,7 +104,9 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 - [Phase 2] Client: confirm days/audiences (sexta só casais e mulheres; homens só com reserva) and hours 22h–5h in Regras (02-CONTENT.md §5)
 - [Phase 2] Client: confirm map pin −15.5936421/−47.9771526 (taken from old site's Google place link) and new Instagram handle
 - [Phase 2] Client/lawyer: razão social, CNPJ, DPO and review of Termos/Política drafts ("[VALIDAR" markers must be gone before production, Phase 7)
-- [Phase 2] If 02-WP-TEXTS.md (from the WordPress DB backup) lands, plan 02-02 merges its original wording into the seed texts
+- [Phase 2] Client check on staging (02-06 Task 2, blocking): menu, Quem somos + sub-pages, Contato (pin, Como chegar, WhatsApp), Espaço, legal pages; staff upload photos/video, model (4th photo error), edit Regras/address, Excluir test model
+- [Phase 2] Run the extended staging smoke (Phase 2 pages + WhatsApp link) from a network that reaches the host; confirm the VPS ran the 4 Phase 2 migrations (journalctl -u paraiso-update)
+- [Phase 2] Client: review the texts merged from the WordPress originals (02-02-SUMMARY table); share wp-content/uploads backup for space/model photos (D-07)
 
 ### Blockers/Concerns
 
@@ -123,6 +127,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T03:45:53.607Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-10-19T04:20:00.000Z
+Stopped at: 02-06 Task 2 — client checkpoint (see 02-06-SUMMARY.md)
 Resume file: None
