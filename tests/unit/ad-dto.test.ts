@@ -46,3 +46,38 @@ describe('toMemberAdDTO (CLAS-02, D-05)', () => {
     }
   })
 })
+
+describe('toMemberAdDTO media (CLAS-01, CLAS-02, T-04-07)', () => {
+  const media = [
+    { id: 31, kind: 'foto' as const, order: 2, filename: 'segredo-c.webp', previa: 'segredo-c-previa.webp', owner: 3, url: '/api/ad-media/file/segredo-c.webp', width: 1200, height: 900, sizes: { card: { width: 480, height: 360, filename: 'segredo-c-480.webp' } } },
+    { id: 29, kind: 'foto' as const, order: 0, filename: 'segredo-a.webp', previa: 'segredo-a-previa.webp', owner: 3, url: '/api/ad-media/file/segredo-a.webp', width: 1000, height: 1500, sizes: { card: { width: 480, height: 720 } } },
+    { id: 30, kind: 'foto' as const, order: 1, filename: 'segredo-b.webp', owner: 3, width: 800, height: 800 },
+    { id: 40, kind: 'video' as const, order: 3, filename: 'segredo.mp4', owner: 3, durationSeconds: 42, url: '/api/ad-media/file/segredo.mp4' },
+  ]
+
+  it('sorts photos by order and points every URL at the protected route', () => {
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media })
+    expect(dto.fotos.map((f) => f.id)).toEqual([29, 30, 31])
+    expect(dto.fotos[0]).toEqual({
+      id: 29,
+      miniatura: '/area-do-assinante/midia/29/miniatura',
+      foto: '/area-do-assinante/midia/29/foto',
+      width: 1000,
+      height: 1500,
+      thumbWidth: 480,
+      thumbHeight: 720,
+    })
+    expect(dto.video).toEqual({ id: 40, src: '/area-do-assinante/midia/40/video', durationLabel: '0:42' })
+  })
+
+  it('never serialises filenames, Payload URLs, the blurred twin or the owner', () => {
+    const json = JSON.stringify(toMemberAdDTO(doc, { euSouLabel: 'Casal', media }))
+    for (const banned of ['filename', 'segredo', '/api/', 'previa', 'owner']) expect(json).not.toContain(banned)
+  })
+
+  it('has no media when there is none', () => {
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: [] })
+    expect(dto.fotos).toEqual([])
+    expect(dto.video).toBeNull()
+  })
+})

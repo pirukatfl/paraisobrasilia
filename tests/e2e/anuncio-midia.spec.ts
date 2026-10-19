@@ -19,16 +19,18 @@ const RUI = { email: 'rui@teste.local', name: 'Rui Vencido', password: PASSWORD 
 const FIXTURES = path.resolve('tests/fixtures')
 
 let liaAd = 0
+let liaId = 0
+let noaId = 0
 let ruiAd = 0
 
 test.beforeAll(async ({ request }) => {
   test.setTimeout(120_000)
   const api = await staffApi(request)
   await api.deleteAll('assinantes')
-  const liaId = (await api.createAssinante(LIA)).id
+  liaId = (await api.createAssinante(LIA)).id
   await api.liberar(liaId, { durationDays: 30, method: 'cortesia', amount: 0 })
   liaAd = (await api.createAd({ author: liaId, texto: 'Lia procura casais simpáticos.', status: 'aprovado' })).id
-  const noaId = (await api.createAssinante(NOA)).id
+  noaId = (await api.createAssinante(NOA)).id
   await api.liberar(noaId, { durationDays: 30, method: 'cortesia', amount: 0 })
   const ruiId = (await api.createAssinante(RUI)).id
   await api.createSubscription({
@@ -186,4 +188,73 @@ test('other subscribers, anonymous and cross-site posts cannot upload', async ({
   expect((await api.findAdMedia(liaAd)).length).toBe(before)
   expect(await api.findAdMedia(ruiAd)).toHaveLength(0)
   await api.dispose()
+})
+
+test('members see the cover in the list, the gallery and the video in the full ad', async ({ browser, baseURL, request }) => {
+  test.setTimeout(120_000)
+  const api = await staffApi(request)
+  const galeria = (await api.createAd({ author: liaId, texto: 'Lia com fotos e vídeo.', status: 'aprovado' })).id
+  await api.uploadAdMedia(galeria, 'flyer-square.jpg', 0)
+  await api.uploadAdMedia(galeria, 'flyer-portrait.jpg', 1)
+  await api.uploadAdMedia(galeria, 'espaco.mp4', 2)
+  await api.createAd({ author: noaId, texto: 'Noa ainda sem fotos.', status: 'aprovado' })
+  const stored = await api.findAdMedia(galeria)
+  const filenames = stored.flatMap((m) => [m.filename, m.sizes?.card?.filename, m.previa]).filter(Boolean) as string[]
+  expect(filenames.length).toBeGreaterThan(3)
+  await api.dispose()
+
+  const { page, context } = await asSubscriber(browser, baseURL!, NOA)
+  await page.goto('/area-do-assinante/classisex')
+  const main = page.locator('main')
+  const card = main.getByRole('article').filter({ hasText: 'Lia com fotos e vídeo.' })
+  await expect(card.locator('img')).toHaveCount(1)
+  expect(await card.locator('img').getAttribute('src')).toMatch(/^\/area-do-assinante\/midia\/\d+\/miniatura$/)
+  await expect(card).toContainText('2 fotos')
+  const semFoto = main.getByRole('article').filter({ hasText: 'Noa ainda sem fotos.' })
+  await expect(semFoto).toContainText('Sem foto')
+  await expect(semFoto.locator('img')).toHaveCount(0)
+
+  await page.goto(`/area-do-assinante/classisex/${galeria}`)
+  const fotos = main.getByRole('list', { name: 'Fotos do anúncio' }).locator('img')
+  await expect(fotos).toHaveCount(2)
+  for (const src of await fotos.evaluateAll((imgs) => imgs.map((i) => i.getAttribute('src')))) {
+    expect(src).toMatch(/^\/area-do-assinante\/midia\/\d+\/(miniatura|foto)$/)
+  }
+  await expect
+    .poll(() => fotos.first().evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
+    .toBe(true)
+  await main.getByRole('list', { name: 'Fotos do anúncio' }).getByRole('button').first().click()
+  const dialog = page.getByRole('dialog', { name: 'Fotos do anúncio' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.locator('img')).toHaveAttribute('src', /\/area-do-assinante\/midia\/\d+\/foto$/)
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+
+  const video = main.locator('video')
+  await expect(video).toHaveCount(1)
+  await expect(video).toHaveAttribute('src', /\/area-do-assinante\/midia\/\d+\/video$/)
+  await expect(video).toHaveAttribute('controls', '')
+  await expect(video).toHaveAttribute('preload', 'metadata')
+  expect(await video.evaluate((v: HTMLVideoElement) => v.playsInline)).toBe(true)
+  await expect(main).toContainText(/Vídeo · 0:\d\d/)
+  const src = (await video.getAttribute('src'))!
+  const ranged = await page.evaluate(async (u) => {
+    const res = await fetch(u, { headers: { Range: 'bytes=0-1' }, cache: 'no-store' })
+    return res.status
+  }, src)
+  expect(ranged).toBe(206)
+
+  const html = await page.content()
+  expect(html).not.toMatch(/\/_next\/image[^"']*midia/)
+  expect(html).not.toContain('/api/ad-media')
+  for (const name of filenames) expect(html).not.toContain(name)
+  await context.close()
+
+  // Expired viewer: no media URL at all
+  const rui = await asSubscriber(browser, baseURL!, RUI)
+  for (const path of ['/area-do-assinante/classisex', `/area-do-assinante/classisex/${galeria}`]) {
+    await rui.page.goto(path)
+    expect(await rui.page.content()).not.toContain('/area-do-assinante/midia/')
+  }
+  await rui.context.close()
 })
