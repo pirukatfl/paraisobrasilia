@@ -22,6 +22,7 @@ import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
+import { assertOutsidePublicMedia, privateMediaDir } from './lib/classisex/storage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -34,6 +35,14 @@ const dirname = path.dirname(filename)
  * stay on the site host.
  */
 const mediaDir = path.resolve(/* turbopackIgnore: true */ process.env.MEDIA_DIR || 'media')
+
+/**
+ * ClassiSex photos/videos (Phase 4, CLAS-06): PRIVATE_MEDIA_DIR — `private-media` in development
+ * and tests, `/app/private-media` in the container (named volume `private_media`). Never under
+ * MEDIA_DIR or public/: Payload's public file routes would serve them (T-04-03). Checked at load.
+ */
+const privateDir = privateMediaDir()
+assertOutsidePublicMedia(mediaDir, privateDir)
 
 export default buildConfig({
   admin: {

@@ -47,6 +47,8 @@ next-env.d.ts
 
 # local uploads (dev only; staging/prod keep them in the Docker volume `media`)
 /media
+# ClassiSex private uploads (dev/test; staging/prod use the Docker volume `private_media`)
+/private-media
 
 # Claude Code / GSD tooling (local only)
 .claude/

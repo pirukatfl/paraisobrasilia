@@ -89,7 +89,8 @@ cat >docker-compose.yml <<'PARAISO_COMPOSE'
 #   docker compose --env-file .env.staging up -d app caddy
 #
 # Data lives in named volumes on the server disk: pgdata (database), media (flyers),
-# caddy_data (TLS certificates). Backups must copy pgdata AND media off the server.
+# private_media (ClassiSex photos/videos), caddy_data (TLS certificates).
+# Backups must copy pgdata, media AND private_media off the server.
 name: paraiso-staging
 
 services:
@@ -128,9 +129,12 @@ services:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
       SITE_ENV: staging
       MEDIA_DIR: /app/media
+      PRIVATE_MEDIA_DIR: /app/private-media
     volumes:
       # Payload upload staticDir; the image creates /app/media owned by `node`
       - media:/app/media
+      # ClassiSex photos/videos: private, served only through the app (never by Caddy)
+      - private_media:/app/private-media
     depends_on:
       db:
         condition: service_healthy
@@ -155,6 +159,7 @@ services:
 volumes:
   pgdata:
   media:
+  private_media:
   caddy_data:
   caddy_config:
 PARAISO_COMPOSE
@@ -165,6 +170,10 @@ cat >Caddyfile <<'PARAISO_CADDY'
 # STAGING_DOMAIN comes from .env.staging (passed to the caddy container by compose).
 {$STAGING_DOMAIN} {
 	encode zstd gzip
+	# Outer guard for uploads (ClassiSex videos up to 100 MB, T-04-09)
+	request_body {
+		max_size 110MB
+	}
 	header Strict-Transport-Security "max-age=31536000"
 	reverse_proxy app:3000
 }
