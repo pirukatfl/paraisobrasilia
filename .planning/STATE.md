@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-10-19T13:27:11.000Z"
-last_activity: 2026-10-19 -- 03-04 done: audit log, liberar/renovar/encerrar service, endpoints and admin panel
+stopped_at: Completed 03-05-PLAN.md
+last_updated: "2026-10-19T13:45:53.000Z"
+last_activity: 2026-10-19 -- Completed 03-05 passwords without e-mail
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 23
-  completed_plans: 20
-  percent: 87
+  completed_plans: 21
+  percent: 91
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 3 of 7 (assinantes e controle de acesso)
-Plan: 4 of 7 complete (03-04 done)
+Plan: 5 of 7 complete (03-05 done)
 Status: Executing
-Last activity: 2026-10-19 -- 03-04 done: audit log, liberar/renovar/encerrar service, endpoints and admin panel
+Last activity: 2026-10-19 -- Completed 03-05 passwords without e-mail
 
-Progress: [█████████░] 87% (20/23 plans); Phase 3: 4/7
+Progress: [█████████░] 91% (21/23 plans); Phase 3: 5/7
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -69,6 +69,7 @@ Progress: [█████████░] 87% (20/23 plans); Phase 3: 4/7
 | Phase 03 P02 | 20 min | 2 tasks | 25 files |
 | Phase 03 P03 | 30 min | 3 tasks | 22 files |
 | Phase 03 P04 | 35 min | 3 tasks | 20 files |
+| Phase 03 P05 | 40min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03]: withRequestState: restore req.context/user after nested Local API calls in hooks (Payload mutates the shared req)
 - [Phase 03]: Staff actions = service (int-tested) + staff-only collection endpoints + client UI field 'Assinatura'; dates always computed on the server
 - [Phase 03]: Modules reachable from payload.config never import 'server-only' (status.ts vs access.ts)
+- [Phase 03]: 03-05: no e-mail; temporary password or 48 h single-use link sent by WhatsApp
 
 ### Pending Todos
 
@@ -139,6 +141,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T13:27:11.000Z
-Stopped at: Completed 03-04-PLAN.md
+Last session: 2026-10-19T13:45:53.000Z
+Stopped at: Completed 03-05-PLAN.md
 Resume file: None
