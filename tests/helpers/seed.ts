@@ -44,7 +44,24 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['audit-log', 'subscriptions', 'assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = [
+  // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
+  'ad-reports',
+  'ad-media',
+  'ads',
+  'ad-categories',
+  'audit-log',
+  'subscriptions',
+  'assinantes',
+  'plans',
+  'models',
+  'pages',
+  'space-items',
+  'videos',
+  'parties',
+  'media',
+  'users',
+] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -319,4 +336,46 @@ export async function seedModel(
     } as never,
     overrideAccess: true,
   })
+}
+
+/** Eu sou options (Casal, Solteiro, Solteira) — same function the classisex_ads migration runs. */
+export async function seedAdCategories(payload: Payload): Promise<number> {
+  const { seedAdCategoriesIfEmpty } = await import('../../src/migrations/seed/ad-categories-content')
+  return seedAdCategoriesIfEmpty(payload)
+}
+
+export interface SeedAdInput {
+  author: number
+  euSou?: number
+  cidade?: string
+  texto?: string
+  contato?: { whatsapp?: string; telegram?: string; email?: string }
+  status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+  publishedAt?: string
+  motivo?: string
+}
+
+/** Creates a ClassiSex ad through the Local API (default: first Eu sou option, pendente). */
+export async function seedAd(payload: Payload, input: SeedAdInput) {
+  let euSou = input.euSou
+  if (euSou === undefined) {
+    const { docs } = await payload.find({ collection: 'ad-categories' as never, sort: 'order', limit: 1, overrideAccess: true })
+    euSou = (docs[0] as { id: number }).id
+  }
+  const status = input.status ?? 'pendente'
+  return payload.create({
+    collection: 'ads' as never,
+    data: {
+      author: input.author,
+      euSou,
+      cidade: input.cidade ?? 'Brasília',
+      texto: input.texto ?? 'Casal simpático procura amigos para a próxima festa.',
+      contato: input.contato ?? { whatsapp: '5561999990000' },
+      status,
+      submittedAt: new Date().toISOString(),
+      ...(status === 'aprovado' ? { publishedAt: input.publishedAt ?? new Date().toISOString() } : {}),
+      ...(input.motivo ? { motivo: input.motivo } : {}),
+    } as never,
+    overrideAccess: true,
+  }) as Promise<{ id: number; status: string; resumo?: string | null }>
 }
