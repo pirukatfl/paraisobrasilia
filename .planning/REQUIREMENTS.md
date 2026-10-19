@@ -66,7 +66,7 @@
 - [x] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
 - [x] **PAINEL-05**: Equipe libera, renova e encerra a assinatura de um cliente, registrando o pagamento
 - [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
-- [ ] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
+- [x] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
 - [x] **PAINEL-08**: Toda ação da equipe sobre assinantes fica registrada (quem, quando, o quê)
 
 ### Migração e lançamento (MIG)
@@ -132,7 +132,7 @@
 | CLAS-04 | Fase 4 | Complete |
 | CLAS-05 | Fase 4 | Pending |
 | CLAS-06 | Fase 4 | Pending |
-| PAINEL-07 | Fase 4 | Pending |
+| PAINEL-07 | Fase 4 | Complete |
 | PREV-01 | Fase 4 | Pending |
 | PAINEL-03 | Fase 5 | Pending |
 | PREV-02 | Fase 5 | Pending |

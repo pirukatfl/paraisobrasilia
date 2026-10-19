@@ -151,7 +151,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 **Plans**: 10 plans
 - [x] 04-01-PLAN.md — Regras puras: tirar contatos do texto e ler/limpar vídeos MP4/MOV (wave 1)
 - [x] 04-02-PLAN.md — Anúncios do assinante: opções "Eu sou", coleção ads, Meus anúncios, tudo em análise (wave 1)
-- [ ] 04-03-PLAN.md — Fila de moderação da equipe: aprovar, recusar, despublicar e registro (wave 2)
+- [x] 04-03-PLAN.md — Fila de moderação da equipe: aprovar, recusar, despublicar e registro (wave 2)
 - [ ] 04-04-PLAN.md — ClassiSex do assinante: lista com filtros, anúncio com contatos, vencimento esconde (wave 3)
 - [ ] 04-05-PLAN.md — Mídia privada: volume separado, coleção ad-media, rota protegida com ranges (wave 4)
 - [ ] 04-06-PLAN.md — Fotos e vídeo: envio pelo assinante e exibição no ClassiSex (wave 5)
@@ -212,7 +212,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
-| 4. ClassiSex e prévias de perfis | 2/10 | In Progress|  |
+| 4. ClassiSex e prévias de perfis | 3/10 | In Progress|  |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
 | 6. Migração do WordPress | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |
