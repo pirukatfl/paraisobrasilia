@@ -179,4 +179,11 @@ describe('subscription periods and entitlement (ASS-03, ASS-04, D-05, T-03-06)',
       expect((args as { context?: Record<string, unknown> }).context?.skipAudit).toBe(true)
     }
   })
+
+  it('deleting an account removes its periods in the same request', async () => {
+    await seedSubscription(payload, { assinanteId: sub.id, planId: mensal.id, startsAt: '2026-10-19T18:00:00.000Z' })
+    await payload.delete({ collection: 'assinantes', id: sub.id, ...asStaff() })
+    const { totalDocs } = await payload.count({ collection: 'subscriptions', where: { assinante: { equals: sub.id } } })
+    expect(totalDocs).toBe(0)
+  })
 })

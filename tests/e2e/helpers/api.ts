@@ -106,6 +106,25 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`find plans failed: ${res.status()}`)
       return ((await res.json()) as { docs: { id: number; name: string; price: number; promoPrice?: number | null; paymentUrl?: string | null; active: boolean }[] }).docs
     },
+    /** Subscription period (staff REST). endsAt empty = computed from the plan. */
+    async createSubscription(data: {
+      assinante: number
+      plan?: number
+      startsAt: string
+      endsAt?: string
+      status?: 'ativa' | 'encerrada'
+      payment?: { method: string; amount?: number; note?: string }
+    }) {
+      const res = await request.post('/api/subscriptions', {
+        headers,
+        data: { status: 'ativa', payment: { method: 'pix', amount: 30 }, ...data },
+      })
+      return (await check(res, 'create subscription')).doc as unknown as { id: number; startsAt: string; endsAt: string }
+    },
+    async endSubscription(id: number) {
+      const res = await request.patch(`/api/subscriptions/${id}`, { headers, data: { status: 'encerrada' } })
+      return (await check(res, 'end subscription')).doc
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

@@ -6,7 +6,10 @@ import { sair } from '@/lib/assinantes/actions'
 // Members area: always rendered per request (private, no-store).
 export const dynamic = 'force-dynamic'
 
-const LINKS = [{ href: '/area-do-assinante', label: 'Minha assinatura' }]
+const LINKS = [
+  { href: '/area-do-assinante', label: 'Minha assinatura' },
+  { href: '/area-do-assinante/exclusivo', label: 'Conteúdo exclusivo' },
+]
 
 /**
  * Chrome only. Authorization lives in each page (and each server action) via the DAL in

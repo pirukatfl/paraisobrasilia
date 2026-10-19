@@ -1,6 +1,13 @@
-import { APIError, Forbidden, type CollectionBeforeOperationHook, type CollectionConfig } from 'payload'
+import {
+  APIError,
+  Forbidden,
+  type CollectionBeforeDeleteHook,
+  type CollectionBeforeOperationHook,
+  type CollectionConfig,
+} from 'payload'
 
 import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
+import { withRequestState } from '../lib/assinantes/context'
 
 export const MIN_PASSWORD_LENGTH = 8
 export const PASSWORD_TOO_SHORT = 'A senha precisa ter pelo menos 8 caracteres.'
@@ -38,6 +45,25 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
     }
   }
   return args
+}
+
+/**
+ * Deleting an account removes its periods first (subscriptions.assinante is required, and the
+ * API never deletes periods on its own). Same request/transaction; the count is kept in
+ * req.context for the audit entry.
+ */
+const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  const removed = await withRequestState(req, async () => {
+    const result = await req.payload.delete({
+      collection: 'subscriptions',
+      where: { assinante: { equals: id } },
+      overrideAccess: true,
+      context: { skipAudit: true, assinanteBeingDeleted: true },
+      req,
+    })
+    return result.docs.length
+  })
+  req.context = { ...req.context, periodosRemovidos: removed }
 }
 
 /**
@@ -80,6 +106,7 @@ export const Assinantes: CollectionConfig = {
   },
   hooks: {
     beforeOperation: [guardOperations],
+    beforeDelete: [removePeriods],
   },
   fields: [
     // email and password are added by `auth`
