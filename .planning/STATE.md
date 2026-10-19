@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-stopped_at: Phase 2 complete (6/6) — ready to discuss Phase 3
-last_updated: 2026-10-19T11:25:51.491Z
-last_activity: 2026-10-19 -- 02-06 Task 1 done: Phase 2 pushed (93fcccd, deploy-staging run 39198530631 green); awaiting client check
+status: executing
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-10-19T12:38:20.000Z"
+last_activity: 2026-10-19 -- 03-01 done: role-safe access, assinantes auth, /entrar and members area
 progress:
   total_phases: 7
-  completed_phases: 1
-  total_plans: 16
-  completed_plans: 16
-  percent: 14
+  completed_phases: 2
+  total_plans: 23
+  completed_plans: 17
+  percent: 74
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 3 of 7 (assinantes e controle de acesso)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-10-19
+Plan: 1 of 7 complete (03-01 done)
+Status: Executing
+Last activity: 2026-10-19 -- 03-01 done: role-safe access, assinantes auth, /entrar and members area
 
-Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
+Progress: [███████░░░] 74% (17/23 plans); Phase 3: 1/7
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -65,6 +65,7 @@ Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 | Phase 02 P04 | 9 min | 2 tasks | 16 files |
 | Phase 02 P05 | 12 min | 2 tasks | 24 files |
 | Phase 02 P06 | ~35 min (Task 1; + client wait) | 1/2 tasks | 11 files |
+| Phase 03 P01 | 45 min | 2 tasks | 33 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: Home works without parties (D-10); budgets: home 344 KB incl. JS in production, /contato 138 KB, /quem-somos 146 KB
 - [Phase 02]: Fonts preload latin subset only; favicon 15 KB
 - [Phase 02]: Phase 2 on main at 93fcccd; staff guide docs/painel/GUIA-DA-EQUIPE.md; image removal = Excluir the file (Despublicar keeps it)
+- [Phase 03]: Roles by principal collection (src/access/roles.ts): users = staff; assinantes never pass staff checks
+- [Phase 03]: assinantes accounts only by staff or trusted context; public first-register/forgot-password closed; 30-day sessions
 
 ### Pending Todos
 
@@ -128,6 +131,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T04:20:00.000Z
-Stopped at: 02-06 Task 2 — client checkpoint (see 02-06-SUMMARY.md)
+Last session: 2026-10-19T12:38:20.000Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
