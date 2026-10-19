@@ -64,10 +64,12 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    assinantes: AssinanteAuthOperations;
   };
   blocks: {};
   collections: {
     users: User;
+    assinantes: Assinante;
     media: Media;
     videos: Video;
     parties: Party;
@@ -82,6 +84,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    assinantes: AssinantesSelect<false> | AssinantesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -107,13 +110,31 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | Assinante;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface AssinanteAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -157,6 +178,50 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * Crie a conta depois de conferir o comprovante. A conta pode existir sem acesso; o acesso é liberado em "Assinatura".
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assinantes".
+ */
+export interface Assinante {
+  id: number;
+  /**
+   * Como o assinante é chamado no site ("Olá, …").
+   */
+  name: string;
+  /**
+   * Só números, com 55 e DDD. Usado pela equipe para enviar senha e avisos.
+   */
+  whatsapp?: string | null;
+  /**
+   * Só a equipe vê. Não anote dados bancários nem comprovantes.
+   */
+  staffNotes?: string | null;
+  /**
+   * Marcado quando a equipe define a senha; some quando o assinante troca.
+   */
+  mustChangePassword?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'assinantes';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -485,6 +550,10 @@ export interface PayloadLockedDocument {
         value: number | User;
       } | null)
     | ({
+        relationTo: 'assinantes';
+        value: number | Assinante;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -509,10 +578,15 @@ export interface PayloadLockedDocument {
         value: number | Model;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'assinantes';
+        value: number | Assinante;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -522,10 +596,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'assinantes';
+        value: number | Assinante;
+      };
   key?: string | null;
   value?:
     | {
@@ -556,6 +635,33 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assinantes_select".
+ */
+export interface AssinantesSelect<T extends boolean = true> {
+  name?: T;
+  whatsapp?: T;
+  staffNotes?: T;
+  mustChangePassword?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;

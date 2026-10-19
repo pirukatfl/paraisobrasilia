@@ -44,7 +44,7 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = ['assinantes', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -84,6 +84,22 @@ export async function seedStaffUser(
     data: { email, password, name: 'Equipe de Teste' },
     overrideAccess: true,
   })
+}
+
+/**
+ * Creates a subscriber account the way migrations and imports do (trusted context: the
+ * beforeOperation guard only lets staff or trusted calls create accounts, T-03-02).
+ */
+export async function seedAssinante(
+  payload: Payload,
+  { email, password, name, whatsapp }: { email: string; password: string; name: string; whatsapp?: string },
+) {
+  return payload.create({
+    collection: 'assinantes' as never,
+    data: { email, password, name, ...(whatsapp ? { whatsapp } : {}) } as never,
+    overrideAccess: true,
+    context: { trustedCreate: true, skipAudit: true },
+  }) as Promise<{ id: number; email: string; name: string; mustChangePassword?: boolean | null }>
 }
 
 export interface SeedPartyInput {

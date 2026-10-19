@@ -1,5 +1,7 @@
 import type { GroupField } from 'payload'
 
+import { isStaff } from '../access/roles'
+
 /**
  * "Autorização de uso de imagem" (D-09): recommended, NOT required to publish.
  * The note may hold personal information, so only staff can read the group:
@@ -14,7 +16,7 @@ export const imageAuthorization: GroupField = {
       'Recomendado, não obrigatório para publicar. Ex.: Enviou as fotos por WhatsApp para divulgação em 12/10/2026.',
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: isStaff,
   },
   fields: [
     {

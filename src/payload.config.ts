@@ -8,6 +8,7 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { Assinantes } from './collections/Assinantes'
 import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
@@ -48,6 +49,7 @@ export default buildConfig({
   },
   collections: [
     Users,
+    Assinantes,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,
@@ -59,6 +61,8 @@ export default buildConfig({
     Models,
   ],
   globals: [Contact],
+  // T-03-12: a cookie sent from another origin is ignored (same-origin admin and server actions keep working)
+  csrf: [process.env.NEXT_PUBLIC_SERVER_URL].filter((url): url is string => Boolean(url)),
   editor: lexicalEditor(),
   i18n: {
     supportedLanguages: { pt, en },

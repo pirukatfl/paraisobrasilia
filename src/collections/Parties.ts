@@ -11,10 +11,9 @@ import {
 } from '@payloadcms/richtext-lexical'
 import type { CollectionBeforeChangeHook, CollectionConfig, FieldHook } from 'payload'
 
+import { isStaff, staffOrPublished } from '../access/roles'
 import { revalidatePartyAfterChange, revalidatePartyAfterDelete } from '../lib/parties/revalidate'
 import { defaultEndsAt } from '../lib/parties/visibility'
-
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 
 /** "Festa do Branco — Edição 10" → "festa-do-branco-edicao-10" */
 export function slugify(input: string): string {
@@ -53,7 +52,7 @@ export const Parties: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
   access: {
     // Visitors and anonymous API calls see only published parties (T-01-25)
-    read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }),
+    read: staffOrPublished,
     create: isStaff,
     update: isStaff,
     delete: isStaff,

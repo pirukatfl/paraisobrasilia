@@ -12,10 +12,9 @@ import {
 } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
 
+import { isStaff, staffOrPublished } from '../access/roles'
 import { PAGE_KEY_LABELS, PAGE_KEYS } from '../lib/pages/keys'
 import { revalidatePageAfterChange, revalidatePageAfterDelete } from '../lib/pages/revalidate'
-
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 
 /**
  * Institutional and legal pages with fixed keys (INST-01, INST-06, PAINEL-04).
@@ -34,7 +33,7 @@ export const Pages: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
   access: {
     // T-02-04: anonymous visitors and API calls see published pages only
-    read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }),
+    read: staffOrPublished,
     create: isStaff,
     update: isStaff,
     delete: isStaff,

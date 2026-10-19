@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
+import { isStaff } from '../access/roles'
 
 /**
  * Venue videos (MIDIA-01): MP4 only, stored on the server disk under MEDIA_DIR/videos

@@ -1,9 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+import { isStaff, staffOrPublished } from '../access/roles'
 import { imageAuthorization } from '../fields/imageAuthorization'
 import { revalidateModels, revalidateModelsAfterDelete } from '../lib/gallery/revalidate'
-
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 
 export const MAX_MODEL_PHOTOS = 3
 
@@ -23,7 +22,7 @@ export const Models: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
   access: {
     // T-02-10: visitors see published models only
-    read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }),
+    read: staffOrPublished,
     // T-02-11: writes are staff-only
     create: isStaff,
     update: isStaff,

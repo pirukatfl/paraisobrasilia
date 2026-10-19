@@ -1,5 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
+import { isStaff } from '../access/roles'
+
+const secureCookies = (process.env.NEXT_PUBLIC_SERVER_URL ?? '').startsWith('https://')
+
 /**
  * Staff accounts for the admin panel (/admin).
  * No public sign-up: the very first account is created through Payload's built-in
@@ -18,12 +22,16 @@ export const Users: CollectionConfig = {
   auth: {
     maxLoginAttempts: 5,
     lockTime: 600000, // 10 minutes
+    cookies: { sameSite: 'Lax', secure: secureCookies },
   },
   access: {
-    create: ({ req }) => Boolean(req.user),
-    read: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    // T-03-01: only staff principals (collection `users`), never subscribers
+    create: isStaff,
+    read: isStaff,
+    update: isStaff,
+    delete: isStaff,
+    // Payload's default unlock access is "any logged-in user"
+    unlock: isStaff,
   },
   fields: [
     // email and password are added by `auth`

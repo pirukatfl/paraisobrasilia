@@ -1,8 +1,7 @@
 import { APIError, type CollectionBeforeOperationHook, type CollectionConfig } from 'payload'
 
+import { isStaff } from '../access/roles'
 import { revalidateGalleries, revalidateGalleriesAfterDelete } from '../lib/gallery/revalidate'
-
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 
 /** Images stay capped at 15 MB although the global upload limit is 100 MB (videos). */
 export const MAX_IMAGE_BYTES = 15_000_000

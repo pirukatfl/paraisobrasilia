@@ -1,9 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+import { isStaff, staffOrPublished } from '../access/roles'
 import { imageAuthorization } from '../fields/imageAuthorization'
 import { revalidateSpace, revalidateSpaceAfterDelete } from '../lib/gallery/revalidate'
-
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 
 type Sibling = { kind?: 'photo' | 'video' }
 
@@ -20,7 +19,7 @@ export const SpaceItems: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
   access: {
     // T-02-05: visitors see published items only
-    read: ({ req }) => (req.user ? true : { _status: { equals: 'published' } }),
+    read: staffOrPublished,
     create: isStaff,
     update: isStaff,
     delete: isStaff,

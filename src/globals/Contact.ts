@@ -1,8 +1,8 @@
 import type { GlobalAfterChangeHook, GlobalConfig } from 'payload'
 
+import { isStaff } from '../access/roles'
 import { expire } from '../lib/cache/expire'
 
-const isStaff = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
 
 const revalidateContact: GlobalAfterChangeHook = ({ doc }) => {
   expire(['contact'])
