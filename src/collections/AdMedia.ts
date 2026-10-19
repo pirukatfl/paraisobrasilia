@@ -56,6 +56,10 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
   if (operation !== 'create' && operation !== 'update') return args
   const file = req.file
   if (!file) return args
+  // T-04-02/T-04-09: a REST caller that is not staff is refused by the access rules right after
+  // this hook; do not decode its bytes (sharp, MP4 parsing) before that happens. Local API calls
+  // (member upload service, seeds) run with overrideAccess and are validated as before.
+  if ((args as { overrideAccess?: boolean }).overrideAccess !== true && !isStaff({ req })) return args
   if (!privateStorageConfigured()) throw fail(AD_MEDIA_MESSAGES.indisponivel, 503)
 
   const writeArgs = args as { data?: Record<string, unknown> }
