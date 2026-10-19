@@ -12,19 +12,20 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Festas (o "produto"): flyers no formato das redes sociais (1:1 e 4:5), adaptáveis ao celular, cada um levando a uma página com texto e detalhes da festa; festas passadas saem da home sozinhas — Fase 1 (FEST-01..04; prévia no WhatsApp aguardando confirmação do cliente em staging)
+- ✓ Confirmação de maioridade (18+) na entrada, sem exigir cadastro (módulo trocável) — Fase 1 (INST-04; parecer jurídico pendente antes do lançamento)
+- ✓ SEO básico correto (título, descrição, Open Graph) nas páginas abertas — Fase 1 (INST-05; desempenho alto no celular segue para a Fase 7)
+- ✓ Painel simples para a equipe publicar, editar e despublicar festas/flyers sem desenvolvedor — Fase 1 (PAINEL-01; teste com a equipe da casa aguardando confirmação do cliente; fotos, vídeos e contos seguem nas Fases 2 e 5)
 
 ### Active
 
 **Área aberta (sem cadastro, sem restrição, mas SEM contatos de perfis):**
-- [ ] Festas (o "produto"): flyers em tamanho igual/adaptável ao das redes sociais; cada flyer leva a uma página com o texto e os detalhes da festa
 - [ ] Fotos e vídeos do espaço onde acontecem as festas
 - [ ] Fotos profissionais das modelos que a casa contrata
 - [ ] Chamadas (prévias) para todo o conteúdo restrito, sem expor contato: perfis, mensagens/recados, fotos
 - [ ] Contos e conteúdo curioso; parte dos contos aberta para gerar curiosidade, o restante para assinantes
 - [ ] Endereço, mapa e informações que atraiam clientes reais
 - [ ] Menu "Quem Somos" com submenus: Normas, Regras, Dicas
-- [ ] Confirmação de maioridade (18+) na entrada, sem exigir cadastro
 
 **Área controlada (só assinantes):**
 - [ ] ClassiSex: perfil completo com fotos e vídeos
@@ -33,10 +34,10 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - [ ] Assinatura com pagamento manual: o cliente paga por fora e a casa libera/renova o acesso pelo painel
 
 **Operação:**
-- [ ] Painel simples para a equipe da casa publicar festas/flyers, fotos, vídeos e contos sem depender de desenvolvedor
+- [ ] Painel simples para a equipe da casa publicar fotos, vídeos e contos sem depender de desenvolvedor (festas já validadas na Fase 1)
 - [ ] Gestão de assinantes no painel (liberar, renovar, expirar acesso)
 - [ ] Migração dos assinantes e perfis existentes do WordPress atual
-- [ ] SEO básico correto (título, descrição, Open Graph) e desempenho alto no celular
+- [ ] Desempenho alto no celular (SEO básico já validado na Fase 1)
 
 ### Out of Scope
 
@@ -52,8 +53,11 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - Problemas observados no site atual: menu repetido 3 vezes no HTML, meta description "news", og:site_name "Paraiso Club" (diferente da marca), handle de Twitter inválido, copyright 2005–2024, muitas imagens sem alt, erros de digitação ("assinantess", "profissinais"), item "Fotos" apontando para "quemsomos", dois Instagrams diferentes, uploads com nome de teste, página pesada por causa do page builder.
 - Contato atual: telefone (61) 9 9988-9772, suporte@swingbrasilia.com.br, Facebook e Instagram. Endereço físico não aparece no site atual.
 - Público: adultos em Brasília interessados em festas liberais; a casa quer converter visitantes em clientes reais e assinantes.
-- Ainda não sabemos: onde o site está hospedado, acesso ao banco/admin do WordPress (necessário para migrar assinantes), qual plugin gerencia os assinantes hoje, logo e identidade visual.
-- O acesso direto ao domínio a partir do ambiente de desenvolvimento foi bloqueado pela rede; a análise foi feita só pelo texto da página.
+- WordPress atual hospedado na Hostinger; o cliente tem login no wp-admin e acesso à hospedagem, ainda não compartilhados (2026-10-19). Ainda não sabemos: qual plugin gerencia os assinantes, tipo de hash das senhas, logo vetorial.
+- Hospedagem do site novo: Hostinger VPS (Ubuntu 24.04, IP 187.77.246.132), mesma conta do site atual. Staging no ar em https://novo.swingbrasilia.com.br (registro DNS A `novo` no hPanel), confirmado pelo cliente em 2026-10-19.
+- Código: GitHub pirukatfl/paraisobrasilia (branch main). Cada push no main roda o workflow deploy-staging, que publica as imagens em ghcr.io/pirukatfl/paraisobrasilia; um timer do systemd na VPS (instalado por scripts/deploy/bootstrap-vps.sh) baixa a versão nova a cada 5 minutos, roda as migrações e reinicia. Ninguém precisa de SSH para publicar.
+- Banco (Postgres) e mídia ficam em volumes no disco da VPS; o backup fora do servidor ainda não existe (Fase 7).
+- O acesso direto ao domínio (inclusive ao staging) e SSH à VPS a partir do ambiente de desenvolvimento são bloqueados pela rede; verificações em staging dependem do cliente ou do CI.
 
 ## Constraints
 
@@ -71,11 +75,12 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 | Pagamento manual na v1 | É como a casa cobra hoje | — Pending |
 | Migrar assinantes e perfis existentes | Ninguém perde acesso na troca | — Pending |
 | Cortar Mural, Rede Social, IA HOT Vídeos e Galeria Amadora | Site mais limpo e focado | — Pending |
-| Painel para a equipe da casa publicar | Autonomia no dia a dia | — Pending |
-| Área aberta mostra só prévias, sem contato | Contato é o valor da assinatura | — Pending |
-| Stack técnica | A definir na pesquisa | — Pending |
-| Hospedagem: Hostinger VPS (mesma conta do site atual) | Aceita conteúdo adulto por escrito | — Pending |
-| Fotos e vídeos no disco da própria VPS, sem Backblaze B2 | Decisão do cliente (2026-10-17): menos contas e custos; backup precisa incluir a mídia | — Pending |
+| Painel para a equipe da casa publicar | Autonomia no dia a dia | ✓ Good — festas com rascunho/publicar/despublicar no Payload (Fase 1); teste com a equipe pendente |
+| Área aberta mostra só prévias, sem contato | Contato é o valor da assinatura | — Pending (prévias nas Fases 4-5) |
+| Stack técnica: Next.js 16 + Payload 3 + Postgres 16, em Docker | Painel pronto em português, um só deploy | ✓ Good — Fase 1 no ar em staging |
+| Hospedagem: Hostinger VPS (mesma conta do site atual) | Aceita conteúdo adulto por escrito | ✓ Good — staging no ar em novo.swingbrasilia.com.br (2026-10-19) |
+| Fotos e vídeos no disco da própria VPS, sem Backblaze B2 | Decisão do cliente (2026-10-17): menos contas e custos; backup precisa incluir a mídia | ✓ Implementado (volume media); ⚠️ backup fora do servidor pendente (Fase 7) |
+| Deploy por pull: GitHub Actions → GHCR → timer systemd na VPS | Nosso ambiente não tem SSH para a VPS; o cliente roda um script uma vez | ✓ Good — run 39162346021 publicou as imagens; site no ar |
 
 ## Evolution
 
@@ -95,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-17 after initialization*
+*Last updated: 2026-10-19 after Phase 1*

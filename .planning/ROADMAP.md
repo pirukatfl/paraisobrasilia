@@ -6,7 +6,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 
 ## Phases
 
-- [ ] **Phase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico
+- [x] **Phase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico (completed 2026-10-19)
 - [ ] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas
 - [ ] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe
 - [ ] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
@@ -30,12 +30,12 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
   4. Equipe cria, edita e despublica uma festa com flyer no painel, sem ajuda técnica, e a festa passada some da home sozinha após a data
   5. Estão registrados: acesso (ou ausência de acesso) ao WordPress e plugin de assinantes, parecer jurídico sobre age gate, e AUP da hospedagem/e-mail/storage
 
-**Plans:** 8/10 plans executed
+**Plans:** 10/10 plans complete
 Plans:
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Scaffold Next.js 16 + Payload 3 + Postgres, Portuguese admin, local run (wave 1)
-- [ ] 01-02-PLAN.md — Discovery records: WordPress, legal brief on age gate, provider AUPs (wave 1)
+- [x] 01-02-PLAN.md — Discovery records: WordPress, legal brief on age gate, provider AUPs (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -61,7 +61,7 @@ Plans:
 
 **Wave 7** *(blocked on Wave 6 completion)*
 
-- [ ] 01-10-PLAN.md — Staging deploy on the VPS with HTTPS, B2 media, acceptance check (wave 7)
+- [x] 01-10-PLAN.md — Staging deploy on the VPS with HTTPS, media on the VPS disk, acceptance check (wave 7)
 
 **UI hint**: yes
 
@@ -164,7 +164,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fundação e vitrine de festas | 8/10 | In Progress|  |
+| 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 0/? | Not started | - |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |

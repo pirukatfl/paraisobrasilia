@@ -35,7 +35,7 @@ Fontes (acessadas em 2026-10-17; **fonte: imprensa/artigo, não é parecer**):
 
 ## Status
 
-Status: Pendente — ainda não enviado (2026-10-17)
+Status: Pendente — envio ao advogado ainda não confirmado pelo cliente (2026-10-19)
 
 > Atualizar para `Status: Pendente — enviado em {data}` quando a casa encaminhar ao advogado, e depois para `Status: Respondido em {data}: {resumo}`. Guardar o parecer (ou referência a ele) fora do repositório se contiver dados da casa.
 

@@ -4,7 +4,7 @@ Registro dos fatos sobre o site atual em WordPress, necessários para planejar a
 
 ## Status do acesso
 
-Status: aguardando acesso — 2026-10-17
+Status: acesso existe, ainda não compartilhado — 2026-10-19 (cliente confirmou: WordPress hospedado na Hostinger, com login no wp-admin e acesso à hospedagem; credenciais ainda não enviadas pelo canal seguro, checklist abaixo continua a preencher)
 
 > Atualizar esta linha quando o acesso for liberado (`Status: fatos coletados em {data}`) ou quando o cliente confirmar que não há acesso (`Status: sem acesso em {data}`).
 
@@ -19,8 +19,8 @@ Opções aceitas:
 
 Para a hospedagem (painel e banco de dados), vale a mesma regra: usuário próprio ou compartilhamento temporário por gerenciador de senhas.
 
-- Canal usado: _(a preencher — ex.: "usuário admin temporário criado em {data}, removido em {data}")_
-- Acesso à hospedagem: _(a preencher — ex.: "subconta no painel", "dump enviado pelo cliente")_
+- Canal usado: _(a preencher — ex.: "usuário admin temporário criado em {data}, removido em {data}")_ — 2026-10-19: cliente tem login no wp-admin; acesso ainda não compartilhado
+- Acesso à hospedagem: cliente tem acesso ao painel da Hostinger (hPanel), informado em 2026-10-19; forma de compartilhamento (subconta ou dump) a combinar
 
 ## Checklist de descoberta
 
