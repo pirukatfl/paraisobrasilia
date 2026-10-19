@@ -73,6 +73,10 @@ export interface Config {
     plans: Plan;
     subscriptions: Subscription;
     'audit-log': AuditLog;
+    'ad-categories': AdCategory;
+    ads: Ad;
+    'ad-media': AdMedia;
+    'ad-reports': AdReport;
     media: Media;
     videos: Video;
     parties: Party;
@@ -89,6 +93,10 @@ export interface Config {
       periodos: 'subscriptions';
       historico: 'audit-log';
     };
+    ads: {
+      midias: 'ad-media';
+      denuncias: 'ad-reports';
+    };
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
@@ -96,6 +104,10 @@ export interface Config {
     plans: PlansSelect<false> | PlansSelect<true>;
     subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    'ad-categories': AdCategoriesSelect<false> | AdCategoriesSelect<true>;
+    ads: AdsSelect<false> | AdsSelect<true>;
+    'ad-media': AdMediaSelect<false> | AdMediaSelect<true>;
+    'ad-reports': AdReportsSelect<false> | AdReportsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -339,7 +351,11 @@ export interface AuditLog {
     | 'periodo-corrigido'
     | 'senha-definida-pela-equipe'
     | 'link-de-senha-gerado'
-    | 'senha-trocada-pelo-assinante';
+    | 'senha-trocada-pelo-assinante'
+    | 'anuncio-aprovado'
+    | 'anuncio-recusado'
+    | 'anuncio-despublicado'
+    | 'denuncia-resolvida';
   actorType: 'equipe' | 'assinante' | 'sistema';
   actor?: (number | null) | User;
   actorLabel?: string | null;
@@ -355,6 +371,173 @@ export interface AuditLog {
     | number
     | boolean
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Opções do campo "Eu sou" nos anúncios (ex.: Casal, Solteiro, Solteira).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-categories".
+ */
+export interface AdCategory {
+  id: number;
+  name: string;
+  /**
+   * Menor aparece primeiro.
+   */
+  order?: number | null;
+  /**
+   * Desmarque para tirar da lista sem apagar os anúncios que já usam esta opção.
+   */
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ads".
+ */
+export interface Ad {
+  id: number;
+  /**
+   * Calculado: Eu sou · cidade — início do texto.
+   */
+  resumo?: string | null;
+  /**
+   * Assinante que escreveu o anúncio. Não aparece no site.
+   */
+  author: number | Assinante;
+  euSou: number | AdCategory;
+  /**
+   * Opcional. Só letras.
+   */
+  cidade?: string | null;
+  cidadeBusca?: string | null;
+  /**
+   * Até 600 caracteres. Na área aberta, telefones, e-mails, links e @ são removidos automaticamente.
+   */
+  texto: string;
+  /**
+   * Pelo menos um. Nunca aparece na área aberta.
+   */
+  contato?: {
+    /**
+     * Só números, com 55 e DDD.
+     */
+    whatsapp?: string | null;
+    /**
+     * Usuário sem o @.
+     */
+    telegram?: string | null;
+    email?: string | null;
+  };
+  midias?: {
+    docs?: (number | AdMedia)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  denuncias?: {
+    docs?: (number | AdReport)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Use os botões do quadro Moderação.
+   */
+  status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
+  /**
+   * Preenchido pelos botões Recusar e Despublicar.
+   */
+  motivo?: string | null;
+  submittedAt?: string | null;
+  /**
+   * Ordem da lista: mais recentes primeiro.
+   */
+  publishedAt?: string | null;
+  moderatedAt?: string | null;
+  moderatedBy?: (number | null) | User;
+  /**
+   * O anunciante declarou ter 18 anos ou mais e autorização de todas as pessoas das fotos e do vídeo.
+   */
+  consentAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Fotos e vídeos dos anúncios. Ficam fora da área pública: só a equipe, o anunciante e assinantes ativos abrem.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-media".
+ */
+export interface AdMedia {
+  id: number;
+  ad: number | Ad;
+  /**
+   * Preenchido com o autor do anúncio.
+   */
+  owner: number | Assinante;
+  kind: 'foto' | 'video';
+  /**
+   * Menor aparece primeiro.
+   */
+  order?: number | null;
+  durationSeconds?: number | null;
+  previa?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * Denúncias feitas por assinantes. As urgentes (pessoa menor de idade) aparecem primeiro.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-reports".
+ */
+export interface AdReport {
+  id: number;
+  /**
+   * Fica vazio se o anúncio foi apagado; o resumo abaixo continua.
+   */
+  ad?: (number | null) | Ad;
+  adSnapshot?: string | null;
+  /**
+   * Só a equipe vê. Nunca é mostrado ao anunciante.
+   */
+  reporter?: (number | null) | Assinante;
+  motivo: 'contato-falso' | 'golpe-ou-cobranca' | 'ofensivo' | 'menor-de-idade' | 'sem-autorizacao-de-imagem' | 'outro';
+  detalhes?: string | null;
+  /**
+   * Marcada sozinha quando o motivo é pessoa menor de idade.
+   */
+  urgente?: boolean | null;
+  /**
+   * Use os botões do quadro Denúncia.
+   */
+  status: 'aberta' | 'resolvida' | 'descartada';
+  resolvidaPor?: (number | null) | User;
+  resolvidaEm?: string | null;
+  nota?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -701,6 +884,22 @@ export interface PayloadLockedDocument {
         value: number | AuditLog;
       } | null)
     | ({
+        relationTo: 'ad-categories';
+        value: number | AdCategory;
+      } | null)
+    | ({
+        relationTo: 'ads';
+        value: number | Ad;
+      } | null)
+    | ({
+        relationTo: 'ad-media';
+        value: number | AdMedia;
+      } | null)
+    | ({
+        relationTo: 'ad-reports';
+        value: number | AdReport;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -882,6 +1081,102 @@ export interface AuditLogSelect<T extends boolean = true> {
   assinanteLabel?: T;
   summary?: T;
   details?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-categories_select".
+ */
+export interface AdCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  order?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ads_select".
+ */
+export interface AdsSelect<T extends boolean = true> {
+  resumo?: T;
+  author?: T;
+  euSou?: T;
+  cidade?: T;
+  cidadeBusca?: T;
+  texto?: T;
+  contato?:
+    | T
+    | {
+        whatsapp?: T;
+        telegram?: T;
+        email?: T;
+      };
+  midias?: T;
+  denuncias?: T;
+  status?: T;
+  motivo?: T;
+  submittedAt?: T;
+  publishedAt?: T;
+  moderatedAt?: T;
+  moderatedBy?: T;
+  consentAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-media_select".
+ */
+export interface AdMediaSelect<T extends boolean = true> {
+  ad?: T;
+  owner?: T;
+  kind?: T;
+  order?: T;
+  durationSeconds?: T;
+  previa?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-reports_select".
+ */
+export interface AdReportsSelect<T extends boolean = true> {
+  ad?: T;
+  adSnapshot?: T;
+  reporter?: T;
+  motivo?: T;
+  detalhes?: T;
+  urgente?: T;
+  status?: T;
+  resolvidaPor?: T;
+  resolvidaEm?: T;
+  nota?: T;
   updatedAt?: T;
   createdAt?: T;
 }

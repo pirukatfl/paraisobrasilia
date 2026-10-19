@@ -44,7 +44,24 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['audit-log', 'subscriptions', 'assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = [
+  // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
+  'ad-reports',
+  'ad-media',
+  'ads',
+  'ad-categories',
+  'audit-log',
+  'subscriptions',
+  'assinantes',
+  'plans',
+  'models',
+  'pages',
+  'space-items',
+  'videos',
+  'parties',
+  'media',
+  'users',
+] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -319,4 +336,84 @@ export async function seedModel(
     } as never,
     overrideAccess: true,
   })
+}
+
+/** Eu sou options (Casal, Solteiro, Solteira) — same function the classisex_ads migration runs. */
+export async function seedAdCategories(payload: Payload): Promise<number> {
+  const { seedAdCategoriesIfEmpty } = await import('../../src/migrations/seed/ad-categories-content')
+  return seedAdCategoriesIfEmpty(payload)
+}
+
+export interface SeedAdInput {
+  author: number
+  euSou?: number
+  cidade?: string
+  texto?: string
+  contato?: { whatsapp?: string; telegram?: string; email?: string }
+  status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+  publishedAt?: string
+  motivo?: string
+}
+
+/** Creates a ClassiSex ad through the Local API (default: first Eu sou option, pendente). */
+export async function seedAd(payload: Payload, input: SeedAdInput) {
+  let euSou = input.euSou
+  if (euSou === undefined) {
+    const { docs } = await payload.find({ collection: 'ad-categories' as never, sort: 'order', limit: 1, overrideAccess: true })
+    euSou = (docs[0] as { id: number }).id
+  }
+  const status = input.status ?? 'pendente'
+  return payload.create({
+    collection: 'ads' as never,
+    data: {
+      author: input.author,
+      euSou,
+      cidade: input.cidade ?? 'Brasília',
+      texto: input.texto ?? 'Casal simpático procura amigos para a próxima festa.',
+      contato: input.contato ?? { whatsapp: '5561999990000' },
+      status,
+      submittedAt: new Date().toISOString(),
+      ...(status === 'aprovado' ? { publishedAt: input.publishedAt ?? new Date().toISOString() } : {}),
+      ...(input.motivo ? { motivo: input.motivo } : {}),
+    } as never,
+    overrideAccess: true,
+  }) as Promise<{ id: number; status: string; resumo?: string | null }>
+}
+
+/**
+ * Convenience for ClassiSex tests: subscriber with a period covering `now` (30 days by default)
+ * and one approved ad.
+ */
+export async function seedVisibleAd(
+  payload: Payload,
+  input: { authorEmail: string; authorName?: string; now?: Date; days?: number } & Omit<SeedAdInput, 'author' | 'status'>,
+) {
+  const now = input.now ?? new Date()
+  const author = await seedAssinante(payload, {
+    email: input.authorEmail,
+    password: 'senha-anuncio-123',
+    name: input.authorName ?? 'Anunciante Teste',
+  })
+  await seedSubscription(payload, {
+    assinanteId: author.id,
+    startsAt: new Date(now.getTime() - 86_400_000).toISOString(),
+    endsAt: new Date(now.getTime() + (input.days ?? 30) * 86_400_000).toISOString(),
+  })
+  const { authorEmail: _e, authorName: _n, now: _now, days: _d, ...ad } = input
+  const created = await seedAd(payload, { ...ad, author: author.id, status: 'aprovado' })
+  return { author, ad: created }
+}
+
+/** Uploads a fixture (photo or espaco.mp4) to an ad through the Local API (staff path). */
+export async function seedAdMedia(
+  payload: Payload,
+  { ad, fixture = 'flyer-square.jpg', order = 0 }: { ad: number; fixture?: string; order?: number },
+) {
+  return payload.create({
+    collection: 'ad-media' as never,
+    data: { ad, order } as never,
+    filePath: path.join(FIXTURES, fixture),
+    depth: 0,
+    overrideAccess: true,
+  }) as Promise<{ id: number; kind: 'foto' | 'video'; filename: string; previa?: string | null }>
 }

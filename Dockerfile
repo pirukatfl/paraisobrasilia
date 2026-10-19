@@ -70,9 +70,11 @@ ENV NODE_ENV=production \
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/public ./public
-# Upload directory: the named volume `media` is mounted here. A new, empty volume takes
-# this directory's owner (node), so Payload can write flyers and their derivatives.
-RUN mkdir -p /app/media && chown node:node /app/media
+# Upload directories: the named volumes `media` and `private_media` are mounted here. A new,
+# empty volume takes the directory's owner (node), so Payload can write files and derivatives.
+# PRIVATE_MEDIA_DIR is set by the compose file together with the volume (never here): without
+# it, production refuses ClassiSex uploads instead of writing into the container layer.
+RUN mkdir -p /app/media /app/private-media && chown node:node /app/media /app/private-media
 
 USER node
 EXPOSE 3000

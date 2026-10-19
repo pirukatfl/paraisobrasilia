@@ -12,6 +12,7 @@ test-results
 playwright-report
 coverage
 media
+private-media
 docs
 scripts
 *.log

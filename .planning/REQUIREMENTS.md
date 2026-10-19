@@ -20,7 +20,7 @@
 
 ### Área aberta — Prévias e contos (PREV)
 
-- [ ] **PREV-01**: Visitante vê chamadas (prévias) de perfis do ClassiSex, sem nenhum contato ou dado identificável
+- [x] **PREV-01**: Visitante vê chamadas (prévias) de perfis do ClassiSex, sem nenhum contato ou dado identificável
 - [ ] **PREV-02**: Visitante vê chamadas de recados/mensagens, sem contato
 - [ ] **PREV-03**: Visitante lê o início de cada conto; o restante aparece só para assinantes
 - [ ] **PREV-04**: Toda prévia tem chamada clara para assinar ("Assine Já")
@@ -44,12 +44,12 @@
 
 ### ClassiSex (CLAS)
 
-- [ ] **CLAS-01**: Assinante vê a lista de perfis com fotos
-- [ ] **CLAS-02**: Assinante abre o perfil completo com fotos, vídeos e contato
-- [ ] **CLAS-03**: Assinante cria e edita o próprio perfil (fotos, vídeos, texto, contato)
-- [ ] **CLAS-04**: Perfil novo ou editado só aparece depois de aprovado pela equipe
-- [ ] **CLAS-05**: Assinante denuncia um perfil
-- [ ] **CLAS-06**: Fotos e vídeos dos perfis nunca abrem por link direto para quem não é assinante
+- [x] **CLAS-01**: Assinante vê a lista de perfis com fotos
+- [x] **CLAS-02**: Assinante abre o perfil completo com fotos, vídeos e contato
+- [x] **CLAS-03**: Assinante cria e edita o próprio perfil (fotos, vídeos, texto, contato)
+- [x] **CLAS-04**: Perfil novo ou editado só aparece depois de aprovado pela equipe
+- [x] **CLAS-05**: Assinante denuncia um perfil
+- [x] **CLAS-06**: Fotos e vídeos dos perfis nunca abrem por link direto para quem não é assinante
 
 ### Recados e mensagens (REC)
 
@@ -66,7 +66,7 @@
 - [x] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
 - [x] **PAINEL-05**: Equipe libera, renova e encerra a assinatura de um cliente, registrando o pagamento
 - [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
-- [ ] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
+- [x] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
 - [x] **PAINEL-08**: Toda ação da equipe sobre assinantes fica registrada (quem, quando, o quê)
 
 ### Migração e lançamento (MIG)
@@ -126,14 +126,14 @@
 | PAINEL-05 | Fase 3 | Complete |
 | PAINEL-06 | Fase 3 | Complete |
 | PAINEL-08 | Fase 3 | Complete |
-| CLAS-01 | Fase 4 | Pending |
-| CLAS-02 | Fase 4 | Pending |
-| CLAS-03 | Fase 4 | Pending |
-| CLAS-04 | Fase 4 | Pending |
-| CLAS-05 | Fase 4 | Pending |
-| CLAS-06 | Fase 4 | Pending |
-| PAINEL-07 | Fase 4 | Pending |
-| PREV-01 | Fase 4 | Pending |
+| CLAS-01 | Fase 4 | Complete |
+| CLAS-02 | Fase 4 | Complete |
+| CLAS-03 | Fase 4 | Complete |
+| CLAS-04 | Fase 4 | Complete |
+| CLAS-05 | Fase 4 | Complete |
+| CLAS-06 | Fase 4 | Complete |
+| PAINEL-07 | Fase 4 | Complete |
+| PREV-01 | Fase 4 | Complete |
 | PAINEL-03 | Fase 5 | Pending |
 | PREV-02 | Fase 5 | Pending |
 | PREV-03 | Fase 5 | Pending |

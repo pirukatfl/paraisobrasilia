@@ -8,6 +8,10 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { AdCategories } from './collections/AdCategories'
+import { AdMedia } from './collections/AdMedia'
+import { AdReports } from './collections/AdReports'
+import { Ads } from './collections/Ads'
 import { Assinantes } from './collections/Assinantes'
 import { AuditLog } from './collections/AuditLog'
 import { Media } from './collections/Media'
@@ -20,6 +24,7 @@ import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
+import { assertOutsidePublicMedia, privateMediaDir } from './lib/classisex/storage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -33,6 +38,14 @@ const dirname = path.dirname(filename)
  */
 const mediaDir = path.resolve(/* turbopackIgnore: true */ process.env.MEDIA_DIR || 'media')
 
+/**
+ * ClassiSex photos/videos (Phase 4, CLAS-06): PRIVATE_MEDIA_DIR — `private-media` in development
+ * and tests, `/app/private-media` in the container (named volume `private_media`). Never under
+ * MEDIA_DIR or public/: Payload's public file routes would serve them (T-04-03). Checked at load.
+ */
+const privateDir = privateMediaDir()
+assertOutsidePublicMedia(mediaDir, privateDir)
+
 export default buildConfig({
   admin: {
     user: Users.slug,
@@ -45,7 +58,11 @@ export default buildConfig({
     },
     components: {
       // PAINEL-06: who expires this week, first thing staff see
-      beforeDashboard: ['/components/admin/assinantes/Vencimentos#Vencimentos'],
+      // PAINEL-07: ClassiSex moderation queue
+      beforeDashboard: [
+        '/components/admin/assinantes/Vencimentos#Vencimentos',
+        '/components/admin/classisex/FilaClassisex#FilaClassisex',
+      ],
       graphics: {
         Logo: '/components/admin/Logo',
         Icon: '/components/admin/Icon',
@@ -60,6 +77,10 @@ export default buildConfig({
     Plans,
     Subscriptions,
     AuditLog,
+    AdCategories,
+    Ads,
+    { ...AdMedia, upload: { ...(typeof AdMedia.upload === 'object' ? AdMedia.upload : {}), staticDir: privateDir } },
+    AdReports,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

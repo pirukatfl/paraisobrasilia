@@ -168,3 +168,40 @@ test('database port 5432 is closed to the internet', async () => {
   const host = process.env.STAGING_HOST || new URL(BASE!).hostname
   expect(await tcpOpens(host, 5432, 3_000)).toBe(false)
 })
+
+// Plan 04-10: Phase 4 public and private surfaces (read-only)
+test('public ClassiSex preview has no contact data', async ({ page, context, baseURL }) => {
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const res = await page.goto('/classisex')
+  expect(res?.status()).toBe(200)
+  await expect(page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
+  for (const text of await page.locator('article').allInnerTexts()) {
+    expect(text).not.toMatch(/\d{8,}/)
+    expect(text).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.]+/)
+  }
+})
+
+test('ClassiSex members area asks for the login', async ({ playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: BASE })
+  const res = await anon.get('/area-do-assinante/classisex', { maxRedirects: 0 })
+  expect([302, 303, 307, 308]).toContain(res.status())
+  expect(res.headers()['location']).toMatch(/\/entrar(\?|$)/)
+  await anon.dispose()
+})
+
+test('ClassiSex originals and collections are closed to anonymous visitors', async ({ playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: BASE })
+  const media = await anon.get('/area-do-assinante/midia/1/foto')
+  expect([403, 404]).toContain(media.status())
+  expect(media.headers()['content-type'] ?? '').not.toMatch(/^image\//)
+
+  for (const path of ['/api/ads', '/api/ad-media', '/api/ad-reports']) {
+    const res = await anon.get(path)
+    const body = await res.text()
+    if (res.status() === 200) expect((JSON.parse(body) as { docs?: unknown[] }).docs ?? []).toHaveLength(0)
+    else expect([401, 403]).toContain(res.status())
+  }
+  const file = await anon.get('/api/ad-media/file/qualquer.webp')
+  expect(file.status() === 200 && /^image\//.test(file.headers()['content-type'] ?? '')).toBe(false)
+  await anon.dispose()
+})

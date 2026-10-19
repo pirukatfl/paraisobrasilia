@@ -165,6 +165,110 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`encerrar failed: ${res.status()} ${await res.text()}`)
       return (await res.json()) as { ended: number }
     },
+    /** ClassiSex "Eu sou" options (seeded by global setup). */
+    async findAdCategories() {
+      const res = await request.get('/api/ad-categories?limit=50&depth=0&sort=order', { headers })
+      if (!res.ok()) throw new Error(`find ad-categories failed: ${res.status()}`)
+      return ((await res.json()) as { docs: { id: number; name: string; active?: boolean }[] }).docs
+    },
+    /** ClassiSex ad written by staff (REST is staff-only); euSou defaults to the first option. */
+    async createAd(data: {
+      author: number
+      euSou?: number
+      cidade?: string
+      texto?: string
+      contato?: { whatsapp?: string; telegram?: string; email?: string }
+      status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+      publishedAt?: string
+    }) {
+      let euSou = data.euSou
+      if (euSou === undefined) {
+        const res = await request.get('/api/ad-categories?limit=1&depth=0&sort=order', { headers })
+        euSou = ((await res.json()) as { docs: { id: number }[] }).docs[0].id
+      }
+      const status = data.status ?? 'pendente'
+      const res = await request.post('/api/ads', {
+        headers,
+        data: {
+          cidade: 'Brasília',
+          texto: 'Anúncio de teste criado pela equipe.',
+          contato: { whatsapp: '5561999990000' },
+          submittedAt: new Date().toISOString(),
+          ...(status === 'aprovado' ? { publishedAt: data.publishedAt ?? new Date().toISOString() } : {}),
+          ...data,
+          euSou,
+          status,
+        },
+      })
+      return (await check(res, 'create ad')).doc
+    },
+    async updateAd(id: number, data: Record<string, unknown>) {
+      const res = await request.patch(`/api/ads/${id}`, { headers, data })
+      return (await check(res, 'update ad')).doc
+    },
+    /** Staff moderation actions (04-03): POST /api/ads/:id/aprovar|recusar|despublicar. */
+    async aprovar(id: number) {
+      const res = await request.post(`/api/ads/${id}/aprovar`, { headers, data: {} })
+      if (!res.ok()) throw new Error(`aprovar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; statusLabel: string }
+    },
+    async recusar(id: number, motivo: string) {
+      const res = await request.post(`/api/ads/${id}/recusar`, { headers, data: { motivo } })
+      if (!res.ok()) throw new Error(`recusar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; statusLabel: string }
+    },
+    async despublicar(id: number, motivo: string) {
+      const res = await request.post(`/api/ads/${id}/despublicar`, { headers, data: { motivo } })
+      if (!res.ok()) throw new Error(`despublicar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; statusLabel: string }
+    },
+    /** ClassiSex photo/video uploaded by staff (multipart REST); the owner is the ad's author. */
+    async uploadAdMedia(adId: number, fixture: 'flyer-square.jpg' | 'flyer-portrait.jpg' | 'espaco.mp4', order = 0) {
+      const res = await request.post('/api/ad-media', {
+        headers,
+        multipart: {
+          _payload: JSON.stringify({ ad: adId, order }),
+          file: {
+            name: fixture,
+            mimeType: fixture.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg',
+            buffer: fs.readFileSync(path.join(FIXTURES, fixture)),
+          },
+        },
+      })
+      return (await check(res, 'upload ad-media')).doc as { id: number; filename?: string }
+    },
+    /** Media docs of one ad, cover first (staff REST). */
+    async findAdMedia(adId: number) {
+      const res = await request.get(`/api/ad-media?where[ad][equals]=${adId}&sort=order&depth=0&limit=20`, { headers })
+      if (!res.ok()) throw new Error(`find ad-media failed: ${res.status()}`)
+      return ((await res.json()) as {
+        docs: { id: number; kind: 'foto' | 'video'; order: number; filename: string; previa?: string | null; sizes?: { card?: { filename?: string | null } } }[]
+      }).docs
+    },
+    async getAd(id: number) {
+      const res = await request.get(`/api/ads/${id}?depth=0`, { headers })
+      if (!res.ok()) throw new Error(`get ad failed: ${res.status()}`)
+      return (await res.json()) as { id: number; status: string; motivo?: string | null }
+    },
+    /** Staff resolves a report (04-08): POST /api/ad-reports/:id/resolver. */
+    async resolverDenuncia(id: number, acao: 'despublicar' | 'descartar', nota?: string) {
+      const res = await request.post(`/api/ad-reports/${id}/resolver`, { headers, data: { acao, nota } })
+      if (!res.ok()) throw new Error(`resolver denuncia failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { status: string; closed: number }
+    },
+    /** Report written by staff REST (the member flow goes through the server action instead). */
+    async createReport(data: { ad: number; reporter: number; motivo: string; adSnapshot?: string }) {
+      const res = await request.post('/api/ad-reports', { headers, data: { adSnapshot: 'Resumo de teste', ...data } })
+      return (await check(res, 'create report')).doc
+    },
+    /** Reports, urgent first (staff REST). */
+    async findReports(where = '') {
+      const res = await request.get(`/api/ad-reports?limit=100&depth=0&sort=-urgente,createdAt${where ? `&${where}` : ''}`, { headers })
+      if (!res.ok()) throw new Error(`find ad-reports failed: ${res.status()}`)
+      return ((await res.json()) as {
+        docs: { id: number; motivo: string; status: string; urgente: boolean; ad?: number | null; reporter?: number | null }[]
+      }).docs
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

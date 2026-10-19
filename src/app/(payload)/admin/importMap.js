@@ -1,4 +1,6 @@
 import { AssinaturaPanel as AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24 } from '../../../components/admin/assinantes/AssinaturaPanel'
+import { ModeracaoPanel as ModeracaoPanel_ec761e6491e5a1911a27084fe817e462 } from '../../../components/admin/classisex/ModeracaoPanel'
+import { DenunciaPanel as DenunciaPanel_38859cfdaab329474f1feee2c26931b5 } from '../../../components/admin/classisex/DenunciaPanel'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -19,11 +21,14 @@ import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1e
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { Vencimentos as Vencimentos_1f1ae1b3e16b6364b3c888af76c92816 } from '../../../components/admin/assinantes/Vencimentos'
+import { FilaClassisex as FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2 } from '../../../components/admin/classisex/FilaClassisex'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
   "/components/admin/assinantes/AssinaturaPanel#AssinaturaPanel": AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24,
+  "/components/admin/classisex/ModeracaoPanel#ModeracaoPanel": ModeracaoPanel_ec761e6491e5a1911a27084fe817e462,
+  "/components/admin/classisex/DenunciaPanel#DenunciaPanel": DenunciaPanel_38859cfdaab329474f1feee2c26931b5,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -44,5 +49,6 @@ export const importMap = {
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/assinantes/Vencimentos#Vencimentos": Vencimentos_1f1ae1b3e16b6364b3c888af76c92816,
+  "/components/admin/classisex/FilaClassisex#FilaClassisex": FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

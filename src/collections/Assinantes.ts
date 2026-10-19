@@ -12,6 +12,7 @@ import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
 import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
+import { expire } from '../lib/cache/expire'
 
 export const MIN_PASSWORD_LENGTH = 8
 export const PASSWORD_TOO_SHORT = 'A senha precisa ter pelo menos 8 caracteres.'
@@ -61,8 +62,29 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
  * Deleting an account removes its periods first (subscriptions.assinante is required, and the
  * API never deletes periods on its own). Same request/transaction; the count is kept in
  * req.context for the audit entry.
+ * Phase 4 (T-04-20, LGPD): the account's ClassiSex ads go too (ads.author is required); deleting
+ * an ad cascades to its media files and detaches its reports.
  */
 const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  // Reports made by this account stay for the record, without the reporter (04-08)
+  await withRequestState(req, () =>
+    req.payload.update({
+      collection: 'ad-reports',
+      where: { reporter: { equals: id } },
+      data: { reporter: null },
+      overrideAccess: true,
+      req,
+    }),
+  )
+  await withRequestState(req, () =>
+    req.payload.delete({
+      collection: 'ads',
+      where: { author: { equals: id } },
+      overrideAccess: true,
+      context: { skipAudit: true, assinanteBeingDeleted: true },
+      req,
+    }),
+  )
   const removed = await withRequestState(req, async () => {
     const result = await req.payload.delete({
       collection: 'subscriptions',
@@ -86,6 +108,12 @@ const FIELD_LABELS: Record<string, string> = {
 }
 
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
+/** D-06: a new access end date moves the author's ads on/off the public preview. */
+const expireAdsOnAccessChange: CollectionAfterChangeHook = ({ doc, previousDoc }) => {
+  if ((doc.accessUntil ?? null) !== (previousDoc?.accessUntil ?? null)) expire(['ads'])
+  return doc
+}
+
 const auditAccount: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
   if (req.context?.skipAudit) return doc
   const passwordSetBy = req.context?.passwordSetBy as 'equipe' | 'assinante' | undefined
@@ -184,7 +212,7 @@ export const Assinantes: CollectionConfig = {
   hooks: {
     beforeOperation: [guardOperations],
     beforeDelete: [removePeriods],
-    afterChange: [auditAccount],
+    afterChange: [auditAccount, expireAdsOnAccessChange],
     afterDelete: [auditAccountDeleted],
   },
   fields: [

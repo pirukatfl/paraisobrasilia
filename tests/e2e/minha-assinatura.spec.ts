@@ -9,7 +9,8 @@ import { loginAsAssinante } from './helpers/assinante'
 test.describe.configure({ mode: 'serial' })
 
 const PASSWORD = 'senha-provisoria-1'
-const RESTRICTED = 'Você está na área restrita do Paraíso.'
+// Intro of the members ClassiSex (Phase 4 replaced the Phase 3 'Conteúdo exclusivo' placeholder)
+const RESTRICTED = 'Anúncios publicados pelos assinantes do Paraíso.'
 const DAY = 86_400_000
 
 type Account = { email: string; name: string }
@@ -74,12 +75,19 @@ test('active subscription shows the valid-until date and opens the restricted pa
 
   const nav = page.getByRole('navigation', { name: 'Área do assinante' })
   await expect(nav.getByRole('link', { name: 'Minha assinatura' })).toBeVisible()
-  await expect(nav.getByRole('link', { name: 'Conteúdo exclusivo' })).toBeVisible()
+  await expect(nav.getByRole('link', { name: 'ClassiSex' })).toBeVisible()
+  await expect(nav.getByRole('link', { name: 'Meus anúncios' })).toBeVisible()
+  await expect(nav.getByRole('link', { name: 'Trocar senha' })).toBeVisible()
+  await expect(nav.getByRole('link', { name: 'Conteúdo exclusivo' })).toHaveCount(0)
   await expect(nav.getByRole('button', { name: 'Sair' })).toBeVisible()
 
-  await nav.getByRole('link', { name: 'Conteúdo exclusivo' }).click()
-  await expect(page.getByRole('heading', { name: 'Conteúdo exclusivo', level: 1 })).toBeVisible()
+  await nav.getByRole('link', { name: 'ClassiSex' }).click()
+  await expect(page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
   await expect(main).toContainText(RESTRICTED)
+
+  // The Phase 3 placeholder address now leads to the ClassiSex
+  await page.goto('/area-do-assinante/exclusivo')
+  await expect(page).toHaveURL(/\/area-do-assinante\/classisex$/)
   await context.close()
 })
 
@@ -91,7 +99,7 @@ test('expired subscription offers renewal and hides the restricted content', asy
   await expect(main.getByRole('link', { name: 'Renovar' })).toHaveAttribute('href', '/assine-ja')
   await expect(main.getByRole('link', { name: /WhatsApp/ })).toHaveAttribute('href', /^https:\/\/wa\.me\//)
 
-  await page.goto('/area-do-assinante/exclusivo')
+  await page.goto('/area-do-assinante/classisex')
   await expect(main).toContainText('Sua assinatura não está ativa')
   expect(await page.content()).not.toContain(RESTRICTED)
   await context.close()
@@ -103,7 +111,7 @@ test('account without subscription sees the plans link', async ({ browser, baseU
   const main = page.locator('main')
   await expect(main).toContainText('Sua conta ainda não tem uma assinatura ativa.')
   await expect(main.getByRole('link', { name: 'Ver planos' })).toHaveAttribute('href', '/assine-ja')
-  await page.goto('/area-do-assinante/exclusivo')
+  await page.goto('/area-do-assinante/classisex')
   await expect(main).toContainText('Sua assinatura não está ativa')
   expect(await page.content()).not.toContain(RESTRICTED)
   await context.close()
@@ -115,7 +123,7 @@ test('access ended by staff is explained', async ({ browser, baseURL }) => {
   await expect(page.locator('main')).toContainText(
     'Seu acesso foi encerrado pela equipe. Fale com a gente pelo WhatsApp.',
   )
-  await page.goto('/area-do-assinante/exclusivo')
+  await page.goto('/area-do-assinante/classisex')
   await expect(page.locator('main')).toContainText('Sua assinatura não está ativa')
   expect(await page.content()).not.toContain(RESTRICTED)
   await context.close()
@@ -123,6 +131,9 @@ test('access ended by staff is explained', async ({ browser, baseURL }) => {
 
 test('anonymous visitors are sent to /entrar from the restricted page', async ({ page, context, baseURL }) => {
   await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  await page.goto('/area-do-assinante/classisex')
+  await expect(page).toHaveURL(/\/entrar\?next=%2Farea-do-assinante%2Fclassisex$/)
+  // Old placeholder address: redirected first, then sent to /entrar
   await page.goto('/area-do-assinante/exclusivo')
-  await expect(page).toHaveURL(/\/entrar\?next=%2Farea-do-assinante%2Fexclusivo$/)
+  await expect(page).toHaveURL(/\/entrar\?next=%2Farea-do-assinante%2Fclassisex$/)
 })

@@ -1,4 +1,6 @@
-import { readFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -118,5 +120,144 @@ describe('Phase 3 staff guide and runbook (plan 03-07)', () => {
     expect(runbook).toContain('janela anônima')
     expect(runbook).toContain('audit_log')
     expect(runbook).toContain('first-register')
+  })
+})
+
+describe('Phase 4 private media volume (plan 04-05, T-04-03, T-04-09, T-04-16)', () => {
+  it.each(['docker-compose.staging.yml', 'docker-compose.staging.ghcr.yml'])(
+    '%s mounts private_media at /app/private-media next to media',
+    (file) => {
+      const compose = read(file)
+      const app = service(compose, 'app')
+      expect(app).toContain('- private_media:/app/private-media')
+      expect(app).toContain('PRIVATE_MEDIA_DIR: /app/private-media')
+      expect(app).toContain('- media:/app/media')
+      expect(compose).toMatch(/\nvolumes:\n(?:  \w+:\n)*  private_media:\n/)
+      // Caddy never sees the private files
+      expect(service(compose, 'caddy')).not.toContain('private')
+    },
+  )
+
+  it('bootstrap still installs the exact compose and Caddyfile', () => {
+    const bootstrap = read('scripts/deploy/bootstrap-vps.sh')
+    expect(heredoc(bootstrap, 'PARAISO_COMPOSE')).toBe(read('docker-compose.staging.ghcr.yml'))
+    expect(heredoc(bootstrap, 'PARAISO_CADDY')).toBe(read('Caddyfile'))
+  })
+
+  it('Caddy caps request bodies at 110 MB', () => {
+    expect(read('Caddyfile')).toContain('max_size 110MB')
+  })
+
+  it('the image creates /app/private-media for node but leaves PRIVATE_MEDIA_DIR to the compose', () => {
+    const dockerfile = read('Dockerfile')
+    expect(dockerfile).toMatch(/mkdir -p [^\n]*\/app\/private-media/)
+    expect(dockerfile).toMatch(/chown node:node [^\n]*\/app\/private-media/)
+    expect(dockerfile).not.toMatch(/ENV[^\n]*PRIVATE_MEDIA_DIR|^\s+PRIVATE_MEDIA_DIR=/m)
+  })
+
+  it('local private files are never committed nor sent to the image', () => {
+    expect(read('.gitignore')).toMatch(/^\/private-media$/m)
+    expect(read('.dockerignore')).toMatch(/^private-media$/m)
+    expect(read('.env.staging.example')).toMatch(/^PRIVATE_MEDIA_DIR=\/app\/private-media$/m)
+  })
+})
+
+describe('Phase 4 staff guide, runbook and bootstrap re-run (plan 04-10)', () => {
+  it('the staff guide has the ClassiSex section, its headings and the minor rule', () => {
+    const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+    expect(guide).toMatch(/^## ClassiSex$/m)
+    for (const heading of [
+      'Fila de moderação',
+      'Aprovar, recusar ou despublicar',
+      'O que recusar',
+      'Denúncias',
+      'Opções "Eu sou"',
+      'Fotos e vídeos dos anúncios',
+      'Testar como assinante',
+    ]) {
+      expect(guide).toContain(`### ${heading}`)
+    }
+    expect(guide).toContain('anúncios')
+    expect(guide).toContain('janela anônima')
+    expect(guide).toContain('menor de idade')
+    expect(guide).toContain('despublica o anúncio sozinho, na mesma hora')
+    expect(guide).toContain('Descartar')
+  })
+
+  it('the runbook 7.3 documents the volume, the one-time re-run and the checks', () => {
+    const runbook = read('docs/deploy/STAGING.md')
+    for (const text of [
+      '7.3',
+      'private_media',
+      'bootstrap-vps.sh',
+      '/app/private-media',
+      'docker system df -v | grep private_media',
+      'Envio de fotos indisponível',
+      'read -rsp',
+      'raw.githubusercontent.com/pirukatfl/paraisobrasilia/main/scripts/deploy/bootstrap-vps.sh',
+      'DOMAIN=novo.swingbrasilia.com.br GHCR_USER=pirukatfl GHCR_TOKEN="$GH_TOKEN" bash /root/bootstrap-vps.sh',
+    ]) {
+      expect(runbook).toContain(text)
+    }
+  })
+
+  describe('bootstrap-vps.sh is safe to re-run', () => {
+    const script = read('scripts/deploy/bootstrap-vps.sh')
+
+    it('never removes volumes, data or the env file', () => {
+      expect(script).not.toMatch(/docker volume (rm|prune)|compose[^\n]* down|rm -rf|system prune|\brm .*\.env/)
+    })
+
+    it('generates secrets only when .env.staging does not exist yet', () => {
+      const ifFile = script.indexOf('if [ -f "$ENV_FILE" ]; then')
+      const elseAt = script.indexOf('\nelse\n', ifFile)
+      expect(ifFile).toBeGreaterThan(-1)
+      for (const m of script.matchAll(/openssl rand/g)) expect(m.index!).toBeGreaterThan(elseAt)
+    })
+
+    it('keeps existing secrets and domain, only refreshing the image name', () => {
+      const start = script.indexOf('ENV_FILE="$APP_DIR/.env.staging"')
+      const end = script.indexOf('chmod 600 "$ENV_FILE"')
+      const block = script.slice(start, end)
+      const dir = mkdtempSync(path.join(tmpdir(), 'bootstrap-'))
+      const envPath = path.join(dir, '.env.staging')
+      const original = [
+        'POSTGRES_PASSWORD=senha-do-banco-antiga',
+        'PAYLOAD_SECRET=segredo-antigo',
+        'STAGING_DOMAIN=novo.swingbrasilia.com.br',
+        'GHCR_IMAGE=ghcr.io/velho/imagem',
+        'IMAGE_TAG=staging',
+        '',
+      ].join('\n')
+      writeFileSync(envPath, original)
+      const harness = `set -euo pipefail
+APP_DIR='${dir}'
+GHCR_IMAGE='ghcr.io/pirukatfl/paraisobrasilia'
+ok() { :; }
+die() { echo "DIE: $*" >&2; exit 1; }
+ask() { echo "ASKED" >&2; exit 9; }
+${block}
+echo "DOMAIN_OUT=$DOMAIN"`
+      for (let run = 0; run < 2; run++) {
+        const res = spawnSync('bash', ['-c', harness], { encoding: 'utf8', env: { ...process.env, DOMAIN: 'outro.exemplo.com' } })
+        expect(res.status, res.stderr).toBe(0)
+        expect(res.stdout).toContain('DOMAIN_OUT=novo.swingbrasilia.com.br')
+      }
+      const after = readFileSync(envPath, 'utf8')
+      expect(after).toContain('POSTGRES_PASSWORD=senha-do-banco-antiga')
+      expect(after).toContain('PAYLOAD_SECRET=segredo-antigo')
+      expect(after).toContain('STAGING_DOMAIN=novo.swingbrasilia.com.br')
+      expect(after).toContain('GHCR_IMAGE=ghcr.io/pirukatfl/paraisobrasilia')
+      expect(after.match(/^GHCR_IMAGE=/gm)).toHaveLength(1)
+    })
+
+    it('reloads Caddy after the rewritten Caddyfile (bind mount is not recreated by compose)', () => {
+      expect(script).toContain('caddy reload --config /etc/caddy/Caddyfile')
+      expect(script.indexOf('caddy reload')).toBeGreaterThan(script.indexOf('update.sh" --force'))
+    })
+
+    it('re-login to ghcr.io happens when a token is passed, so GHCR_TOKEN on the command line is used', () => {
+      expect(script).toContain('if [ -n "${GHCR_TOKEN:-}" ] || ! grep -qs')
+    })
   })
 })

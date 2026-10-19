@@ -1,8 +1,9 @@
 /**
  * Site navigation registry (header menu, mobile menu, footer).
- * Fixed order (UI-SPEC Phase 2): Festas · Quem somos · Espaço · Modelos · Contato.
+ * Fixed order (UI-SPEC Phase 2): Festas · Quem somos · Espaço · Modelos · ClassiSex · Contato.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
- * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já.
+ * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já,
+ * 04-07 ClassiSex (public preview).
  */
 import { pathForKey } from '../pages/keys'
 
@@ -23,6 +24,8 @@ export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels:
     { href: '/espaco', label: 'Espaço' },
     // D-08: secondary section, listed only while at least one model is published
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
+    // PREV-01: open preview; the full board lives in the members area
+    { href: '/classisex', label: 'ClassiSex' },
     { href: '/contato', label: 'Contato' },
     // Phase 3: plans page (03-02) and members area
     { href: '/assine-ja', label: 'Assine Já' },

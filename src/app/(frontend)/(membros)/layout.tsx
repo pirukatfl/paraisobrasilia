@@ -8,7 +8,8 @@ export const dynamic = 'force-dynamic'
 
 const LINKS = [
   { href: '/area-do-assinante', label: 'Minha assinatura' },
-  { href: '/area-do-assinante/exclusivo', label: 'Conteúdo exclusivo' },
+  { href: '/area-do-assinante/classisex', label: 'ClassiSex' },
+  { href: '/area-do-assinante/meus-anuncios', label: 'Meus anúncios' },
   { href: '/area-do-assinante/senha', label: 'Trocar senha' },
 ]
 

@@ -17,11 +17,16 @@ export default async function globalSetup(): Promise<void> {
   for (const dir of ['.next/dev/cache/fetch-cache', '.next/dev/cache/images']) {
     fs.rmSync(path.resolve(dir), { recursive: true, force: true })
   }
+  // ClassiSex private files left by a previous run (the reset above deleted their documents)
+  fs.rmSync(path.resolve('private-media'), { recursive: true, force: true })
   await seedContact(payload)
   await seedPages(payload)
   // Same state as a fresh deploy: the four plans from the migration seed (D-03)
   const { seedPlansIfEmpty } = await import('../../src/migrations/seed/plans-content')
   await seedPlansIfEmpty(payload)
+  // ClassiSex Eu sou options (Casal, Solteiro, Solteira), as the classisex_ads migration seeds them
+  const { seedAdCategoriesIfEmpty } = await import('../../src/migrations/seed/ad-categories-content')
+  await seedAdCategoriesIfEmpty(payload)
   await seedStaffUser(payload, {
     email: STAFF_EMAIL,
     password: process.env.E2E_STAFF_PASSWORD ?? 'senha-de-teste-123',
