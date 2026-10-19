@@ -16,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ])
   return [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },
+    { url: `${base}/espaco`, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${base}/contato`, changeFrequency: 'monthly', priority: 0.6 },
     // Institutional pages: published ones only
     ...pages.flatMap((page) =>

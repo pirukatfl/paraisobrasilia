@@ -55,6 +55,7 @@ export async function Footer() {
     { href: pathForKey('normas'), label: 'Normas' },
     { href: pathForKey('regras'), label: 'Regras' },
     { href: pathForKey('dicas'), label: 'Dicas' },
+    { href: '/espaco', label: 'Espaço' },
     { href: '/contato', label: 'Contato' },
   ]
   const legal: FooterLink[] = [

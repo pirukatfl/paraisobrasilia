@@ -69,8 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    videos: Video;
     parties: Party;
     pages: Page;
+    'space-items': SpaceItem;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,8 +82,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    'space-items': SpaceItemsSelect<false> | SpaceItemsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -198,6 +202,14 @@ export interface Media {
       filesize?: number | null;
       filename?: string | null;
     };
+    gallery?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
     og?: {
       url?: string | null;
       width?: number | null;
@@ -207,6 +219,34 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * MP4 (H.264), até 100 MB e cerca de 2 minutos. Exporte em 720p para carregar rápido no celular.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos".
+ */
+export interface Video {
+  id: number;
+  /**
+   * Ex.: Pista de dança numa noite de festa.
+   */
+  title: string;
+  /**
+   * Uma foto que aparece antes de o vídeo tocar.
+   */
+  poster: number | Media;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * Crie a festa, envie o flyer e clique em Publicar. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
@@ -346,6 +386,42 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Fotos e vídeos dos ambientes. Sem nudez explícita: esta galeria é aberta ao público.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "space-items".
+ */
+export interface SpaceItem {
+  id: number;
+  kind: 'photo' | 'video';
+  /**
+   * JPG, PNG ou WebP até 15 MB. A foto é convertida para WebP automaticamente.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Escolha um item de Vídeos.
+   */
+  video?: (number | null) | Video;
+  /**
+   * Opcional, até 80 caracteres.
+   */
+  caption?: string | null;
+  /**
+   * Números menores aparecem primeiro.
+   */
+  order?: number | null;
+  /**
+   * Recomendado, não obrigatório para publicar. Ex.: Enviou as fotos por WhatsApp para divulgação em 12/10/2026.
+   */
+  imageAuthorization?: {
+    date?: string | null;
+    note?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -378,12 +454,20 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'videos';
+        value: number | Video;
+      } | null)
+    | ({
         relationTo: 'parties';
         value: number | Party;
       } | null)
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'space-items';
+        value: number | SpaceItem;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -501,6 +585,16 @@ export interface MediaSelect<T extends boolean = true> {
               filesize?: T;
               filename?: T;
             };
+        gallery?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
         og?:
           | T
           | {
@@ -512,6 +606,25 @@ export interface MediaSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "videos_select".
+ */
+export interface VideosSelect<T extends boolean = true> {
+  title?: T;
+  poster?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -567,6 +680,26 @@ export interface PagesSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "space-items_select".
+ */
+export interface SpaceItemsSelect<T extends boolean = true> {
+  kind?: T;
+  image?: T;
+  video?: T;
+  caption?: T;
+  order?: T;
+  imageAuthorization?:
+    | T
+    | {
+        date?: T;
+        note?: T;
       };
   updatedAt?: T;
   createdAt?: T;

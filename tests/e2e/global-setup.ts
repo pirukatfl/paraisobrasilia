@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 import { brasiliaAt } from '../helpers/dates'
 import { getTestPayload, resetDatabase, seedContact, seedPages, seedParty, seedStaffUser } from '../helpers/seed'
 
@@ -9,6 +12,11 @@ export default async function globalSetup(): Promise<void> {
 
   const payload = await getTestPayload()
   await resetDatabase(payload)
+  // The reset runs outside the Next server, so its cache hooks cannot expire anything: drop the
+  // dev server's persisted data and image caches, or a previous run's gallery would be served.
+  for (const dir of ['.next/dev/cache/fetch-cache', '.next/dev/cache/images']) {
+    fs.rmSync(path.resolve(dir), { recursive: true, force: true })
+  }
   await seedContact(payload)
   await seedPages(payload)
   await seedStaffUser(payload, {

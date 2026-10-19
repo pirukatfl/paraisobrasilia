@@ -44,7 +44,7 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['pages', 'parties', 'media', 'users'] as const
+const RESET_ORDER = ['pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -156,6 +156,71 @@ export async function seedParty(payload: Payload, partial: SeedPartyInput) {
       ...(partial.dressCode !== undefined ? { dressCode: partial.dressCode } : {}),
       ...(partial.attractions !== undefined ? { attractions: partial.attractions } : {}),
       ...(partial.details !== undefined ? { details: lexicalParagraph(partial.details) } : {}),
+    } as never,
+    overrideAccess: true,
+  })
+}
+
+export interface SeedSpacePhotoInput {
+  order?: number
+  published?: boolean
+  caption?: string
+  alt?: string
+  /** Fixture file name in tests/fixtures (default flyer-square.jpg) */
+  fixture?: string
+  authorization?: { date?: string; note?: string }
+}
+
+/** Uploads a fixture image and creates a space gallery photo (published by default). */
+export async function seedSpacePhoto(payload: Payload, input: SeedSpacePhotoInput = {}) {
+  const image = await payload.create({
+    collection: 'media',
+    data: { alt: input.alt ?? 'Pista de dança do Paraíso' },
+    filePath: path.join(FIXTURES, input.fixture ?? 'flyer-square.jpg'),
+    overrideAccess: true,
+  })
+  const published = input.published ?? true
+  return payload.create({
+    collection: 'space-items' as never,
+    draft: !published,
+    data: {
+      _status: published ? 'published' : 'draft',
+      kind: 'photo',
+      image: image.id,
+      order: input.order ?? 0,
+      ...(input.caption ? { caption: input.caption } : {}),
+      ...(input.authorization ? { imageAuthorization: input.authorization } : {}),
+    } as never,
+    overrideAccess: true,
+  })
+}
+
+/** Uploads tests/fixtures/espaco.mp4 with a poster and creates a space gallery video. */
+export async function seedSpaceVideo(
+  payload: Payload,
+  input: { order?: number; published?: boolean; title?: string } = {},
+) {
+  const poster = await payload.create({
+    collection: 'media',
+    data: { alt: 'Capa do vídeo do espaço' },
+    filePath: path.join(FIXTURES, 'flyer-square.jpg'),
+    overrideAccess: true,
+  })
+  const video = await payload.create({
+    collection: 'videos' as never,
+    data: { title: input.title ?? 'Pista de dança numa noite de festa', poster: poster.id } as never,
+    filePath: path.join(FIXTURES, 'espaco.mp4'),
+    overrideAccess: true,
+  })
+  const published = input.published ?? true
+  return payload.create({
+    collection: 'space-items' as never,
+    draft: !published,
+    data: {
+      _status: published ? 'published' : 'draft',
+      kind: 'video',
+      video: (video as { id: number }).id,
+      order: input.order ?? 0,
     } as never,
     overrideAccess: true,
   })

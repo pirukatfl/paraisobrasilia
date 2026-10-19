@@ -10,8 +10,10 @@ import { fileURLToPath } from 'url'
 
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { SpaceItems } from './collections/SpaceItems'
 import { Parties } from './collections/Parties'
 import { Users } from './collections/Users'
+import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
 
 const filename = fileURLToPath(import.meta.url)
@@ -46,8 +48,13 @@ export default buildConfig({
   collections: [
     Users,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
+    {
+      ...Videos,
+      upload: { ...(typeof Videos.upload === 'object' ? Videos.upload : {}), staticDir: path.join(mediaDir, 'videos') },
+    },
     Parties,
     Pages,
+    SpaceItems,
   ],
   globals: [Contact],
   editor: lexicalEditor(),
@@ -70,7 +77,8 @@ export default buildConfig({
   sharp,
   upload: {
     limits: {
-      fileSize: 15000000, // 15 MB
+      // 100 MB for venue videos; images are capped at 15 MB by the Media beforeOperation hook
+      fileSize: 104_857_600,
     },
   },
   plugins: [

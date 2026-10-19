@@ -20,6 +20,7 @@ export function getNavItems(_opts: { hasModels: boolean } = { hasModels: false }
         { href: pathForKey('dicas'), label: 'Dicas' },
       ],
     },
+    { href: '/espaco', label: 'Espaço' },
     { href: '/contato', label: 'Contato' },
   ]
 }
