@@ -59,3 +59,34 @@ describe('staging deploy files', () => {
     expect(env).toMatch(/^MEDIA_DIR=\/app\/media$/m)
   })
 })
+
+describe('Phase 2 runbook and staff guide (plan 02-06)', () => {
+  it('the runbook covers videos on the media volume, the size cap and the disk check', () => {
+    const runbook = read('docs/deploy/STAGING.md')
+    expect(runbook).toContain('/app/media/videos')
+    expect(runbook).toContain('100 MB')
+    expect(runbook).toContain('df -h')
+    expect(runbook).toContain('docker system df -v | grep media')
+  })
+
+  it('the staff guide has every Phase 2 section, including image removal with Excluir', () => {
+    const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+    for (const heading of [
+      'Fotos e vídeos do espaço',
+      'Modelos',
+      'Textos (Quem Somos, Normas, Regras, Dicas, Termos, Privacidade)',
+      'Contato e endereço',
+      'Remoção de imagem',
+    ]) {
+      expect(guide).toMatch(new RegExp(`^## ${heading.replace(/[()]/g, '\\$&')}$`, 'm'))
+    }
+    expect(guide).toContain('Excluir')
+  })
+
+  it.each(['docker-compose.staging.yml', 'docker-compose.staging.ghcr.yml'])(
+    '%s still mounts the media volume (photos and videos) into the app',
+    (file) => {
+      expect(service(read(file), 'app')).toContain('- media:/app/media')
+    },
+  )
+})

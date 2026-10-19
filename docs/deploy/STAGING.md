@@ -112,6 +112,10 @@ Para publicar uma festa: **Festas → Criar novo** → preencher → **Publicar*
 
 As festas, fotos e usuários **não se perdem** numa atualização: ficam nos volumes do servidor (seção 7).
 
+> **Textos e contato iniciais (Fase 2).** Na primeira atualização com a Fase 2, as migrações criam sozinhas os dados de
+> **Contato e endereço** e os seis textos (Quem somos, Normas, Regras, Dicas, Termos de Uso e Política de Privacidade).
+> Elas só preenchem o que **ainda não existe**: o que a equipe editar no painel **nunca é sobrescrito** por uma atualização.
+
 ---
 
 ## 5. Ver o que está acontecendo (logs)
@@ -159,7 +163,7 @@ Tudo fica **no disco do servidor**, em volumes do Docker (decisão de 17/10/2026
 | Volume | Conteúdo |
 |---|---|
 | `paraiso-staging_pgdata` | banco de dados: festas, usuários da equipe, textos |
-| `paraiso-staging_media` | flyers e fotos enviados pelo painel (e as versões reduzidas geradas automaticamente) |
+| `paraiso-staging_media` | flyers, fotos do espaço e das modelos enviados pelo painel (e as versões reduzidas geradas automaticamente); vídeos na pasta `/app/media/videos` |
 | `paraiso-staging_caddy_data` | certificados HTTPS (se perder, o Caddy pede outros sozinho) |
 
 **Importante:** como as fotos estão no disco do servidor, **o backup precisa incluir os volumes `pgdata` e `media` e ficar
@@ -168,6 +172,26 @@ fora do servidor** — se o servidor quebrar, um backup guardado nele mesmo se p
 **Agora (staging):** ative os backups da Hostinger: hPanel → **VPS** → servidor → **Snapshots e backups** → ative os
 **backups automáticos** e crie um **snapshot** antes de mudanças grandes. O backup automatizado completo (banco + fotos,
 guardado fora do servidor, com teste de restauração) entra na **Fase 7**, antes do site oficial.
+
+
+### 7.1 Vídeos e espaço em disco (Fase 2)
+
+Desde a Fase 2 o volume `media` guarda também os **vídeos do espaço**, em `/app/media/videos` (dentro do container `app`).
+Vídeo ocupa muito mais espaço que foto, então:
+
+- **Limite por arquivo:** vídeo até **100 MB**; foto até **15 MB** (o painel recusa acima disso, com aviso em português).
+- **Como exportar o vídeo antes de enviar:** MP4 (H.264), **720p**, até ~2 minutos — fica bem abaixo de 100 MB e carrega
+  rápido no celular. Pelo celular, os apps de edição (ex.: CapCut, InShot) têm a opção "Exportar 720p".
+- **Conferir o espaço livre** de vez em quando (e antes de subir muitos vídeos), no Terminal do navegador:
+
+  ```bash
+  df -h /                                  # espaço livre do disco do servidor (coluna "Disp"/"Avail")
+  docker system df -v | grep media         # quanto o volume de fotos e vídeos já ocupa
+  ```
+
+  Se o disco passar de ~80% de uso, avise o desenvolvedor antes de enviar mais vídeos.
+- **Backup:** os **snapshots da Hostinger** copiam o disco inteiro, inclusive o volume `media` com as fotos e os vídeos.
+  Crie um snapshot antes de mudanças grandes (hPanel → **VPS** → servidor → **Snapshots e backups**).
 
 ---
 
@@ -198,7 +222,8 @@ E2E_BASE_URL=https://novo.swingbrasilia.com.br pnpm exec playwright test tests/e
 ```
 
 Confere: HTTPS com cadeado e `noindex`, `robots.txt` bloqueando tudo, confirmação 18+, flyer e imagem de compartilhamento
-servidos pelo próprio site, rascunhos invisíveis para visitantes e a porta do banco (5432) fechada. Não cria nem altera nada.
+servidos pelo próprio site, rascunhos invisíveis para visitantes, as páginas da Fase 2 (Quem somos, Normas, Regras, Dicas,
+Termos, Privacidade, Contato com o link do WhatsApp, Espaço) e a porta do banco (5432) fechada. Não cria nem altera nada.
 
 ---
 

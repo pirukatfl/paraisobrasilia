@@ -90,7 +90,12 @@ test.describe('staff edits a page (PAINEL-04)', () => {
 
     const publishTitle = async (title: string) => {
       await page.locator('#field-title').fill(title)
+      // "Status: Publicado" is already on screen: wait for the save itself before checking the site
+      const saved = page.waitForResponse(
+        (r) => /\/api\/pages\/\d+/.test(r.url()) && r.request().method() === 'PATCH' && r.ok(),
+      )
       await page.getByRole('button', { name: 'Publicar alterações' }).click()
+      await saved
       await expect(page.getByText('Status: Publicado')).toBeVisible()
     }
 

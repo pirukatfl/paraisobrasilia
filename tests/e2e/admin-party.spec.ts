@@ -71,7 +71,12 @@ test('staff creates, publishes, edits and unpublishes a party', async ({ page, c
 
   // Edit the title and publish again
   await page.locator('#field-title').fill('Festa E2E Editada')
+  // "Status: Publicado" is already on screen: wait for the save itself before checking the site
+  const saved = page.waitForResponse(
+    (r) => /\/api\/parties\/\d+/.test(r.url()) && r.request().method() === 'PATCH' && r.ok(),
+  )
   await page.getByRole('button', { name: 'Publicar alterações' }).click()
+  await saved
   await expect(page.getByText('Status: Publicado')).toBeVisible()
   await expect(await homeShows(site, 'Festa E2E Editada')).toBeVisible()
 

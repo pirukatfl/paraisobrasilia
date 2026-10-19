@@ -52,7 +52,8 @@ test('age gate shows on a fresh visit and can be dismissed', async ({ page }) =>
   await expect(dialog).toBeVisible()
   await page.getByRole('button', { name: ENTER }).click()
   await expect(dialog).toBeHidden()
-  await expect(page.getByRole('heading', { name: 'Próximas festas', level: 1 })).toBeVisible()
+  // With upcoming parties the H1 is "Próximas festas"; without, "Paraíso Brasília" (plan 02-05)
+  await expect(page.getByRole('heading', { name: /^(Próximas festas|Paraíso Brasília)$/, level: 1 })).toBeVisible()
 })
 
 test('party flyer, page and share image are served by the site', async ({ page, context, playwright, baseURL }) => {
@@ -90,6 +91,34 @@ test('party flyer, page and share image are served by the site', async ({ page, 
   expect(ogRes.headers()['content-type']).toContain('image/jpeg')
 
   await anon.dispose()
+})
+
+// Plan 02-06: the open-area pages added in Phase 2 (seeded by the migrations on deploy)
+// Institutional titles are editable in the panel: match the stable word, not the whole seed title
+const PHASE2_PAGES: [string, RegExp][] = [
+  ['/quem-somos', /Quem somos/i],
+  ['/quem-somos/normas', /Normas/i],
+  ['/quem-somos/regras', /Regras/i],
+  ['/quem-somos/dicas', /Dicas/i],
+  ['/termos-de-uso', /Termos de Uso/i],
+  ['/politica-de-privacidade', /Política de Privacidade/i],
+  ['/contato', /Contato/i],
+  ['/espaco', /Conheça o Paraíso/i],
+]
+
+test('Phase 2 pages answer 200 with their heading', async ({ page, context, baseURL }) => {
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  for (const [path, h1] of PHASE2_PAGES) {
+    const res = await page.goto(path)
+    expect(res?.status(), path).toBe(200)
+    await expect(page.getByRole('heading', { level: 1 }), path).toHaveText(h1)
+  }
+})
+
+test('contact page links to the house WhatsApp', async ({ page, context, baseURL }) => {
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  await page.goto('/contato')
+  await expect(page.locator('main a[href^="https://wa.me/5561999889772"]').first()).toBeVisible()
 })
 
 test('drafts are never exposed to anonymous visitors', async ({ playwright }) => {
