@@ -64,3 +64,16 @@ export function formatUpdatedDate(iso: string): string {
   const p = parts(updatedFmt, iso)
   return `${p.day} de ${clean(p.month)} de ${p.year}`
 }
+
+const shortDateFmt = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: TZ,
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+})
+
+/** "17/11/2026" in Brasília time. */
+export function formatShortDate(iso: string): string {
+  const p = parts(shortDateFmt, iso)
+  return `${p.day}/${p.month}/${p.year}`
+}
