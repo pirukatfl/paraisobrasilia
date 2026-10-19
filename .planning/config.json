@@ -64,5 +64,28 @@
   "agent_skills": {},
   "features": {},
   "mode": "yolo",
-  "granularity": "standard"
+  "granularity": "standard",
+  "model_overrides": {
+    "gsd-planner": "opus",
+    "gsd-roadmapper": "opus",
+    "gsd-phase-researcher": "opus",
+    "gsd-project-researcher": "opus",
+    "gsd-research-synthesizer": "opus",
+    "gsd-plan-checker": "opus",
+    "gsd-pattern-mapper": "opus",
+    "gsd-ui-researcher": "opus",
+    "gsd-ui-checker": "opus",
+    "gsd-advisor-researcher": "opus",
+    "gsd-assumptions-analyzer": "opus",
+    "gsd-eval-planner": "opus",
+    "gsd-domain-researcher": "opus",
+    "gsd-ai-researcher": "opus",
+    "gsd-framework-selector": "opus",
+    "gsd-executor": "sonnet",
+    "gsd-code-fixer": "sonnet",
+    "gsd-debugger": "sonnet",
+    "gsd-debug-session-manager": "sonnet",
+    "gsd-doc-writer": "sonnet",
+    "gsd-nyquist-auditor": "sonnet"
+  }
 }
