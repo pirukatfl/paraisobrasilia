@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-10-19T12:38:20.000Z"
-last_activity: 2026-10-19 -- 03-01 done: role-safe access, assinantes auth, /entrar and members area
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-10-19T12:47:54.000Z"
+last_activity: 2026-10-19 -- 03-02 done: plans collection and Assine Já
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 23
-  completed_plans: 17
-  percent: 74
+  completed_plans: 18
+  percent: 78
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 3 of 7 (assinantes e controle de acesso)
-Plan: 1 of 7 complete (03-01 done)
+Plan: 2 of 7 complete (03-02 done)
 Status: Executing
-Last activity: 2026-10-19 -- 03-01 done: role-safe access, assinantes auth, /entrar and members area
+Last activity: 2026-10-19 -- 03-02 done: plans collection and Assine Já
 
-Progress: [███████░░░] 74% (17/23 plans); Phase 3: 1/7
+Progress: [████████░░] 78% (18/23 plans); Phase 3: 2/7
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -66,6 +66,7 @@ Progress: [███████░░░] 74% (17/23 plans); Phase 3: 1/7
 | Phase 02 P05 | 12 min | 2 tasks | 24 files |
 | Phase 02 P06 | ~35 min (Task 1; + client wait) | 1/2 tasks | 11 files |
 | Phase 03 P01 | 45 min | 2 tasks | 33 files |
+| Phase 03 P02 | 20 min | 2 tasks | 25 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: Phase 2 on main at 93fcccd; staff guide docs/painel/GUIA-DA-EQUIPE.md; image removal = Excluir the file (Despublicar keeps it)
 - [Phase 03]: Roles by principal collection (src/access/roles.ts): users = staff; assinantes never pass staff checks
 - [Phase 03]: assinantes accounts only by staff or trusted context; public first-register/forgot-password closed; 30-day sessions
+- [Phase 03]: Plans seeded by migration (Mensal 30, Trimestral 75, Semestral 135, Anual 240), paymentUrl empty until the client sends PagBank links; 'Combinar pelo WhatsApp' replaces 'Pagar' meanwhile
 
 ### Pending Todos
 
@@ -131,6 +133,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T12:38:20.000Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-10-19T12:47:54.000Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
