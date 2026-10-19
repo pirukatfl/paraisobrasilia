@@ -1,9 +1,14 @@
 import type { Payload } from 'payload'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { findMemberAd, findMemberAds } from '../../src/lib/classisex/board'
+import { expire } from '../../src/lib/cache/expire'
+import { findMemberAd, findMemberAds, findPublicAds } from '../../src/lib/classisex/board'
+import { getPublicAds } from '../../src/lib/classisex/public'
 import { isAdVisible } from '../../src/lib/classisex/visibility'
 import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante, seedSubscription } from '../helpers/seed'
+
+// The cache-expiry hooks are observed through this spy (D-06, T-04-14)
+vi.mock('../../src/lib/cache/expire', () => ({ expire: vi.fn() }))
 
 const NOW = new Date('2026-10-19T18:00:00.000Z')
 const DAY = 86_400_000
@@ -125,5 +130,76 @@ describe('ClassiSex visibility and members board (CLAS-01, CLAS-02, D-05, D-06, 
     expect(isAdVisible({ status: 'aprovado' }, '2026-11-18T03:00:00.000Z', new Date('2026-11-18T03:00:00.000Z'))).toBe(false)
     expect(isAdVisible({ status: 'pendente' }, '2026-12-18T03:00:00.000Z', new Date('2026-11-18T02:00:00.000Z'))).toBe(false)
     expect(isAdVisible({ status: 'aprovado' }, null, new Date())).toBe(false)
+  })
+})
+
+describe('public preview read model (PREV-01, D-04, D-07)', () => {
+  let payload: Payload
+  const NOW_P = new Date()
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    await seedAdCategories(payload)
+    vi.mocked(expire).mockClear()
+  })
+
+  const withAccess = async (email: string, start: number, end: number) => {
+    const acc = await seedAssinante(payload, { email, password: 'senha-teste-1234', name: email.split('@')[0] })
+    await seedSubscription(payload, {
+      assinanteId: acc.id,
+      startsAt: new Date(NOW_P.getTime() + start).toISOString(),
+      endsAt: new Date(NOW_P.getTime() + end).toISOString(),
+    })
+    return acc
+  }
+
+  it('lists only visible ads, newest first, with redacted text and the same filters', async () => {
+    const active = await withAccess('pub-ativo@teste.local', -DAY, 10 * DAY)
+    const expired = await withAccess('pub-vencido@teste.local', -30 * DAY, -DAY)
+    const old = await seedAd(payload, {
+      author: active.id,
+      status: 'aprovado',
+      cidade: 'Taguatinga',
+      publishedAt: new Date(NOW_P.getTime() - 2 * DAY).toISOString(),
+    })
+    const recent = await seedAd(payload, {
+      author: active.id,
+      status: 'aprovado',
+      texto: 'Chama no zap 61 99988-9772 agora.',
+      publishedAt: new Date(NOW_P.getTime() - DAY).toISOString(),
+    })
+    await seedAd(payload, { author: active.id, status: 'pendente' })
+    await seedAd(payload, { author: active.id, status: 'recusado' })
+    await seedAd(payload, { author: active.id, status: 'despublicado' })
+    await seedAd(payload, { author: expired.id, status: 'aprovado' })
+
+    const page = await findPublicAds(payload, {}, NOW_P)
+    expect(page.items.map((i) => i.id)).toEqual([recent.id, old.id])
+    expect(page.items[0].texto).not.toContain('99988')
+    expect(JSON.stringify(page)).not.toContain('5561999990000')
+    expect((await findPublicAds(payload, { cidade: 'taguatinga' }, NOW_P)).items.map((i) => i.id)).toEqual([old.id])
+
+    // The cached wrapper calls through outside a Next server
+    const cachedPage = await getPublicAds({})
+    expect(cachedPage.items.map((i) => i.id)).toEqual([recent.id, old.id])
+  })
+
+  it('subscription and access changes expire the ads tag', async () => {
+    const acc = await seedAssinante(payload, { email: 'tag@teste.local', password: 'senha-teste-1234', name: 'Tag' })
+    vi.mocked(expire).mockClear()
+    const sub = await seedSubscription(payload, {
+      assinanteId: acc.id,
+      startsAt: new Date(NOW_P.getTime() - DAY).toISOString(),
+      endsAt: new Date(NOW_P.getTime() + DAY).toISOString(),
+    })
+    const calls = () => vi.mocked(expire).mock.calls.filter(([tags]) => tags.includes('ads')).length
+    expect(calls()).toBeGreaterThanOrEqual(2) // the period itself and the author's accessUntil
+    vi.mocked(expire).mockClear()
+    await payload.delete({ collection: 'subscriptions', id: (sub as { id: number }).id, overrideAccess: true })
+    expect(calls()).toBeGreaterThanOrEqual(1)
   })
 })
