@@ -3,6 +3,7 @@
  * Never return Payload documents to the browser (author, filenames and URLs stay on the server).
  */
 import { formatShortDate } from '../format/date'
+import { whatsappUrl } from '../site/contact'
 import type { AdStatus } from './rules'
 
 export type AdContatoDTO = { whatsapp: string | null; telegram: string | null; email: string | null }
@@ -74,5 +75,49 @@ export function toOwnerAdDTO(
     statusLabel,
     motivo: doc.status === 'recusado' || doc.status === 'despublicado' ? doc.motivo || null : null,
     updatedLabel: formatShortDate(doc.updatedAt),
+  }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Members board (CLAS-01, CLAS-02, D-05): full ad with contact links. Media URLs always point at
+// the protected route /area-do-assinante/midia/… (04-05/04-06), never at Payload.
+// ---------------------------------------------------------------------------------------------
+
+export type ContactLinkDTO = { label: string; href: string }
+
+export type MemberPhotoDTO = { id: number; thumbUrl: string; url: string; width: number | null; height: number | null }
+export type MemberVideoDTO = { id: number; url: string; durationLabel: string | null }
+
+export type MemberAdDTO = {
+  id: number
+  euSou: string
+  cidade: string | null
+  texto: string
+  publishedLabel: string
+  contato: { whatsapp: ContactLinkDTO | null; telegram: ContactLinkDTO | null; email: ContactLinkDTO | null }
+  fotos: MemberPhotoDTO[]
+  video: MemberVideoDTO | null
+}
+
+export const WHATSAPP_GREETING = 'Olá! Vi seu anúncio no ClassiSex do Paraíso.'
+
+export function toMemberAdDTO(
+  doc: AdDocLike,
+  { euSouLabel, fotos = [], video = null }: { euSouLabel: string; fotos?: MemberPhotoDTO[]; video?: MemberVideoDTO | null },
+): MemberAdDTO {
+  const c = contatoOf(doc)
+  return {
+    id: doc.id,
+    euSou: euSouLabel,
+    cidade: doc.cidade || null,
+    texto: doc.texto,
+    publishedLabel: doc.publishedAt ? formatShortDate(doc.publishedAt) : '',
+    contato: {
+      whatsapp: c.whatsapp ? { label: c.whatsapp, href: whatsappUrl(c.whatsapp, WHATSAPP_GREETING) } : null,
+      telegram: c.telegram ? { label: `@${c.telegram}`, href: `https://t.me/${encodeURIComponent(c.telegram)}` } : null,
+      email: c.email ? { label: c.email, href: `mailto:${c.email}` } : null,
+    },
+    fotos,
+    video,
   }
 }

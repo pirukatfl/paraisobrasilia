@@ -3,7 +3,8 @@ import 'server-only'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
-import type { OwnerAdDTO } from './dto'
+import { findMemberAd, findMemberAds, type BoardFilters, type BoardPage } from './board'
+import type { MemberAdDTO, OwnerAdDTO } from './dto'
 import { getOwnAdFormValues, listOwnAds, type OwnAdFormValues } from './service'
 
 /**
@@ -34,4 +35,18 @@ export async function getActiveAdCategories(): Promise<CategoryOption[]> {
     overrideAccess: true,
   })
   return docs.map((d) => ({ id: d.id, name: d.name }))
+}
+
+/**
+ * Members board (CLAS-01, CLAS-02). T-04-05: entitlement of the viewer is checked by the page
+ * (requireActiveSubscription) and the visibility of each ad is computed per request here.
+ */
+export async function listMemberAds(filters: BoardFilters): Promise<BoardPage<MemberAdDTO>> {
+  const payload = await getPayload({ config })
+  return findMemberAds(payload, filters, new Date())
+}
+
+export async function getMemberAd(id: string | number): Promise<MemberAdDTO | null> {
+  const payload = await getPayload({ config })
+  return findMemberAd(payload, id, new Date())
 }
