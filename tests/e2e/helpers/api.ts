@@ -140,11 +140,20 @@ export async function staffApi(request: APIRequestContext) {
       if (!res.ok()) throw new Error(`GET ${path} failed: ${res.status()}`)
       return (await res.json()) as { docs: unknown[] } & Record<string, unknown>
     },
+    /** Staff REST DELETE by id. */
+    async remove(collection: string, id: number) {
+      const res = await request.delete(`/api/${collection}/${id}`, { headers })
+      if (!res.ok()) throw new Error(`delete ${collection}/${id} failed: ${res.status()}`)
+    },
     /** Staff action "Gerar link de nova senha" (48 h, single use). */
     async linkSenha(id: number) {
       const res = await request.post(`/api/assinantes/${id}/link-senha`, { headers, data: {} })
       if (!res.ok()) throw new Error(`link-senha failed: ${res.status()} ${await res.text()}`)
       return (await res.json()) as { url: string; expiresAt: string; whatsappUrl: string | null }
+    },
+    async updateAssinante(id: number, data: Record<string, unknown>) {
+      const res = await request.patch(`/api/assinantes/${id}`, { headers, data })
+      return (await check(res, 'update assinante')).doc
     },
     /** Staff sets a temporary password (field Senha on the subscriber page). */
     async setPassword(id: number, password: string) {

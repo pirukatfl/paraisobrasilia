@@ -52,6 +52,8 @@ export default buildConfig({
       },
     },
   },
+  // T-03-16: the site and the admin use REST only; GraphQL would be a second surface to secure
+  graphQL: { disable: true },
   collections: [
     Users,
     Assinantes,
