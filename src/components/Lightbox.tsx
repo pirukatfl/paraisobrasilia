@@ -11,17 +11,23 @@ const SWIPE_THRESHOLD = 48
 /**
  * Shared lightbox for the space and model galleries (UI-SPEC S10): native <dialog> (focus trap
  * and Escape built in), ←/→ keys, swipe, counter announced politely, video only for the active slide.
+ * `plainImages`: render a plain <img> instead of next/image — required for ClassiSex media, which
+ * must never pass through the image optimizer (T-04-07).
  */
 export function Lightbox({
   slides,
   index,
   onIndexChange,
   onClose,
+  label = 'Galeria de fotos',
+  plainImages = false,
 }: {
   slides: LightboxSlide[]
   index: number | null
   onIndexChange: (index: number) => void
   onClose: () => void
+  label?: string
+  plainImages?: boolean
 }) {
   const ref = useRef<HTMLDialogElement>(null)
   const pointerStart = useRef<number | null>(null)
@@ -71,7 +77,7 @@ export function Lightbox({
   return (
     <dialog
       ref={ref}
-      aria-label="Galeria de fotos"
+      aria-label={label}
       onClose={onClose}
       onKeyDown={onKeyDown}
       className="lightbox m-0 h-dvh max-h-none w-screen max-w-none bg-bg/96 p-0 text-text backdrop:bg-bg/96"
@@ -106,6 +112,17 @@ export function Lightbox({
                 src={slide.videoUrl}
                 title={slide.label}
                 className="max-h-[calc(100dvh-128px)] max-w-full"
+              />
+            ) : plainImages ? (
+              // eslint-disable-next-line @next/next/no-img-element -- private media (T-04-07)
+              <img
+                key={slide.image.url}
+                src={slide.image.url}
+                alt={slide.image.alt}
+                width={slide.image.width}
+                height={slide.image.height}
+                decoding="async"
+                className="max-h-[calc(100dvh-128px)] w-auto max-w-full object-contain"
               />
             ) : (
               <Image

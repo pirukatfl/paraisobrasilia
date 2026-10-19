@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic'
  *          active access looking at a visible ad. Everybody else: 403 (no/inactive session) or 404.
  * T-04-05: the viewer's entitlement is recomputed on every request (never cached).
  * T-04-08: `Cache-Control: private` + `Vary: Cookie` — no CDN/proxy keeps these bytes; never
- *          passed to next/image.
+ *          passed to the Next image optimizer.
  * The file path comes only from the database document (path.basename), never from the URL.
  */
 const COMMON = {

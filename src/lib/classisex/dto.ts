@@ -142,8 +142,16 @@ export function toOwnerAdDTO(
 
 export type ContactLinkDTO = { label: string; href: string }
 
-export type MemberPhotoDTO = { id: number; thumbUrl: string; url: string; width: number | null; height: number | null }
-export type MemberVideoDTO = { id: number; url: string; durationLabel: string | null }
+export type MemberPhotoDTO = {
+  id: number
+  miniatura: string
+  foto: string
+  width: number | null
+  height: number | null
+  thumbWidth: number | null
+  thumbHeight: number | null
+}
+export type MemberVideoDTO = { id: number; src: string; durationLabel: string }
 
 export type MemberAdDTO = {
   id: number
@@ -160,9 +168,23 @@ export const WHATSAPP_GREETING = 'Olá! Vi seu anúncio no ClassiSex do Paraíso
 
 export function toMemberAdDTO(
   doc: AdDocLike,
-  { euSouLabel, fotos = [], video = null }: { euSouLabel: string; fotos?: MemberPhotoDTO[]; video?: MemberVideoDTO | null },
+  { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
 ): MemberAdDTO {
   const c = contatoOf(doc)
+  const fotos: MemberPhotoDTO[] = media
+    .filter((m) => m.kind === 'foto')
+    .sort(byOrder)
+    .map((m) => ({
+      id: m.id,
+      miniatura: mediaUrl(m.id, 'miniatura'),
+      foto: mediaUrl(m.id, 'foto'),
+      width: m.width ?? null,
+      height: m.height ?? null,
+      thumbWidth: m.sizes?.card?.width ?? null,
+      thumbHeight: m.sizes?.card?.height ?? null,
+    }))
+  const v = media.find((m) => m.kind === 'video')
+  const video: MemberVideoDTO | null = v ? { id: v.id, src: mediaUrl(v.id, 'video'), durationLabel: durationLabel(v.durationSeconds) } : null
   return {
     id: doc.id,
     euSou: euSouLabel,

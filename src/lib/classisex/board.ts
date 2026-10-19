@@ -7,7 +7,7 @@ import type { Payload, Where } from 'payload'
 
 import { relId, toMemberAdDTO, type AdDocLike, type MemberAdDTO } from './dto'
 import { CIDADE_MAX, normaliseCidade } from './rules'
-import { categoryLabels } from './service'
+import { categoryLabels, mediaByAd } from './service'
 import { visibleAdsWhere } from './visibility'
 
 export const PAGE_SIZE = 20
@@ -69,7 +69,17 @@ export async function findVisibleAdDocs(
 
 export async function findMemberAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<MemberAdDTO>> {
   const { items, labels, ...rest } = await findVisibleAdDocs(payload, filters, now)
-  return { ...rest, items: items.map((doc) => toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '' })) }
+  // One query for the media of the whole page (no N+1)
+  const media = await mediaByAd(
+    payload,
+    items.map((d) => d.id),
+  )
+  return {
+    ...rest,
+    items: items.map((doc) =>
+      toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) }),
+    ),
+  }
 }
 
 /** One visible ad, or null (unknown, not approved, author without access). */
@@ -89,6 +99,6 @@ export async function findVisibleAdDoc(payload: Payload, id: number | string, no
 export async function findMemberAd(payload: Payload, id: number | string, now: Date): Promise<MemberAdDTO | null> {
   const doc = await findVisibleAdDoc(payload, id, now)
   if (!doc) return null
-  const labels = await categoryLabels(payload)
-  return toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '' })
+  const [labels, media] = await Promise.all([categoryLabels(payload), mediaByAd(payload, [doc.id])])
+  return toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) })
 }

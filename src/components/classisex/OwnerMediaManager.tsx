@@ -7,7 +7,7 @@ export const MEDIA_HINT = 'Fotos JPG, PNG ou WebP até 15 MB (até 5). Vídeo MP
  * "Fotos e vídeo" on Editar anúncio (CLAS-03, D-01). Server component: plain forms work without
  * JavaScript. Uploads post multipart to the route handler …/meus-anuncios/{id}/midia; Remover and
  * Usar como capa are server actions. Thumbnails are plain <img> through the protected route,
- * never next/image (T-04-07).
+ * never the Next image optimizer (T-04-07).
  */
 export function OwnerMediaManager({ adId, media }: { adId: number; media: OwnerMediaDTO }) {
   const uploadAction = `/area-do-assinante/meus-anuncios/${adId}/midia`
@@ -28,7 +28,7 @@ export function OwnerMediaManager({ adId, media }: { adId: number; media: OwnerM
         <ul aria-label="Fotos do anúncio" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {media.fotos.map((foto, i) => (
             <li key={foto.id} className="flex flex-col gap-2 rounded-lg border border-line bg-surface p-2">
-              {/* eslint-disable-next-line @next/next/no-img-element -- private media: never through next/image */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- private media: never through the Next image optimizer */}
               <img
                 src={foto.thumb.url}
                 alt={`Foto ${i + 1} do anúncio`}

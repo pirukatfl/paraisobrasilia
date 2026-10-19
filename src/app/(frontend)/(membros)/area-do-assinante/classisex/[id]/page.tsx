@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { ContactLinks } from '@/components/classisex/ContactLinks'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
+import { MediaGallery } from '@/components/classisex/MediaGallery'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberAd } from '@/lib/classisex/queries'
 
@@ -42,6 +43,7 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </h1>
       <p className="type-label mt-2 text-muted">Publicado em {ad.publishedLabel}</p>
+      <MediaGallery fotos={ad.fotos} video={ad.video} />
       <p className="mt-6 whitespace-pre-line text-body">{ad.texto}</p>
       <section aria-labelledby="titulo-contato" className="mt-8">
         <h2 id="titulo-contato" className="type-heading mb-4">

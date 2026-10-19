@@ -22,7 +22,7 @@ export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean 
       )}
       <div className="mt-3 flex items-start gap-4">
         {ad.capa && (
-          // eslint-disable-next-line @next/next/no-img-element -- private media: never through next/image (T-04-07)
+          // eslint-disable-next-line @next/next/no-img-element -- private media: never through the Next image optimizer (T-04-07)
           <img
             src={ad.capa.url}
             alt="Capa do anúncio"
