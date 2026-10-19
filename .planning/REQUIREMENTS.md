@@ -20,7 +20,7 @@
 
 ### Área aberta — Prévias e contos (PREV)
 
-- [ ] **PREV-01**: Visitante vê chamadas (prévias) de perfis do ClassiSex, sem nenhum contato ou dado identificável
+- [x] **PREV-01**: Visitante vê chamadas (prévias) de perfis do ClassiSex, sem nenhum contato ou dado identificável
 - [ ] **PREV-02**: Visitante vê chamadas de recados/mensagens, sem contato
 - [ ] **PREV-03**: Visitante lê o início de cada conto; o restante aparece só para assinantes
 - [ ] **PREV-04**: Toda prévia tem chamada clara para assinar ("Assine Já")
@@ -133,7 +133,7 @@
 | CLAS-05 | Fase 4 | Pending |
 | CLAS-06 | Fase 4 | Complete |
 | PAINEL-07 | Fase 4 | Complete |
-| PREV-01 | Fase 4 | Pending |
+| PREV-01 | Fase 4 | Complete |
 | PAINEL-03 | Fase 5 | Pending |
 | PREV-02 | Fase 5 | Pending |
 | PREV-03 | Fase 5 | Pending |
