@@ -28,8 +28,8 @@
 ### Área aberta — Institucional (INST)
 
 - [ ] **INST-01**: Visitante acessa "Quem Somos" com submenus Normas, Regras e Dicas
-- [ ] **INST-02**: Visitante vê endereço, mapa e botões "Como chegar" (Google Maps/Waze)
-- [ ] **INST-03**: Visitante fala com a casa por botão de WhatsApp e vê redes sociais oficiais
+- [x] **INST-02**: Visitante vê endereço, mapa e botões "Como chegar" (Google Maps/Waze)
+- [x] **INST-03**: Visitante fala com a casa por botão de WhatsApp e vê redes sociais oficiais
 - [x] **INST-04**: Visitante confirma ter 18+ ao entrar, sem cadastro (módulo trocável caso a lei exija verificação mais forte)
 - [x] **INST-05**: Site tem título, descrição e prévia de compartilhamento corretos em todas as páginas abertas
 - [ ] **INST-06**: Site tem páginas de Termos de Uso e Política de Privacidade (LGPD)
@@ -110,8 +110,8 @@
 | INST-05 | Fase 1 | Complete |
 | PAINEL-01 | Fase 1 | Complete |
 | INST-01 | Fase 2 | Pending |
-| INST-02 | Fase 2 | Pending |
-| INST-03 | Fase 2 | Pending |
+| INST-02 | Fase 2 | Complete |
+| INST-03 | Fase 2 | Complete |
 | INST-06 | Fase 2 | Pending |
 | MIDIA-01 | Fase 2 | Pending |
 | MIDIA-02 | Fase 2 | Pending |

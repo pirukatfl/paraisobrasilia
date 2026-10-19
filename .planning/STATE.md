@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 complete, ready to plan Phase 2
-last_updated: "2026-10-19T02:33:06.355Z"
-last_activity: 2026-10-19 -- Phase 2 planning complete
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-10-19T02:55:42.364Z"
+last_activity: 2026-10-19 -- Completed 02-01 (contact global, /contato, nav + footer)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 10
-  percent: 14
+  completed_plans: 11
+  percent: 69
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-10-19 -- Phase 2 planning complete
+Plan: 1 of 6 complete
+Status: In progress
+Last activity: 2026-10-19 -- Completed 02-01 (contact global, /contato, nav + footer)
 
-Progress: [████████████████████] 10/10 plans (100%) of planned plans; 1 of 7 phases complete
+Progress: 11/16 planned plans (69%); Phase 2: 1/6 plans
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Progress: [████████████████████] 10/10 p
 | Phase 01 P09 | 15 min | 2 tasks | 17 files |
 | Phase 01 P02 | ~10 min (+ client wait) | 2 tasks | 4 files |
 | Phase 01 P10 | ~60 min (+ client wait) | 3 tasks | 20 files |
+| Phase 02 P01 | 18 min | 2 tasks | 32 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Pull-based deploy: GitHub Actions pushes images to ghcr.io/pirukatfl/paraisobrasilia, VPS systemd timer pulls every 5 min — no SSH from our environment
 - [Phase 01]: Media on the VPS disk (named volume media), no Backblaze B2 — client decision 2026-10-17
 - [Phase 01]: Staging live at https://novo.swingbrasilia.com.br (Hostinger VPS 187.77.246.132, Ubuntu 24.04), client-confirmed 2026-10-19
+- [Phase 02]: Shared cache helpers in src/lib/cache (cached, expire); tags contact, pages/page:{key}, space, models
+- [Phase 02]: Seed data in src/migrations/seed/* applied by migrations only when missing (staff edits never overwritten)
 
 ### Pending Todos
 
@@ -110,6 +113,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19
-Stopped at: Phase 1 complete, ready to plan Phase 2
+Last session: 2026-10-19T02:55:42.325Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
