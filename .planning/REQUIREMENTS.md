@@ -44,8 +44,8 @@
 
 ### ClassiSex (CLAS)
 
-- [ ] **CLAS-01**: Assinante vê a lista de perfis com fotos
-- [ ] **CLAS-02**: Assinante abre o perfil completo com fotos, vídeos e contato
+- [x] **CLAS-01**: Assinante vê a lista de perfis com fotos
+- [x] **CLAS-02**: Assinante abre o perfil completo com fotos, vídeos e contato
 - [x] **CLAS-03**: Assinante cria e edita o próprio perfil (fotos, vídeos, texto, contato)
 - [x] **CLAS-04**: Perfil novo ou editado só aparece depois de aprovado pela equipe
 - [ ] **CLAS-05**: Assinante denuncia um perfil
@@ -126,8 +126,8 @@
 | PAINEL-05 | Fase 3 | Complete |
 | PAINEL-06 | Fase 3 | Complete |
 | PAINEL-08 | Fase 3 | Complete |
-| CLAS-01 | Fase 4 | Pending |
-| CLAS-02 | Fase 4 | Pending |
+| CLAS-01 | Fase 4 | Complete |
+| CLAS-02 | Fase 4 | Complete |
 | CLAS-03 | Fase 4 | Complete |
 | CLAS-04 | Fase 4 | Complete |
 | CLAS-05 | Fase 4 | Pending |
