@@ -173,6 +173,13 @@ export const Assinantes: CollectionConfig = {
       admin: { description: 'Como o assinante é chamado no site ("Olá, …").' },
     },
     {
+      // Liberar / renovar / encerrar with the payment record (PAINEL-05); hidden on create
+      name: 'assinaturaPainel',
+      type: 'ui',
+      label: 'Assinatura',
+      admin: { components: { Field: '/components/admin/assinantes/AssinaturaPanel#AssinaturaPanel' } },
+    },
+    {
       name: 'whatsapp',
       type: 'text',
       label: 'WhatsApp',
