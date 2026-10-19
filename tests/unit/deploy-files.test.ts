@@ -120,3 +120,42 @@ describe('Phase 3 staff guide and runbook (plan 03-07)', () => {
     expect(runbook).toContain('first-register')
   })
 })
+
+describe('Phase 4 private media volume (plan 04-05, T-04-03, T-04-09, T-04-16)', () => {
+  it.each(['docker-compose.staging.yml', 'docker-compose.staging.ghcr.yml'])(
+    '%s mounts private_media at /app/private-media next to media',
+    (file) => {
+      const compose = read(file)
+      const app = service(compose, 'app')
+      expect(app).toContain('- private_media:/app/private-media')
+      expect(app).toContain('PRIVATE_MEDIA_DIR: /app/private-media')
+      expect(app).toContain('- media:/app/media')
+      expect(compose).toMatch(/\nvolumes:\n(?:  \w+:\n)*  private_media:\n/)
+      // Caddy never sees the private files
+      expect(service(compose, 'caddy')).not.toContain('private')
+    },
+  )
+
+  it('bootstrap still installs the exact compose and Caddyfile', () => {
+    const bootstrap = read('scripts/deploy/bootstrap-vps.sh')
+    expect(heredoc(bootstrap, 'PARAISO_COMPOSE')).toBe(read('docker-compose.staging.ghcr.yml'))
+    expect(heredoc(bootstrap, 'PARAISO_CADDY')).toBe(read('Caddyfile'))
+  })
+
+  it('Caddy caps request bodies at 110 MB', () => {
+    expect(read('Caddyfile')).toContain('max_size 110MB')
+  })
+
+  it('the image creates /app/private-media for node but leaves PRIVATE_MEDIA_DIR to the compose', () => {
+    const dockerfile = read('Dockerfile')
+    expect(dockerfile).toMatch(/mkdir -p [^\n]*\/app\/private-media/)
+    expect(dockerfile).toMatch(/chown node:node [^\n]*\/app\/private-media/)
+    expect(dockerfile).not.toMatch(/ENV[^\n]*PRIVATE_MEDIA_DIR|^\s+PRIVATE_MEDIA_DIR=/m)
+  })
+
+  it('local private files are never committed nor sent to the image', () => {
+    expect(read('.gitignore')).toMatch(/^\/private-media$/m)
+    expect(read('.dockerignore')).toMatch(/^private-media$/m)
+    expect(read('.env.staging.example')).toMatch(/^PRIVATE_MEDIA_DIR=\/app\/private-media$/m)
+  })
+})
