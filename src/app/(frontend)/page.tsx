@@ -1,31 +1,64 @@
+import { AboutTeaser } from '@/components/home/AboutTeaser'
+import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
+import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
+import { getSpacePhotos } from '@/lib/gallery/queries'
+import { getPageIntro } from '@/lib/pages/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
+import { getContact } from '@/lib/site/queries'
 
 // Rendered per request, never at build time: the Docker/CI build has no database.
-// The data itself stays in the Next data cache (unstable_cache, tag 'parties', 600 s),
-// so publish/edit/unpublish expire it instantly and ended parties drop off by time (FEST-04).
+// The data itself stays in the Next data cache (unstable_cache, tags 'parties', 'space',
+// 'page:quem-somos', 'contact'), so staff changes show at once and ended parties drop off by time.
 export const dynamic = 'force-dynamic'
 
+/** Optional home sections fail soft: an error hides only that section (T-02-15). */
+async function optional<T>(load: () => Promise<T>): Promise<T | null> {
+  try {
+    return await load()
+  } catch {
+    return null
+  }
+}
+
 export default async function HomePage() {
-  const parties = await getUpcomingParties(new Date())
+  const [parties, photos, intro, contact] = await Promise.all([
+    getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
+    optional(() => getSpacePhotos(6)),
+    optional(() => getPageIntro('quem-somos')),
+    optional(() => getContact()),
+  ])
+  const hasParties = parties.length > 0
 
   return (
-    <section aria-labelledby="titulo-proximas-festas">
-      <p className="type-eyebrow text-muted">Casa de festas liberais em Brasília</p>
-      <h1 id="titulo-proximas-festas" className="type-display mt-2">
-        Próximas festas
-      </h1>
-
-      {parties.length > 0 ? (
-        <PartyGrid parties={parties} />
+    <>
+      {hasParties ? (
+        <section aria-labelledby="titulo-proximas-festas">
+          <p className="type-eyebrow text-muted">Casa de festas liberais em Brasília</p>
+          <h1 id="titulo-proximas-festas" className="type-display mt-2">
+            Próximas festas
+          </h1>
+          <PartyGrid parties={parties} />
+        </section>
       ) : (
-        <div className="mt-12 max-w-[480px]">
-          <h2 className="type-heading">Nenhuma festa agendada no momento</h2>
-          <p className="mt-4 text-body text-muted">
-            A próxima programação será publicada aqui em breve. Volte nos próximos dias.
-          </p>
-        </div>
+        <>
+          <p className="type-eyebrow text-muted">Casa de festas liberais em Brasília</p>
+          <h1 className="type-display mt-2">Paraíso Brasília</h1>
+          <section aria-labelledby="titulo-proximas-festas" className="mt-8 max-w-[480px]">
+            <h2 id="titulo-proximas-festas" className="type-heading">
+              Próximas festas
+            </h2>
+            <p className="type-label mt-4 text-text">Nenhuma festa agendada no momento</p>
+            <p className="mt-2 text-body text-muted">
+              A próxima programação será publicada aqui em breve. Volte nos próximos dias.
+            </p>
+          </section>
+        </>
       )}
-    </section>
+
+      <SpaceTeaser photos={photos ?? []} />
+      <AboutTeaser intro={intro} />
+      {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
+    </>
   )
 }

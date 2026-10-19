@@ -74,6 +74,20 @@ export async function staffApi(request: APIRequestContext) {
       })
       return (await check(res, 'create model')).doc
     },
+    /** Publishes or unpublishes every party (restores the global-setup state afterwards). */
+    async setAllPartiesStatus(status: 'draft' | 'published', onlyIds?: number[]) {
+      const res = await request.get('/api/parties?limit=200&depth=0&draft=true', { headers })
+      const { docs } = (await res.json()) as { docs: { id: number; _status: string }[] }
+      const changed: number[] = []
+      for (const doc of docs) {
+        if (onlyIds && !onlyIds.includes(doc.id)) continue
+        if (doc._status === status) continue
+        const upd = await request.patch(`/api/parties/${doc.id}`, { headers, data: { _status: status } })
+        if (!upd.ok()) throw new Error(`party ${doc.id} → ${status} failed: ${upd.status()}`)
+        changed.push(doc.id)
+      }
+      return changed
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)
