@@ -171,7 +171,7 @@ test('inactive viewer gets the status panel and no ad markup', async ({ browser,
   await context.close()
 })
 
-test('anonymous visitors go to /entrar; pages are private and noindex', async ({ browser, baseURL, playwright }) => {
+test('anonymous visitors go to /entrar; pages are private and noindex', async ({ browser, baseURL }) => {
   const anon = await browser.newContext({ baseURL })
   await anon.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
   const page = await anon.newPage()
@@ -187,7 +187,6 @@ test('anonymous visitors go to /entrar; pages are private and noindex', async ({
     expect(headers['x-robots-tag']).toContain('noindex')
   }
   await context.close()
-  void playwright
 })
 
 test('ending the author access hides the ads; renewing brings them back', async ({ browser, baseURL, request }) => {
