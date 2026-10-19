@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-10-19T02:55:42.364Z"
-last_activity: 2026-10-19 -- Completed 02-01 (contact global, /contato, nav + footer)
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-10-19T03:08:59.663Z"
+last_activity: 2026-10-19 -- Completed 02-02 (pages collection, Quem Somos, legal pages)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 11
-  percent: 69
+  completed_plans: 12
+  percent: 75
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: 1 of 6 complete
+Plan: 2 of 6 complete
 Status: In progress
-Last activity: 2026-10-19 -- Completed 02-01 (contact global, /contato, nav + footer)
+Last activity: 2026-10-19 -- Completed 02-02 (pages collection, Quem Somos, legal pages)
 
-Progress: 11/16 planned plans (69%); Phase 2: 1/6 plans
+Progress: 12/16 planned plans (75%); Phase 2: 2/6 plans
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: 11/16 planned plans (69%); Phase 2: 1/6 plans
 | Phase 01 P02 | ~10 min (+ client wait) | 2 tasks | 4 files |
 | Phase 01 P10 | ~60 min (+ client wait) | 3 tasks | 20 files |
 | Phase 02 P01 | 18 min | 2 tasks | 32 files |
+| Phase 02 P02 | 11 min | 2 tasks | 33 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 01]: Staging live at https://novo.swingbrasilia.com.br (Hostinger VPS 187.77.246.132, Ubuntu 24.04), client-confirmed 2026-10-19
 - [Phase 02]: Shared cache helpers in src/lib/cache (cached, expire); tags contact, pages/page:{key}, space, models
 - [Phase 02]: Seed data in src/migrations/seed/* applied by migrations only when missing (staff edits never overwritten)
+- [Phase 02]: 02-WP-TEXTS.md original wording merged into Quem somos/Normas/Regras seeds; Termos/Privacidade drafts keep [VALIDAR markers
 
 ### Pending Todos
 
@@ -113,6 +115,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T02:55:42.325Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-10-19T03:08:59.634Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

@@ -27,12 +27,12 @@
 
 ### Área aberta — Institucional (INST)
 
-- [ ] **INST-01**: Visitante acessa "Quem Somos" com submenus Normas, Regras e Dicas
+- [x] **INST-01**: Visitante acessa "Quem Somos" com submenus Normas, Regras e Dicas
 - [x] **INST-02**: Visitante vê endereço, mapa e botões "Como chegar" (Google Maps/Waze)
 - [x] **INST-03**: Visitante fala com a casa por botão de WhatsApp e vê redes sociais oficiais
 - [x] **INST-04**: Visitante confirma ter 18+ ao entrar, sem cadastro (módulo trocável caso a lei exija verificação mais forte)
 - [x] **INST-05**: Site tem título, descrição e prévia de compartilhamento corretos em todas as páginas abertas
-- [ ] **INST-06**: Site tem páginas de Termos de Uso e Política de Privacidade (LGPD)
+- [x] **INST-06**: Site tem páginas de Termos de Uso e Política de Privacidade (LGPD)
 
 ### Assinantes (ASS)
 
@@ -63,7 +63,7 @@
 - [x] **PAINEL-01**: Equipe publica, edita e despublica festas com flyer, sem ajuda técnica
 - [ ] **PAINEL-02**: Equipe envia fotos e vídeos do espaço e das modelos, registrando a autorização de uso de imagem
 - [ ] **PAINEL-03**: Equipe publica contos e define o trecho aberto
-- [ ] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
+- [x] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
 - [ ] **PAINEL-05**: Equipe libera, renova e encerra a assinatura de um cliente, registrando o pagamento
 - [ ] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
 - [ ] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
@@ -109,15 +109,15 @@
 | INST-04 | Fase 1 | Complete |
 | INST-05 | Fase 1 | Complete |
 | PAINEL-01 | Fase 1 | Complete |
-| INST-01 | Fase 2 | Pending |
+| INST-01 | Fase 2 | Complete |
 | INST-02 | Fase 2 | Complete |
 | INST-03 | Fase 2 | Complete |
-| INST-06 | Fase 2 | Pending |
+| INST-06 | Fase 2 | Complete |
 | MIDIA-01 | Fase 2 | Pending |
 | MIDIA-02 | Fase 2 | Pending |
 | MIDIA-03 | Fase 2 | Pending |
 | PAINEL-02 | Fase 2 | Pending |
-| PAINEL-04 | Fase 2 | Pending |
+| PAINEL-04 | Fase 2 | Complete |
 | ASS-01 | Fase 3 | Pending |
 | ASS-02 | Fase 3 | Pending |
 | ASS-03 | Fase 3 | Pending |
