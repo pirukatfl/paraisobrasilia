@@ -8,6 +8,8 @@ import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
+import { AdCategories } from './collections/AdCategories'
+import { Ads } from './collections/Ads'
 import { Assinantes } from './collections/Assinantes'
 import { AuditLog } from './collections/AuditLog'
 import { Media } from './collections/Media'
@@ -60,6 +62,8 @@ export default buildConfig({
     Plans,
     Subscriptions,
     AuditLog,
+    AdCategories,
+    Ads,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

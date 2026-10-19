@@ -73,6 +73,8 @@ export interface Config {
     plans: Plan;
     subscriptions: Subscription;
     'audit-log': AuditLog;
+    'ad-categories': AdCategory;
+    ads: Ad;
     media: Media;
     videos: Video;
     parties: Party;
@@ -96,6 +98,8 @@ export interface Config {
     plans: PlansSelect<false> | PlansSelect<true>;
     subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
     'audit-log': AuditLogSelect<false> | AuditLogSelect<true>;
+    'ad-categories': AdCategoriesSelect<false> | AdCategoriesSelect<true>;
+    ads: AdsSelect<false> | AdsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -355,6 +359,85 @@ export interface AuditLog {
     | number
     | boolean
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Opções do campo "Eu sou" nos anúncios (ex.: Casal, Solteiro, Solteira).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-categories".
+ */
+export interface AdCategory {
+  id: number;
+  name: string;
+  /**
+   * Menor aparece primeiro.
+   */
+  order?: number | null;
+  /**
+   * Desmarque para tirar da lista sem apagar os anúncios que já usam esta opção.
+   */
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ads".
+ */
+export interface Ad {
+  id: number;
+  /**
+   * Calculado: Eu sou · cidade — início do texto.
+   */
+  resumo?: string | null;
+  /**
+   * Assinante que escreveu o anúncio. Não aparece no site.
+   */
+  author: number | Assinante;
+  euSou: number | AdCategory;
+  /**
+   * Opcional. Só letras.
+   */
+  cidade?: string | null;
+  cidadeBusca?: string | null;
+  /**
+   * Até 600 caracteres. Na área aberta, telefones, e-mails, links e @ são removidos automaticamente.
+   */
+  texto: string;
+  /**
+   * Pelo menos um. Nunca aparece na área aberta.
+   */
+  contato?: {
+    /**
+     * Só números, com 55 e DDD.
+     */
+    whatsapp?: string | null;
+    /**
+     * Usuário sem o @.
+     */
+    telegram?: string | null;
+    email?: string | null;
+  };
+  status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
+  /**
+   * Preenchido ao recusar ou despublicar.
+   */
+  motivo?: string | null;
+  submittedAt?: string | null;
+  /**
+   * Ordem da lista: mais recentes primeiro.
+   */
+  publishedAt?: string | null;
+  moderatedAt?: string | null;
+  moderatedBy?: (number | null) | User;
+  /**
+   * O anunciante declarou ter 18 anos ou mais e autorização de todas as pessoas das fotos e do vídeo.
+   */
+  consentAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -701,6 +784,14 @@ export interface PayloadLockedDocument {
         value: number | AuditLog;
       } | null)
     | ({
+        relationTo: 'ad-categories';
+        value: number | AdCategory;
+      } | null)
+    | ({
+        relationTo: 'ads';
+        value: number | Ad;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -882,6 +973,45 @@ export interface AuditLogSelect<T extends boolean = true> {
   assinanteLabel?: T;
   summary?: T;
   details?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-categories_select".
+ */
+export interface AdCategoriesSelect<T extends boolean = true> {
+  name?: T;
+  order?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ads_select".
+ */
+export interface AdsSelect<T extends boolean = true> {
+  resumo?: T;
+  author?: T;
+  euSou?: T;
+  cidade?: T;
+  cidadeBusca?: T;
+  texto?: T;
+  contato?:
+    | T
+    | {
+        whatsapp?: T;
+        telegram?: T;
+        email?: T;
+      };
+  status?: T;
+  motivo?: T;
+  submittedAt?: T;
+  publishedAt?: T;
+  moderatedAt?: T;
+  moderatedBy?: T;
+  consentAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
