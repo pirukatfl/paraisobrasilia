@@ -38,8 +38,8 @@
 
 - [x] **ASS-01**: Assinante entra com e-mail e senha e continua logado entre visitas
 - [ ] **ASS-02**: Assinante redefine a senha por link enviado ao e-mail (v1: link/senha provisória gerados pela equipe e enviados pelo WhatsApp; e-mail adiado — decisão do cliente 2026-10-19)
-- [ ] **ASS-03**: Assinante vê até quando sua assinatura vale
-- [ ] **ASS-04**: Assinatura vencida perde acesso ao conteúdo restrito automaticamente na data
+- [x] **ASS-03**: Assinante vê até quando sua assinatura vale
+- [x] **ASS-04**: Assinatura vencida perde acesso ao conteúdo restrito automaticamente na data
 - [x] **ASS-05**: Visitante vê na página "Assine Já" os planos e como pagar (pagamento manual)
 
 ### ClassiSex (CLAS)
@@ -120,8 +120,8 @@
 | PAINEL-04 | Fase 2 | Complete |
 | ASS-01 | Fase 3 | Complete |
 | ASS-02 | Fase 3 | Pending |
-| ASS-03 | Fase 3 | Pending |
-| ASS-04 | Fase 3 | Pending |
+| ASS-03 | Fase 3 | Complete |
+| ASS-04 | Fase 3 | Complete |
 | ASS-05 | Fase 3 | Complete |
 | PAINEL-05 | Fase 3 | Pending |
 | PAINEL-06 | Fase 3 | Pending |

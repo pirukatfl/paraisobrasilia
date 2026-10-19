@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-10-19T12:47:54.000Z"
-last_activity: 2026-10-19 -- 03-02 done: plans collection and Assine Já
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-10-19T13:02:46.000Z"
+last_activity: 2026-10-19 -- 03-03 done: subscription periods, date-based access, Minha assinatura
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 23
-  completed_plans: 18
-  percent: 78
+  completed_plans: 19
+  percent: 83
 ---
 
 # Project State
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 3 of 7 (assinantes e controle de acesso)
-Plan: 2 of 7 complete (03-02 done)
+Plan: 3 of 7 complete (03-03 done)
 Status: Executing
-Last activity: 2026-10-19 -- 03-02 done: plans collection and Assine Já
+Last activity: 2026-10-19 -- 03-03 done: subscription periods, date-based access, Minha assinatura
 
-Progress: [████████░░] 78% (18/23 plans); Phase 3: 2/7
+Progress: [████████░░] 83% (19/23 plans); Phase 3: 3/7
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -67,6 +67,7 @@ Progress: [████████░░] 78% (18/23 plans); Phase 3: 2/7
 | Phase 02 P06 | ~35 min (Task 1; + client wait) | 1/2 tasks | 11 files |
 | Phase 03 P01 | 45 min | 2 tasks | 33 files |
 | Phase 03 P02 | 20 min | 2 tasks | 25 files |
+| Phase 03 P03 | 30 min | 3 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 03]: Roles by principal collection (src/access/roles.ts): users = staff; assinantes never pass staff checks
 - [Phase 03]: assinantes accounts only by staff or trusted context; public first-register/forgot-password closed; 30-day sessions
 - [Phase 03]: Plans seeded by migration (Mensal 30, Trimestral 75, Semestral 135, Anual 240), paymentUrl empty until the client sends PagBank links; 'Combinar pelo WhatsApp' replaces 'Pagar' meanwhile
+- [Phase 03]: Access = periods evaluated per request (startsAt <= now < endsAt, endsAt at São Paulo midnight after the last valid day); accessUntil denormalised for listing only
+- [Phase 03]: withRequestState: restore req.context/user after nested Local API calls in hooks (Payload mutates the shared req)
 
 ### Pending Todos
 
@@ -133,6 +136,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T12:47:54.000Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-10-19T13:02:46.000Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
