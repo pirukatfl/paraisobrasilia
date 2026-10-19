@@ -15,17 +15,17 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - ✓ Festas (o "produto"): flyers no formato das redes sociais (1:1 e 4:5), adaptáveis ao celular, cada um levando a uma página com texto e detalhes da festa; festas passadas saem da home sozinhas — Fase 1 (FEST-01..04; prévia no WhatsApp aguardando confirmação do cliente em staging)
 - ✓ Confirmação de maioridade (18+) na entrada, sem exigir cadastro (módulo trocável) — Fase 1 (INST-04; parecer jurídico pendente antes do lançamento)
 - ✓ SEO básico correto (título, descrição, Open Graph) nas páginas abertas — Fase 1 (INST-05; desempenho alto no celular segue para a Fase 7)
-- ✓ Painel simples para a equipe publicar, editar e despublicar festas/flyers sem desenvolvedor — Fase 1 (PAINEL-01; teste com a equipe da casa aguardando confirmação do cliente; fotos, vídeos e contos seguem nas Fases 2 e 5)
+- ✓ Painel simples para a equipe publicar, editar e despublicar festas/flyers sem desenvolvedor — Fase 1 (PAINEL-01; contos seguem na Fase 5)
+- ✓ Fotos e vídeos do espaço e fotos das modelos (até 3 por modelo), com autorização de imagem registrada no painel — Fase 2 (MIDIA-01..03, PAINEL-02; galerias aguardam o backup de uploads do WordPress)
+- ✓ Endereço, mapa OSM, "Como chegar" (Google Maps/Waze), WhatsApp e redes — Fase 2 (INST-02, INST-03)
+- ✓ Quem Somos com Normas, Regras e Dicas, editáveis no painel — Fase 2 (INST-01, PAINEL-04)
+- ✓ Termos de Uso e Política de Privacidade — Fase 2 (INST-06; rascunho com marcas [VALIDAR] até o parecer jurídico)
 
 ### Active
 
 **Área aberta (sem cadastro, sem restrição, mas SEM contatos de perfis):**
-- [ ] Fotos e vídeos do espaço onde acontecem as festas
-- [ ] Fotos profissionais das modelos que a casa contrata
 - [ ] Chamadas (prévias) para todo o conteúdo restrito, sem expor contato: perfis, mensagens/recados, fotos
 - [ ] Contos e conteúdo curioso; parte dos contos aberta para gerar curiosidade, o restante para assinantes
-- [ ] Endereço, mapa e informações que atraiam clientes reais
-- [ ] Menu "Quem Somos" com submenus: Normas, Regras, Dicas
 
 **Área controlada (só assinantes):**
 - [ ] ClassiSex: perfil completo com fotos e vídeos
@@ -34,7 +34,7 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - [ ] Assinatura com pagamento manual: o cliente paga por fora e a casa libera/renova o acesso pelo painel
 
 **Operação:**
-- [ ] Painel simples para a equipe da casa publicar fotos, vídeos e contos sem depender de desenvolvedor (festas já validadas na Fase 1)
+- [ ] Painel para a equipe publicar contos (festas, fotos e vídeos já validados nas Fases 1-2)
 - [ ] Gestão de assinantes no painel (liberar, renovar, expirar acesso)
 - [ ] Migração dos assinantes e perfis existentes do WordPress atual
 - [ ] Desempenho alto no celular (SEO básico já validado na Fase 1)
@@ -100,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-19 after Phase 1*
+*Last updated: 2026-10-19 after Phase 2 (aprovada pelo cliente em staging)*

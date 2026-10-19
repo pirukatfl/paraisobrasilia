@@ -7,7 +7,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 ## Phases
 
 - [x] **Phase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico (completed 2026-10-19)
-- [ ] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas
+- [x] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas (completed 2026-10-19)
 - [ ] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe
 - [ ] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
 - [ ] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
@@ -79,7 +79,7 @@ Plans:
   4. Visitante acessa Termos de Uso e Política de Privacidade (LGPD)
   5. Equipe envia fotos e vídeos registrando a autorização de uso de imagem e edita Quem Somos, Normas, Regras, Dicas e contatos sem ajuda técnica
 
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans complete
 Plans:
 **Wave 1**
 
@@ -103,7 +103,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 02-06-PLAN.md — Runbook + staff guide, push to main (deploy + migrations on the VPS), client check on staging (wave 6) — Task 1 done (pushed 93fcccd, run 39198530631 green); awaiting client check
+- [x] 02-06-PLAN.md — Runbook + staff guide, push to main (deploy + migrations on the VPS), client check on staging (wave 6) — Task 1 done (pushed 93fcccd, run 39198530631 green); awaiting client check
 
 Cross-cutting constraints: schema-changing plans run in sequential waves (Payload migration snapshots); every public query is published-only, cached with tags and revalidated on staff changes; media stays on the VPS disk (MEDIA_DIR).
 **UI hint**: yes
@@ -191,7 +191,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
-| 2. Site aberto completo e mídia | 5/6 | In Progress|  |
+| 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |

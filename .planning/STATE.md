@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: awaiting-client-check
-stopped_at: 02-06 Task 2 (client checkpoint on staging)
-last_updated: "2026-10-19T04:20:00.000Z"
+status: ready_to_plan
+stopped_at: Phase 2 complete (6/6) — ready to discuss Phase 3
+last_updated: 2026-10-19T11:25:51.491Z
 last_activity: 2026-10-19 -- 02-06 Task 1 done: Phase 2 pushed (93fcccd, deploy-staging run 39198530631 green); awaiting client check
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 15
-  percent: 94
+  completed_plans: 16
+  percent: 14
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-19)
 
 **Core value:** Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas e consegue chegar até ela; quem é assinante encontra perfis e consegue fazer contato.
-**Current focus:** Fase 2: Site aberto completo e mídia
+**Current focus:** Phase 3 — assinantes e controle de acesso
 
 ## Current Position
 
-Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: 5 of 6 complete; 02-06 Task 1 done, Task 2 (client check) pending
-Status: Awaiting client check (02-06 Task 2, blocking)
-Last activity: 2026-10-19 -- 02-06 Task 1 done: Phase 2 pushed (93fcccd, deploy-staging run 39198530631 green); awaiting client check
+Phase: 3 of 7 (assinantes e controle de acesso)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-10-19
 
 Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 
@@ -36,7 +36,7 @@ Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 
 **Velocity:**
 
-- Total plans completed: 10
+- Total plans completed: 16
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -45,6 +45,7 @@ Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 10/10 | ~43 min executor time (+ client waits) | ~5 min |
+| 2 | 6 | - | - |
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
