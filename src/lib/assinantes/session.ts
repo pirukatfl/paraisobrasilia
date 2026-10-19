@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 import { cache } from 'react'
 
 import type { Assinante } from '../../payload-types'
+import { type AccessStatus, getAccessStatus } from './access'
 
 export type AssinantePrincipal = Assinante & { collection: 'assinantes' }
 
@@ -29,4 +30,19 @@ export async function requireAssinante(path: string): Promise<AssinantePrincipal
   const assinante = await getAssinante()
   if (!assinante) redirect(`/entrar?next=${encodeURIComponent(path)}`)
   return assinante
+}
+
+export type ActiveCheck =
+  | { assinante: AssinantePrincipal; access: AccessStatus; inactive: false }
+  | { assinante: AssinantePrincipal; access: AccessStatus; inactive: true }
+
+/**
+ * Guard for restricted pages: logged-in subscriber AND an active period now. Returns
+ * `inactive: true` instead of throwing so the page renders the inactive panel without any
+ * restricted markup (T-03-05).
+ */
+export async function requireActiveSubscription(path: string): Promise<ActiveCheck> {
+  const assinante = await requireAssinante(path)
+  const access = await getAccessStatus(assinante.id, new Date())
+  return { assinante, access, inactive: access.state !== 'ativa' }
 }

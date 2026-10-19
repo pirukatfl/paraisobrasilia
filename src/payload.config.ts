@@ -13,6 +13,7 @@ import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
 import { SpaceItems } from './collections/SpaceItems'
+import { Subscriptions } from './collections/Subscriptions'
 import { Parties } from './collections/Parties'
 import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
@@ -52,6 +53,7 @@ export default buildConfig({
     Users,
     Assinantes,
     Plans,
+    Subscriptions,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

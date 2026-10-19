@@ -50,7 +50,7 @@ export const Assinantes: CollectionConfig = {
   admin: {
     group: 'Assinantes',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'email', 'updatedAt'],
+    defaultColumns: ['name', 'email', 'accessUntil', 'updatedAt'],
     listSearchableFields: ['name', 'email', 'whatsapp'],
     description:
       'Crie a conta depois de conferir o comprovante. A conta pode existir sem acesso; o acesso é liberado em "Assinatura".',
@@ -106,6 +106,28 @@ export const Assinantes: CollectionConfig = {
       label: 'Observações da equipe',
       admin: { description: 'Só a equipe vê. Não anote dados bancários nem comprovantes.' },
       access: staffOnlyField,
+    },
+    {
+      name: 'accessUntil',
+      type: 'date',
+      label: 'Acesso até',
+      // Maintained by the subscription hooks; subscribers can never write it (T-03-06)
+      access: { create: isStaff, update: isStaff },
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        description: 'Calculado pelos períodos de assinatura. O acesso termina às 00h deste dia (Brasília).',
+        date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' },
+      },
+    },
+    {
+      name: 'periodos',
+      type: 'join',
+      collection: 'subscriptions',
+      on: 'assinante',
+      label: 'Períodos e pagamentos',
+      defaultSort: '-startsAt',
+      admin: { allowCreate: false },
     },
     {
       name: 'mustChangePassword',

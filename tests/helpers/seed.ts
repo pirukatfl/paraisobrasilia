@@ -44,7 +44,7 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = ['subscriptions', 'assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -120,6 +120,33 @@ export async function seedPlan(payload: Payload, input: SeedPlanInput) {
     data: { active: true, order: 0, ...input } as never,
     overrideAccess: true,
   }) as Promise<{ id: number; name: string; durationDays: number; price: number; promoPrice?: number | null }>
+}
+
+export interface SeedSubscriptionInput {
+  assinanteId: number
+  planId?: number | null
+  startsAt: string
+  endsAt?: string
+  status?: 'ativa' | 'encerrada'
+  method?: 'pix' | 'pagbank' | 'dinheiro' | 'transferencia' | 'cortesia' | 'outro'
+  amount?: number
+}
+
+/** Creates a subscription period (no audit) through the Local API. */
+export async function seedSubscription(payload: Payload, input: SeedSubscriptionInput) {
+  return payload.create({
+    collection: 'subscriptions' as never,
+    data: {
+      assinante: input.assinanteId,
+      ...(input.planId ? { plan: input.planId } : {}),
+      startsAt: input.startsAt,
+      ...(input.endsAt ? { endsAt: input.endsAt } : {}),
+      status: input.status ?? 'ativa',
+      payment: { method: input.method ?? 'pix', amount: input.amount ?? 30 },
+    } as never,
+    overrideAccess: true,
+    context: { skipAudit: true },
+  }) as Promise<{ id: number; startsAt: string; endsAt: string; summary?: string | null; status: string }>
 }
 
 export interface SeedPartyInput {

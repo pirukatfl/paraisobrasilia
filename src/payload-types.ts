@@ -71,6 +71,7 @@ export interface Config {
     users: User;
     assinantes: Assinante;
     plans: Plan;
+    subscriptions: Subscription;
     media: Media;
     videos: Video;
     parties: Party;
@@ -82,11 +83,16 @@ export interface Config {
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    assinantes: {
+      periodos: 'subscriptions';
+    };
+  };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     assinantes: AssinantesSelect<false> | AssinantesSelect<true>;
     plans: PlansSelect<false> | PlansSelect<true>;
+    subscriptions: SubscriptionsSelect<false> | SubscriptionsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -202,6 +208,15 @@ export interface Assinante {
    */
   staffNotes?: string | null;
   /**
+   * Calculado pelos períodos de assinatura. O acesso termina às 00h deste dia (Brasília).
+   */
+  accessUntil?: string | null;
+  periodos?: {
+    docs?: (number | Subscription)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
    * Marcado quando a equipe define a senha; some quando o assinante troca.
    */
   mustChangePassword?: boolean | null;
@@ -224,6 +239,39 @@ export interface Assinante {
     | null;
   password?: string | null;
   collection: 'assinantes';
+}
+/**
+ * Cada pagamento vira um período com início e fim. Para dar ou renovar acesso, use o botão "Assinatura" na ficha do assinante; aqui fica o histórico. Períodos não são apagados: para cortar o acesso, use Encerrar.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions".
+ */
+export interface Subscription {
+  id: number;
+  assinante: number | Assinante;
+  /**
+   * Vazio = cortesia ou prazo combinado; informe a data de término.
+   */
+  plan?: (number | null) | Plan;
+  startsAt: string;
+  /**
+   * Deixe vazio para calcular pelo plano. O acesso vale até o dia anterior a esta data, 23h59 de Brasília.
+   */
+  endsAt?: string | null;
+  status: 'ativa' | 'encerrada';
+  closedAt?: string | null;
+  payment: {
+    amount?: number | null;
+    method: 'pix' | 'pagbank' | 'dinheiro' | 'transferencia' | 'cortesia' | 'outro';
+    paidAt?: string | null;
+    /**
+     * Não guarde o comprovante nem dados bancários: só uma anotação.
+     */
+    note?: string | null;
+  };
+  summary?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * Planos mostrados na página Assine Já. O link do PagBank tem o valor fixo: se mudar o preço, gere um link novo no PagBank e cole aqui.
@@ -600,6 +648,10 @@ export interface PayloadLockedDocument {
         value: number | Plan;
       } | null)
     | ({
+        relationTo: 'subscriptions';
+        value: number | Subscription;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -707,6 +759,8 @@ export interface AssinantesSelect<T extends boolean = true> {
   name?: T;
   whatsapp?: T;
   staffNotes?: T;
+  accessUntil?: T;
+  periodos?: T;
   mustChangePassword?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -739,6 +793,29 @@ export interface PlansSelect<T extends boolean = true> {
   description?: T;
   active?: T;
   order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscriptions_select".
+ */
+export interface SubscriptionsSelect<T extends boolean = true> {
+  assinante?: T;
+  plan?: T;
+  startsAt?: T;
+  endsAt?: T;
+  status?: T;
+  closedAt?: T;
+  payment?:
+    | T
+    | {
+        amount?: T;
+        method?: T;
+        paidAt?: T;
+        note?: T;
+      };
+  summary?: T;
   updatedAt?: T;
   createdAt?: T;
 }

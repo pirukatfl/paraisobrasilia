@@ -3,19 +3,10 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { getActivePlans } from '../../src/lib/assinantes/plans'
 import { PLANS_SEED, seedPlansIfEmpty } from '../../src/migrations/seed/plans-content'
+import { expectFieldError } from '../helpers/errors'
 import { getTestPayload, resetDatabase, seedAssinante, seedPlan, seedStaffUser } from '../helpers/seed'
 
 const DENIED = /permiss|forbidden|not allowed/i
-
-/** Payload ValidationError: the field message is in data.errors[].message. */
-async function expectFieldError(promise: Promise<unknown>, message: string) {
-  const err = (await promise.then(
-    () => null,
-    (e: unknown) => e,
-  )) as { data?: { errors?: { message: string }[] } } | null
-  expect(err, 'expected a validation error').not.toBeNull()
-  expect((err?.data?.errors ?? []).map((e) => e.message)).toContain(message)
-}
 
 describe('plans (ASS-05, D-02, D-03)', () => {
   let payload: Payload
