@@ -379,3 +379,27 @@ export async function seedAd(payload: Payload, input: SeedAdInput) {
     overrideAccess: true,
   }) as Promise<{ id: number; status: string; resumo?: string | null }>
 }
+
+/**
+ * Convenience for ClassiSex tests: subscriber with a period covering `now` (30 days by default)
+ * and one approved ad.
+ */
+export async function seedVisibleAd(
+  payload: Payload,
+  input: { authorEmail: string; authorName?: string; now?: Date; days?: number } & Omit<SeedAdInput, 'author' | 'status'>,
+) {
+  const now = input.now ?? new Date()
+  const author = await seedAssinante(payload, {
+    email: input.authorEmail,
+    password: 'senha-anuncio-123',
+    name: input.authorName ?? 'Anunciante Teste',
+  })
+  await seedSubscription(payload, {
+    assinanteId: author.id,
+    startsAt: new Date(now.getTime() - 86_400_000).toISOString(),
+    endsAt: new Date(now.getTime() + (input.days ?? 30) * 86_400_000).toISOString(),
+  })
+  const { authorEmail: _e, authorName: _n, now: _now, days: _d, ...ad } = input
+  const created = await seedAd(payload, { ...ad, author: author.id, status: 'aprovado' })
+  return { author, ad: created }
+}
