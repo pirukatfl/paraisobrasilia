@@ -2,15 +2,17 @@ import type { Metadata } from 'next'
 
 import { ContactBlock } from '@/components/ContactBlock'
 import { MapEmbed } from '@/components/MapEmbed'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getContact } from '@/lib/site/queries'
 
 // Per request (no database at build); data from the tagged cache ('contact').
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: 'Contato e como chegar',
   description: 'Endereço, mapa e WhatsApp do Paraíso Brasília, no Núcleo Rural Lago Oeste, Sobradinho – DF.',
-}
+  path: '/contato',
+})
 
 export default async function ContactPage() {
   const contact = await getContact()

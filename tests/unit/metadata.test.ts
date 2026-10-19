@@ -49,3 +49,19 @@ describe('buildPartyMetadata (FEST-03, INST-05)', () => {
     expect((md.twitter as { card: string }).card).toBe('summary_large_image')
   })
 })
+
+describe('open-area page metadata', () => {
+  it('builds title, description, canonical and a share preview', async () => {
+    const { buildPageMetadata } = await import('../../src/lib/seo/metadata')
+    const meta = buildPageMetadata({ title: 'Quem somos', description: 'Uma casa de festas.', path: '/quem-somos' })
+    expect(meta.title).toBe('Quem somos')
+    expect(meta.description).toBe('Uma casa de festas.')
+    expect(meta.alternates?.canonical).toBe('/quem-somos')
+    const og = meta.openGraph as { url?: string; title?: string; description?: string; images?: { url: string }[]; siteName?: string }
+    expect(og.url).toBe('/quem-somos')
+    expect(og.title).toBe('Quem somos')
+    expect(og.description).toBe('Uma casa de festas.')
+    expect(og.siteName).toBe('Paraíso Brasília')
+    expect(og.images?.[0].url).toBe('/og-default.jpg')
+  })
+})

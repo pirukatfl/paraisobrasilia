@@ -11,14 +11,16 @@ import './globals.css'
 
 const josefin = Josefin_Sans({
   weight: ['400', '600'],
-  subsets: ['latin', 'latin-ext'],
+  // Portuguese is covered by the latin subset; latin-ext is no longer preloaded (MIDIA-03 budget)
+  subsets: ['latin'],
   variable: '--font-josefin',
   display: 'swap',
 })
 
 const inter = Inter({
   weight: ['400', '600'],
-  subsets: ['latin', 'latin-ext'],
+  // Portuguese is covered by the latin subset; latin-ext is no longer preloaded (MIDIA-03 budget)
+  subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 })

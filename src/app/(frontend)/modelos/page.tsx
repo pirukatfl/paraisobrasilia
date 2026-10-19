@@ -3,16 +3,14 @@ import { notFound } from 'next/navigation'
 
 import { ModelGrid } from '@/components/ModelGrid'
 import { getPublishedModels } from '@/lib/gallery/queries'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 
 // Per request (no database at build); data from the tagged cache ('models').
 export const dynamic = 'force-dynamic'
 
 const INTRO = 'As modelos que animam as noites do Paraíso.'
 
-export const metadata: Metadata = {
-  title: 'Modelos',
-  description: INTRO,
-}
+export const metadata: Metadata = buildPageMetadata({ title: 'Modelos', description: INTRO, path: '/modelos' })
 
 /** D-08: secondary section — exists only while at least one model is published. */
 export default async function ModelsPage() {

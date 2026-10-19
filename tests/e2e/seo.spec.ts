@@ -57,3 +57,30 @@ test('sitemap lists the published institutional pages (INST-01, INST-06)', async
     expect(xml).toContain(`${path}</loc>`)
   }
 })
+
+test('open pages have unique titles, descriptions, share tags and canonical links', async ({ page, request }) => {
+  const paths = [
+    '/quem-somos',
+    '/quem-somos/normas',
+    '/quem-somos/regras',
+    '/quem-somos/dicas',
+    '/termos-de-uso',
+    '/politica-de-privacidade',
+    '/espaco',
+    '/contato',
+  ]
+  const titles = new Set<string>()
+  for (const path of paths) {
+    await page.goto(path)
+    const title = await page.title()
+    expect(title, path).toMatch(/ · Paraíso Brasília$/)
+    titles.add(title)
+    await expect(page.locator('meta[name="description"]'), path).toHaveAttribute('content', /.{20,}/)
+    await expect(page.locator('meta[property="og:title"]'), path).toHaveAttribute('content', /.+/)
+    await expect(page.locator('meta[property="og:image"]').first(), path).toHaveAttribute('content', /og-default\.jpg/)
+    await expect(page.locator('link[rel="canonical"]'), path).toHaveAttribute('href', new RegExp(`${path}$`))
+    const res = await request.get(path)
+    expect(res.headers()['x-robots-tag'], path).toContain('noindex')
+  }
+  expect(titles.size).toBe(paths.length)
+})

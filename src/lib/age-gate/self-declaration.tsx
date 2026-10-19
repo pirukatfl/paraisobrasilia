@@ -18,6 +18,8 @@ function SelfDeclarationPrompt({ onVerified }: { onVerified: () => void }) {
         alt="Paraíso Brasília"
         width={160}
         height={135}
+        // Lazy: returning visitors have the gate hidden (display:none), so the logo is never fetched
+        loading="lazy"
         className="mx-auto h-auto w-40 mix-blend-lighten"
       />
       <h2 id="age-gate-titulo" className="type-heading mt-6">

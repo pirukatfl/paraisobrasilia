@@ -41,3 +41,45 @@ export function buildPartyMetadata(party: PartyDetailDTO & PartySeoFields): Meta
     },
   }
 }
+
+const DEFAULT_OG_IMAGE = { url: '/og-default.jpg', width: 1200, height: 630, alt: 'Paraíso Brasília' }
+
+/**
+ * Metadata for the open-area pages (Quem somos, legal pages, Espaço, Modelos, Contato):
+ * title (layout template adds " · Paraíso Brasília"), description, canonical and a share preview.
+ * A page-level `openGraph` replaces the layout's, so site name, locale and image are repeated here.
+ */
+export function buildPageMetadata({
+  title,
+  description,
+  path,
+  image,
+}: {
+  title: string
+  description?: string | null
+  path: string
+  image?: { url: string; width: number; height: number; alt: string }
+}): Metadata {
+  const desc = description?.trim() || undefined
+  const og = image ?? DEFAULT_OG_IMAGE
+  return {
+    title,
+    description: desc,
+    alternates: { canonical: path },
+    openGraph: {
+      type: 'website',
+      url: path,
+      title,
+      description: desc,
+      siteName: 'Paraíso Brasília',
+      locale: 'pt_BR',
+      images: [og],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      images: [og.url],
+    },
+  }
+}

@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { EmptyState } from '@/components/EmptyState'
 import { Gallery } from '@/components/Gallery'
 import { getSpaceItems } from '@/lib/gallery/queries'
+import { buildPageMetadata } from '@/lib/seo/metadata'
 
 // Per request (no database at build); data from the tagged cache ('space').
 export const dynamic = 'force-dynamic'
@@ -10,10 +11,7 @@ export const dynamic = 'force-dynamic'
 const INTRO =
   'Conheça os ambientes do Paraíso: pista, bar, jardim e piscina numa chácara reservada no Lago Oeste.'
 
-export const metadata: Metadata = {
-  title: 'Conheça o Paraíso',
-  description: INTRO,
-}
+export const metadata: Metadata = buildPageMetadata({ title: 'Conheça o Paraíso', description: INTRO, path: '/espaco' })
 
 export default async function SpacePage() {
   const items = await getSpaceItems()
