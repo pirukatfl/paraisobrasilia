@@ -125,6 +125,20 @@ export async function staffApi(request: APIRequestContext) {
       const res = await request.patch(`/api/subscriptions/${id}`, { headers, data: { status: 'encerrada' } })
       return (await check(res, 'end subscription')).doc
     },
+    /** Staff action "Liberar acesso" / "Renovar" (server computes the dates). */
+    async liberar(
+      id: number,
+      body: { planId?: number | null; durationDays?: number; amount?: number; method?: string; note?: string } = {},
+    ) {
+      const res = await request.post(`/api/assinantes/${id}/liberar`, { headers, data: { method: 'pix', ...body } })
+      if (!res.ok()) throw new Error(`liberar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { subscriptionId: number; startsAt: string; endsAt: string; validUntilLabel: string }
+    },
+    async encerrar(id: number, reason: string) {
+      const res = await request.post(`/api/assinantes/${id}/encerrar`, { headers, data: { reason } })
+      if (!res.ok()) throw new Error(`encerrar failed: ${res.status()} ${await res.text()}`)
+      return (await res.json()) as { ended: number }
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

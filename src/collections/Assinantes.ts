@@ -11,6 +11,7 @@ import {
 import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
 import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
+import { assinanteEndpoints } from '../lib/assinantes/endpoints'
 
 export const MIN_PASSWORD_LENGTH = 8
 export const PASSWORD_TOO_SHORT = 'A senha precisa ter pelo menos 8 caracteres.'
@@ -154,6 +155,8 @@ export const Assinantes: CollectionConfig = {
     // Subscribers never open /admin (T-03-17)
     admin: () => false,
   },
+  // Staff-only actions for the "Assinatura" panel (src/lib/assinantes/endpoints.ts)
+  endpoints: assinanteEndpoints,
   hooks: {
     beforeOperation: [guardOperations],
     beforeDelete: [removePeriods],
