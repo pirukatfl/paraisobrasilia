@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next'
 
+import { PAGE_KEYS, pathForKey } from '@/lib/pages/keys'
+import { getPageByKey } from '@/lib/pages/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
 
 // Per request (no database at build); the party list comes from the tagged data cache.
@@ -8,10 +10,19 @@ export const dynamic = 'force-dynamic'
 /** Home + upcoming party pages; past (and, from 01-09, unpublished) parties are excluded. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000').replace(/\/$/, '')
-  const parties = await getUpcomingParties(new Date())
+  const [parties, pages] = await Promise.all([
+    getUpcomingParties(new Date()),
+    Promise.all(PAGE_KEYS.map((key) => getPageByKey(key))),
+  ])
   return [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },
     { url: `${base}/contato`, changeFrequency: 'monthly', priority: 0.6 },
+    // Institutional pages: published ones only
+    ...pages.flatMap((page) =>
+      page
+        ? [{ url: `${base}${pathForKey(page.key)}`, lastModified: page.updatedAt, changeFrequency: 'monthly' as const, priority: 0.5 }]
+        : [],
+    ),
     ...parties.map((p) => ({
       url: `${base}/festas/${p.slug}`,
       lastModified: p.updatedAt,

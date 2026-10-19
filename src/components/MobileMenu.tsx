@@ -71,7 +71,9 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  aria-current={isActivePath(item.href, pathname) && !item.children ? 'page' : undefined}
+                  aria-current={
+                    pathname === item.href || (!item.children && isActivePath(item.href, pathname)) ? 'page' : undefined
+                  }
                   className={linkClass(item.href)}
                   onClick={() => setOpen(false)}
                 >

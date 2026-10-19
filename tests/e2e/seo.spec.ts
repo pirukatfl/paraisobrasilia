@@ -42,3 +42,18 @@ test('sitemap lists upcoming parties only', async ({ request }) => {
   expect(xml).toContain('/festas/festa-de-teste')
   expect(xml).not.toContain('/festas/festa-passada')
 })
+
+test('sitemap lists the published institutional pages (INST-01, INST-06)', async ({ request }) => {
+  const xml = await (await request.get('/sitemap.xml')).text()
+  for (const path of [
+    '/contato',
+    '/quem-somos',
+    '/quem-somos/normas',
+    '/quem-somos/regras',
+    '/quem-somos/dicas',
+    '/termos-de-uso',
+    '/politica-de-privacidade',
+  ]) {
+    expect(xml).toContain(`${path}</loc>`)
+  }
+})

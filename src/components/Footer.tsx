@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { ExternalLink } from '@/components/ExternalLink'
 import { WhatsAppIcon } from '@/components/icons'
+import { pathForKey } from '@/lib/pages/keys'
 import { type ContactDTO, instagramUrl, telUrl, whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 
@@ -50,7 +51,15 @@ export async function Footer() {
   const instagram = instagramUrl(contact?.instagram)
   const navigate: FooterLink[] = [
     { href: '/', label: 'Festas' },
+    { href: pathForKey('quem-somos'), label: 'Quem somos' },
+    { href: pathForKey('normas'), label: 'Normas' },
+    { href: pathForKey('regras'), label: 'Regras' },
+    { href: pathForKey('dicas'), label: 'Dicas' },
     { href: '/contato', label: 'Contato' },
+  ]
+  const legal: FooterLink[] = [
+    { href: pathForKey('termos'), label: 'Termos de Uso' },
+    { href: pathForKey('privacidade'), label: 'Política de Privacidade' },
   ]
 
   return (
@@ -98,9 +107,12 @@ export async function Footer() {
             </ul>
           </Group>
         )}
-        <nav aria-label="Rodapé">
+        <nav aria-label="Rodapé" className="contents">
           <Group id="rodape-navegue" title="Navegue">
             <LinkList links={navigate} />
+          </Group>
+          <Group id="rodape-legal" title="Legal">
+            <LinkList links={legal} />
           </Group>
         </nav>
       </div>

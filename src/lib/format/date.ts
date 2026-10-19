@@ -51,3 +51,16 @@ export function formatCardDate(iso: string): string {
   const p = parts(shortFmt, iso)
   return `${capitalize(clean(p.weekday))}, ${p.day} ${clean(p.month)} · ${formatPartyTime(iso)}`
 }
+
+const updatedFmt = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: TZ,
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+/** "19 de outubro de 2026" — "Atualizado em …" on legal pages (Brasília time). */
+export function formatUpdatedDate(iso: string): string {
+  const p = parts(updatedFmt, iso)
+  return `${p.day} de ${clean(p.month)} de ${p.year}`
+}
