@@ -65,7 +65,7 @@
 - [ ] **PAINEL-03**: Equipe publica contos e define o trecho aberto
 - [x] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
 - [x] **PAINEL-05**: Equipe libera, renova e encerra a assinatura de um cliente, registrando o pagamento
-- [ ] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
+- [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
 - [ ] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
 - [x] **PAINEL-08**: Toda ação da equipe sobre assinantes fica registrada (quem, quando, o quê)
 
@@ -124,7 +124,7 @@
 | ASS-04 | Fase 3 | Complete |
 | ASS-05 | Fase 3 | Complete |
 | PAINEL-05 | Fase 3 | Complete |
-| PAINEL-06 | Fase 3 | Pending |
+| PAINEL-06 | Fase 3 | Complete |
 | PAINEL-08 | Fase 3 | Complete |
 | CLAS-01 | Fase 4 | Pending |
 | CLAS-02 | Fase 4 | Pending |
