@@ -9,11 +9,13 @@ export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean 
   return (
     <article className="rounded-xl border border-line bg-surface p-5" aria-label={`Anúncio: ${ad.statusLabel}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className={`type-eyebrow ${published ? 'text-accent' : 'text-muted'}`}>{ad.statusLabel}</p>
+        <p className={`type-eyebrow ${published ? 'text-accent' : 'text-muted'}`}>
+          {ad.motivo ? `${ad.statusLabel}: ${ad.motivo}` : ad.statusLabel}
+        </p>
         <p className="type-label text-muted">Atualizado em {ad.updatedLabel}</p>
       </div>
       {ad.motivo && (
-        <p className="mt-3 rounded-lg border border-danger px-3 py-2 text-body">Motivo da equipe: {ad.motivo}</p>
+        <p className="mt-3 text-body text-muted">Corrija o que a equipe pediu e salve de novo para nova análise.</p>
       )}
       <h2 className="type-heading mt-3">
         {ad.euSou}

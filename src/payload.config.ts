@@ -47,7 +47,11 @@ export default buildConfig({
     },
     components: {
       // PAINEL-06: who expires this week, first thing staff see
-      beforeDashboard: ['/components/admin/assinantes/Vencimentos#Vencimentos'],
+      // PAINEL-07: ClassiSex moderation queue
+      beforeDashboard: [
+        '/components/admin/assinantes/Vencimentos#Vencimentos',
+        '/components/admin/classisex/FilaClassisex#FilaClassisex',
+      ],
       graphics: {
         Logo: '/components/admin/Logo',
         Icon: '/components/admin/Icon',

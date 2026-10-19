@@ -12,7 +12,8 @@ import { writeAudit, type AuditAction } from '../assinantes/audit'
 import { withRequestState } from '../assinantes/context'
 
 import { accessStatusFor } from '../assinantes/status'
-import { relId, toOwnerAdDTO, type AdDocLike, type OwnerAdDTO } from './dto'
+import { contatoOf, relId, toOwnerAdDTO, type AdContatoDTO, type AdDocLike, type OwnerAdDTO } from './dto'
+import { redactContacts } from './redact'
 import {
   ACTIVE_LIMIT,
   ACTIVE_STATUSES,
@@ -332,4 +333,53 @@ export async function getModerationCounts(payload: Payload): Promise<{ pendentes
     overrideAccess: true,
   })
   return { pendentes: totalDocs }
+}
+
+export type ModerationView = {
+  id: number
+  status: AdStatus
+  statusLabel: string
+  motivo: string | null
+  /** Exactly what the open area shows (T-04-01): contacts removed on the server */
+  publicText: string
+  publicCidade: string | null
+  removed: number
+  contato: AdContatoDTO
+  /** Current values of the moderation fields, to refresh the admin form after an action */
+  fields: {
+    status: AdStatus
+    motivo: string | null
+    publishedAt: string | null
+    moderatedAt: string | null
+    moderatedBy: number | null
+  }
+}
+
+/** Data for the Moderação panel (staff only). */
+export async function getModerationView(req: PayloadRequest, id: number | string): Promise<ModerationView> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  const ad = (await loadAdForStaff(req, id)) as AdDoc & {
+    resumo?: string | null
+    moderatedAt?: string | null
+    moderatedBy?: unknown
+  }
+  const text = redactContacts(ad.texto ?? '')
+  const cidade = ad.cidade ? redactContacts(ad.cidade).text : null
+  return {
+    id: ad.id,
+    status: ad.status,
+    statusLabel: STAFF_STATUS_LABELS[ad.status],
+    motivo: ad.motivo ?? null,
+    publicText: text.text,
+    publicCidade: cidade,
+    removed: text.removed,
+    contato: contatoOf(ad),
+    fields: {
+      status: ad.status,
+      motivo: ad.motivo ?? null,
+      publishedAt: ad.publishedAt ?? null,
+      moderatedAt: ad.moderatedAt ?? null,
+      moderatedBy: relId(ad.moderatedBy),
+    },
+  }
 }

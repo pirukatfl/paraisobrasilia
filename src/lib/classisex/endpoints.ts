@@ -1,10 +1,11 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
-import { approveAd, rejectAd, ServiceError, unpublishAd } from './service'
+import { approveAd, getModerationView, rejectAd, ServiceError, unpublishAd } from './service'
 
 /**
  * Staff-only moderation actions on an ad, used by the "Moderação" panel in /admin (PAINEL-07):
+ *   GET  /api/ads/:id/moderacao  (situation, public text as visitors see it, contacts)
  *   POST /api/ads/:id/aprovar
  *   POST /api/ads/:id/recusar     { motivo }
  *   POST /api/ads/:id/despublicar { motivo }
@@ -35,6 +36,14 @@ async function run(fn: () => Promise<unknown>): Promise<Response> {
 }
 
 export const adEndpoints: Endpoint[] = [
+  {
+    path: '/:id/moderacao',
+    method: 'get',
+    handler: async (req) => {
+      if (!isStaff({ req })) return forbidden()
+      return run(() => getModerationView(req, idOf(req)))
+    },
+  },
   {
     path: '/:id/aprovar',
     method: 'post',

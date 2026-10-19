@@ -148,6 +148,13 @@ export const Ads: CollectionConfig = {
   },
   fields: [
     {
+      // Aprovar / Recusar / Despublicar with the public preview (PAINEL-07); hidden on create
+      name: 'moderacao',
+      type: 'ui',
+      label: 'Moderação',
+      admin: { components: { Field: '/components/admin/classisex/ModeracaoPanel#ModeracaoPanel' } },
+    },
+    {
       name: 'resumo',
       type: 'text',
       label: 'Resumo',
@@ -230,16 +237,16 @@ export const Ads: CollectionConfig = {
       index: true,
       label: 'Situação',
       options: AD_STATUS_OPTIONS.map((o) => ({ ...o })),
-      // Owners never set the status (T-04-04); staff use the Moderação buttons (04-03)
+      // Owners never set the status (T-04-04); staff use the audited Moderação buttons (04-03)
       access: { create: isStaff, update: isStaff },
-      admin: { position: 'sidebar' },
+      admin: { position: 'sidebar', readOnly: true, description: 'Use os botões do quadro Moderação.' },
     },
     {
       name: 'motivo',
       type: 'text',
       maxLength: 300,
       label: 'Motivo (aparece para o anunciante)',
-      admin: { position: 'sidebar', description: 'Preenchido ao recusar ou despublicar.' },
+      admin: { position: 'sidebar', readOnly: true, description: 'Preenchido pelos botões Recusar e Despublicar.' },
     },
     { name: 'submittedAt', type: 'date', index: true, label: 'Enviado em', admin: dateAdmin() },
     {
