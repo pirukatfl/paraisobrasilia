@@ -58,11 +58,19 @@ async function asSubscriber(browser: Browser, baseURL: string, acc: { email: str
 
 type Fetched = { status: number; type: string; length: number; headers: Record<string, string> }
 
-/** Same-origin fetch from the page (the browser sends the cookie with Sec-Fetch-Site). */
+/**
+ * Same-origin fetch from the page (the browser sends the cookie with Sec-Fetch-Site). `no-store`:
+ * the full 200 is cacheable for the viewer (private, max-age=600), and Chromium would otherwise
+ * answer later range requests from its own cache.
+ */
 const fetchIn = (page: Page, path: string, range?: string) =>
   page.evaluate(
     async ([p, r]) => {
-      const res = await fetch(p as string, { credentials: 'include', headers: r ? { Range: r as string } : undefined })
+      const res = await fetch(p as string, {
+        credentials: 'include',
+        cache: 'no-store',
+        headers: r ? { Range: r as string } : undefined,
+      })
       const buf = await res.arrayBuffer()
       const headers: Record<string, string> = {}
       res.headers.forEach((v, k) => (headers[k] = v))

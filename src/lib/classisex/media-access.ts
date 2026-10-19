@@ -1,0 +1,33 @@
+import { isAdVisible } from './visibility'
+
+/**
+ * Who may open a ClassiSex photo or video through /area-do-assinante/midia/… (CLAS-06, D-05).
+ * Pure decision, unit-tested; the route handler loads the facts and maps the answer to
+ * 200 / 403 / 404. Pure module.
+ */
+export type Principal = { collection: 'users' | 'assinantes'; id: number } | null
+export type MediaVariant = 'miniatura' | 'foto' | 'video'
+export type MediaDecision = 'allow' | 'unauthenticated' | 'not-found'
+
+export const MEDIA_VARIANTS: MediaVariant[] = ['miniatura', 'foto', 'video']
+
+export function canViewMedia(args: {
+  principal: Principal
+  viewerActive: boolean
+  media: { owner: number | null; kind: 'foto' | 'video' }
+  ad: { status: string } | null
+  authorAccessUntil: string | null
+  variante: MediaVariant
+  now: Date
+}): MediaDecision {
+  const { principal, media, variante } = args
+  // A variant that does not exist for this kind of file is simply not there
+  if ((variante === 'video') !== (media.kind === 'video')) return 'not-found'
+  if (!principal) return 'unauthenticated'
+  if (principal.collection === 'users') return 'allow'
+  if (media.owner !== null && principal.id === media.owner) return 'allow'
+  // T-04-05: entitlement of the viewer is checked on every request
+  if (!args.viewerActive) return 'unauthenticated'
+  if (!args.ad || !isAdVisible(args.ad, args.authorAccessUntil, args.now)) return 'not-found'
+  return 'allow'
+}
