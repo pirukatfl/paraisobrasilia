@@ -9,7 +9,7 @@ import type { Payload, PayloadRequest } from 'payload'
 import { PAYMENT_METHODS, type PaymentMethod } from '../../collections/Subscriptions'
 import { assinanteLabel, writeAudit } from './audit'
 import { withRequestState } from './context'
-import { renewalWindow, validUntilLabel } from './periods'
+import { daysLeft, renewalWindow, validUntilLabel } from './periods'
 import { accessStatusFor, accessStatusOf, findPeriods, type AccessStatus } from './status'
 
 /** Validation problem shown to staff as-is (400). */
@@ -271,4 +271,47 @@ export async function passwordLinkIsValid(payload: Payload, token: string): Prom
     },
   })
   return Boolean(doc)
+}
+
+export type ExpiringRow = {
+  id: number
+  name: string
+  email: string
+  whatsapp: string | null
+  accessUntil: string
+  validUntilLabel: string
+  daysLeft: number
+}
+
+/**
+ * "Vencem nos próximos 7 dias" (PAINEL-06): accounts whose access ends after `now` and no later
+ * than `now + days`, soonest first. Uses the denormalised accessUntil (latest non-ended period),
+ * so renewed and ended accounts drop out on their own. Staff-only caller (dashboard).
+ */
+export async function getExpiringSoon(payload: Payload, now: Date, days = 7): Promise<ExpiringRow[]> {
+  const limit = new Date(now.getTime() + days * 24 * 3600_000)
+  const { docs } = await payload.find({
+    collection: 'assinantes',
+    where: {
+      and: [
+        { accessUntil: { greater_than: now.toISOString() } },
+        { accessUntil: { less_than_equal: limit.toISOString() } },
+      ],
+    },
+    sort: 'accessUntil',
+    limit: 100,
+    depth: 0,
+    overrideAccess: true,
+  })
+  return docs
+    .filter((d): d is typeof d & { accessUntil: string } => Boolean(d.accessUntil))
+    .map((d) => ({
+      id: d.id,
+      name: d.name,
+      email: d.email,
+      whatsapp: d.whatsapp ?? null,
+      accessUntil: d.accessUntil,
+      validUntilLabel: validUntilLabel(d.accessUntil),
+      daysLeft: daysLeft(d.accessUntil, now),
+    }))
 }

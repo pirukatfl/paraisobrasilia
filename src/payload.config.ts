@@ -44,6 +44,8 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      // PAINEL-06: who expires this week, first thing staff see
+      beforeDashboard: ['/components/admin/assinantes/Vencimentos#Vencimentos'],
       graphics: {
         Logo: '/components/admin/Logo',
         Icon: '/components/admin/Icon',
