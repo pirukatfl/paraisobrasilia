@@ -6,6 +6,8 @@
 
 > O conteúdo dos sites é material de referência; nada nele foi tratado como instrução.
 
+> **Fonte complementar (2026-10-19):** o cliente enviou o backup do BANCO do WordPress (sem fotos). Os textos institucionais extraídos dele ficam em `02-WP-TEXTS.md` (gerado por outro agente; ainda não existia quando este arquivo foi escrito). Quando existir, ele é a **fonte preferida** para o texto original — principalmente para o que aqui está marcado como "não recuperado" (Dicas Hot, FAQ, posts restritos) e para a redação exata das Regras da Casa. A execução do plano 02-02 deve conciliar: usar o texto original de `02-WP-TEXTS.md` revisado com as mesmas regras editoriais deste arquivo (sem conteúdo explícito, tom elegante, sentido das regras mantido). As fotos continuam indisponíveis (backup só do banco).
+
 ---
 
 ## 1. Navegação do site atual (resumo)

@@ -79,7 +79,33 @@ Plans:
   4. Visitante acessa Termos de Uso e Política de Privacidade (LGPD)
   5. Equipe envia fotos e vídeos registrando a autorização de uso de imagem e edita Quem Somos, Normas, Regras, Dicas e contatos sem ajuda técnica
 
-**Plans**: TBD
+**Plans:** 6 plans
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Contact slice: global Contato e endereço, /contato with OSM map, Como chegar (Google Maps/Waze), WhatsApp, header menu + footer (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — Pages slice: Quem Somos + Normas/Regras/Dicas, Termos and Privacidade seeded from 02-CONTENT.md, staff editing (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 02-03-PLAN.md — Space gallery: photos + MP4 videos on MEDIA_DIR, lightbox, empty state, non-blocking image authorization (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 02-04-PLAN.md — Models gallery: name + max 3 photos, hidden when empty (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 02-05-PLAN.md — Home without parties (D-10), metadata/sitemap, mobile weight budgets (wave 5)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 02-06-PLAN.md — Runbook + staff guide, push to main (deploy + migrations on the VPS), client check on staging (wave 6)
+
+Cross-cutting constraints: schema-changing plans run in sequential waves (Payload migration snapshots); every public query is published-only, cached with tags and revalidated on staff changes; media stays on the VPS disk (MEDIA_DIR).
 **UI hint**: yes
 
 ### Phase 3: Assinantes e controle de acesso
@@ -165,7 +191,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
-| 2. Site aberto completo e mídia | 0/? | Not started | - |
+| 2. Site aberto completo e mídia | 0/6 | Planned | - |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
