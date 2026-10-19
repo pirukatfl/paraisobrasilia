@@ -79,7 +79,7 @@ Plans:
   4. Visitante acessa Termos de Uso e Política de Privacidade (LGPD)
   5. Equipe envia fotos e vídeos registrando a autorização de uso de imagem e edita Quem Somos, Normas, Regras, Dicas e contatos sem ajuda técnica
 
-**Plans:** 3/6 plans executed
+**Plans:** 4/6 plans executed
 Plans:
 **Wave 1**
 
@@ -95,7 +95,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 02-04-PLAN.md — Models gallery: name + max 3 photos, hidden when empty (wave 4)
+- [x] 02-04-PLAN.md — Models gallery: name + max 3 photos, hidden when empty (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -191,7 +191,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
-| 2. Site aberto completo e mídia | 3/6 | In Progress|  |
+| 2. Site aberto completo e mídia | 4/6 | In Progress|  |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |

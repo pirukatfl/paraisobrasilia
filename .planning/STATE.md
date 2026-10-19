@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-10-19T03:22:26.611Z"
-last_activity: 2026-10-19 -- Completed 02-03 (space gallery, videos, lightbox)
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-10-19T03:32:19.132Z"
+last_activity: 2026-10-19 -- Completed 02-04 (models gallery, conditional section)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 13
-  percent: 81
+  completed_plans: 14
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: 3 of 6 complete
+Plan: 4 of 6 complete
 Status: In progress
-Last activity: 2026-10-19 -- Completed 02-03 (space gallery, videos, lightbox)
+Last activity: 2026-10-19 -- Completed 02-04 (models gallery, conditional section)
 
-Progress: 13/16 planned plans (81%); Phase 2: 3/6 plans
+Progress: 14/16 planned plans (88%); Phase 2: 4/6 plans
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: 13/16 planned plans (81%); Phase 2: 3/6 plans
 | Phase 02 P01 | 18 min | 2 tasks | 32 files |
 | Phase 02 P02 | 11 min | 2 tasks | 33 files |
 | Phase 02 P03 | 12 min | 2 tasks | 27 files |
+| Phase 02 P04 | 9 min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: 02-WP-TEXTS.md original wording merged into Quem somos/Normas/Regras seeds; Termos/Privacidade drafts keep [VALIDAR markers
 - [Phase 02]: Payload 3.91 file route serves byte ranges (206): videos use /api/videos/file/*, no fallback route
 - [Phase 02]: e2e data changes go through the staff REST API (cache tags expire); global setup clears .next/dev/cache
+- [Phase 02]: Modelos section (route, nav, footer, sitemap) exists only while a model is published (hasPublishedModels, tag models)
 
 ### Pending Todos
 
@@ -118,6 +120,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T03:22:26.580Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-10-19T03:32:19.100Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None

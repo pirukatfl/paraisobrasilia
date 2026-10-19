@@ -15,7 +15,7 @@
 ### Área aberta — Espaço e modelos (MIDIA)
 
 - [x] **MIDIA-01**: Visitante vê galeria de fotos e vídeos do espaço
-- [ ] **MIDIA-02**: Visitante vê galeria de fotos profissionais das modelos da casa
+- [x] **MIDIA-02**: Visitante vê galeria de fotos profissionais das modelos da casa
 - [ ] **MIDIA-03**: Fotos e vídeos carregam rápido no celular (formatos modernos, carregamento sob demanda)
 
 ### Área aberta — Prévias e contos (PREV)
@@ -61,7 +61,7 @@
 ### Painel da equipe (PAINEL)
 
 - [x] **PAINEL-01**: Equipe publica, edita e despublica festas com flyer, sem ajuda técnica
-- [ ] **PAINEL-02**: Equipe envia fotos e vídeos do espaço e das modelos, registrando a autorização de uso de imagem
+- [x] **PAINEL-02**: Equipe envia fotos e vídeos do espaço e das modelos, registrando a autorização de uso de imagem
 - [ ] **PAINEL-03**: Equipe publica contos e define o trecho aberto
 - [x] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
 - [ ] **PAINEL-05**: Equipe libera, renova e encerra a assinatura de um cliente, registrando o pagamento
@@ -114,9 +114,9 @@
 | INST-03 | Fase 2 | Complete |
 | INST-06 | Fase 2 | Complete |
 | MIDIA-01 | Fase 2 | Complete |
-| MIDIA-02 | Fase 2 | Pending |
+| MIDIA-02 | Fase 2 | Complete |
 | MIDIA-03 | Fase 2 | Pending |
-| PAINEL-02 | Fase 2 | Pending |
+| PAINEL-02 | Fase 2 | Complete |
 | PAINEL-04 | Fase 2 | Complete |
 | ASS-01 | Fase 3 | Pending |
 | ASS-02 | Fase 3 | Pending |
