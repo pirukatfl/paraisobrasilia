@@ -70,6 +70,7 @@ export interface Config {
   collections: {
     users: User;
     assinantes: Assinante;
+    plans: Plan;
     media: Media;
     videos: Video;
     parties: Party;
@@ -85,6 +86,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     assinantes: AssinantesSelect<false> | AssinantesSelect<true>;
+    plans: PlansSelect<false> | PlansSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -222,6 +224,46 @@ export interface Assinante {
     | null;
   password?: string | null;
   collection: 'assinantes';
+}
+/**
+ * Planos mostrados na página Assine Já. O link do PagBank tem o valor fixo: se mudar o preço, gere um link novo no PagBank e cole aqui.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plans".
+ */
+export interface Plan {
+  id: number;
+  /**
+   * Ex.: Mensal.
+   */
+  name: string;
+  /**
+   * 30 = mensal, 90 = trimestral, 180 = semestral, 365 = anual.
+   */
+  durationDays: number;
+  /**
+   * Se mudar o preço, gere um link novo no PagBank.
+   */
+  price: number;
+  /**
+   * Opcional. Aparece como 'de R$ X por R$ Y'.
+   */
+  promoPrice?: number | null;
+  /**
+   * Link de pagamento do PagBank com o valor deste plano. Se o preço mudar, gere um link novo no PagBank. Vazio: o site mostra "Combinar pelo WhatsApp".
+   */
+  paymentUrl?: string | null;
+  /**
+   * Opcional, até 140 caracteres.
+   */
+  description?: string | null;
+  active?: boolean | null;
+  /**
+   * Menor aparece primeiro.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -554,6 +596,10 @@ export interface PayloadLockedDocument {
         value: number | Assinante;
       } | null)
     | ({
+        relationTo: 'plans';
+        value: number | Plan;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -679,6 +725,22 @@ export interface AssinantesSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "plans_select".
+ */
+export interface PlansSelect<T extends boolean = true> {
+  name?: T;
+  durationDays?: T;
+  price?: T;
+  promoPrice?: T;
+  paymentUrl?: T;
+  description?: T;
+  active?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

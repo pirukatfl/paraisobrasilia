@@ -44,7 +44,7 @@ export async function getTestPayload(): Promise<Payload> {
   return payloadPromise
 }
 
-const RESET_ORDER = ['assinantes', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
+const RESET_ORDER = ['assinantes', 'plans', 'models', 'pages', 'space-items', 'videos', 'parties', 'media', 'users'] as const
 
 /** Deletes every document in RESET_ORDER (children before parents; collections not registered yet are skipped). */
 export async function resetDatabase(payload: Payload): Promise<void> {
@@ -100,6 +100,26 @@ export async function seedAssinante(
     overrideAccess: true,
     context: { trustedCreate: true, skipAudit: true },
   }) as Promise<{ id: number; email: string; name: string; mustChangePassword?: boolean | null }>
+}
+
+export interface SeedPlanInput {
+  name: string
+  durationDays: number
+  price: number
+  promoPrice?: number | null
+  paymentUrl?: string
+  description?: string
+  active?: boolean
+  order?: number
+}
+
+/** Creates a subscription plan (Assine Já) through the Local API. */
+export async function seedPlan(payload: Payload, input: SeedPlanInput) {
+  return payload.create({
+    collection: 'plans' as never,
+    data: { active: true, order: 0, ...input } as never,
+    overrideAccess: true,
+  }) as Promise<{ id: number; name: string; durationDays: number; price: number; promoPrice?: number | null }>
 }
 
 export interface SeedPartyInput {

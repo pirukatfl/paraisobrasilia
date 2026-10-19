@@ -3,7 +3,8 @@ import { revalidateTag } from 'next/cache.js'
 
 /**
  * Cache tags: 'parties' — home list, sitemap, static params; 'party:{slug}' — one party page;
- * 'contact' — contact global (02-01); 'pages' + 'page:{key}' (02-02); 'space' (02-03); 'models' (02-04).
+ * 'contact' — contact global (02-01); 'pages' + 'page:{key}' (02-02); 'space' (02-03); 'models' (02-04);
+ * 'plans' — Assine Já plans (03-02).
  * `{ expire: 0 }` expires immediately, so the next visitor gets fresh HTML instead of a
  * stale-while-revalidate copy.
  */
