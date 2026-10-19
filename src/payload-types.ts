@@ -425,9 +425,12 @@ export interface Ad {
     telegram?: string | null;
     email?: string | null;
   };
+  /**
+   * Use os botões do quadro Moderação.
+   */
   status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
   /**
-   * Preenchido ao recusar ou despublicar.
+   * Preenchido pelos botões Recusar e Despublicar.
    */
   motivo?: string | null;
   submittedAt?: string | null;
