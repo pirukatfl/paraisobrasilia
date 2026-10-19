@@ -4,6 +4,7 @@ import type { Payload } from 'payload'
 import sharp from 'sharp'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { attachMedia, removeMedia, ServiceError, setCover } from '../../src/lib/classisex/service'
 import { privateMediaDir } from '../../src/lib/classisex/storage'
 import { buildMp4 } from '../helpers/mp4-fixtures'
 import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante } from '../helpers/seed'
@@ -163,5 +164,100 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     const err = await upload(await jpegWithExif(100, 100), 'image/jpeg', 'prod.jpg').catch((e) => e)
     expect(err.status).toBe(503)
     expect(err.message).toBe('Envio de fotos indisponível no momento.')
+  })
+})
+
+describe('owner media service (CLAS-03, D-01, D-03, T-04-04)', () => {
+  let payload: Payload
+  let owner: { id: number }
+  let other: { id: number }
+  let adId: number
+  const now = new Date()
+  const dir = privateMediaDir()
+
+  const photoFile = async (name = 'foto.jpg') => {
+    const data = await jpegWithExif(300, 200)
+    return { data, mimetype: 'image/jpeg', name, size: data.length }
+  }
+  const adStatus = async () =>
+    ((await payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true })) as { status: string }).status
+  const mediaOf = async () =>
+    (
+      await payload.find({
+        collection: 'ad-media',
+        where: { ad: { equals: adId } },
+        sort: 'order',
+        depth: 0,
+        overrideAccess: true,
+      })
+    ).docs as unknown as MediaDoc[]
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    await seedAdCategories(payload)
+    owner = await seedAssinante(payload, { email: 'dono@teste.local', password: 'senha-dono-1234', name: 'Dono' })
+    other = await seedAssinante(payload, { email: 'outro@teste.local', password: 'senha-outro-1234', name: 'Outro' })
+    adId = (await seedAd(payload, { author: owner.id, status: 'aprovado' })).id
+  })
+
+  it('attaches a photo for the owner and sends the ad back to moderation', async () => {
+    const { id } = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile(), now })
+    const media = await mediaOf()
+    expect(media.map((m) => m.id)).toEqual([id])
+    expect(media[0].kind).toBe('foto')
+    expect(await adStatus()).toBe('pendente')
+  })
+
+  it('refuses another subscriber with 404 and writes no file', async () => {
+    const before = fs.existsSync(dir) ? fs.readdirSync(dir).length : 0
+    const err = await attachMedia(payload, { assinanteId: other.id, adId, file: await photoFile(), now }).catch((e) => e)
+    expect(err).toBeInstanceOf(ServiceError)
+    expect(err.status).toBe(404)
+    expect(await mediaOf()).toHaveLength(0)
+    expect(fs.existsSync(dir) ? fs.readdirSync(dir).length : 0).toBe(before)
+    expect(await adStatus()).toBe('aprovado')
+  })
+
+  it('turns hook refusals into ServiceError 400 with the same message', async () => {
+    for (let i = 0; i < 5; i++) await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile(`f${i}.jpg`), now })
+    const err = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile('f6.jpg'), now }).catch((e) => e)
+    expect(err).toBeInstanceOf(ServiceError)
+    expect(err.status).toBe(400)
+    expect(err.code).toBe('limite-fotos')
+    expect(err.message).toBe('Cada anúncio pode ter até 5 fotos.')
+    const long = buildMp4({ durationSeconds: 61 })
+    const err2 = await attachMedia(payload, {
+      assinanteId: owner.id,
+      adId,
+      file: { data: long, mimetype: 'video/mp4', name: 'longo.mp4', size: long.length },
+      now,
+    }).catch((e) => e)
+    expect(err2.code).toBe('longo')
+  })
+
+  it('appends in order, sets the cover and removes media (files gone, ad pending)', async () => {
+    const a = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile('a.jpg'), now })
+    const b = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile('b.jpg'), now })
+    const c = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile('c.jpg'), now })
+    expect((await mediaOf()).map((m) => m.id)).toEqual([a.id, b.id, c.id])
+
+    await payload.update({ collection: 'ads', id: adId, data: { status: 'aprovado' } as never, overrideAccess: true })
+    await setCover(payload, { assinanteId: owner.id, mediaId: c.id, now })
+    expect((await mediaOf()).map((m) => m.id)).toEqual([c.id, a.id, b.id])
+    expect(await adStatus()).toBe('pendente')
+
+    await expect(setCover(payload, { assinanteId: other.id, mediaId: a.id, now })).rejects.toMatchObject({ status: 404 })
+    await expect(removeMedia(payload, { assinanteId: other.id, mediaId: a.id, now })).rejects.toMatchObject({ status: 404 })
+
+    await payload.update({ collection: 'ads', id: adId, data: { status: 'aprovado' } as never, overrideAccess: true })
+    const removed = (await mediaOf()).find((m) => m.id === a.id)!
+    await removeMedia(payload, { assinanteId: owner.id, mediaId: a.id, now })
+    expect((await mediaOf()).map((m) => m.id)).toEqual([c.id, b.id])
+    expect(fs.existsSync(path.join(dir, removed.filename))).toBe(false)
+    expect(await adStatus()).toBe('pendente')
   })
 })

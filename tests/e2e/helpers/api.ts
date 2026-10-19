@@ -237,6 +237,19 @@ export async function staffApi(request: APIRequestContext) {
       })
       return (await check(res, 'upload ad-media')).doc as { id: number; filename?: string }
     },
+    /** Media docs of one ad, cover first (staff REST). */
+    async findAdMedia(adId: number) {
+      const res = await request.get(`/api/ad-media?where[ad][equals]=${adId}&sort=order&depth=0&limit=20`, { headers })
+      if (!res.ok()) throw new Error(`find ad-media failed: ${res.status()}`)
+      return ((await res.json()) as {
+        docs: { id: number; kind: 'foto' | 'video'; order: number; filename: string; previa?: string | null; sizes?: { card?: { filename?: string | null } } }[]
+      }).docs
+    },
+    async getAd(id: number) {
+      const res = await request.get(`/api/ads/${id}?depth=0`, { headers })
+      if (!res.ok()) throw new Error(`get ad failed: ${res.status()}`)
+      return (await res.json()) as { id: number; status: string; motivo?: string | null }
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)
