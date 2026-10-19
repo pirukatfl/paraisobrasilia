@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url'
 import { Media } from './collections/Media'
 import { Parties } from './collections/Parties'
 import { Users } from './collections/Users'
+import { Contact } from './globals/Contact'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -46,6 +47,7 @@ export default buildConfig({
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     Parties,
   ],
+  globals: [Contact],
   editor: lexicalEditor(),
   i18n: {
     supportedLanguages: { pt, en },

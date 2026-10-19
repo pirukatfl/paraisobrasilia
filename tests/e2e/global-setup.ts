@@ -1,5 +1,5 @@
 import { brasiliaAt } from '../helpers/dates'
-import { getTestPayload, resetDatabase, seedParty, seedStaffUser } from '../helpers/seed'
+import { getTestPayload, resetDatabase, seedContact, seedParty, seedStaffUser } from '../helpers/seed'
 
 export const STAFF_EMAIL = 'equipe@teste.local'
 
@@ -9,6 +9,7 @@ export default async function globalSetup(): Promise<void> {
 
   const payload = await getTestPayload()
   await resetDatabase(payload)
+  await seedContact(payload)
   await seedStaffUser(payload, {
     email: STAFF_EMAIL,
     password: process.env.E2E_STAFF_PASSWORD ?? 'senha-de-teste-123',

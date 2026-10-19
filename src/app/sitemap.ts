@@ -11,6 +11,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const parties = await getUpcomingParties(new Date())
   return [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },
+    { url: `${base}/contato`, changeFrequency: 'monthly', priority: 0.6 },
     ...parties.map((p) => ({
       url: `${base}/festas/${p.slug}`,
       lastModified: p.updatedAt,

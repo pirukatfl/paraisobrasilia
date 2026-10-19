@@ -79,11 +79,11 @@ Plans:
   4. Visitante acessa Termos de Uso e Política de Privacidade (LGPD)
   5. Equipe envia fotos e vídeos registrando a autorização de uso de imagem e edita Quem Somos, Normas, Regras, Dicas e contatos sem ajuda técnica
 
-**Plans:** 6 plans
+**Plans:** 1/6 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Contact slice: global Contato e endereço, /contato with OSM map, Como chegar (Google Maps/Waze), WhatsApp, header menu + footer (wave 1)
+- [x] 02-01-PLAN.md — Contact slice: global Contato e endereço, /contato with OSM map, Como chegar (Google Maps/Waze), WhatsApp, header menu + footer (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -191,7 +191,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
-| 2. Site aberto completo e mídia | 0/6 | Planned | - |
+| 2. Site aberto completo e mídia | 1/6 | In Progress|  |
 | 3. Assinantes e controle de acesso | 0/? | Not started | - |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |

@@ -59,6 +59,16 @@ export async function resetDatabase(payload: Payload): Promise<void> {
   }
 }
 
+/** Restores (or overrides) the "Contato e endereço" global with the seeded values. */
+export async function seedContact(payload: Payload, overrides: Record<string, unknown> = {}) {
+  const { CONTACT_SEED } = await import('../../src/migrations/seed/contact-content')
+  return payload.updateGlobal({
+    slug: 'contact' as never,
+    data: { ...CONTACT_SEED, ...overrides } as never,
+    overrideAccess: true,
+  })
+}
+
 export async function seedStaffUser(
   payload: Payload,
   { email, password }: { email: string; password: string },
