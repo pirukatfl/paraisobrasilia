@@ -16,7 +16,7 @@
 
 - [x] **MIDIA-01**: Visitante vê galeria de fotos e vídeos do espaço
 - [x] **MIDIA-02**: Visitante vê galeria de fotos profissionais das modelos da casa
-- [ ] **MIDIA-03**: Fotos e vídeos carregam rápido no celular (formatos modernos, carregamento sob demanda)
+- [x] **MIDIA-03**: Fotos e vídeos carregam rápido no celular (formatos modernos, carregamento sob demanda)
 
 ### Área aberta — Prévias e contos (PREV)
 
@@ -115,7 +115,7 @@
 | INST-06 | Fase 2 | Complete |
 | MIDIA-01 | Fase 2 | Complete |
 | MIDIA-02 | Fase 2 | Complete |
-| MIDIA-03 | Fase 2 | Pending |
+| MIDIA-03 | Fase 2 | Complete |
 | PAINEL-02 | Fase 2 | Complete |
 | PAINEL-04 | Fase 2 | Complete |
 | ASS-01 | Fase 3 | Pending |

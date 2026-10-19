@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-10-19T03:32:19.132Z"
-last_activity: 2026-10-19 -- Completed 02-04 (models gallery, conditional section)
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-10-19T03:45:53.645Z"
+last_activity: 2026-10-19 -- Completed 02-05 (home without parties, SEO, budgets)
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 15
+  percent: 94
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 ## Current Position
 
 Phase: 2 of 7 (Site aberto completo e mídia)
-Plan: 4 of 6 complete
+Plan: 5 of 6 complete
 Status: In progress
-Last activity: 2026-10-19 -- Completed 02-04 (models gallery, conditional section)
+Last activity: 2026-10-19 -- Completed 02-05 (home without parties, SEO, budgets)
 
-Progress: 14/16 planned plans (88%); Phase 2: 4/6 plans
+Progress: 15/16 planned plans (94%); Phase 2: 5/6 plans
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: 14/16 planned plans (88%); Phase 2: 4/6 plans
 | Phase 02 P02 | 11 min | 2 tasks | 33 files |
 | Phase 02 P03 | 12 min | 2 tasks | 27 files |
 | Phase 02 P04 | 9 min | 2 tasks | 16 files |
+| Phase 02 P05 | 12 min | 2 tasks | 24 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 02]: Payload 3.91 file route serves byte ranges (206): videos use /api/videos/file/*, no fallback route
 - [Phase 02]: e2e data changes go through the staff REST API (cache tags expire); global setup clears .next/dev/cache
 - [Phase 02]: Modelos section (route, nav, footer, sitemap) exists only while a model is published (hasPublishedModels, tag models)
+- [Phase 02]: Home works without parties (D-10); budgets: home 344 KB incl. JS in production, /contato 138 KB, /quem-somos 146 KB
+- [Phase 02]: Fonts preload latin subset only; favicon 15 KB
 
 ### Pending Todos
 
@@ -120,6 +123,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T03:32:19.100Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-10-19T03:45:53.607Z
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None
