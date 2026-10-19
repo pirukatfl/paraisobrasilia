@@ -67,6 +67,8 @@ export async function Footer() {
     { href: '/espaco', label: 'Espaço' },
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     { href: '/contato', label: 'Contato' },
+    { href: '/assine-ja', label: 'Assine Já' },
+    { href: '/area-do-assinante', label: 'Área do assinante' },
   ]
   const legal: FooterLink[] = [
     { href: pathForKey('termos'), label: 'Termos de Uso' },

@@ -93,6 +93,19 @@ export async function staffApi(request: APIRequestContext) {
       const res = await request.post('/api/assinantes', { headers, data })
       return (await check(res, 'create assinante')).doc as { id: number; url?: string; filename?: string }
     },
+    async createPlan(data: { name: string; durationDays: number; price: number; promoPrice?: number; paymentUrl?: string; active?: boolean; order?: number }) {
+      const res = await request.post('/api/plans', { headers, data })
+      return (await check(res, 'create plan')).doc
+    },
+    async updatePlan(id: number, data: Record<string, unknown>) {
+      const res = await request.patch(`/api/plans/${id}`, { headers, data })
+      return (await check(res, 'update plan')).doc
+    },
+    async findPlans() {
+      const res = await request.get('/api/plans?limit=50&depth=0&sort=order', { headers })
+      if (!res.ok()) throw new Error(`find plans failed: ${res.status()}`)
+      return ((await res.json()) as { docs: { id: number; name: string; price: number; promoPrice?: number | null; paymentUrl?: string | null; active: boolean }[] }).docs
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)

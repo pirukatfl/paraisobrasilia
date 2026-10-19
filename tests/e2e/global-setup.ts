@@ -19,6 +19,9 @@ export default async function globalSetup(): Promise<void> {
   }
   await seedContact(payload)
   await seedPages(payload)
+  // Same state as a fresh deploy: the four plans from the migration seed (D-03)
+  const { seedPlansIfEmpty } = await import('../../src/migrations/seed/plans-content')
+  await seedPlansIfEmpty(payload)
   await seedStaffUser(payload, {
     email: STAFF_EMAIL,
     password: process.env.E2E_STAFF_PASSWORD ?? 'senha-de-teste-123',

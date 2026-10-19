@@ -78,7 +78,7 @@ test('Modelos appears in nav, footer and sitemap only while a model is published
 
   await api.createModel({ name: 'Aurora', photos: 1 })
   links = await navLinks()
-  await expect(links).toHaveText(['Festas', 'Quem somos', 'Espaço', 'Modelos', 'Contato', 'Área do assinante'])
+  await expect(links).toHaveText(['Festas', 'Quem somos', 'Espaço', 'Modelos', 'Contato', 'Assine Já', 'Área do assinante'])
   await expect(page.locator('footer').getByRole('link', { name: 'Modelos' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).toContain('/modelos</loc>')
 })

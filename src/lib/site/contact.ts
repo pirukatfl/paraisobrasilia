@@ -27,8 +27,10 @@ export function fullAddress(c: Pick<ContactDTO, 'addressLine' | 'addressDetail' 
   return c.postalCode ? `${main}, CEP ${c.postalCode}` : main
 }
 
-export function whatsappUrl(number: string): string {
-  return `https://wa.me/${digits(number)}`
+/** wa.me link; `text` pre-fills the message (encoded, never raw staff/visitor input in the URL). */
+export function whatsappUrl(number: string, text?: string): string {
+  const base = `https://wa.me/${digits(number)}`
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base
 }
 
 /** tel: link in international form (+55…) */

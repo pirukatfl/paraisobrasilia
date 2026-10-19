@@ -36,6 +36,9 @@ describe('contact link builders (INST-02, INST-03)', () => {
   it('builds WhatsApp and tel links with digits only', () => {
     expect(whatsappUrl('5561999889772')).toBe('https://wa.me/5561999889772')
     expect(whatsappUrl('+55 (61) 99988-9772')).toBe('https://wa.me/5561999889772')
+    expect(whatsappUrl('5561999889772', 'Olá! Quero assinar o plano Mensal.')).toBe(
+      'https://wa.me/5561999889772?text=Ol%C3%A1!%20Quero%20assinar%20o%20plano%20Mensal.',
+    )
     expect(telUrl('5561999889772')).toBe('tel:+5561999889772')
   })
 

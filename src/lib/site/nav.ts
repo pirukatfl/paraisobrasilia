@@ -2,7 +2,7 @@
  * Site navigation registry (header menu, mobile menu, footer).
  * Fixed order (UI-SPEC Phase 2): Festas · Quem somos · Espaço · Modelos · Contato.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
- * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante.
+ * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já.
  */
 import { pathForKey } from '../pages/keys'
 
@@ -24,7 +24,9 @@ export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels:
     // D-08: secondary section, listed only while at least one model is published
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     { href: '/contato', label: 'Contato' },
-    // Phase 3: members area (redirects to /entrar when logged out)
+    // Phase 3: plans page (03-02) and members area
+    { href: '/assine-ja', label: 'Assine Já' },
+    // members area (redirects to /entrar when logged out)
     { href: '/area-do-assinante', label: 'Área do assinante' },
   ]
 }
