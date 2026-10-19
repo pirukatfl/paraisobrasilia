@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 03-06-PLAN.md
-last_updated: "2026-10-19T14:01:11.000Z"
+status: ready_to_plan
+stopped_at: Phase 3 complete (7/7) — ready to discuss Phase 4
+last_updated: 2026-10-19T18:02:02.146Z
 last_activity: 2026-10-19 -- Completed 03-06 expiring dashboard and leak matrix; 03-07 (staging push) pending, needs the client
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 23
-  completed_plans: 22
-  percent: 96
+  completed_plans: 23
+  percent: 29
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-19)
 
 **Core value:** Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas e consegue chegar até ela; quem é assinante encontra perfis e consegue fazer contato.
-**Current focus:** Phase 3 — assinantes e controle de acesso
+**Current focus:** Phase 4 — classisex e prévias de perfis
 
 ## Current Position
 
-Phase: 3 of 7 (assinantes e controle de acesso)
-Plan: 6 of 7 complete (03-06 done)
-Status: 03-01..03-06 complete; 03-07 (deploy + client check) pending
-Last activity: 2026-10-19 -- Completed 03-06 expiring dashboard and leak matrix; 03-07 (staging push) pending, needs the client
+Phase: 4 of 7 (classisex e prévias de perfis)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-10-19
 
 Progress: [██████████] 96% (22/23 plans); Phase 3: 6/7
 
@@ -36,7 +36,7 @@ Progress: [██████████] 96% (22/23 plans); Phase 3: 6/7
 
 **Velocity:**
 
-- Total plans completed: 22
+- Total plans completed: 29
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -46,6 +46,7 @@ Progress: [██████████] 96% (22/23 plans); Phase 3: 6/7
 |-------|-------|-------|----------|
 | 01 | 10/10 | ~43 min executor time (+ client waits) | ~5 min |
 | 2 | 6 | - | - |
+| 3 | 7 | - | - |
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|

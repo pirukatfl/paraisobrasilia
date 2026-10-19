@@ -19,6 +19,7 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - ✓ Fotos e vídeos do espaço e fotos das modelos (até 3 por modelo), com autorização de imagem registrada no painel — Fase 2 (MIDIA-01..03, PAINEL-02; galerias aguardam o backup de uploads do WordPress)
 - ✓ Endereço, mapa OSM, "Como chegar" (Google Maps/Waze), WhatsApp e redes — Fase 2 (INST-02, INST-03)
 - ✓ Quem Somos com Normas, Regras e Dicas, editáveis no painel — Fase 2 (INST-01, PAINEL-04)
+- ✓ Login de assinante (sessão de 30 dias), validade por data sem cron, Assine Já com planos/preços/links PagBank editáveis, liberar/renovar/encerrar com pagamento, vencimentos em 7 dias e registro de ações — Fase 3 (ASS-01, 03..05, PAINEL-05/06/08; ASS-02 por senha provisória/link via WhatsApp, e-mail adiado)
 - ✓ Termos de Uso e Política de Privacidade — Fase 2 (INST-06; rascunho com marcas [VALIDAR] até o parecer jurídico)
 
 ### Active
@@ -30,12 +31,9 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 **Área controlada (só assinantes):**
 - [ ] ClassiSex: perfil completo com fotos e vídeos
 - [ ] Recados e mensagens com contato
-- [ ] Login de assinante
-- [ ] Assinatura com pagamento manual: o cliente paga por fora e a casa libera/renova o acesso pelo painel
 
 **Operação:**
 - [ ] Painel para a equipe publicar contos (festas, fotos e vídeos já validados nas Fases 1-2)
-- [ ] Gestão de assinantes no painel (liberar, renovar, expirar acesso)
 - [ ] Migração dos assinantes e perfis existentes do WordPress atual
 - [ ] Desempenho alto no celular (SEO básico já validado na Fase 1)
 
@@ -100,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-19 after Phase 2 (aprovada pelo cliente em staging)*
+*Last updated: 2026-10-19 after Phase 3 (aprovada pelo cliente)*

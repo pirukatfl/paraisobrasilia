@@ -8,7 +8,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 
 - [x] **Phase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico (completed 2026-10-19)
 - [x] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas (completed 2026-10-19)
-- [ ] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe
+- [x] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe (completed 2026-10-19)
 - [ ] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
 - [ ] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
 - [ ] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
@@ -129,7 +129,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 03-04-PLAN.md — Liberar, renovar, encerrar e registro de ações
 - [x] 03-05-PLAN.md — Troca de senha, senha provisória e link de nova senha
 - [x] 03-06-PLAN.md — Vencem em 7 dias e testes de vazamento
-- [ ] 03-07-PLAN.md — Guias, deploy e conferência do cliente
+- [x] 03-07-PLAN.md — Guias, deploy e conferência do cliente
 **UI hint**: yes
 
 ### Phase 4: ClassiSex e prévias de perfis
@@ -199,7 +199,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 |-------|----------------|--------|-----------|
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
-| 3. Assinantes e controle de acesso | 6/7 | In Progress|  |
+| 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
 | 4. ClassiSex e prévias de perfis | 0/? | Not started | - |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
 | 6. Migração do WordPress | 0/? | Not started | - |
