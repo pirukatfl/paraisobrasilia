@@ -94,7 +94,7 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
 
   // Photo → back to moderation
   await enviar(page, 'foto', path.join(FIXTURES, 'flyer-square.jpg'))
-  await expect(page.getByRole('alert')).toContainText('Foto enviada. O anúncio volta para análise da equipe.')
+  await expect(main.getByRole('alert')).toContainText('Foto enviada. O anúncio volta para análise da equipe.')
   const thumbs = section.getByRole('list', { name: 'Fotos do anúncio' }).locator('img')
   await expect(thumbs).toHaveCount(1)
   const src = await thumbs.first().getAttribute('src')
@@ -109,10 +109,10 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   // Video, then a second video
   await page.goto(editar(liaAd))
   await enviar(page, 'video', path.join(FIXTURES, 'espaco.mp4'))
-  await expect(page.getByRole('alert')).toContainText('Vídeo enviado. O anúncio volta para análise da equipe.')
+  await expect(main.getByRole('alert')).toContainText('Vídeo enviado. O anúncio volta para análise da equipe.')
   await expect(section).toContainText(/Vídeo · \d+:\d\d/)
   await enviar(page, 'video', path.join(FIXTURES, 'espaco.mp4'))
-  await expect(page.getByRole('alert')).toContainText('Cada anúncio pode ter 1 vídeo.')
+  await expect(main.getByRole('alert')).toContainText('Cada anúncio pode ter 1 vídeo.')
 
   // Too long, not a photo
   const longo = testInfo.outputPath('longo.mp4')
@@ -121,9 +121,9 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   fs.writeFileSync(longo, buildMp4({ durationSeconds: 61 }))
   fs.writeFileSync(falso, 'isto é só um texto, não uma foto')
   await enviar(page, 'video', longo)
-  await expect(page.getByRole('alert')).toContainText('O vídeo pode ter até 60 segundos.')
+  await expect(main.getByRole('alert')).toContainText('O vídeo pode ter até 60 segundos.')
   await enviar(page, 'foto', falso)
-  await expect(page.getByRole('alert')).toContainText('Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.')
+  await expect(main.getByRole('alert')).toContainText('Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.')
 
   // Second photo becomes the cover, then the first is removed
   await enviar(page, 'foto', path.join(FIXTURES, 'flyer-portrait.jpg'))

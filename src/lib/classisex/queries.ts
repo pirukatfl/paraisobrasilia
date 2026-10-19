@@ -4,8 +4,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { findMemberAd, findMemberAds, type BoardFilters, type BoardPage } from './board'
-import type { MemberAdDTO, OwnerAdDTO } from './dto'
-import { getOwnAdFormValues, listOwnAds, type OwnAdFormValues } from './service'
+import type { MemberAdDTO, OwnerAdDTO, OwnerMediaDTO } from './dto'
+import { getOwnAdFormValues, getOwnAdMedia, listOwnAds, type OwnAdFormValues } from './service'
 
 /**
  * Members-area reads for the ClassiSex. Subscriber-specific: never cached (T-03-05 pattern);
@@ -16,9 +16,16 @@ export async function getOwnAds(assinanteId: number): Promise<OwnerAdDTO[]> {
   return listOwnAds(payload, assinanteId, new Date())
 }
 
-export async function getOwnAdForEdit(assinanteId: number, id: string): Promise<OwnAdFormValues | null> {
+export async function getOwnAdForEdit(
+  assinanteId: number,
+  id: string,
+): Promise<(OwnAdFormValues & { media: OwnerMediaDTO }) | null> {
   const payload = await getPayload({ config })
-  return getOwnAdFormValues(payload, assinanteId, id)
+  const [values, media] = await Promise.all([
+    getOwnAdFormValues(payload, assinanteId, id),
+    getOwnAdMedia(payload, assinanteId, id),
+  ])
+  return values && media ? { ...values, media } : null
 }
 
 export type CategoryOption = { id: number; name: string }

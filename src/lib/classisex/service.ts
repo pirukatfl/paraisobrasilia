@@ -5,14 +5,25 @@
  *
  * T-04-04: ownership is checked here on every write; author and status never come from the form.
  */
-import type { Payload, PayloadRequest } from 'payload'
+import { APIError, type Payload, type PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
 import { writeAudit, type AuditAction } from '../assinantes/audit'
 import { withRequestState } from '../assinantes/context'
 
 import { accessStatusFor } from '../assinantes/status'
-import { contatoOf, relId, toOwnerAdDTO, type AdContatoDTO, type AdDocLike, type OwnerAdDTO } from './dto'
+import { uploadCodeFor, VIDEO_MIME_TYPES } from './media-messages'
+import {
+  contatoOf,
+  relId,
+  toOwnerAdDTO,
+  toOwnerMediaDTO,
+  type AdContatoDTO,
+  type AdDocLike,
+  type AdMediaDocLike,
+  type OwnerAdDTO,
+  type OwnerMediaDTO,
+} from './dto'
 import { redactContacts } from './redact'
 import {
   ACTIVE_LIMIT,
@@ -155,6 +166,125 @@ export async function deleteAd(
   await payload.delete({ collection: 'ads', id: ad.id, overrideAccess: true, context: { ownerEdit: true } })
 }
 
+// ---------------------------------------------------------------------------------------------
+// Owner photos and video (CLAS-03, D-01, D-03). Called by the upload route handler and the
+// remover/capa server actions after the session + active-access checks.
+// T-04-15: route handlers have no server-action origin check; payload.auth ignores a cookie whose
+// Origin is not in the csrf list, so a cross-site POST arrives here as nobody.
+// ---------------------------------------------------------------------------------------------
+
+export type UploadFile = { data: Buffer; mimetype: string; name: string; size: number }
+
+type MediaRow = { id: number; ad: unknown; owner: unknown; kind: 'foto' | 'video'; order?: number | null }
+
+/**
+ * D-03: a media change sends the ad back to 'pendente'. `strict` (adding media) respects the
+ * 3-active-ads limit like an edit; a removal never fails on it: if the ad is off the board
+ * (recusado/despublicado) and the limit is reached, it simply stays where it is.
+ */
+async function backToModeration(payload: Payload, assinanteId: number, ad: AdDoc, now: Date, strict: boolean) {
+  if (!ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
+    if (strict) throw limitError()
+    return
+  }
+  await payload.update({
+    collection: 'ads',
+    id: ad.id,
+    data: { status: 'pendente', submittedAt: now.toISOString(), motivo: null },
+    overrideAccess: true,
+    context: { ownerEdit: true },
+  })
+}
+
+async function loadOwnedMedia(payload: Payload, assinanteId: number, mediaId: number | string) {
+  const numericId = Number(mediaId)
+  if (!Number.isInteger(numericId) || numericId <= 0) throw notFound()
+  const media = (await payload.findByID({
+    collection: 'ad-media',
+    id: numericId,
+    depth: 0,
+    overrideAccess: true,
+    disableErrors: true,
+  })) as MediaRow | null
+  if (!media || relId(media.owner) !== Number(assinanteId)) throw notFound()
+  const ad = await loadOwnedAd(payload, assinanteId, relId(media.ad) ?? 0)
+  return { media, ad }
+}
+
+/** Adds one photo or the video at the end of the ad's list; the hooks validate and clean it. */
+export async function attachMedia(
+  payload: Payload,
+  { assinanteId, adId, file, now }: { assinanteId: number; adId: number | string; file: UploadFile; now: Date },
+): Promise<{ id: number }> {
+  const ad = await loadOwnedAd(payload, assinanteId, adId)
+  if (!ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
+    throw limitError()
+  }
+  const kind = VIDEO_MIME_TYPES.includes(file.mimetype) ? 'video' : 'foto'
+  const { docs } = await payload.find({
+    collection: 'ad-media',
+    where: { ad: { equals: ad.id } },
+    sort: '-order',
+    depth: 0,
+    limit: 1,
+    overrideAccess: true,
+  })
+  const order = docs.length ? Number(docs[0].order ?? 0) + 1 : 0
+  let created: { id: number }
+  try {
+    created = await payload.create({
+      collection: 'ad-media',
+      data: { ad: ad.id, order } as never,
+      file,
+      depth: 0,
+      overrideAccess: true,
+    })
+  } catch (err) {
+    if (err instanceof APIError && err.status < 600 && err.status >= 400 && err.status !== 500) {
+      throw new ServiceError(uploadCodeFor(err.message, kind), err.message, err.status === 503 ? 503 : 400)
+    }
+    throw err
+  }
+  await backToModeration(payload, assinanteId, ad, now, false)
+  return { id: created.id }
+}
+
+/** Removes a photo or the video (files go with it: collection hooks). */
+export async function removeMedia(
+  payload: Payload,
+  { assinanteId, mediaId, now }: { assinanteId: number; mediaId: number | string; now: Date },
+): Promise<{ adId: number }> {
+  const { media, ad } = await loadOwnedMedia(payload, assinanteId, mediaId)
+  await payload.delete({ collection: 'ad-media', id: media.id, overrideAccess: true })
+  await backToModeration(payload, assinanteId, ad, now, false)
+  return { adId: ad.id }
+}
+
+/** Puts a photo first (order 0); the other photos keep their relative order after it. */
+export async function setCover(
+  payload: Payload,
+  { assinanteId, mediaId, now }: { assinanteId: number; mediaId: number | string; now: Date },
+): Promise<{ adId: number }> {
+  const { media, ad } = await loadOwnedMedia(payload, assinanteId, mediaId)
+  if (media.kind !== 'foto') throw notFound()
+  const { docs } = await payload.find({
+    collection: 'ad-media',
+    where: { and: [{ ad: { equals: ad.id } }, { kind: { equals: 'foto' } }] },
+    sort: 'order',
+    depth: 0,
+    limit: 20,
+    overrideAccess: true,
+  })
+  const ordered = [media.id, ...docs.map((d) => d.id).filter((id) => id !== media.id)]
+  for (const [index, id] of ordered.entries()) {
+    const current = docs.find((d) => d.id === id)
+    if (current && Number(current.order ?? 0) === index) continue
+    await payload.update({ collection: 'ad-media', id, data: { order: index }, depth: 0, overrideAccess: true })
+  }
+  await backToModeration(payload, assinanteId, ad, now, false)
+  return { adId: ad.id }
+}
+
 /** Id → label of every Eu sou option (small list). */
 export async function categoryLabels(payload: Payload): Promise<Map<number, string>> {
   const { docs } = await payload.find({
@@ -182,9 +312,45 @@ export async function listOwnAds(payload: Payload, assinanteId: number, now: Dat
     accessStatusFor(payload, assinanteId, now),
   ])
   const authorActive = access.state === 'ativa'
-  return (docs as unknown as AdDocLike[]).map((doc) =>
-    toOwnerAdDTO(doc, { authorActive, euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '' }),
+  const media = await mediaByAd(
+    payload,
+    docs.map((d) => d.id),
   )
+  return (docs as unknown as AdDocLike[]).map((doc) =>
+    toOwnerAdDTO(doc, { authorActive, euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) }),
+  )
+}
+
+/** Media of several ads in one query (no N+1), grouped by ad, in display order. */
+export async function mediaByAd(payload: Payload, adIds: number[]): Promise<Map<number, AdMediaDocLike[]>> {
+  const out = new Map<number, AdMediaDocLike[]>()
+  if (adIds.length === 0) return out
+  const { docs } = await payload.find({
+    collection: 'ad-media',
+    where: { ad: { in: adIds } },
+    sort: 'order',
+    depth: 0,
+    limit: adIds.length * 6,
+    pagination: false,
+    overrideAccess: true,
+  })
+  for (const doc of docs as unknown as AdMediaDocLike[]) {
+    const adId = relId(doc.ad)
+    if (adId === null) continue
+    out.set(adId, [...(out.get(adId) ?? []), doc])
+  }
+  return out
+}
+
+/** Photos and video of one of the owner's ads (edit page), or null when not theirs. */
+export async function getOwnAdMedia(payload: Payload, assinanteId: number, id: number | string): Promise<OwnerMediaDTO | null> {
+  try {
+    const ad = await loadOwnedAd(payload, assinanteId, id)
+    return toOwnerMediaDTO((await mediaByAd(payload, [ad.id])).get(ad.id) ?? [])
+  } catch (err) {
+    if (err instanceof ServiceError && err.code === 'nao-encontrado') return null
+    throw err
+  }
 }
 
 export type OwnAdFormValues = {

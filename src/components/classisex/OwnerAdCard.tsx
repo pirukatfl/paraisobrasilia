@@ -3,6 +3,9 @@ import Link from 'next/link'
 import type { OwnerAdDTO } from '@/lib/classisex/dto'
 import { apagarAnuncio } from '@/lib/classisex/actions'
 
+const mediaSummary = (fotos: number, video: boolean) =>
+  [fotos === 0 ? 'Sem fotos' : fotos === 1 ? '1 foto' : `${fotos} fotos`, video ? '1 vídeo' : null].filter(Boolean).join(' · ')
+
 /** One ad in Meus anúncios (owner view): status, refusal reason, text, contacts, edit/delete. */
 export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean }) {
   const published = ad.status === 'aprovado' && ad.statusLabel === 'Publicado'
@@ -17,10 +20,27 @@ export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean 
       {ad.motivo && (
         <p className="mt-3 text-body text-muted">Corrija o que a equipe pediu e salve de novo para nova análise.</p>
       )}
-      <h2 className="type-heading mt-3">
-        {ad.euSou}
-        {ad.cidade ? ` · ${ad.cidade}` : ''}
-      </h2>
+      <div className="mt-3 flex items-start gap-4">
+        {ad.capa && (
+          // eslint-disable-next-line @next/next/no-img-element -- private media: never through next/image (T-04-07)
+          <img
+            src={ad.capa.url}
+            alt="Capa do anúncio"
+            width={ad.capa.width ?? 480}
+            height={ad.capa.height ?? 480}
+            loading="lazy"
+            decoding="async"
+            className="h-20 w-20 shrink-0 rounded object-cover"
+          />
+        )}
+        <div>
+          <h2 className="type-heading">
+            {ad.euSou}
+            {ad.cidade ? ` · ${ad.cidade}` : ''}
+          </h2>
+          <p className="type-label mt-1 text-muted">{mediaSummary(ad.fotos, ad.video)}</p>
+        </div>
+      </div>
       <p className="mt-2 whitespace-pre-line text-body">{ad.texto}</p>
       <ul className="type-label mt-3 flex flex-col gap-1 text-muted">
         {ad.contato.whatsapp && <li>WhatsApp: {ad.contato.whatsapp}</li>}

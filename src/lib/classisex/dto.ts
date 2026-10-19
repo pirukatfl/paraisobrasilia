@@ -31,6 +31,9 @@ export type OwnerAdDTO = {
   statusLabel: string
   motivo: string | null
   updatedLabel: string
+  fotos: number
+  video: boolean
+  capa: ThumbDTO | null
 }
 
 export const OWNER_STATUS_LABELS: Record<AdStatus, string> = {
@@ -52,6 +55,56 @@ export const relId = (value: unknown): number | null => {
   return Number(value)
 }
 
+// ---------------------------------------------------------------------------------------------
+// Media (04-06). URLs always point at the protected route (CLAS-06): never a Payload file URL,
+// a filename or next/image (T-04-07).
+// ---------------------------------------------------------------------------------------------
+
+export type MediaVariante = 'miniatura' | 'foto' | 'video'
+
+export const mediaUrl = (id: number, variante: MediaVariante): string => `/area-do-assinante/midia/${id}/${variante}`
+
+/** Structural shape of an `ad-media` document read with depth 0. */
+export type AdMediaDocLike = {
+  id: number
+  ad?: unknown
+  kind: 'foto' | 'video'
+  order?: number | null
+  durationSeconds?: number | null
+  width?: number | null
+  height?: number | null
+  sizes?: { card?: { width?: number | null; height?: number | null } | null } | null
+}
+
+export function durationLabel(seconds: number | null | undefined): string {
+  const total = Math.max(0, Math.round(Number(seconds ?? 0)))
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
+const byOrder = (a: AdMediaDocLike, b: AdMediaDocLike) => Number(a.order ?? 0) - Number(b.order ?? 0) || a.id - b.id
+
+export type ThumbDTO = { url: string; width: number | null; height: number | null }
+
+const thumbOf = (m: AdMediaDocLike): ThumbDTO => ({
+  url: mediaUrl(m.id, 'miniatura'),
+  width: m.sizes?.card?.width ?? null,
+  height: m.sizes?.card?.height ?? null,
+})
+
+export type OwnerMediaDTO = {
+  fotos: { id: number; thumb: ThumbDTO; capa: boolean }[]
+  video: { id: number; src: string; durationLabel: string } | null
+}
+
+export function toOwnerMediaDTO(media: AdMediaDocLike[]): OwnerMediaDTO {
+  const fotos = media.filter((m) => m.kind === 'foto').sort(byOrder)
+  const video = media.find((m) => m.kind === 'video')
+  return {
+    fotos: fotos.map((m, i) => ({ id: m.id, thumb: thumbOf(m), capa: i === 0 })),
+    video: video ? { id: video.id, src: mediaUrl(video.id, 'video'), durationLabel: durationLabel(video.durationSeconds) } : null,
+  }
+}
+
 export function contatoOf(doc: Pick<AdDocLike, 'contato'>): AdContatoDTO {
   return {
     whatsapp: doc.contato?.whatsapp || null,
@@ -62,8 +115,9 @@ export function contatoOf(doc: Pick<AdDocLike, 'contato'>): AdContatoDTO {
 
 export function toOwnerAdDTO(
   doc: AdDocLike,
-  { authorActive, euSouLabel }: { authorActive: boolean; euSouLabel: string },
+  { authorActive, euSouLabel, media = [] }: { authorActive: boolean; euSouLabel: string; media?: AdMediaDocLike[] },
 ): OwnerAdDTO {
+  const fotos = media.filter((m) => m.kind === 'foto').sort(byOrder)
   const statusLabel = doc.status === 'aprovado' && !authorActive ? OFF_BOARD_LABEL : OWNER_STATUS_LABELS[doc.status]
   return {
     id: doc.id,
@@ -75,6 +129,9 @@ export function toOwnerAdDTO(
     statusLabel,
     motivo: doc.status === 'recusado' || doc.status === 'despublicado' ? doc.motivo || null : null,
     updatedLabel: formatShortDate(doc.updatedAt),
+    fotos: fotos.length,
+    video: media.some((m) => m.kind === 'video'),
+    capa: fotos[0] ? thumbOf(fotos[0]) : null,
   }
 }
 

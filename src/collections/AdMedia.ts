@@ -14,28 +14,27 @@ import { isStaff } from '../access/roles'
 import { withRequestState } from '../lib/assinantes/context'
 import { expire } from '../lib/cache/expire'
 import { makeBlurredPreview } from '../lib/classisex/blur'
+import {
+  AD_MEDIA_MESSAGES,
+  MAX_AD_PHOTO_BYTES,
+  MAX_AD_PHOTOS,
+  MAX_AD_VIDEO_BYTES,
+  MAX_AD_VIDEOS,
+  PHOTO_MIME_TYPES,
+  VIDEO_MIME_TYPES,
+} from '../lib/classisex/media-messages'
 import { MAX_VIDEO_SECONDS, Mp4Error, readMp4Info, scrubMp4Metadata } from '../lib/classisex/mp4'
 import { privateStorageConfigured } from '../lib/classisex/storage'
 
-export const MAX_AD_PHOTO_BYTES = 15_000_000
-export const MAX_AD_VIDEO_BYTES = 100_000_000
-export const MAX_AD_PHOTOS = 5
-export const MAX_AD_VIDEOS = 1
-
-export const AD_MEDIA_MESSAGES = {
-  indisponivel: 'Envio de fotos indisponível no momento.',
-  tipo: 'Envie fotos JPG, PNG ou WebP, ou um vídeo MP4 ou MOV.',
-  fotoGrande: 'A foto passa de 15 MB.',
-  videoGrande: 'O vídeo passa de 100 MB.',
-  fotoIlegivel: 'Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.',
-  videoLongo: `O vídeo pode ter até ${MAX_VIDEO_SECONDS} segundos.`,
-  fotos: 'Cada anúncio pode ter até 5 fotos.',
-  videos: 'Cada anúncio pode ter 1 vídeo.',
-  semAnuncio: 'Anúncio não encontrado.',
-} as const
-
-export const PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-export const VIDEO_MIME_TYPES = ['video/mp4', 'video/quicktime']
+export {
+  AD_MEDIA_MESSAGES,
+  MAX_AD_PHOTO_BYTES,
+  MAX_AD_PHOTOS,
+  MAX_AD_VIDEO_BYTES,
+  MAX_AD_VIDEOS,
+  PHOTO_MIME_TYPES,
+  VIDEO_MIME_TYPES,
+}
 
 const fail = (message: string, status = 400) => new APIError(message, status, null, true)
 

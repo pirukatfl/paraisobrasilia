@@ -4,8 +4,10 @@ import { notFound } from 'next/navigation'
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { AdForm } from '@/components/classisex/AdForm'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
+import { OwnerMediaManager } from '@/components/classisex/OwnerMediaManager'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { salvarAnuncio } from '@/lib/classisex/actions'
+import { MEDIA_OK_MESSAGES, uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { getActiveAdCategories, getOwnAdForEdit } from '@/lib/classisex/queries'
 
 export const dynamic = 'force-dynamic'
@@ -15,12 +17,31 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function EditarAnuncioPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
+const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
+
+export default async function EditarAnuncioPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ midia?: string | string[]; codigo?: string | string[] }>
+}) {
+  const [{ id }, query] = await Promise.all([params, searchParams])
+  const midia = one(query.midia)
+  // Only fixed texts are shown: the URL carries a code, never a message
+  const notice = midia === 'erro' ? uploadErrorMessage(one(query.codigo)) : midia ? MEDIA_OK_MESSAGES[midia] : undefined
   const check = await requireActiveSubscription(`/area-do-assinante/meus-anuncios/${encodeURIComponent(id)}/editar`)
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
+      {notice && (
+        <p
+          role="alert"
+          className={`mb-8 max-w-[680px] rounded-lg border px-4 py-2 text-body ${midia === 'erro' ? 'border-danger' : 'border-line bg-surface'}`}
+        >
+          {notice}
+        </p>
+      )}
       <p className="type-eyebrow text-muted">Área do assinante</p>
       <h1 id="titulo-editar-anuncio" className="type-display mt-2">
         Editar anúncio
@@ -64,6 +85,7 @@ export default async function EditarAnuncioPage({ params }: { params: Promise<{ 
           email: ad.email,
         }}
       />
+      <OwnerMediaManager adId={ad.id} media={ad.media} />
     </section>
   )
 }

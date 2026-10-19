@@ -7,7 +7,7 @@ import { getPayload } from 'payload'
 import { requireActiveSubscription, requireAssinante } from '../assinantes/session'
 import type { AdInput } from './rules'
 import { validateAdInput } from './rules'
-import { createAd, deleteAd, ServiceError, updateAd } from './service'
+import { createAd, deleteAd, removeMedia, ServiceError, setCover, updateAd } from './service'
 
 const MEUS_ANUNCIOS = '/area-do-assinante/meus-anuncios'
 
@@ -107,4 +107,35 @@ export async function apagarAnuncio(formData: FormData): Promise<void> {
     failed = true
   }
   redirect(`${MEUS_ANUNCIOS}?${failed ? 'erro=nao-encontrado' : 'ok=apagado'}`)
+}
+
+/** Remover / Usar como capa on "Fotos e vídeo" (CLAS-03, D-03): active access, owner only. */
+async function changeMedia(
+  formData: FormData,
+  change: (assinanteId: number, mediaId: string) => Promise<{ adId: number }>,
+  ok: 'removida' | 'capa',
+): Promise<void> {
+  const adId = field(formData, 'anuncio')
+  const editar = `${MEUS_ANUNCIOS}/${encodeURIComponent(adId)}/editar`
+  const check = await requireActiveSubscription(editar)
+  if (check.inactive) redirect(`${editar}?midia=erro&codigo=inativo`)
+  let target = ''
+  try {
+    const { adId: owned } = await change(check.assinante.id, field(formData, 'id'))
+    target = `${MEUS_ANUNCIOS}/${owned}/editar?midia=${ok}`
+  } catch (err) {
+    if (err instanceof ServiceError && err.code === 'nao-encontrado') notFound()
+    throw err
+  }
+  redirect(target)
+}
+
+export async function removerMidia(formData: FormData): Promise<void> {
+  const payload = await getPayload({ config })
+  await changeMedia(formData, (assinanteId, mediaId) => removeMedia(payload, { assinanteId, mediaId, now: new Date() }), 'removida')
+}
+
+export async function definirCapa(formData: FormData): Promise<void> {
+  const payload = await getPayload({ config })
+  await changeMedia(formData, (assinanteId, mediaId) => setCover(payload, { assinanteId, mediaId, now: new Date() }), 'capa')
 }
