@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { SubscriptionStatus } from '@/components/assinantes/SubscriptionStatus'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { whatsappUrl } from '@/lib/site/contact'
@@ -19,6 +20,7 @@ export default async function ExclusivoPage() {
     const contact = await getContact()
     return (
       <section aria-labelledby="titulo-exclusivo">
+        <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
         <p className="type-eyebrow text-muted">Área do assinante</p>
         <h1 id="titulo-exclusivo" className="type-display mt-2">
           Conteúdo exclusivo
@@ -36,6 +38,7 @@ export default async function ExclusivoPage() {
   // Phase 4 replaces this content (ClassiSex, recados); keep the guard above.
   return (
     <section aria-labelledby="titulo-exclusivo">
+      <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
       <p className="type-eyebrow text-muted">Área do assinante</p>
       <h1 id="titulo-exclusivo" className="type-display mt-2">
         Conteúdo exclusivo

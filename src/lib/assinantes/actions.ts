@@ -7,7 +7,9 @@ import { redirect } from 'next/navigation'
 import { AuthenticationError, getPayload, LockedAuth, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
 
+import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
 import { safeNext } from './redirect'
+import { requireAssinante } from './session'
 
 type LoginError = 'credenciais' | 'bloqueado'
 
@@ -70,4 +72,41 @@ export async function entrar(formData: FormData): Promise<void> {
 export async function sair(): Promise<void> {
   await logout({ config })
   redirect('/')
+}
+
+const SENHA_PATH = '/area-do-assinante/senha'
+
+/**
+ * Self password change (D-04). Re-checks the principal inside the action, verifies the current
+ * password through a login (counts toward the lockout, T-03-04), then updates as the subscriber:
+ * Payload keeps the current session and revokes every other one.
+ */
+export async function trocarSenha(formData: FormData): Promise<void> {
+  const assinante = await requireAssinante(SENHA_PATH)
+  const atual = field(formData, 'atual')
+  const nova = field(formData, 'nova')
+  const confirmacao = field(formData, 'confirmacao')
+  if (nova.length < MIN_PASSWORD_LENGTH) redirect(`${SENHA_PATH}?erro=curta`)
+  if (nova !== confirmacao) redirect(`${SENHA_PATH}?erro=diferente`)
+
+  const payload = await getPayload({ config })
+  let error: 'atual' | 'bloqueado' | null = null
+  try {
+    await payload.login({ collection: 'assinantes', data: { email: assinante.email, password: atual } })
+  } catch (err) {
+    if (err instanceof LockedAuth) error = 'bloqueado'
+    else if (err instanceof AuthenticationError || err instanceof ValidationError) error = 'atual'
+    else throw err
+  }
+  if (error) redirect(`${SENHA_PATH}?erro=${error}`)
+
+  await payload.update({
+    collection: 'assinantes',
+    id: assinante.id,
+    data: { password: nova, mustChangePassword: false },
+    overrideAccess: true,
+    // The authenticated subscriber (with its session id): audit actor and the session kept
+    user: assinante,
+  })
+  redirect('/area-do-assinante?ok=senha')
 }

@@ -44,8 +44,14 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
     if (data.password.length < MIN_PASSWORD_LENGTH) {
       throw new APIError(PASSWORD_TOO_SHORT, 400, null, true)
     }
+    // D-04: a password typed by staff is temporary; the subscriber's own change clears the flag.
+    // passwordSetBy tells the audit hook which row to write (T-03-11).
     if (staff) {
       writeArgs.data = { ...data, mustChangePassword: true }
+      req.context = { ...req.context, passwordSetBy: 'equipe' }
+    } else if (isAssinante({ req })) {
+      writeArgs.data = { ...data, mustChangePassword: false }
+      req.context = { ...req.context, passwordSetBy: 'assinante' }
     }
   }
   return args
@@ -82,16 +88,34 @@ const FIELD_LABELS: Record<string, string> = {
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
 const auditAccount: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
   if (req.context?.skipAudit) return doc
+  const passwordSetBy = req.context?.passwordSetBy as 'equipe' | 'assinante' | undefined
   if (operation === 'create') {
+    const details = diffForAudit(null, doc)
+    delete details.mustChangePassword
     await writeAudit(req, {
       action: 'conta-criada',
       assinante: doc,
-      summary: `Conta criada: ${assinanteLabel(doc)}`,
-      details: diffForAudit(null, doc),
+      summary: `Conta criada${passwordSetBy === 'equipe' ? ' com senha provisória' : ''}: ${assinanteLabel(doc)}`,
+      details,
     })
     return doc
   }
+  if (passwordSetBy === 'equipe') {
+    await writeAudit(req, {
+      action: 'senha-definida-pela-equipe',
+      assinante: doc,
+      summary: 'Senha provisória definida pela equipe (o assinante troca no próximo acesso; outras sessões encerradas)',
+    })
+  } else if (passwordSetBy === 'assinante') {
+    await writeAudit(req, {
+      action: 'senha-trocada-pelo-assinante',
+      assinante: doc,
+      summary: 'Senha trocada pelo assinante',
+    })
+  }
   const diff = diffForAudit(previousDoc ?? null, doc)
+  // The temporary-password flag follows the password rows above
+  if (passwordSetBy) delete diff.mustChangePassword
   const fields = Object.keys(diff)
   if (fields.length > 0) {
     await writeAudit(req, {

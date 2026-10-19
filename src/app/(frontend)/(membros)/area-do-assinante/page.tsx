@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { SubscriptionStatus } from '@/components/assinantes/SubscriptionStatus'
 import { getAccessStatus } from '@/lib/assinantes/access'
 import { requireAssinante } from '@/lib/assinantes/session'
@@ -13,11 +14,22 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function AreaDoAssinantePage() {
+export default async function AreaDoAssinantePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ok?: string | string[] }>
+}) {
   const assinante = await requireAssinante('/area-do-assinante')
   const [access, contact] = await Promise.all([getAccessStatus(assinante.id), getContact()])
+  const { ok } = await searchParams
   return (
     <section aria-labelledby="titulo-area">
+      {ok === 'senha' && (
+        <p role="status" className="mb-8 rounded-lg border border-line bg-surface px-4 py-2 text-body">
+          Senha alterada.
+        </p>
+      )}
+      <PasswordBanner mustChangePassword={assinante.mustChangePassword} />
       <p className="type-eyebrow text-muted">Área do assinante</p>
       <h1 id="titulo-area" className="type-display mt-2">
         Olá, {assinante.name}
