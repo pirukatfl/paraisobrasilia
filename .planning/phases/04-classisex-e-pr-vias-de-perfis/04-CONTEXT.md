@@ -1,7 +1,7 @@
 # Phase 4: ClassiSex e prévias de perfis — Context
 
 **Gathered:** 2026-10-19
-**Status:** Cliente pediu para pular as perguntas e seguir o modelo do ClassiSex atual (https://swingbrasilia.com.br/classisex1/). Defaults abaixo escolhidos por nós a partir do backup do banco; o cliente pode ajustar.
+**Status:** Aprovado pelo cliente em 2026-10-19 ("aprovado"). Cliente pediu para pular as perguntas e seguir o modelo do ClassiSex atual (https://swingbrasilia.com.br/classisex1/). Defaults abaixo escolhidos por nós a partir do backup do banco; o cliente pode ajustar.
 
 ## Como é o ClassiSex atual (backup do WP, só agregados)
 - Não é perfil: são **anúncios curtos** (comentários wpDiscuz no post 2894). 205 aprovados (2025-04 a 2026-10), 70 autores, todos logados; ~3 anúncios por autor; quase sem respostas (1).

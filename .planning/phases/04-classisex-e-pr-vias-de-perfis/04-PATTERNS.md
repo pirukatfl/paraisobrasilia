@@ -1,0 +1,43 @@
+# Phase 4 — Pattern Map
+
+> Analog files in the codebase for every file Phase 4 creates or changes. Executors copy the analog's structure, naming and conventions. "Perfis" in ROADMAP/REQUIREMENTS = "anúncios" here (04-CONTEXT D-01).
+
+| New / changed file | Role | Data flow | Closest analog | What to copy |
+|--------------------|------|-----------|----------------|--------------|
+| src/lib/classisex/redact.ts, mp4.ts, rules.ts, range.ts, media-access.ts, dto.ts | pure modules | input → output | src/lib/assinantes/periods.ts, src/lib/assinantes/redirect.ts | no Payload/Next imports; exported constants; table-driven unit tests in tests/unit |
+| src/collections/AdCategories.ts | collection (no drafts) + seed | staff → DB → public read | src/collections/Plans.ts + src/migrations/seed/plans-content.ts | `order` field, `admin.group: 'ClassiSex'`, seed-if-empty function called from the migration `up` and from e2e global setup |
+| src/collections/Ads.ts | collection, REST staff-only, endpoints | service/staff → DB | src/collections/Subscriptions.ts (staff-only access, computed fields in hooks, date fields `displayFormat: 'dd/MM/yyyy'`) + src/collections/Assinantes.ts (`endpoints`, UI field, joins) | pt labels and `admin.description` on every field; `expire(['ads'])` in afterChange/afterDelete |
+| src/collections/AdMedia.ts | upload collection (private) | route handler/staff → disk + DB | src/collections/Media.ts (`rejectBigImages` beforeOperation, webp `formatOptions`, imageSizes) + Videos.ts | `staticDir` injected in payload.config.ts like Media/Videos, but from `PRIVATE_MEDIA_DIR`; read `isStaff` (never `() => true`) |
+| src/collections/AdReports.ts | collection, staff-only | action → DB → staff | src/collections/AuditLog.ts (staff read, select fields) + Subscriptions.ts | `admin.defaultColumns`, select options with pt labels |
+| src/collections/Assinantes.ts | existing auth collection | — | itself (03-03 `beforeDelete` cascade of periods) | extend the cascade: ads (→ media files) and reports (`reporter` → null) inside `withRequestState` |
+| src/collections/AuditLog.ts / src/lib/assinantes/audit.ts | existing log | — | themselves | add `AUDIT_ACTIONS` values (`anuncio-aprovado`, `anuncio-recusado`, `anuncio-despublicado`, `denuncia-resolvida`) + migration (select enum) |
+| src/collections/Subscriptions.ts | existing | — | itself | afterChange/afterDelete also `expire(['ads'])` (author visibility moves with accessUntil) |
+| src/lib/classisex/service.ts, endpoints.ts | domain service + staff endpoints | staff/owner request → DB | src/lib/assinantes/service.ts, src/lib/assinantes/endpoints.ts | functions take `payload` (+ `req`); `ServiceError` with pt message and status; endpoints return 403 unless `isStaff`; never import 'server-only' |
+| src/lib/classisex/actions.ts | `'use server'` actions | form → service → redirect | src/lib/assinantes/actions.ts | FormData parsed by hand, DAL guard first in every action, `redirect()` outside try, `?erro=` codes |
+| src/lib/classisex/queries.ts | server-only DAL reads, never cached | DB → DTO | src/lib/assinantes/session.ts / access.ts | `import 'server-only'`, `getPayload({ config })`, bounded limits, DTO out |
+| src/lib/classisex/public.ts | server-only cached public read | DB → DTO | src/lib/gallery/queries.ts, src/lib/assinantes/plans.ts | `cached(fn, keyParts, () => ['ads'])`, DTO mapper unit-tested |
+| src/lib/classisex/storage.ts, blur.ts | server helpers (no 'server-only': reachable from payload.config) | env/disk | src/payload.config.ts `mediaDir` | `path.resolve(/* turbopackIgnore: true */ …)` |
+| src/components/admin/classisex/ModeracaoPanel.tsx | admin UI field (client) | admin ↔ endpoints | src/components/admin/assinantes/AssinaturaPanel.tsx | `useDocumentInfo()` id, fetch same-origin, promise-based effect with reload counter (03-04 lint fix) |
+| src/components/admin/classisex/FilaClassisex.tsx | beforeDashboard server component | DB → admin | src/components/admin/assinantes/Vencimentos.tsx | server props `payload`/`user`; render nothing unless `user.collection === 'users'`; register path string, `pnpm generate:importmap` |
+| src/app/(frontend)/(membros)/area-do-assinante/{classisex,meus-anuncios}/** | members pages | DAL → DTO → HTML | src/app/(frontend)/(membros)/area-do-assinante/exclusivo/page.tsx, senha/page.tsx | `dynamic = 'force-dynamic'`, metadata `robots: { index: false, follow: false }`, `PasswordBanner`, inactive branch renders `SubscriptionStatus` only |
+| src/app/(frontend)/(membros)/area-do-assinante/midia/[id]/[variante]/route.ts, meus-anuncios/[id]/midia/route.ts | route handlers | cookie → rules → disk | (new) Payload `uploads/endpoints/getFile.js` (range + headers shape) | `params` is a Promise; principal via `payload.auth({ headers: request.headers })`; paths from the DB doc only |
+| src/app/(frontend)/classisex/page.tsx, classisex/previa/[id]/route.ts | public page + public derivative route | cached DTO → HTML | src/app/(frontend)/assine-ja/page.tsx, src/app/(frontend)/espaco/page.tsx | `buildPageMetadata`, section/H1 structure, `EmptyState`, token classes (`bg-surface`, `text-muted`, `type-label`, `btn-primary`) |
+| src/app/(frontend)/(membros)/layout.tsx | members sub-nav | — | itself | LINKS: Minha assinatura · ClassiSex · Meus anúncios · Trocar senha |
+| src/app/(frontend)/(membros)/area-do-assinante/exclusivo/page.tsx | Phase 3 placeholder | — | itself | becomes `permanentRedirect('/area-do-assinante/classisex')` (04-04) |
+| src/lib/site/nav.ts, src/components/Footer.tsx, src/lib/seo/sitemap.ts, src/app/robots.ts | nav/SEO registries | — | themselves | add 'ClassiSex' → /classisex right before 'Contato' (Festas · Quem somos · Espaço · (Modelos) · ClassiSex · Contato · Assine Já · Área do assinante); sitemap gains /classisex; robots unchanged (members paths already disallowed) |
+| next.config.ts | headers | — | itself | `/classisex/previa/:path*` keeps default headers; members media already under `/area-do-assinante/:path*` noindex rule |
+| Dockerfile, docker-compose.staging.yml, docker-compose.staging.ghcr.yml, scripts/deploy/bootstrap-vps.sh, Caddyfile, .env.example, .env.staging.example, .gitignore, .dockerignore | deploy | — | the `media` volume lines in the same files | `private_media:/app/private-media`, `PRIVATE_MEDIA_DIR: /app/private-media`; bootstrap heredoc must stay byte-identical to the GHCR compose and Caddyfile (tests/unit/deploy-files.test.ts) |
+| src/migrations/*.ts | schema + seed | — | src/migrations/20261019_123931_plans.ts (seed in `up`, only when empty) | `CI=true PAYLOAD_MIGRATING=true pnpm payload migrate:create <name>` then `pnpm payload migrate`, `pnpm generate:types`, `pnpm generate:importmap` |
+| tests/int/*.int.test.ts | integration | — | tests/int/staff-actions.int.test.ts, tests/int/subscriptions.int.test.ts | `getTestPayload()`, `resetDatabase()`, principals `{ ...doc, collection }` with `overrideAccess: false`; `expectFieldError` for pt messages |
+| tests/e2e/*.spec.ts | e2e | — | tests/e2e/assinantes-seguranca.spec.ts (in-page fetch for subscriber calls), tests/e2e/minha-assinatura.spec.ts, tests/e2e/painel-assinatura.spec.ts (admin, desktop) | `pb_age_ok` cookie, staff REST for data, `loginAsAssinante`, separate `browser.newContext()` per principal, `page.locator('main').getByRole('alert')` |
+| tests/helpers/seed.ts, tests/e2e/helpers/api.ts, tests/e2e/global-setup.ts | test data | — | themselves | RESET_ORDER gains `'ad-reports','ad-media','ads','ad-categories'` at the front; `seedAd`, `createAd`, `uploadAdMedia`; global setup seeds Eu sou options and clears `./private-media` |
+| docs/painel/GUIA-DA-EQUIPE.md, docs/deploy/STAGING.md | docs (pt) | — | their Phase 3 sections | new `## ClassiSex` section and `### 7.3 ClassiSex (Fase 4)` |
+
+## Conventions observed (carry over)
+- Comments in English, UI/admin copy in Portuguese; threat IDs in code comments (`// T-04-xx`).
+- No hard-coded hex in components (sharp background values are data, as in Media.ts).
+- Public queries: visible-only, bounded, cached with tags, DTO out. Subscriber/owner reads: never cached, DAL-guarded.
+- `'.js'` suffix on `next/cache.js` imports in modules loaded by plain Node (hooks reachable from the config).
+- Collection slugs in English (`ads`, `ad-media`, `ad-reports`, `ad-categories`); admin labels Portuguese; admin group `'ClassiSex'`.
+- Members URLs in Portuguese: `/area-do-assinante/classisex`, `/area-do-assinante/meus-anuncios`, `/area-do-assinante/midia/{id}/{miniatura|foto|video}`; public `/classisex`, `/classisex/previa/{id}`.
+- New gated collections are added to the leak matrix (03-06 pattern) — 04-09 adds tests/e2e/classisex-seguranca.spec.ts.
