@@ -12,20 +12,21 @@ const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:
 
 /** Disclosure menu for < 1024px (UI-SPEC Global — Header navigation). */
 export function MobileMenu({ items }: { items: NavItem[] }) {
-  const [open, setOpen] = useState(false)
   const pathname = usePathname() ?? '/'
+  // Open state is tied to the path it was opened on: navigating closes the menu by itself.
+  const [openOn, setOpenOn] = useState<string | null>(null)
+  const open = openOn === pathname
+  const setOpen = useCallback((value: boolean) => setOpenOn(value ? pathname : null), [pathname])
   const panelId = useId()
   const buttonRef = useRef<HTMLButtonElement>(null)
 
-  const close = useCallback((refocus: boolean) => {
-    setOpen(false)
-    if (refocus) buttonRef.current?.focus()
-  }, [])
-
-  // Close on navigation
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
+  const close = useCallback(
+    (refocus: boolean) => {
+      setOpen(false)
+      if (refocus) buttonRef.current?.focus()
+    },
+    [setOpen],
+  )
 
   useEffect(() => {
     if (!open) return
@@ -52,7 +53,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
         aria-expanded={open}
         aria-controls={panelId}
         aria-label={open ? 'Fechar menu' : 'Abrir menu'}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => setOpen(!open)}
         className="type-label inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-2 text-text"
       >
         {open ? <CloseIcon /> : <MenuIcon />}
