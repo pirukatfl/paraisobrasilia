@@ -23,10 +23,11 @@ describe('sitemap (INST-06, T-02-13)', () => {
         '/politica-de-privacidade',
         '/assine-ja',
         '/classisex',
+        '/contos',
       ]),
     )
     expect(urls).not.toContain('/modelos')
-    expect(urls).toHaveLength(11)
+    expect(urls).toHaveLength(12)
   })
 
   it('includes /modelos and upcoming parties when present', () => {
@@ -36,6 +37,15 @@ describe('sitemap (INST-06, T-02-13)', () => {
     expect(urls).toContain('/modelos')
     expect(urls).toContain('/festas/festa-x')
     expect(urls).not.toContain('/quem-somos') // unpublished pages are not passed in
+  })
+
+  it('lists published contos and never the members contos (05-03)', () => {
+    const urls = paths(
+      buildSitemap({ base, parties: [], pages: [], hasModels: false, contos: [{ slug: 'conto-um', updatedAt: '2026-10-19T12:00:00.000Z' }] }),
+    )
+    expect(urls).toContain('/contos')
+    expect(urls).toContain('/contos/conto-um')
+    for (const url of urls) expect(url).not.toMatch(/^\/area-do-assinante/)
   })
 
   it('lists /assine-ja and never the members or auth pages (T-03-05)', () => {

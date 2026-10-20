@@ -67,6 +67,7 @@ export async function Footer() {
     { href: '/espaco', label: 'Espaço' },
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     { href: '/classisex', label: 'ClassiSex' },
+    { href: '/contos', label: 'Contos' },
     { href: '/contato', label: 'Contato' },
     { href: '/assine-ja', label: 'Assine Já' },
     { href: '/area-do-assinante', label: 'Área do assinante' },

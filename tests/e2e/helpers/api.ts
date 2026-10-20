@@ -4,6 +4,30 @@ import path from 'path'
 
 import { STAFF_EMAIL, STAFF_PASSWORD } from './staff'
 
+/** Lexical state with one paragraph per text (same shape as tests/helpers/seed.ts, no Payload import). */
+function lexicalParagraphs(texts: string[]) {
+  const text = (t: string) => ({ type: 'text', text: t, format: 0, detail: 0, mode: 'normal', style: '', version: 1 })
+  return {
+    root: {
+      type: 'root',
+      format: '',
+      indent: 0,
+      version: 1,
+      direction: 'ltr',
+      children: texts.map((t) => ({
+        type: 'paragraph',
+        format: '',
+        indent: 0,
+        version: 1,
+        direction: 'ltr',
+        textFormat: 0,
+        textStyle: '',
+        children: [text(t)],
+      })),
+    },
+  }
+}
+
 const FIXTURES = path.resolve('tests/fixtures')
 
 /**
@@ -270,6 +294,32 @@ export async function staffApi(request: APIRequestContext) {
       return ((await res.json()) as {
         docs: { id: number; motivo: string; status: string; urgente: boolean; ad?: number | null; reporter?: number | null }[]
       }).docs
+    },
+    /** Conto written by staff REST (05-03): one Lexical paragraph per entry of `paragrafos`. */
+    async createConto(data: {
+      title: string
+      slug?: string
+      paragrafos: string[]
+      paragrafosAbertos?: number
+      publishedAt?: string
+      status?: 'published' | 'draft'
+    }) {
+      const res = await request.post('/api/contos', {
+        headers,
+        data: {
+          title: data.title,
+          ...(data.slug ? { slug: data.slug } : {}),
+          publishedAt: data.publishedAt ?? '2026-10-01T12:00:00.000Z',
+          paragrafosAbertos: data.paragrafosAbertos ?? 3,
+          texto: lexicalParagraphs(data.paragrafos),
+          _status: data.status ?? 'published',
+        },
+      })
+      return (await check(res, 'create conto')).doc
+    },
+    async updateConto(id: number, data: Record<string, unknown>) {
+      const res = await request.patch(`/api/contos/${id}`, { headers, data })
+      return (await check(res, 'update conto')).doc
     },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })

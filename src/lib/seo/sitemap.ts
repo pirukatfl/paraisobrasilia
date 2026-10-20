@@ -8,6 +8,8 @@ export type SitemapInput = {
   /** Published institutional pages only */
   pages: { key: PageKey; updatedAt: string }[]
   hasModels: boolean
+  /** Published contos (05-03) */
+  contos?: { slug: string; updatedAt: string }[]
 }
 
 /**
@@ -15,7 +17,7 @@ export type SitemapInput = {
  * /modelos while a model is published, upcoming published parties, /assine-ja and the ClassiSex
  * preview /classisex (redacted, blurred; listing it is a client decision kept open in 04-RESEARCH Q2).
  */
-export function buildSitemap({ base, parties, pages, hasModels }: SitemapInput): MetadataRoute.Sitemap {
+export function buildSitemap({ base, parties, pages, hasModels, contos = [] }: SitemapInput): MetadataRoute.Sitemap {
   const root = base.replace(/\/$/, '')
   return [
     { url: `${root}/`, changeFrequency: 'daily', priority: 1 },
@@ -25,6 +27,13 @@ export function buildSitemap({ base, parties, pages, hasModels }: SitemapInput):
     // Members (/area-do-assinante) and auth pages (/entrar, /nova-senha) are never listed (T-03-05)
     { url: `${root}/assine-ja`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${root}/classisex`, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${root}/contos`, changeFrequency: 'weekly', priority: 0.6 },
+    ...contos.map((c) => ({
+      url: `${root}/contos/${c.slug}`,
+      lastModified: c.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    })),
     ...pages.map((page) => ({
       url: `${root}${pathForKey(page.key)}`,
       lastModified: page.updatedAt,
