@@ -78,7 +78,23 @@ test('Modelos appears in nav, footer and sitemap only while a model is published
 
   await api.createModel({ name: 'Aurora', photos: 1 })
   links = await navLinks()
-  await expect(links).toHaveText(['Festas', 'Quem somos', 'Espaço', 'Modelos', 'ClassiSex', 'Contato', 'Assine Já', 'Área do assinante'])
+  // UI-SPEC order, pinned explicitly: Recados (05-07) and Contos (05-03) sit between ClassiSex and Contato
+  const order = ['Festas', 'Quem somos', 'Espaço', 'Modelos', 'ClassiSex', 'Recados', 'Contos', 'Contato', 'Assine Já', 'Área do assinante']
+  await expect(links).toHaveText(order)
+  if (!isMobile) {
+    // the ten items stay on one line at 1280 px
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/')
+    const fits = await page.getByRole('navigation', { name: 'Principal' }).evaluate((nav) => {
+      const ul = nav.querySelector('ul') as HTMLElement
+      const ys = Array.from(nav.querySelectorAll('a')).map((a) => Math.round(a.getBoundingClientRect().y))
+      const right = Math.max(...Array.from(nav.querySelectorAll('a')).map((a) => a.getBoundingClientRect().right))
+      return { overflow: ul.scrollWidth - ul.clientWidth, oneLine: new Set(ys).size === 1, right, viewport: window.innerWidth }
+    })
+    expect(fits.overflow).toBeLessThanOrEqual(0)
+    expect(fits.oneLine).toBe(true)
+    expect(fits.right).toBeLessThanOrEqual(fits.viewport)
+  }
   await expect(page.locator('footer').getByRole('link', { name: 'Modelos' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).toContain('/modelos</loc>')
 })

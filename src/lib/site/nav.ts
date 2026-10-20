@@ -1,6 +1,7 @@
 /**
  * Site navigation registry (header menu, mobile menu, footer).
- * Fixed order (UI-SPEC Phase 2): Festas · Quem somos · Espaço · Modelos · ClassiSex · Contato.
+ * Fixed order (UI-SPEC Phase 2, updated by 05-03/05-07): Festas · Quem somos · Espaço · Modelos · ClassiSex ·
+ * Recados (05-07) · Contos (05-03) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
  * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
