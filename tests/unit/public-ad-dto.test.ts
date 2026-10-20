@@ -39,6 +39,15 @@ describe('toPublicAdDTO (PREV-01, D-04)', () => {
     expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media: [media[3]] }).foto).toBeNull()
   })
 
+  it('uses coverOf: the blurred cover is the first photo even when it has no previa', () => {
+    const noPrevia = [
+      { id: 70, kind: 'foto' as const, order: 0, previa: null },
+      { id: 71, kind: 'foto' as const, order: 1, previa: 'x-previa.webp' },
+    ]
+    // the cover (70) has no blurred twin yet: nothing is shown instead of leaking another photo
+    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media: noPrevia }).foto).toBeNull()
+  })
+
   it('redacts a contact that slipped into the apelido (staff edit, old data)', () => {
     const dto = toPublicAdDTO({ ...doc, apelido: 'Casal 61 99988-9772' }, { euSouLabel: 'Casal' })
     expect(dto.apelido).not.toContain('99988')

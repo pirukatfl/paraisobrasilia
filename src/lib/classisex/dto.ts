@@ -2,6 +2,7 @@
  * Data shapes sent to the browser for ClassiSex pages. Pure: no Payload/Next imports.
  * Never return Payload documents to the browser (author, filenames and URLs stay on the server).
  */
+import { coverOf, visibleMediaFor, type Tier } from '../assinantes/tier'
 import { formatShortDate } from '../format/date'
 import { whatsappUrl } from '../site/contact'
 import { redactContacts } from './redact'
@@ -46,8 +47,8 @@ export const OWNER_STATUS_LABELS: Record<AdStatus, string> = {
   despublicado: 'Despublicado pela equipe',
 }
 
-/** D-06: an approved ad of an author without active access is off the board. */
-export const OFF_BOARD_LABEL = 'Fora do ar: assinatura vencida'
+/** G-05: an approved ad of a free (or expired) author stays up showing only its cover. */
+export const FREE_PUBLISHED_LABEL = 'Publicado como conta gratuita (só a capa aparece)'
 
 export const relId = (value: unknown): number | null => {
   if (value === null || value === undefined || value === '') return null
@@ -96,8 +97,9 @@ const thumbOf = (m: AdMediaDocLike): ThumbDTO => ({
 })
 
 export type OwnerMediaDTO = {
-  fotos: { id: number; thumb: ThumbDTO; capa: boolean }[]
-  videos: { id: number; src: string; durationLabel: string }[]
+  /** `guardada`: kept on file but hidden from others by the author's current tier (I-1). */
+  fotos: { id: number; thumb: ThumbDTO; capa: boolean; guardada: boolean }[]
+  videos: { id: number; src: string; durationLabel: string; guardada: boolean }[]
 }
 
 const videoOf = (m: AdMediaDocLike) => ({
@@ -106,11 +108,15 @@ const videoOf = (m: AdMediaDocLike) => ({
   durationLabel: durationLabel(m.durationSeconds),
 })
 
-export function toOwnerMediaDTO(media: AdMediaDocLike[]): OwnerMediaDTO {
+export function toOwnerMediaDTO(media: AdMediaDocLike[], { authorTier }: { authorTier: Tier }): OwnerMediaDTO {
   const fotos = media.filter((m) => m.kind === 'foto').sort(byOrder)
+  const shown = new Set(visibleMediaFor(authorTier, media).map((m) => m.id))
   return {
-    fotos: fotos.map((m, i) => ({ id: m.id, thumb: thumbOf(m), capa: i === 0 })),
-    videos: media.filter((m) => m.kind === 'video').sort(byOrder).map(videoOf),
+    fotos: fotos.map((m, i) => ({ id: m.id, thumb: thumbOf(m), capa: i === 0, guardada: !shown.has(m.id) })),
+    videos: media
+      .filter((m) => m.kind === 'video')
+      .sort(byOrder)
+      .map((m) => ({ ...videoOf(m), guardada: !shown.has(m.id) })),
   }
 }
 
@@ -123,10 +129,11 @@ export function contatoOf(doc: Pick<AdDocLike, 'contato'>): AdContatoDTO {
 
 export function toOwnerAdDTO(
   doc: AdDocLike,
-  { authorActive, euSouLabel, media = [] }: { authorActive: boolean; euSouLabel: string; media?: AdMediaDocLike[] },
+  { authorTier, euSouLabel, media = [] }: { authorTier: Tier; euSouLabel: string; media?: AdMediaDocLike[] },
 ): OwnerAdDTO {
   const fotos = media.filter((m) => m.kind === 'foto').sort(byOrder)
-  const statusLabel = doc.status === 'aprovado' && !authorActive ? OFF_BOARD_LABEL : OWNER_STATUS_LABELS[doc.status]
+  const statusLabel =
+    doc.status === 'aprovado' && authorTier === 'gratis' ? FREE_PUBLISHED_LABEL : OWNER_STATUS_LABELS[doc.status]
   return {
     id: doc.id,
     apelido: doc.apelido ?? '',
@@ -172,16 +179,19 @@ export type MemberAdDTO = {
   contato: { whatsapp: ContactLinkDTO | null; telegram: ContactLinkDTO | null }
   fotos: MemberPhotoDTO[]
   videos: MemberVideoDTO[]
+  /** Author is a free account: no "Enviar mensagem" (G-02). No author identity here. */
+  autorGratuito: boolean
 }
 
 export const WHATSAPP_GREETING = 'Olá! Vi seu anúncio no ClassiSex do Paraíso.'
 
 export function toMemberAdDTO(
   doc: AdDocLike,
-  { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
+  { euSouLabel, media = [], authorTier }: { euSouLabel: string; media?: AdMediaDocLike[]; authorTier: Tier },
 ): MemberAdDTO {
   const c = contatoOf(doc)
-  const fotos: MemberPhotoDTO[] = media
+  const shown = visibleMediaFor(authorTier, media)
+  const fotos: MemberPhotoDTO[] = shown
     .filter((m) => m.kind === 'foto')
     .sort(byOrder)
     .map((m) => ({
@@ -193,7 +203,7 @@ export function toMemberAdDTO(
       thumbWidth: m.sizes?.card?.width ?? null,
       thumbHeight: m.sizes?.card?.height ?? null,
     }))
-  const videos: MemberVideoDTO[] = media.filter((m) => m.kind === 'video').sort(byOrder).map(videoOf)
+  const videos: MemberVideoDTO[] = shown.filter((m) => m.kind === 'video').sort(byOrder).map(videoOf)
   return {
     id: doc.id,
     apelido: doc.apelido ?? '',
@@ -207,6 +217,7 @@ export function toMemberAdDTO(
     },
     fotos,
     videos,
+    autorGratuito: authorTier === 'gratis',
   }
 }
 
@@ -235,9 +246,9 @@ export function toPublicAdDTO(
   doc: AdDocLike,
   { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
 ): PublicAdDTO {
-  const cover = media
-    .filter((m) => m.kind === 'foto' && m.previa)
-    .sort(byOrder)[0]
+  // The same file as the members board and the media route (coverOf); it needs its blurred twin
+  const found = coverOf(media)
+  const cover = found && found.previa ? found : null
   return {
     id: doc.id,
     apelido: redactContacts(doc.apelido ?? '').text,

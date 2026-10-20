@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { toMemberAdDTO } from '../../src/lib/classisex/dto'
+import { toMemberAdDTO, toOwnerAdDTO, toOwnerMediaDTO } from '../../src/lib/classisex/dto'
 
 const doc = {
   id: 7,
@@ -19,7 +19,7 @@ const doc = {
 
 describe('toMemberAdDTO (CLAS-02, D-05)', () => {
   it('builds contact links', () => {
-    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal' })
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', authorTier: 'assinante' })
     expect(dto.apelido).toBe('Casal BSB')
     expect(dto.euSou).toBe('Casal')
     expect(dto.cidade).toBe('Brasília')
@@ -35,13 +35,13 @@ describe('toMemberAdDTO (CLAS-02, D-05)', () => {
   })
 
   it('leaves empty contacts out', () => {
-    const dto = toMemberAdDTO({ ...doc, contato: { whatsapp: '', telegram: null } }, { euSouLabel: 'Casal' })
+    const dto = toMemberAdDTO({ ...doc, contato: { whatsapp: '', telegram: null } }, { euSouLabel: 'Casal', authorTier: 'assinante' })
     expect(dto.contato.whatsapp).toBeNull()
     expect(dto.contato.telegram).toBeNull()
   })
 
   it('never serialises author, staff fields, filenames or Payload URLs', () => {
-    const json = JSON.stringify(toMemberAdDTO(doc, { euSouLabel: 'Casal' }))
+    const json = JSON.stringify(toMemberAdDTO(doc, { euSouLabel: 'Casal', authorTier: 'assinante' }))
     for (const banned of ['Duda Secreta', 'duda@segredo.local', '"author"', 'staff', 'filename', '/api/', 'nota da equipe', 'moderated']) {
       expect(json).not.toContain(banned)
     }
@@ -57,7 +57,7 @@ describe('toMemberAdDTO media (CLAS-01, CLAS-02, T-04-07)', () => {
   ]
 
   it('sorts photos by order and points every URL at the protected route', () => {
-    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media })
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media, authorTier: 'assinante' })
     expect(dto.fotos.map((f) => f.id)).toEqual([29, 30, 31])
     expect(dto.fotos[0]).toEqual({
       id: 29,
@@ -72,12 +72,12 @@ describe('toMemberAdDTO media (CLAS-01, CLAS-02, T-04-07)', () => {
   })
 
   it('never serialises filenames, Payload URLs, the blurred twin or the owner', () => {
-    const json = JSON.stringify(toMemberAdDTO(doc, { euSouLabel: 'Casal', media }))
+    const json = JSON.stringify(toMemberAdDTO(doc, { euSouLabel: 'Casal', media, authorTier: 'assinante' }))
     for (const banned of ['filename', 'segredo', '/api/', 'previa', 'owner']) expect(json).not.toContain(banned)
   })
 
   it('has no media when there is none', () => {
-    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: [] })
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: [], authorTier: 'assinante' })
     expect(dto.fotos).toEqual([])
     expect(dto.videos).toEqual([])
   })
@@ -87,7 +87,57 @@ describe('toMemberAdDTO media (CLAS-01, CLAS-02, T-04-07)', () => {
       { id: 41, kind: 'video' as const, order: 5, durationSeconds: 59 },
       { id: 40, kind: 'video' as const, order: 3, durationSeconds: 42 },
     ]
-    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: two })
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: two, authorTier: 'assinante' })
     expect(dto.videos.map((v) => v.id)).toEqual([40, 41])
+  })
+})
+
+describe('toMemberAdDTO by author tier (G-04, G-05)', () => {
+  const media = [
+    { id: 31, kind: 'foto' as const, order: 2 },
+    { id: 29, kind: 'foto' as const, order: 0 },
+    { id: 30, kind: 'foto' as const, order: 1 },
+    { id: 40, kind: 'video' as const, order: 3, durationSeconds: 42 },
+  ]
+
+  it('a free author shows only the cover and no video, and flags autorGratuito', () => {
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media, authorTier: 'gratis' })
+    expect(dto.fotos.map((f) => f.id)).toEqual([29])
+    expect(dto.videos).toEqual([])
+    expect(dto.autorGratuito).toBe(true)
+    expect(JSON.stringify(dto)).not.toMatch(/"(30|31|40)"|\/(30|31|40)\//)
+  })
+
+  it('a paying author shows everything', () => {
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media, authorTier: 'assinante' })
+    expect(dto.fotos.map((f) => f.id)).toEqual([29, 30, 31])
+    expect(dto.videos.map((v) => v.id)).toEqual([40])
+    expect(dto.autorGratuito).toBe(false)
+  })
+})
+
+describe('toOwnerMediaDTO / toOwnerAdDTO by tier (I-1, G-05)', () => {
+  const media = [
+    { id: 31, kind: 'foto' as const, order: 2 },
+    { id: 29, kind: 'foto' as const, order: 0 },
+    { id: 40, kind: 'video' as const, order: 3, durationSeconds: 42 },
+  ]
+
+  it('lists every file and marks the ones hidden from others as guardada', () => {
+    const free = toOwnerMediaDTO(media, { authorTier: 'gratis' })
+    expect(free.fotos.map((f) => [f.id, f.guardada])).toEqual([[29, false], [31, true]])
+    expect(free.videos.map((v) => [v.id, v.guardada])).toEqual([[40, true]])
+    const paying = toOwnerMediaDTO(media, { authorTier: 'assinante' })
+    expect([...paying.fotos, ...paying.videos].every((x) => x.guardada === false)).toBe(true)
+  })
+
+  it('labels an approved ad of a free author and has no off-board label', () => {
+    const d = { ...doc, status: 'aprovado' as const }
+    expect(toOwnerAdDTO(d, { authorTier: 'gratis', euSouLabel: 'Casal', media }).statusLabel).toBe(
+      'Publicado como conta gratuita (só a capa aparece)',
+    )
+    expect(toOwnerAdDTO(d, { authorTier: 'assinante', euSouLabel: 'Casal', media }).statusLabel).toBe('Publicado')
+    const pend = { ...doc, status: 'pendente' as const }
+    expect(toOwnerAdDTO(pend, { authorTier: 'gratis', euSouLabel: 'Casal', media }).statusLabel).toBe('Em análise pela equipe')
   })
 })
