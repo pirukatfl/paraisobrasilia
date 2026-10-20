@@ -10,7 +10,7 @@ export function Nav({ items }: { items: NavItem[] }) {
   const pathname = usePathname() ?? '/'
   return (
     <nav aria-label="Principal" className="hidden lg:block">
-      <ul className="flex items-center gap-6">
+      <ul className="flex items-center gap-4 xl:gap-5">
         {items.map((item) => {
           const active = isActivePath(item.href, pathname)
           return (
@@ -18,7 +18,7 @@ export function Nav({ items }: { items: NavItem[] }) {
               <Link
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
-                className={`type-eyebrow inline-flex min-h-11 items-center border-b-2 transition-colors duration-150 hover:text-accent focus-visible:text-accent ${
+                className={`type-eyebrow inline-flex min-h-11 whitespace-nowrap items-center border-b-2 transition-colors duration-150 hover:text-accent focus-visible:text-accent ${
                   active ? 'border-accent text-text' : 'border-transparent text-muted'
                 }`}
               >
