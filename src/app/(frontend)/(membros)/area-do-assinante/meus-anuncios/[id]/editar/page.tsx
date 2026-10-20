@@ -7,7 +7,7 @@ import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { OwnerMediaManager } from '@/components/classisex/OwnerMediaManager'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { salvarAnuncio } from '@/lib/classisex/actions'
-import { MEDIA_OK_MESSAGES, uploadErrorMessage } from '@/lib/classisex/media-messages'
+import { MEDIA_OK_MESSAGES, uploadErrorMessage, batchNotice } from '@/lib/classisex/media-messages'
 import { getActiveAdCategories, getOwnAdForEdit } from '@/lib/classisex/queries'
 
 export const dynamic = 'force-dynamic'
@@ -24,12 +24,14 @@ export default async function EditarAnuncioPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ midia?: string | string[]; codigo?: string | string[] }>
+  searchParams: Promise<{ midia?: string | string[]; codigo?: string | string[]; ok?: string | string[]; falhas?: string | string[] }>
 }) {
   const [{ id }, query] = await Promise.all([params, searchParams])
   const midia = one(query.midia)
   // Only fixed texts are shown: the URL carries a code, never a message
-  const notice = midia === 'erro' ? uploadErrorMessage(one(query.codigo)) : midia ? MEDIA_OK_MESSAGES[midia] : undefined
+  const lote = midia === 'lote' ? batchNotice(one(query.ok), one(query.falhas), one(query.codigo)) : undefined
+  const isError = midia === 'erro' || lote?.error === true
+  const notice = lote ? lote.text : midia === 'erro' ? uploadErrorMessage(one(query.codigo)) : midia ? MEDIA_OK_MESSAGES[midia] : undefined
   const check = await requireActiveSubscription(`/area-do-assinante/meus-anuncios/${encodeURIComponent(id)}/editar`)
   const header = (
     <>
@@ -37,7 +39,7 @@ export default async function EditarAnuncioPage({
       {notice && (
         <p
           role="alert"
-          className={`mb-8 max-w-[680px] rounded-lg border px-4 py-2 text-body ${midia === 'erro' ? 'border-danger' : 'border-line bg-surface'}`}
+          className={`mb-8 max-w-[680px] rounded-lg border px-4 py-2 text-body ${isError ? 'border-danger' : 'border-line bg-surface'}`}
         >
           {notice}
         </p>

@@ -251,6 +251,9 @@ desfocada**, com o botão "Assine para ver". O texto, a cidade, todas as fotos, 
 Telegram**, pelo menos um; não há campo de e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
 vence, os anúncios da pessoa saem do ar até ela renovar.
 
+O assinante já pode anexar as fotos e os vídeos **na hora de criar o anúncio** (em Meus anúncios → Novo anúncio); os arquivos
+sobem logo depois de enviar o formulário e chegam para você na mesma fila de aprovação. As regras e os limites são os mesmos.
+
 ### Fila de moderação
 
 1. No painel inicial, a caixa **ClassiSex** mostra "N anúncios para aprovar" e "N denúncias abertas".

@@ -42,6 +42,7 @@ export default async function NovoAnuncioPage() {
       </p>
       <AdForm
         action={criarAnuncio}
+        withMedia
         categories={categories}
         initial={{
           apelido: '',

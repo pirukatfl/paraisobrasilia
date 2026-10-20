@@ -1,6 +1,9 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from 'react'
+
+import { AdMediaPicker } from './AdMediaPicker'
 
 import type { AdFormState, AdFormValues } from '@/lib/classisex/actions'
 
@@ -19,6 +22,35 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   )
 }
 
+const subscribe = () => () => {}
+
+type Item = { file: File; tipo: 'foto' | 'video' }
+
+/** One file per request to the owner route; resolves with the error code ('' = accepted). Reports byte progress. */
+function uploadOne(adId: number, item: Item, onProgress: (fraction: number) => void): Promise<string> {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `/area-do-assinante/meus-anuncios/${adId}/midia`)
+    xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total)
+    xhr.onerror = () => resolve('erro')
+    xhr.onload = () => {
+      // The route answers 303 to the edit page with ?midia=…; XHR follows it and exposes the final URL
+      try {
+        const url = new URL(xhr.responseURL)
+        const midia = url.searchParams.get('midia')
+        if (midia === `${item.tipo}-ok`) resolve('')
+        else resolve(url.searchParams.get('codigo') || 'erro')
+      } catch {
+        resolve('erro')
+      }
+    }
+    const body = new FormData()
+    body.set('tipo', item.tipo)
+    body.set('arquivo', item.file, item.file.name)
+    xhr.send(body)
+  })
+}
+
 /**
  * Ad form for Novo / Editar (D-01). Validation happens on the server (actions.ts); typed values
  * come back in the action state so nothing is lost on an error.
@@ -28,13 +60,49 @@ export function AdForm({
   categories,
   initial,
   adId,
+  withMedia = false,
 }: {
   action: (state: AdFormState, formData: FormData) => Promise<AdFormState>
   categories: { id: number; name: string }[]
   initial: AdFormValues
   adId?: number
+  withMedia?: boolean
 }) {
   const [state, formAction, pending] = useActionState(action, null)
+  const router = useRouter()
+  // File pickers need JavaScript (files go one by one to the media route), so they render after hydration only
+  const hydrated = useSyncExternalStore(subscribe, () => true, () => false)
+  const [photos, setPhotos] = useState<File[]>([])
+  const [videos, setVideos] = useState<File[]>([])
+  const [progress, setProgress] = useState<{ index: number; total: number; fraction: number } | null>(null)
+  const uploading = useRef(false)
+  const hasFiles = photos.length + videos.length > 0
+
+  const createdId = state?.createdId
+  useEffect(() => {
+    if (createdId === undefined || uploading.current) return
+    uploading.current = true
+    const items: Item[] = [...photos.map((file) => ({ file, tipo: 'foto' as const })), ...videos.map((file) => ({ file, tipo: 'video' as const }))]
+    void (async () => {
+      let ok = 0
+      let failed = 0
+      let code = ''
+      for (const [i, item] of items.entries()) {
+        setProgress({ index: i + 1, total: items.length, fraction: 0 })
+        const result = await uploadOne(createdId, item, (fraction) => setProgress({ index: i + 1, total: items.length, fraction }))
+        if (result === '') ok += 1
+        else {
+          failed += 1
+          code ||= result
+        }
+      }
+      const q = new URLSearchParams({ midia: 'lote', ok: String(ok), falhas: String(failed) })
+      if (code) q.set('codigo', code)
+      router.push(`/area-do-assinante/meus-anuncios/${createdId}/editar?${q.toString()}`)
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once per created ad
+  }, [createdId])
+  const busy = pending || progress !== null
   const values = state?.values ?? initial
   const errors = state?.errors ?? {}
   const described = (key: string) => (errors[key] ? `erro-${key}` : undefined)
@@ -175,8 +243,24 @@ export function AdForm({
         <FieldError id="erro-consent" message={errors.consent} />
       </div>
 
-      <button type="submit" className="btn-primary" disabled={pending}>
-        {pending ? 'Enviando…' : 'Enviar para aprovação'}
+      {withMedia && hydrated && (
+        <>
+          <input type="hidden" name="comMidia" value={hasFiles ? 'sim' : ''} />
+          <AdMediaPicker photos={photos} videos={videos} onPhotos={setPhotos} onVideos={setVideos} disabled={busy} />
+        </>
+      )}
+
+      {progress && (
+        <div role="status" className="flex flex-col gap-2">
+          <p className="text-body">
+            Enviando arquivo {progress.index} de {progress.total} ({Math.round(progress.fraction * 100)}%). Não feche esta página.
+          </p>
+          <progress max={1} value={progress.fraction} aria-label="Progresso do envio" className="w-full" />
+        </div>
+      )}
+
+      <button type="submit" className="btn-primary" disabled={busy}>
+        {progress ? 'Enviando arquivos…' : pending ? 'Enviando…' : 'Enviar para aprovação'}
       </button>
     </form>
   )

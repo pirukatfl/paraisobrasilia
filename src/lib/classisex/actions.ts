@@ -22,7 +22,8 @@ export type AdFormValues = {
   telegram: string
 }
 
-export type AdFormState = { errors: Record<string, string>; values: AdFormValues } | null
+/** `createdId` is set only when the ad was created and the browser will now upload the chosen files. */
+export type AdFormState = { errors: Record<string, string>; values: AdFormValues; createdId?: number } | null
 
 const field = (formData: FormData, name: string) => {
   const value = formData.get(name)
@@ -60,6 +61,7 @@ async function save(
   formData: FormData,
   path: string,
   write: (assinanteId: number, input: AdInput) => Promise<unknown>,
+  stayWithId = false,
 ): Promise<AdFormState> {
   // DAL guard first (T-04-05): only subscribers with active access create or edit
   const check = await requireActiveSubscription(path)
@@ -67,14 +69,20 @@ async function save(
   if (check.inactive) return { errors: { form: INACTIVE }, values }
   const result = validateAdInput(input)
   if (!result.ok) return { errors: result.errors as Record<string, string>, values }
+  let created: unknown
   try {
-    await write(check.assinante.id, input)
+    created = await write(check.assinante.id, input)
   } catch (err) {
     if (err instanceof ServiceError) {
       if (err.code === 'nao-encontrado') notFound()
       return { errors: (err.errors as Record<string, string> | undefined) ?? { form: err.message }, values }
     }
     throw err
+  }
+  // New ad with files chosen: the browser uploads them next (one request per file) and then goes to the edit page
+  const createdId = (created as { id?: number } | undefined)?.id
+  if (stayWithId && field(formData, 'comMidia') === 'sim' && typeof createdId === 'number') {
+    return { errors: {}, values, createdId }
   }
   // redirect() throws: keep it outside the try block
   redirect(`${MEUS_ANUNCIOS}?ok=enviado`)
@@ -85,6 +93,7 @@ export async function criarAnuncio(_prev: AdFormState, formData: FormData): Prom
   const payload = await getPayload({ config })
   return save(formData, `${MEUS_ANUNCIOS}/novo`, (assinanteId, input) =>
     createAd(payload, { assinanteId, input, now: new Date() }),
+    true,
   )
 }
 

@@ -83,3 +83,28 @@ export function uploadCodeFor(message: string, kind: 'foto' | 'video'): UploadEr
 export function uploadErrorMessage(code: string | undefined): string {
   return (code && UPLOAD_ERROR_MESSAGES[code as UploadErrorCode]) || 'Não foi possível enviar o arquivo. Tente de novo.'
 }
+
+/** Limits shown by the create form (client side); the server enforces the same ones. */
+export const CLIENT_MESSAGES = {
+  fotosMax: `Você pode escolher até ${MAX_AD_PHOTOS} fotos. As que passaram do limite não foram adicionadas.`,
+  videosMax: `Você pode escolher até ${MAX_AD_VIDEOS} vídeos. Os que passaram do limite não foram adicionados.`,
+  fotoTipo: (name: string) => `"${name}" não é uma foto JPG, PNG ou WebP.`,
+  videoTipo: (name: string) => `"${name}" não é um vídeo MP4 ou MOV.`,
+  fotoGrande: (name: string) => `A foto "${name}" passa de 15 MB.`,
+  videoGrande: (name: string) => `O vídeo "${name}" passa de 100 MB.`,
+  videoLongo: (name: string) => `O vídeo "${name}" passa de ${MAX_VIDEO_SECONDS} segundos.`,
+} as const
+
+/** Edit-page notice after the create-with-files flow: ?midia=lote&ok=N&falhas=M&codigo=… */
+export function batchNotice(okRaw: string | undefined, failRaw: string | undefined, code: string | undefined): { text: string; error: boolean } {
+  const n = (v: string | undefined) => (v && /^\d{1,2}$/.test(v) ? Number(v) : 0)
+  const ok = n(okRaw)
+  const fails = n(failRaw)
+  const created = 'Anúncio criado e enviado para análise da equipe.'
+  if (fails === 0) return { text: `${created} ${ok} ${ok === 1 ? 'arquivo enviado' : 'arquivos enviados'}.`, error: false }
+  const plural = fails === 1 ? '1 arquivo não foi aceito' : `${fails} arquivos não foram aceitos`
+  return {
+    text: `${created} ${ok} enviado(s); ${plural}: ${uploadErrorMessage(code)} Você pode tentar de novo aqui, em Fotos e vídeos.`,
+    error: true,
+  }
+}
