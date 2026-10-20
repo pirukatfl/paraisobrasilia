@@ -10,8 +10,7 @@ export const dynamic = 'force-dynamic'
 const LINKS: { href: string; label: string; badge?: boolean }[] = [
   { href: '/area-do-assinante', label: 'Minha assinatura' },
   { href: '/area-do-assinante/classisex', label: 'ClassiSex' },
-  { href: '/area-do-assinante/recados', label: 'Recados' },
-  { href: '/area-do-assinante/mensagens', label: 'Mensagens', badge: true },
+  { href: '/area-do-assinante/mensagens', label: 'Recados', badge: true },
   { href: '/area-do-assinante/contos', label: 'Contos' },
   { href: '/area-do-assinante/meus-anuncios', label: 'Meus anúncios' },
   { href: '/area-do-assinante/senha', label: 'Trocar senha' },

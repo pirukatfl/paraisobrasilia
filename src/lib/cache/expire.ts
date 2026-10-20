@@ -6,7 +6,6 @@ import { revalidateTag } from 'next/cache.js'
  * 'contact' — contact global (02-01); 'pages' + 'page:{key}' (02-02); 'space' (02-03); 'models' (02-04);
  * 'plans' — Assine Já plans (03-02); 'ads' — ClassiSex public preview (04-07), expired by ads,
  * Eu sou options, ad media and subscription changes.
- * 'recados' — public recados teaser (05-07), expired by recado writes and subscription changes.
  * 'contos' (lists, sitemap) and 'conto:{slug}' (one conto) — 05-02/05-03.
  * `{ expire: 0 }` expires immediately, so the next visitor gets fresh HTML instead of a
  * stale-while-revalidate copy.

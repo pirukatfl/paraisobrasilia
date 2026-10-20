@@ -5,6 +5,14 @@ export const MESSAGE_MAX = 2000
 export const NEW_CONVERSATIONS_PER_DAY = 20
 export const MESSAGES_PER_DAY = 200
 export const THREAD_PAGE = 50
+const MAX_PAGE = 1000
+
+/** `?pagina=` of the Recados list: integer >= 1, default 1. */
+export function parsePage(value: string | string[] | undefined): number {
+  const raw = Array.isArray(value) ? value[0] : value
+  const page = Number.parseInt(raw ?? '', 10)
+  return Number.isInteger(page) && page >= 1 ? Math.min(page, MAX_PAGE) : 1
+}
 export const INBOX_PAGE = 30
 /** countUnread stops at this value + 1 so the UI can show "99+". */
 export const UNREAD_CAP = 99

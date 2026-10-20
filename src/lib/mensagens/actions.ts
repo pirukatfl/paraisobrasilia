@@ -20,12 +20,10 @@ const field = (formData: FormData, name: string) => {
 }
 
 /**
- * Starts (or continues) a conversation from an ad or recado (REC-02, D-02). Only origem, alvo,
+ * Starts (or continues) a conversation from an ad (REC-02, D-02, R-01). Only alvo,
  * texto and apelido are read from the form: the recipient is derived by the service (T-05-10).
  */
 export async function iniciarConversa(_prev: MessageFormState, formData: FormData): Promise<MessageFormState> {
-  const origemRaw = field(formData, 'origem')
-  const origem = origemRaw === 'recado' ? 'recado' : 'anuncio'
   const alvo = field(formData, 'alvo')
   const check = await requireActiveSubscription(`${BASE}/nova`)
   const values = { texto: field(formData, 'texto'), apelido: field(formData, 'apelido') }
@@ -35,7 +33,6 @@ export async function iniciarConversa(_prev: MessageFormState, formData: FormDat
   try {
     const result = await startConversation(payload, {
       senderId: check.assinante.id,
-      origem,
       id: alvo,
       texto: values.texto,
       apelido: values.apelido || undefined,

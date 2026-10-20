@@ -20,9 +20,9 @@ const computeUrgent: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
  */
 export const MessageReports: CollectionConfig = {
   slug: 'message-reports',
-  labels: { singular: 'Denúncia de mensagem', plural: 'Denúncias de mensagens' },
+  labels: { singular: 'Denúncia de recado', plural: 'Denúncias de recados' },
   admin: {
-    group: 'Recados e mensagens',
+    group: 'Recados',
     useAsTitle: 'reportedApelido',
     defaultColumns: ['urgente', 'motivo', 'reportedApelido', 'status', 'createdAt'],
     listSearchableFields: ['reportedApelido', 'detalhes'],

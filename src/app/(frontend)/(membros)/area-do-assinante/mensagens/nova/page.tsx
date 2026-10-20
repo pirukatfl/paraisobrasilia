@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
 
 /**
- * New conversation from a visible ad (?anuncio=) or recado (?recado=) of someone else (D-02).
+ * New conversation from a visible ad (?anuncio=) of someone else (D-02, R-01).
  * The recipient is never in the URL or the form: the server derives it (T-05-10).
  */
 export default async function NovaMensagemPage({
@@ -29,11 +29,8 @@ export default async function NovaMensagemPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const params = await searchParams
-  const anuncio = first(params.anuncio)
-  const recado = first(params.recado)
-  const origem = anuncio ? 'anuncio' : recado ? 'recado' : null
-  const alvo = anuncio ?? recado ?? ''
-  const here = `/area-do-assinante/mensagens/nova?${origem ?? 'anuncio'}=${encodeURIComponent(alvo)}`
+  const alvo = first(params.anuncio) ?? ''
+  const here = `/area-do-assinante/mensagens/nova?anuncio=${encodeURIComponent(alvo)}`
   const check = await requireActiveSubscription(here)
   const head = (
     <>
@@ -52,8 +49,9 @@ export default async function NovaMensagemPage({
       </section>
     )
   }
-  if (!origem) notFound()
-  const target = await getComposeTarget(check.assinante.id, origem, alvo, check.assinante.apelido)
+  // Old ?recado= links (and no target at all) lead to the Recados list: nothing is created (R-05)
+  if (!alvo) redirect('/area-do-assinante/mensagens')
+  const target = await getComposeTarget(check.assinante.id, alvo, check.assinante.apelido)
   if (target.state === 'nao-encontrado') notFound()
   if (target.state === 'existente') redirect(`/area-do-assinante/mensagens/${target.conversationId}`)
   if (target.state === 'propria') {
@@ -96,7 +94,7 @@ export default async function NovaMensagemPage({
       <p className="type-label mt-2 text-muted">{target.assunto}</p>
       <MessageForm
         action={iniciarConversa}
-        hidden={{ origem, alvo }}
+        hidden={{ alvo }}
         askApelido={!target.apelido}
         initialApelido={target.apelido}
         submitLabel="Enviar"

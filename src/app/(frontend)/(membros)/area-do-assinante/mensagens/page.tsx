@@ -6,8 +6,8 @@ import { Pagination } from '@/components/classisex/Pagination'
 import { EmptyState } from '@/components/EmptyState'
 import { InboxList } from '@/components/mensagens/InboxList'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
-import { parseRecadoPage } from '@/lib/recados/board'
 import { getInbox } from '@/lib/mensagens/queries'
+import { parsePage } from '@/lib/mensagens/rules'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,7 +43,7 @@ export default async function MensagensPage({
       </section>
     )
   }
-  const page = parseRecadoPage((await searchParams).pagina)
+  const page = parsePage((await searchParams).pagina)
   const inbox = await getInbox(check.assinante.id, page)
   return (
     <section aria-labelledby="titulo-mensagens">

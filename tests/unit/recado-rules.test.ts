@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import { REDACTED_LABEL } from '@/lib/classisex/redact'
 import { RECADO_MESSAGES, recadoResumo, validateRecadoInput } from '@/lib/recados/rules'
-import { isRecadoVisible } from '@/lib/recados/visibility'
 
 describe('validateRecadoInput (D-01)', () => {
   it('keeps a clean text and trims the apelido', () => {
@@ -50,15 +49,5 @@ describe('validateRecadoInput (D-01)', () => {
   it('builds the admin title', () => {
     expect(recadoResumo('Bia', 'texto curto')).toBe('Bia — texto curto')
     expect(recadoResumo('Bia', 'x'.repeat(100))).toBe(`Bia — ${'x'.repeat(60)}…`)
-  })
-})
-
-describe('isRecadoVisible (D-01)', () => {
-  const end = '2026-10-20T03:00:00.000Z' // São Paulo midnight
-  it('is visible only while approved and the author has access', () => {
-    expect(isRecadoVisible({ status: 'aprovado' }, end, new Date('2026-10-20T02:59:59.000Z'))).toBe(true)
-    expect(isRecadoVisible({ status: 'aprovado' }, end, new Date('2026-10-20T03:00:00.000Z'))).toBe(false)
-    expect(isRecadoVisible({ status: 'pendente' }, end, new Date('2026-10-20T00:00:00.000Z'))).toBe(false)
-    expect(isRecadoVisible({ status: 'aprovado' }, null, new Date())).toBe(false)
   })
 })

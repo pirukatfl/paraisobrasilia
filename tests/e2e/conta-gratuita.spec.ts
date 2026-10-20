@@ -116,13 +116,12 @@ test('edit page: one photo already, no photo form, videos only for subscribers; 
   await context.close()
 })
 
-test('free account sees the Assine Já panel on board, detail, recados and mensagens, with no restricted markup', async ({ browser, baseURL }) => {
+test('free account sees the Assine Já panel on board, detail and Recados, with no restricted markup', async ({ browser, baseURL }) => {
   const { context, page } = await ctx(browser, baseURL!)
   await loginAsAssinante(page, LIVRE.email, LIVRE.password)
   for (const url of [
     '/area-do-assinante/classisex',
     `/area-do-assinante/classisex/${adId}`,
-    '/area-do-assinante/recados',
     '/area-do-assinante/mensagens',
   ]) {
     await page.goto(url)

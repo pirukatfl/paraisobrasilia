@@ -494,27 +494,6 @@ export async function seedRecado(payload: Payload, input: SeedRecadoInput) {
   }) as Promise<{ id: number; apelido: string; texto: string; status: string; publishedAt?: string | null }>
 }
 
-/** Subscriber with a period covering `now` and one approved recado. */
-export async function seedVisibleRecado(
-  payload: Payload,
-  input: { authorEmail: string; authorName?: string; now?: Date; days?: number } & Omit<SeedRecadoInput, 'author' | 'status'>,
-) {
-  const now = input.now ?? new Date()
-  const author = await seedAssinante(payload, {
-    email: input.authorEmail,
-    password: 'senha-recado-123',
-    name: input.authorName ?? 'Autor de Recado',
-  })
-  await seedSubscription(payload, {
-    assinanteId: author.id,
-    startsAt: new Date(now.getTime() - 86_400_000).toISOString(),
-    endsAt: new Date(now.getTime() + (input.days ?? 30) * 86_400_000).toISOString(),
-  })
-  const { authorEmail: _e, authorName: _n, now: _now, days: _d, ...recado } = input
-  const created = await seedRecado(payload, { ...recado, author: author.id, status: 'aprovado' })
-  return { author, recado: created }
-}
-
 /** Uploads a fixture (photo or espaco.mp4) to an ad through the Local API (staff path). */
 export async function seedAdMedia(
   payload: Payload,

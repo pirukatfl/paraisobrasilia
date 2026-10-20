@@ -6,8 +6,6 @@ import {
 } from 'payload'
 
 import { isStaff } from '../access/roles'
-import { recadoEndpoints } from '../lib/recados/endpoints'
-import { expire } from '../lib/cache/expire'
 import { redactContacts } from '../lib/classisex/redact'
 import { APELIDO_MAX } from '../lib/classisex/rules'
 import {
@@ -85,20 +83,22 @@ const dateAdmin = {
 }
 
 /**
- * Recados of subscribers (D-01, REC-01). New notes wait for staff approval (REC-04, 05-06).
- *
- * T-05-04: every REST operation is staff-only. Subscribers write only through
- * src/lib/recados/service.ts, after the members-area DAL check and an ownership check.
+ * LEGACY mural of recados, switched off on 2026-10-20 (quick recados-privados, R-06). The table and
+ * every data field are kept (no migration); there is no page, component, query or moderation
+ * endpoint, and the collection is hidden from the admin. REST stays staff-only (T-RP-04) and the
+ * account-delete cascade in Assinantes.ts still removes a person's rows (LGPD).
+ * "Recados" for members are now the private conversations (collections `conversations`/`messages`).
  */
 export const Recados: CollectionConfig = {
   slug: 'recados',
   labels: { singular: 'Recado', plural: 'Recados' },
   admin: {
-    group: 'Recados e mensagens',
+    group: 'Recados',
+    hidden: true,
     useAsTitle: 'resumo',
     defaultColumns: ['resumo', 'status', 'submittedAt', 'author'],
     listSearchableFields: ['resumo', 'apelido', 'texto'],
-    description: 'Recados dos assinantes. Novos entram como "Em análise" e só aparecem depois de aprovados.',
+    description: 'Mural antigo, desativado em 20/10/2026. Dados guardados, sem tela.',
   },
   defaultSort: '-submittedAt',
   access: {
@@ -107,32 +107,11 @@ export const Recados: CollectionConfig = {
     update: isStaff,
     delete: isStaff,
   },
-  // Staff-only moderation actions for the Moderação panel (src/lib/recados/endpoints.ts)
-  endpoints: recadoEndpoints,
   hooks: {
     beforeValidate: [normaliseAndRedact],
     beforeChange: [guardModeration, computeDerived],
-    afterChange: [
-      ({ doc }) => {
-        expire(['recados'])
-        return doc
-      },
-    ],
-    afterDelete: [
-      ({ doc }) => {
-        expire(['recados'])
-        return doc
-      },
-    ],
   },
   fields: [
-    {
-      // Aprovar / Recusar / Despublicar with the public preview; hidden on create
-      name: 'moderacao',
-      type: 'ui',
-      label: 'Moderação',
-      admin: { components: { Field: '/components/admin/recados/RecadoModeracaoPanel#RecadoModeracaoPanel' } },
-    },
     {
       name: 'resumo',
       type: 'text',
@@ -181,7 +160,7 @@ export const Recados: CollectionConfig = {
       options: RECADO_STATUS_OPTIONS.map((o) => ({ ...o })),
       // Owners never set the status (T-05-04); staff use the audited buttons (05-06)
       access: { create: isStaff, update: isStaff },
-      admin: { position: 'sidebar', readOnly: true, description: 'Use os botões do quadro Moderação.' },
+      admin: { position: 'sidebar', readOnly: true, description: 'Mural desativado: a situação não muda mais.' },
     },
     {
       name: 'motivo',

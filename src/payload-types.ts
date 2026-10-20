@@ -580,7 +580,7 @@ export interface AdReport {
   createdAt: string;
 }
 /**
- * Recados dos assinantes. Novos entram como "Em análise" e só aparecem depois de aprovados.
+ * Mural antigo, desativado em 20/10/2026. Dados guardados, sem tela.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "recados".
@@ -608,7 +608,7 @@ export interface Recado {
    */
   contatosRemovidos?: number | null;
   /**
-   * Use os botões do quadro Moderação.
+   * Mural desativado: a situação não muda mais.
    */
   status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
   /**

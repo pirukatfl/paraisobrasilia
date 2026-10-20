@@ -92,7 +92,7 @@ describe('message safety (REC-03, T-05-07, T-05-09, T-05-11, T-05-28, T-05-29)',
       await seedBlock(payload, { blocker: a.id, blocked: c.id })
       const before = (await payload.count({ collection: 'conversations', overrideAccess: true })).totalDocs
       await expect(
-        startConversation(payload, { senderId: c.id, origem: 'anuncio', id: ad.id, texto: 'oi', apelido: 'Cris', now: NOW }),
+        startConversation(payload, { senderId: c.id, id: ad.id, texto: 'oi', apelido: 'Cris', now: NOW }),
       ).rejects.toMatchObject({ code: 'bloqueado', message: NEUTRAL })
       expect((await payload.count({ collection: 'conversations', overrideAccess: true })).totalDocs).toBe(before)
     })

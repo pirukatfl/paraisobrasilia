@@ -21,6 +21,7 @@ let conversaId = 0
 test.beforeAll(async ({ request }) => {
   test.setTimeout(120_000)
   const api = await staffApi(request)
+  await api.deleteAll('message-reports') // reports outlive their accounts: start each project from zero
   await api.deleteAll('ads')
   await api.deleteAll('assinantes')
   anaId = (await api.createAssinante(ANA)).id
@@ -119,12 +120,12 @@ test.describe('staff', () => {
     test.setTimeout(150_000)
     await loginAsStaff(page)
     await page.goto('/admin')
-    await expect(page.getByRole('link', { name: 'Mensagens: 1 denúncia aberta' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Recados: 1 denúncia aberta' })).toBeVisible()
     await expect(page.locator('nav a[href="/admin/collections/message-reports"]')).toHaveCount(1)
     for (const hidden of ['conversations', 'messages', 'blocks']) {
       await expect(page.locator(`a[href="/admin/collections/${hidden}"]`)).toHaveCount(0)
     }
-    await page.getByRole('link', { name: 'Mensagens: 1 denúncia aberta' }).click()
+    await page.getByRole('link', { name: 'Recados: 1 denúncia aberta' }).click()
     await expect(page.locator('table tbody tr')).toHaveCount(1)
     const href = await page.locator('table tbody tr').first().getByRole('link').first().getAttribute('href')
     await page.goto(href!)

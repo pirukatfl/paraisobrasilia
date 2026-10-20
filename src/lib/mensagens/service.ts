@@ -17,7 +17,6 @@ import { findVisibleAdDoc } from '../classisex/board'
 import { apelidoError } from '../classisex/rules'
 import { DETAILS_MAX, NOTE_MAX, DAILY_LIMIT } from '../classisex/report-rules'
 import { categoryLabels, ServiceError } from '../classisex/service'
-import { findVisibleRecadoDoc } from '../recados/board'
 import { formatMessageTime, formatSnapshotTime, snippetOf, type InboxItemDTO, type ThreadDTO } from './dto'
 import {
   INBOX_PAGE,
@@ -76,34 +75,20 @@ type ConversationDoc = {
 
 export type Target = { recipientId: number; recipientApelido: string; assunto: string }
 
-/** The recipient of a new conversation comes from a visible ad or recado of someone else. */
+/** The recipient of a new conversation comes from a visible ad of someone else (R-01: anúncio only). */
 export async function resolveTarget(
   payload: Payload,
-  { origem, id, viewerId, now }: { origem: 'anuncio' | 'recado'; id: number | string; viewerId: number; now: Date },
+  { id, viewerId, now }: { id: number | string; viewerId: number; now: Date },
 ): Promise<Target | { error: 'propria' } | null> {
-  if (origem === 'anuncio') {
-    const ad = await findVisibleAdDoc(payload, id, now)
-    if (!ad) return null
-    const authorId = relId((ad as unknown as { author?: unknown }).author)
-    if (authorId === null) return null
-    if (authorId === Number(viewerId)) return { error: 'propria' }
-    const labels = await categoryLabels(payload)
-    const tipo = labels.get(relId(ad.euSou) ?? -1) ?? 'Anúncio'
-    const apelido = ad.apelido?.trim() || 'Anúncio'
-    return { recipientId: authorId, recipientApelido: apelido, assunto: `Anúncio: ${apelido} · ${tipo}`.slice(0, 120) }
-  }
-  const recado = await findVisibleRecadoDoc(payload, id, now)
-  if (!recado) return null
-  const authorId = relId(recado.author)
+  const ad = await findVisibleAdDoc(payload, id, now)
+  if (!ad) return null
+  const authorId = relId((ad as unknown as { author?: unknown }).author)
   if (authorId === null) return null
   if (authorId === Number(viewerId)) return { error: 'propria' }
-  const flat = recado.texto.replace(/\s+/g, ' ').trim()
-  const trecho = flat.length > 40 ? `${flat.slice(0, 40).trimEnd()}…` : flat
-  return {
-    recipientId: authorId,
-    recipientApelido: recado.apelido?.trim() || 'Recado',
-    assunto: `Recado: ${trecho}`.slice(0, 120),
-  }
+  const labels = await categoryLabels(payload)
+  const tipo = labels.get(relId(ad.euSou) ?? -1) ?? 'Anúncio'
+  const apelido = ad.apelido?.trim() || 'Anúncio'
+  return { recipientId: authorId, recipientApelido: apelido, assunto: `Anúncio: ${apelido} · ${tipo}`.slice(0, 120) }
 }
 
 export type ComposeTarget =
@@ -114,21 +99,15 @@ export type ComposeTarget =
   | { state: 'novo'; recipientApelido: string; assunto: string; apelido: string }
 
 /**
- * Who the viewer would write to, derived from a visible ad/recado only (T-05-10). When the pair
- * has no thread yet and canSend refuses (free advertiser, block, suspension...), the compose
- * page shows the reason and no form (I-2).
+ * Who the viewer would write to, derived from a visible ad only (T-05-10). When the pair has no
+ * thread yet and canSend refuses (free advertiser, block, suspension...), the compose page shows
+ * the reason and no form (I-2).
  */
 export async function composeTargetFor(
   payload: Payload,
-  {
-    me,
-    origem,
-    id,
-    ownApelido,
-    now,
-  }: { me: number; origem: 'anuncio' | 'recado'; id: number | string; ownApelido: string | null | undefined; now: Date },
+  { me, id, ownApelido, now }: { me: number; id: number | string; ownApelido: string | null | undefined; now: Date },
 ): Promise<ComposeTarget> {
-  const target = await resolveTarget(payload, { origem, id, viewerId: me, now })
+  const target = await resolveTarget(payload, { id, viewerId: me, now })
   if (!target) return { state: 'nao-encontrado' }
   if ('error' in target) return { state: 'propria' }
   const existing = await findExistingConversation(payload, me, target.recipientId)
@@ -272,7 +251,6 @@ async function appendMessage(
 
 export type StartInput = {
   senderId: number
-  origem: 'anuncio' | 'recado'
   id: number | string
   texto: string
   apelido?: string
@@ -285,9 +263,9 @@ export async function startConversation(payload: Payload, input: StartInput): Pr
   if (invalid) throw fail(invalid)
   const texto = normaliseMessage(input.texto)
 
-  // T-05-10: only origem + id are read; the recipient is the author of the visible ad/recado
-  const target = await resolveTarget(payload, { origem: input.origem, id: input.id, viewerId: senderId, now })
-  if (!target) throw new ServiceError('nao-encontrado', 'Anúncio ou recado não encontrado.', 404)
+  // T-05-10: only the ad id is read; the recipient is the author of the visible ad
+  const target = await resolveTarget(payload, { id: input.id, viewerId: senderId, now })
+  if (!target) throw new ServiceError('nao-encontrado', 'Anúncio não encontrado.', 404)
   if ('error' in target) throw fail(target.error)
 
   const account = (await payload.findByID({

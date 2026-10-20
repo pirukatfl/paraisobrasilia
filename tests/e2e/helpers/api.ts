@@ -344,19 +344,6 @@ export async function staffApi(request: APIRequestContext) {
       })
       return (await check(res, 'create recado')).doc
     },
-    /** Audited staff moderation (05-06): the same endpoints as the Moderação panel. */
-    async aprovarRecado(id: number) {
-      const res = await request.post(`/api/recados/${id}/aprovar`, { headers, data: {} })
-      if (!res.ok()) throw new Error(`aprovar recado failed: ${res.status()}`)
-    },
-    async recusarRecado(id: number, motivo: string) {
-      const res = await request.post(`/api/recados/${id}/recusar`, { headers, data: { motivo } })
-      if (!res.ok()) throw new Error(`recusar recado failed: ${res.status()}`)
-    },
-    async despublicarRecado(id: number, motivo: string) {
-      const res = await request.post(`/api/recados/${id}/despublicar`, { headers, data: { motivo } })
-      if (!res.ok()) throw new Error(`despublicar recado failed: ${res.status()}`)
-    },
     async resolverDenunciaMensagem(id: number, acao: 'descartar' | 'resolver' | 'suspender', nota?: string) {
       const res = await request.post(`/api/message-reports/${id}/resolver`, { headers, data: { acao, nota } })
       if (!res.ok()) throw new Error(`resolver denuncia mensagem failed: ${res.status()}`)

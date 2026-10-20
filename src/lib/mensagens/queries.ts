@@ -35,12 +35,11 @@ export type { ComposeTarget } from './service'
 
 export async function getComposeTarget(
   me: number,
-  origem: 'anuncio' | 'recado',
   id: string,
   ownApelido: string | null | undefined,
 ): Promise<ComposeTarget> {
   const payload = await getPayload({ config })
-  return composeTargetFor(payload, { me, origem, id, ownApelido, now: new Date() })
+  return composeTargetFor(payload, { me, id, ownApelido, now: new Date() })
 }
 
 export async function getThreadSafety(me: number, id: string): Promise<{ euBloqueei: boolean }> {

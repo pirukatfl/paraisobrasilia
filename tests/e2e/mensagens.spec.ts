@@ -3,7 +3,7 @@ import { expect, test, type Browser, type Page } from '@playwright/test'
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 
-// REC-02 / D-02 / D-04: private messages between subscribers, started from an ad or a recado,
+// REC-02 / D-02 / D-04: private messages between subscribers, started from an ad ("Enviar recado", R-01),
 // with an unread counter in the members menu (T-05-05, T-05-06, T-05-10, T-05-18).
 test.describe.configure({ mode: 'serial' })
 
@@ -17,13 +17,13 @@ const DAY = 86_400_000
 const BASE = '/area-do-assinante/mensagens'
 const ids: Record<string, number> = {}
 let adId = 0
-let recadoId = 0
+let ritaAdId = 0
+let anaSecondAdId = 0
 let conversaId = 0
 
 test.beforeAll(async ({ request }) => {
   test.setTimeout(150_000)
   const api = await staffApi(request)
-  await api.deleteAll('recados')
   await api.deleteAll('ads')
   await api.deleteAll('assinantes')
   for (const [key, who] of Object.entries({ ana: ANA, beto: BETO, caio: CAIO, edu: EDU, rita: RITA })) {
@@ -38,13 +38,13 @@ test.beforeAll(async ({ request }) => {
     endsAt: new Date(Date.now() - DAY).toISOString(),
   })
   adId = (await api.createAd({ author: ids.ana!, apelido: 'AnaBSB', status: 'aprovado' })).id
-  recadoId = (await api.createRecado({ author: ids.rita!, apelido: 'Rita e Beto', texto: 'Recado da Rita para o mural.', status: 'aprovado' })).id
+  ritaAdId = (await api.createAd({ author: ids.rita!, apelido: 'Rita e Beto', status: 'aprovado' })).id
+  anaSecondAdId = (await api.createAd({ author: ids.ana!, apelido: 'AnaBSB Segundo', status: 'aprovado' })).id
   await api.dispose()
 })
 
 test.afterAll(async ({ request }) => {
   const api = await staffApi(request)
-  await api.deleteAll('recados')
   await api.deleteAll('ads')
   await api.deleteAll('assinantes')
   await api.dispose()
@@ -60,14 +60,13 @@ async function login(browser: Browser, baseURL: string, who: typeof ANA, next = 
 
 const badge = (page: Page) => page.getByRole('navigation', { name: 'Área do assinante' }).getByLabel(/recados? não lidos?/)
 
-test('the sub-nav lists Mensagens; own content has no Enviar recado', async ({ browser, baseURL }) => {
+test('the sub-nav has a single Recados item; own content has no Enviar recado', async ({ browser, baseURL }) => {
   const ana = await login(browser, baseURL!, ANA, `/area-do-assinante/classisex/${adId}`)
   const labels = await ana.page.getByRole('navigation', { name: 'Área do assinante' }).getByRole('link').allTextContents()
   expect(labels.map((l) => l.trim())).toEqual([
     'Minha assinatura',
     'ClassiSex',
     'Recados',
-    'Mensagens',
     'Contos',
     'Meus anúncios',
     'Trocar senha',
@@ -77,12 +76,7 @@ test('the sub-nav lists Mensagens; own content has no Enviar recado', async ({ b
   await ana.page.goto(`${BASE}/nova?anuncio=${adId}`)
   await expect(ana.page.getByText('Este anúncio é seu.')).toBeVisible()
   await expect(ana.page.getByRole('button', { name: 'Enviar' })).toHaveCount(0)
-  const rita = await login(browser, baseURL!, RITA, '/area-do-assinante/recados')
-  const board = rita.page.getByRole('region', { name: 'Mural de recados' })
-  await expect(board.getByRole('article').filter({ hasText: 'Rita e Beto' })).toHaveCount(1)
-  await expect(board.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
   await ana.context.close()
-  await rita.context.close()
 })
 
 test('Beto writes to Ana from her ad; empty text keeps the apelido; the thread opens', async ({ browser, baseURL }) => {
@@ -114,7 +108,7 @@ test('Ana sees the unread number, opens and replies; Beto reads the reply; the n
   const ana = await login(browser, baseURL!, ANA, '/area-do-assinante/classisex')
   await expect(badge(ana.page)).toHaveText('1')
   await expect(badge(ana.page)).toHaveAttribute('aria-label', '1 recado não lido')
-  await ana.page.getByRole('navigation', { name: 'Área do assinante' }).getByRole('link', { name: /Mensagens/ }).click()
+  await ana.page.getByRole('navigation', { name: 'Área do assinante' }).getByRole('link', { name: /Recados/ }).click()
   const item = ana.page.getByRole('link', { name: /BetoDF/ })
   await expect(item).toContainText('Oi, vi seu anúncio')
   await expect(item).toContainText('Nova')
@@ -135,24 +129,28 @@ test('Ana sees the unread number, opens and replies; Beto reads the reply; the n
   await beto.context.close()
 })
 
-test('a recado starts another conversation; the same person from the ad reuses the existing thread', async ({
+test('an ad of another author starts another conversation; a second ad of the same author reuses the existing thread', async ({
   browser,
   baseURL,
 }) => {
-  const beto = await login(browser, baseURL!, BETO, '/area-do-assinante/recados')
-  const card = beto.page.getByRole('region', { name: 'Mural de recados' }).getByRole('article').filter({ hasText: 'Rita e Beto' })
-  await card.getByRole('link', { name: 'Enviar recado' }).click()
+  const beto = await login(browser, baseURL!, BETO, `${BASE}/nova?anuncio=${ritaAdId}`)
   await expect(beto.page.getByRole('heading', { name: 'Recado para Rita e Beto', level: 1 })).toBeVisible()
   await expect(beto.page.getByLabel('Seu apelido')).toHaveCount(0) // saved on the account already
-  await beto.page.getByLabel('Recado', { exact: true }).fill('Gostei do seu recado')
+  await beto.page.getByLabel('Recado', { exact: true }).fill('Gostei do seu anúncio')
   await beto.page.getByRole('button', { name: 'Enviar' }).click()
   await expect(beto.page.getByRole('heading', { name: 'Conversa com Rita e Beto', level: 1 })).toBeVisible()
-  await expect(beto.page.getByText(/^Recado: /)).toBeVisible()
+  await expect(beto.page.getByText(/^Anúncio: Rita e Beto/)).toBeVisible()
   await beto.page.goto(`${BASE}/nova?anuncio=${adId}`)
+  await expect(beto.page).toHaveURL(new RegExp(`${BASE}/${conversaId}$`))
+  // the same author from another of her ads: still the same thread
+  await beto.page.goto(`${BASE}/nova?anuncio=${anaSecondAdId}`)
   await expect(beto.page).toHaveURL(new RegExp(`${BASE}/${conversaId}$`))
   await beto.page.goto(BASE)
   await expect(beto.page.getByRole('link', { name: /AnaBSB|Rita e Beto/ })).toHaveCount(2)
-  void recadoId
+  // an old ?recado= link only leads to the list and creates nothing
+  await beto.page.goto(`${BASE}/nova?recado=1`)
+  await expect(beto.page).toHaveURL(new RegExp(`${BASE}$`))
+  await expect(beto.page.getByRole('link', { name: /AnaBSB|Rita e Beto/ })).toHaveCount(2)
   await beto.context.close()
 })
 

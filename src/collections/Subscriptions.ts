@@ -121,14 +121,14 @@ const syncAccessUntil: CollectionAfterChangeHook = async ({ doc, previousDoc, re
   const ids = new Set([relId(doc.assinante), relId(previousDoc?.assinante)].filter((v) => v !== null))
   for (const id of ids) await recomputeAccessUntil(req, id as number | string)
   // D-06: the author's ads appear/disappear with the access period (public preview cache)
-  expire(['ads', 'recados'])
+  expire(['ads'])
   return doc
 }
 
 const syncAccessUntilAfterDelete: CollectionAfterDeleteHook = async ({ doc, req }) => {
   const id = relId(doc.assinante)
   if (id !== null && !req.context?.assinanteBeingDeleted) await recomputeAccessUntil(req, id)
-  expire(['ads', 'recados'])
+  expire(['ads'])
   return doc
 }
 

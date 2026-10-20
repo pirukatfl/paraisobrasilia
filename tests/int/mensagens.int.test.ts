@@ -24,7 +24,6 @@ import {
   seedAssinante,
   seedConversation,
   seedMessage,
-  seedRecado,
   seedStaffUser,
   seedSubscription,
 } from '../helpers/seed'
@@ -117,24 +116,24 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
   })
 
   describe('resolveTarget (T-05-10)', () => {
-    it('derives the recipient from a visible ad or recado of someone else', async () => {
+    it('derives the recipient from a visible ad of someone else', async () => {
       const ad = await adOf(b.id)
-      const target = await resolveTarget(payload, { origem: 'anuncio', id: ad.id, viewerId: a.id, now: NOW })
+      const target = await resolveTarget(payload, { id: ad.id, viewerId: a.id, now: NOW })
       expect(target).toMatchObject({ recipientId: b.id, recipientApelido: 'Casal BSB' })
       expect((target as { assunto: string }).assunto).toMatch(/^Anúncio: Casal BSB · /)
-      const rec = await seedRecado(payload, { author: b.id, status: 'aprovado', apelido: 'Beto e Bia', texto: 'Recado para a casa inteira que e bem comprido mesmo' })
-      const t2 = await resolveTarget(payload, { origem: 'recado', id: rec.id, viewerId: a.id, now: NOW })
+      const second = await adOf(b.id, { apelido: 'Beto e Bia' })
+      const t2 = await resolveTarget(payload, { id: second.id, viewerId: a.id, now: NOW })
       expect(t2).toMatchObject({ recipientId: b.id, recipientApelido: 'Beto e Bia' })
-      expect((t2 as { assunto: string }).assunto).toMatch(/^Recado: Recado para a casa/)
+      expect((t2 as { assunto: string }).assunto).toMatch(/^Anúncio: Beto e Bia · /)
     })
 
     it('answers null for hidden items and propria for own items', async () => {
       const pending = await seedAd(payload, { author: b.id })
-      expect(await resolveTarget(payload, { origem: 'anuncio', id: pending.id, viewerId: a.id, now: NOW })).toBeNull()
+      expect(await resolveTarget(payload, { id: pending.id, viewerId: a.id, now: NOW })).toBeNull()
       const hidden = await seedAd(payload, { author: b.id, status: 'despublicado' })
-      expect(await resolveTarget(payload, { origem: 'anuncio', id: hidden.id, viewerId: a.id, now: NOW })).toBeNull()
+      expect(await resolveTarget(payload, { id: hidden.id, viewerId: a.id, now: NOW })).toBeNull()
       const own = await adOf(a.id)
-      expect(await resolveTarget(payload, { origem: 'anuncio', id: own.id, viewerId: a.id, now: NOW })).toEqual({ error: 'propria' })
+      expect(await resolveTarget(payload, { id: own.id, viewerId: a.id, now: NOW })).toEqual({ error: 'propria' })
     })
   })
 
@@ -142,11 +141,11 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('resolves a target, but a free account cannot receive messages (the UI hides the link)', async () => {
       const free = await person('livre@teste.local', 'Livre', { active: false })
       const ad = await seedAd(payload, { author: free.id, status: 'aprovado', apelido: 'Casal Livre' })
-      const target = await resolveTarget(payload, { origem: 'anuncio', id: ad.id, viewerId: a.id, now: NOW })
+      const target = await resolveTarget(payload, { id: ad.id, viewerId: a.id, now: NOW })
       expect(target).toMatchObject({ recipientId: free.id, recipientApelido: 'Casal Livre' })
       expect(await canSend(payload, { senderId: a.id, recipientId: free.id, now: NOW })).toBe('destinatarioInativo')
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi!', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'Oi!', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ code: 'destinatarioInativo' })
       expect((await payload.count({ collection: 'conversations', overrideAccess: true })).totalDocs).toBe(0)
     })
@@ -161,7 +160,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('1: active -> ad of an active author starts a conversation', async () => {
       const ad = await adOf(b.id)
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
       ).resolves.toMatchObject({ conversationId: expect.any(Number) })
     })
 
@@ -169,7 +168,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
       const free = await person('gratis@teste.local', 'Gratis', { active: false })
       const ad = await seedAd(payload, { author: free.id, status: 'aprovado', apelido: 'Gratis' })
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ code: 'destinatarioInativo' })
       expect(await counts()).toEqual({ conversations: 0, messages: 0 })
     })
@@ -178,7 +177,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
       const free = await person('livre2@teste.local', 'Livre', { active: false })
       const ad = await adOf(b.id)
       await expect(
-        startConversation(payload, { senderId: free.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Livre', now: NOW }),
+        startConversation(payload, { senderId: free.id, id: ad.id, texto: 'Oi', apelido: 'Livre', now: NOW }),
       ).rejects.toMatchObject({ code: 'remetenteInativo' })
       expect(await counts()).toEqual({ conversations: 0, messages: 0 })
     })
@@ -192,7 +191,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
       })
       const ad = await adOf(b.id)
       await expect(
-        startConversation(payload, { senderId: expired.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Exp', now: NOW }),
+        startConversation(payload, { senderId: expired.id, id: ad.id, texto: 'Oi', apelido: 'Exp', now: NOW }),
       ).rejects.toMatchObject({ code: 'remetenteInativo' })
       expect(await counts()).toEqual({ conversations: 0, messages: 0 })
     })
@@ -200,7 +199,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('5: own ad answers propria', async () => {
       const own = await adOf(a.id)
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: own.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: own.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ code: 'propria' })
       expect(await counts()).toEqual({ conversations: 0, messages: 0 })
     })
@@ -209,7 +208,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
       const ad = await adOf(b.id)
       const { conversationId } = await startConversation(payload, {
         senderId: a.id,
-        origem: 'anuncio',
+       
         id: ad.id,
         texto: 'SEGREDO-A-B',
         apelido: 'Ana',
@@ -224,30 +223,30 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('composeTargetFor: free author -> indisponivel; active author -> novo; existing thread is kept', async () => {
       const free = await person('gratis2@teste.local', 'Gratis2', { active: false })
       const freeAd = await seedAd(payload, { author: free.id, status: 'aprovado', apelido: 'Gratis2' })
-      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: freeAd.id, ownApelido: 'Ana', now: NOW })).toEqual({
+      expect(await composeTargetFor(payload, { me: a.id, id: freeAd.id, ownApelido: 'Ana', now: NOW })).toEqual({
         state: 'indisponivel',
         message: RECADO_ANUNCIO_GRATUITO,
       })
       const ad = await adOf(b.id)
-      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: ad.id, ownApelido: 'Ana', now: NOW })).toMatchObject({
+      expect(await composeTargetFor(payload, { me: a.id, id: ad.id, ownApelido: 'Ana', now: NOW })).toMatchObject({
         state: 'novo',
         recipientApelido: 'Casal BSB',
         apelido: 'Ana',
       })
       const { conversationId } = await startConversation(payload, {
         senderId: a.id,
-        origem: 'anuncio',
+       
         id: ad.id,
         texto: 'Oi',
         apelido: 'Ana',
         now: NOW,
       })
-      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: ad.id, ownApelido: 'Ana', now: NOW })).toEqual({
+      expect(await composeTargetFor(payload, { me: a.id, id: ad.id, ownApelido: 'Ana', now: NOW })).toEqual({
         state: 'existente',
         conversationId,
       })
       const own = await adOf(a.id)
-      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: own.id, ownApelido: 'Ana', now: NOW })).toEqual({
+      expect(await composeTargetFor(payload, { me: a.id, id: own.id, ownApelido: 'Ana', now: NOW })).toEqual({
         state: 'propria',
       })
     })
@@ -266,11 +265,11 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('creates one thread with snapshots, saves the apelido, and later contacts reuse it', async () => {
       const ad = await adOf(b.id)
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi!', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'Oi!', now: NOW }),
       ).rejects.toMatchObject({ code: 'semApelido', status: 400 })
       const { conversationId } = await startConversation(payload, {
         senderId: a.id,
-        origem: 'anuncio',
+       
         id: ad.id,
         texto: 'Oi, tudo bem?',
         apelido: 'Casal Ana',
@@ -282,8 +281,8 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
       expect(conv.participantA).toBe(Math.min(a.id, b.id))
       expect([conv.apelidoA, conv.apelidoB].sort()).toEqual(['Casal Ana', 'Casal BSB'])
       expect(conv.assunto).toMatch(/^Anúncio: /)
-      const rec = await seedRecado(payload, { author: b.id, status: 'aprovado', apelido: 'Beto', texto: 'Outro assunto' })
-      const again = await startConversation(payload, { senderId: a.id, origem: 'recado', id: rec.id, texto: 'Segunda', now: NOW })
+      const second = await adOf(b.id, { apelido: 'Segundo anúncio' })
+      const again = await startConversation(payload, { senderId: a.id, id: second.id, texto: 'Segunda', now: NOW })
       expect(again.conversationId).toBe(conversationId)
       const after = await payload.findByID({ collection: 'conversations', id: conversationId, overrideAccess: true, depth: 0 })
       expect(after.assunto).toBe(conv.assunto)
@@ -295,7 +294,7 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
       const ad = await adOf(b.id)
       const { conversationId } = await startConversation(payload, {
         senderId: a.id,
-        origem: 'anuncio',
+       
         id: ad.id,
         texto: 'Oi',
         apelido: 'Ana',
@@ -309,23 +308,23 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('refuses own ads, hidden ads, inactive sides and bad texts', async () => {
       const own = await adOf(a.id)
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: own.id, texto: 'x', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: own.id, texto: 'x', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ code: 'propria' })
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: 99999, texto: 'x', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: 99999, texto: 'x', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ status: 404 })
       const ad = await adOf(b.id)
       for (const [texto, code] of [['  ', 'vazio'], ['x'.repeat(2001), 'longa']] as const) {
         await expect(
-          startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto, apelido: 'Ana', now: NOW }),
+          startConversation(payload, { senderId: a.id, id: ad.id, texto, apelido: 'Ana', now: NOW }),
         ).rejects.toMatchObject({ code, status: 400 })
       }
       const off = await person('off2@teste.local', 'Off', { active: false })
       await expect(
-        startConversation(payload, { senderId: off.id, origem: 'anuncio', id: ad.id, texto: 'oi', apelido: 'Off', now: NOW }),
+        startConversation(payload, { senderId: off.id, id: ad.id, texto: 'oi', apelido: 'Off', now: NOW }),
       ).rejects.toMatchObject({ code: 'remetenteInativo', status: 403 })
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'oi', apelido: 'Ana@telefone', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'oi', apelido: 'Ana@telefone', now: NOW }),
       ).rejects.toMatchObject({ code: 'apelido' })
     })
   })
@@ -414,11 +413,11 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
         expect(conv.id).toBeGreaterThan(0)
       }
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'oi', apelido: 'Ana', now: NOW }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'oi', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ code: 'limiteConversas', status: 429 })
       const tomorrow = new Date(NOW.getTime() + DAY)
       await expect(
-        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'oi', apelido: 'Ana', now: tomorrow }),
+        startConversation(payload, { senderId: a.id, id: ad.id, texto: 'oi', apelido: 'Ana', now: tomorrow }),
       ).resolves.toMatchObject({ conversationId: expect.any(Number) })
     })
 

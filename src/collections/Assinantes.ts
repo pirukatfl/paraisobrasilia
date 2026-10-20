@@ -217,7 +217,7 @@ const FIELD_LABELS: Record<string, string> = {
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
 /** D-06: a new access end date moves the author's ads on/off the public preview. */
 const expireAdsOnAccessChange: CollectionAfterChangeHook = ({ doc, previousDoc }) => {
-  if ((doc.accessUntil ?? null) !== (previousDoc?.accessUntil ?? null)) expire(['ads', 'recados'])
+  if ((doc.accessUntil ?? null) !== (previousDoc?.accessUntil ?? null)) expire(['ads'])
   return doc
 }
 
@@ -368,7 +368,7 @@ export const Assinantes: CollectionConfig = {
       name: 'apelido',
       type: 'text',
       maxLength: 40,
-      label: 'Apelido nos recados e mensagens',
+      label: 'Apelido nos recados',
       admin: { description: 'Escolhido pelo assinante. Nunca use o nome verdadeiro.' },
       validate: (value: unknown) => {
         const apelido = String(value ?? '').replace(/\s+/g, ' ').trim()
