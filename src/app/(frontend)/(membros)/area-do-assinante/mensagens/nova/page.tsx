@@ -13,7 +13,7 @@ import { MENSAGEM_MESSAGES } from '@/lib/mensagens/rules'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Nova mensagem',
+  title: 'Novo recado',
   robots: { index: false, follow: false },
 }
 
@@ -38,7 +38,7 @@ export default async function NovaMensagemPage({
   const head = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Mensagens</p>
+      <p className="type-eyebrow text-muted">Recados</p>
     </>
   )
   if (check.inactive) {
@@ -46,7 +46,7 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          Nova mensagem
+          Novo recado
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -61,10 +61,28 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          Nova mensagem
+          Novo recado
         </h1>
         <p role="alert" className="mt-4 max-w-[560px] rounded-lg border border-line bg-surface px-4 py-2 text-body">
           {MENSAGEM_MESSAGES.propria}
+        </p>
+      </section>
+    )
+  }
+  if (target.state === 'indisponivel') {
+    return (
+      <section aria-labelledby="titulo-nova">
+        {head}
+        <h1 id="titulo-nova" className="type-display mt-2">
+          Novo recado
+        </h1>
+        <p role="alert" className="mt-4 max-w-[560px] rounded-lg border border-line bg-surface px-4 py-2 text-body">
+          {target.message}
+        </p>
+        <p className="mt-8">
+          <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
+            Voltar para Recados
+          </Link>
         </p>
       </section>
     )
@@ -73,7 +91,7 @@ export default async function NovaMensagemPage({
     <section aria-labelledby="titulo-nova">
       {head}
       <h1 id="titulo-nova" className="type-display mt-2">
-        Mensagem para {target.recipientApelido}
+        Recado para {target.recipientApelido}
       </h1>
       <p className="type-label mt-2 text-muted">{target.assunto}</p>
       <MessageForm
@@ -85,7 +103,7 @@ export default async function NovaMensagemPage({
       />
       <p className="mt-8">
         <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Voltar para Mensagens
+          Voltar para Recados
         </Link>
       </p>
     </section>

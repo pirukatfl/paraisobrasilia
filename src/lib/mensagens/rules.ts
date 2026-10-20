@@ -26,18 +26,22 @@ export type SendError =
   | 'suspenso'
 
 export const MENSAGEM_MESSAGES: Record<SendError, string> = {
-  vazio: 'Escreva a mensagem.',
-  longa: 'A mensagem pode ter até 2.000 caracteres.',
-  remetenteInativo: 'Sua assinatura não está ativa. Renove para conversar.',
-  destinatarioInativo: 'Esta pessoa está sem assinatura ativa e não pode receber mensagens agora.',
-  propria: 'Este anúncio ou recado é seu.',
+  vazio: 'Escreva o recado.',
+  longa: 'O recado pode ter até 2.000 caracteres.',
+  remetenteInativo: 'Sua assinatura não está ativa. Renove para mandar recados.',
+  destinatarioInativo: 'Esta pessoa está sem assinatura ativa e não recebe recados agora.',
+  propria: 'Este anúncio é seu.',
   limiteConversas: 'Você já começou 20 conversas hoje. Tente amanhã.',
-  limiteMensagens: 'Você enviou muitas mensagens hoje. Tente amanhã.',
-  semApelido: 'Escolha um apelido para conversar.',
-  bloqueado: 'Não é possível enviar mensagens para esta pessoa.',
+  limiteMensagens: 'Você enviou muitos recados hoje. Tente amanhã.',
+  semApelido: 'Escolha um apelido para mandar recados.',
+  bloqueado: 'Não é possível mandar recados para esta pessoa.',
   voceBloqueou: 'Você bloqueou esta pessoa. Desbloqueie para voltar a conversar.',
-  suspenso: 'Seu envio de mensagens foi suspenso pela equipe. Fale com a casa pelo WhatsApp.',
+  suspenso: 'Seu envio de recados foi suspenso pela equipe. Fale com a casa pelo WhatsApp.',
 }
+
+/** Shown instead of the compose form / button for the ad of a free (non-paying) author. */
+export const RECADO_ANUNCIO_GRATUITO =
+  'Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.'
 
 export const normaliseMessage = (texto: string): string => texto.replace(/\r\n/g, '\n').trim()
 

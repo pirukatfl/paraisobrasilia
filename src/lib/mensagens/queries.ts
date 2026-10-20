@@ -5,11 +5,11 @@ import { getPayload } from 'payload'
 
 import type { InboxItemDTO, ThreadDTO } from './dto'
 import {
-  findExistingConversation,
+  composeTargetFor,
+  type ComposeTarget,
   getThread,
   listInbox,
   markRead,
-  resolveTarget,
   threadSafetyState,
 } from './service'
 
@@ -31,13 +31,8 @@ export async function getThreadFor(me: number, id: string, antes?: number): Prom
   return thread
 }
 
-export type ComposeTarget =
-  | { state: 'nao-encontrado' }
-  | { state: 'propria' }
-  | { state: 'existente'; conversationId: number }
-  | { state: 'novo'; recipientApelido: string; assunto: string; apelido: string }
+export type { ComposeTarget } from './service'
 
-/** Who the viewer would write to, derived from a visible ad/recado only (T-05-10). */
 export async function getComposeTarget(
   me: number,
   origem: 'anuncio' | 'recado',
@@ -45,17 +40,7 @@ export async function getComposeTarget(
   ownApelido: string | null | undefined,
 ): Promise<ComposeTarget> {
   const payload = await getPayload({ config })
-  const target = await resolveTarget(payload, { origem, id, viewerId: me, now: new Date() })
-  if (!target) return { state: 'nao-encontrado' }
-  if ('error' in target) return { state: 'propria' }
-  const existing = await findExistingConversation(payload, me, target.recipientId)
-  if (existing !== null) return { state: 'existente', conversationId: existing }
-  return {
-    state: 'novo',
-    recipientApelido: target.recipientApelido,
-    assunto: target.assunto,
-    apelido: ownApelido ?? '',
-  }
+  return composeTargetFor(payload, { me, origem, id, ownApelido, now: new Date() })
 }
 
 export async function getThreadSafety(me: number, id: string): Promise<{ euBloqueei: boolean }> {

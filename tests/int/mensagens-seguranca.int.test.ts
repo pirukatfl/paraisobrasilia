@@ -28,7 +28,7 @@ import {
 const DAY = 86_400_000
 const NOW = new Date()
 const DENIED = /permiss|forbidden|not allowed/i
-const NEUTRAL = 'Não é possível enviar mensagens para esta pessoa.'
+const NEUTRAL = 'Não é possível mandar recados para esta pessoa.'
 
 describe('message safety (REC-03, T-05-07, T-05-09, T-05-11, T-05-28, T-05-29)', () => {
   let payload: Payload
@@ -176,7 +176,7 @@ describe('message safety (REC-03, T-05-07, T-05-09, T-05-11, T-05-28, T-05-29)',
       expect((acc as { mensagensSuspensas?: boolean }).mensagensSuspensas).toBe(true)
       await expect(
         sendMessage(payload, { senderId: a.id, conversationId: conv.id, texto: 'oi', now: NOW }),
-      ).rejects.toMatchObject({ code: 'suspenso', message: 'Seu envio de mensagens foi suspenso pela equipe. Fale com a casa pelo WhatsApp.' })
+      ).rejects.toMatchObject({ code: 'suspenso', message: 'Seu envio de recados foi suspenso pela equipe. Fale com a casa pelo WhatsApp.' })
       expect(await audit('mensagens-suspensas')).toHaveLength(1)
       expect(await getMessageReportCounts(payload)).toEqual({ abertas: 1, urgentes: 1 })
     })

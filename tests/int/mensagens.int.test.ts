@@ -3,8 +3,10 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { Conversations } from '../../src/collections/Conversations'
 import { Messages } from '../../src/collections/Messages'
+import { RECADO_ANUNCIO_GRATUITO } from '../../src/lib/mensagens/rules'
 import {
   canSend,
+  composeTargetFor,
   countUnread,
   findExistingConversation,
   getThread,
@@ -147,6 +149,107 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
         startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi!', apelido: 'Ana', now: NOW }),
       ).rejects.toMatchObject({ code: 'destinatarioInativo' })
       expect((await payload.count({ collection: 'conversations', overrideAccess: true })).totalDocs).toBe(0)
+    })
+  })
+
+  describe('recados privados — quem pode mandar (R-02, R-03, R-04)', () => {
+    const counts = async () => ({
+      conversations: (await payload.count({ collection: 'conversations', overrideAccess: true })).totalDocs,
+      messages: (await payload.count({ collection: 'messages', overrideAccess: true })).totalDocs,
+    })
+
+    it('1: active -> ad of an active author starts a conversation', async () => {
+      const ad = await adOf(b.id)
+      await expect(
+        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
+      ).resolves.toMatchObject({ conversationId: expect.any(Number) })
+    })
+
+    it('2: active -> ad of a FREE author is refused and creates nothing', async () => {
+      const free = await person('gratis@teste.local', 'Gratis', { active: false })
+      const ad = await seedAd(payload, { author: free.id, status: 'aprovado', apelido: 'Gratis' })
+      await expect(
+        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
+      ).rejects.toMatchObject({ code: 'destinatarioInativo' })
+      expect(await counts()).toEqual({ conversations: 0, messages: 0 })
+    })
+
+    it('3: FREE sender is refused and creates nothing', async () => {
+      const free = await person('livre2@teste.local', 'Livre', { active: false })
+      const ad = await adOf(b.id)
+      await expect(
+        startConversation(payload, { senderId: free.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Livre', now: NOW }),
+      ).rejects.toMatchObject({ code: 'remetenteInativo' })
+      expect(await counts()).toEqual({ conversations: 0, messages: 0 })
+    })
+
+    it('4: EXPIRED sender is refused and creates nothing', async () => {
+      const expired = await seedAssinante(payload, { email: 'exp@teste.local', password: 'senha-mensagem-123', name: 'Exp' })
+      await seedSubscription(payload, {
+        assinanteId: expired.id,
+        startsAt: new Date(NOW.getTime() - 40 * DAY).toISOString(),
+        endsAt: new Date(NOW.getTime() - 10 * DAY).toISOString(),
+      })
+      const ad = await adOf(b.id)
+      await expect(
+        startConversation(payload, { senderId: expired.id, origem: 'anuncio', id: ad.id, texto: 'Oi', apelido: 'Exp', now: NOW }),
+      ).rejects.toMatchObject({ code: 'remetenteInativo' })
+      expect(await counts()).toEqual({ conversations: 0, messages: 0 })
+    })
+
+    it('5: own ad answers propria', async () => {
+      const own = await adOf(a.id)
+      await expect(
+        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: own.id, texto: 'Oi', apelido: 'Ana', now: NOW }),
+      ).rejects.toMatchObject({ code: 'propria' })
+      expect(await counts()).toEqual({ conversations: 0, messages: 0 })
+    })
+
+    it('6: a third subscriber never sees the A-B conversation (inbox and thread)', async () => {
+      const ad = await adOf(b.id)
+      const { conversationId } = await startConversation(payload, {
+        senderId: a.id,
+        origem: 'anuncio',
+        id: ad.id,
+        texto: 'SEGREDO-A-B',
+        apelido: 'Ana',
+        now: NOW,
+      })
+      expect((await listInbox(payload, c.id)).items).toHaveLength(0)
+      expect(await getThread(payload, c.id, conversationId)).toBeNull()
+      expect((await listInbox(payload, a.id)).items).toHaveLength(1)
+      expect((await listInbox(payload, b.id)).items).toHaveLength(1)
+    })
+
+    it('composeTargetFor: free author -> indisponivel; active author -> novo; existing thread is kept', async () => {
+      const free = await person('gratis2@teste.local', 'Gratis2', { active: false })
+      const freeAd = await seedAd(payload, { author: free.id, status: 'aprovado', apelido: 'Gratis2' })
+      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: freeAd.id, ownApelido: 'Ana', now: NOW })).toEqual({
+        state: 'indisponivel',
+        message: RECADO_ANUNCIO_GRATUITO,
+      })
+      const ad = await adOf(b.id)
+      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: ad.id, ownApelido: 'Ana', now: NOW })).toMatchObject({
+        state: 'novo',
+        recipientApelido: 'Casal BSB',
+        apelido: 'Ana',
+      })
+      const { conversationId } = await startConversation(payload, {
+        senderId: a.id,
+        origem: 'anuncio',
+        id: ad.id,
+        texto: 'Oi',
+        apelido: 'Ana',
+        now: NOW,
+      })
+      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: ad.id, ownApelido: 'Ana', now: NOW })).toEqual({
+        state: 'existente',
+        conversationId,
+      })
+      const own = await adOf(a.id)
+      expect(await composeTargetFor(payload, { me: a.id, origem: 'anuncio', id: own.id, ownApelido: 'Ana', now: NOW })).toEqual({
+        state: 'propria',
+      })
     })
   })
 

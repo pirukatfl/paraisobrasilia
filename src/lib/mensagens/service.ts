@@ -23,6 +23,7 @@ import {
   INBOX_PAGE,
   isMessageReportReason,
   MENSAGEM_MESSAGES,
+  RECADO_ANUNCIO_GRATUITO,
   MESSAGE_URGENT_REASON,
   messageReasonLabel,
   REPORT_MESSAGES_PT,
@@ -102,6 +103,48 @@ export async function resolveTarget(
     recipientId: authorId,
     recipientApelido: recado.apelido?.trim() || 'Recado',
     assunto: `Recado: ${trecho}`.slice(0, 120),
+  }
+}
+
+export type ComposeTarget =
+  | { state: 'nao-encontrado' }
+  | { state: 'propria' }
+  | { state: 'indisponivel'; message: string }
+  | { state: 'existente'; conversationId: number }
+  | { state: 'novo'; recipientApelido: string; assunto: string; apelido: string }
+
+/**
+ * Who the viewer would write to, derived from a visible ad/recado only (T-05-10). When the pair
+ * has no thread yet and canSend refuses (free advertiser, block, suspension...), the compose
+ * page shows the reason and no form (I-2).
+ */
+export async function composeTargetFor(
+  payload: Payload,
+  {
+    me,
+    origem,
+    id,
+    ownApelido,
+    now,
+  }: { me: number; origem: 'anuncio' | 'recado'; id: number | string; ownApelido: string | null | undefined; now: Date },
+): Promise<ComposeTarget> {
+  const target = await resolveTarget(payload, { origem, id, viewerId: me, now })
+  if (!target) return { state: 'nao-encontrado' }
+  if ('error' in target) return { state: 'propria' }
+  const existing = await findExistingConversation(payload, me, target.recipientId)
+  if (existing !== null) return { state: 'existente', conversationId: existing }
+  const blocked = await canSend(payload, { senderId: me, recipientId: target.recipientId, now })
+  if (blocked) {
+    return {
+      state: 'indisponivel',
+      message: blocked === 'destinatarioInativo' ? RECADO_ANUNCIO_GRATUITO : MENSAGEM_MESSAGES[blocked],
+    }
+  }
+  return {
+    state: 'novo',
+    recipientApelido: target.recipientApelido,
+    assunto: target.assunto,
+    apelido: ownApelido ?? '',
   }
 }
 
