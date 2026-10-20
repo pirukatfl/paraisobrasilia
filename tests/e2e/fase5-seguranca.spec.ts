@@ -20,7 +20,8 @@ import {
 } from './helpers/fase5'
 
 // Phase 5 leak / regression matrix (REC-01..04, PREV-02..04; T-05-01, 02, 05, 07, 09, 17, 18):
-// every principal against every recados / messages / contos surface. Denials are paired with
+// every principal against every recados (private conversations; the old mural table is legacy data)
+// / contos surface. Revised 2026-10-20 (quick recados-privados): no mural, no teaser, no moderation. Denials are paired with
 // controls that prove the data exists, so a pass means "access denied", not "data missing".
 test.describe.configure({ mode: 'serial' })
 test.use({ locale: 'pt-BR', timezoneId: 'America/Sao_Paulo' })
@@ -140,7 +141,7 @@ test.describe('anonymous', () => {
 test.describe('expired subscriber (Edu)', () => {
   test('sees the inactive panel and none of the data, including his old conversation', async ({ browser, baseURL }) => {
     const edu = await asContext(browser, baseURL!, EDU)
-    for (const path of ['/area-do-assinante/recados', M, `${M}/${s.conv.edu}`, `${M}/nova?anuncio=${s.adId}`]) {
+    for (const path of [M, `${M}/${s.conv.edu}`, `${M}/nova?anuncio=${s.adId}`]) {
       for (const headers of [{} as Record<string, string>, { RSC: '1' }]) {
         const res = await edu.context.request.get(path, { headers })
         expect(res.status(), path).toBe(200)
@@ -196,8 +197,8 @@ test.describe('blocked (Bia) and suspended (Susi)', () => {
     await bia.page.getByLabel('Recado', { exact: true }).fill('BLOQ-1-SENTINELA')
     await bia.page.getByRole('button', { name: 'Enviar' }).click()
     await expect(bia.page.getByText('Não é possível mandar recados para esta pessoa.')).toBeVisible()
-    // a new conversation attempt from Ana's recado lands on the same blocked thread
-    await bia.page.goto(`${M}/nova?recado=${s.recadoId}`)
+    // a new conversation attempt from Ana's ad lands on the same blocked thread
+    await bia.page.goto(`${M}/nova?anuncio=${s.adId}`)
     await expect(bia.page).toHaveURL(new RegExp(`${M}/${s.conv.bia}$`))
     await bia.page.getByLabel('Recado', { exact: true }).fill('BLOQ-2-SENTINELA')
     await bia.page.getByRole('button', { name: 'Enviar' }).click()
@@ -248,7 +249,7 @@ test.describe('staff', () => {
 })
 
 test.describe('cross-site requests and headers', () => {
-  test('a foreign Origin is rejected on the server action and on the staff moderation endpoint', async ({
+  test('a foreign Origin is rejected on the server action and on a staff REST write', async ({
     browser,
     baseURL,
     request,
@@ -276,7 +277,7 @@ test.describe('cross-site requests and headers', () => {
 
   test('members pages are private and noindex; the unread route is private, no-store', async ({ browser, baseURL }) => {
     const ana = await asContext(browser, baseURL!, ANA)
-    for (const path of ['/area-do-assinante/recados', M, `${M}/${s.conv.beto}`, `/area-do-assinante/contos/${CONTO_SLUG}`]) {
+    for (const path of [M, `${M}/${s.conv.beto}`, `/area-do-assinante/contos/${CONTO_SLUG}`]) {
       const res = await ana.context.request.get(path)
       expect(res.status(), path).toBe(200)
       expect(res.headers()['cache-control'] ?? '', path).toMatch(/no-store|private/)
@@ -344,17 +345,15 @@ test.describe('contos and public previews', () => {
     await caio.context.close()
   })
 
-  test('public previews carry no recado apelido, text, contact or members link, and each invites to subscribe', async ({
+  test('no public surface carries the legacy recado sentinel, a contact or a members link, and each invites to subscribe', async ({
     playwright,
     baseURL,
   }) => {
     const anon = await playwright.request.newContext({ baseURL })
-    const ctx = await playwright.request.newContext({ baseURL, extraHTTPHeaders: {} })
-    await ctx.dispose()
-    for (const path of ['/recados', '/contos', `/contos/${CONTO_SLUG}`, '/classisex']) {
+    for (const path of ['/recados', '/contos', `/contos/${CONTO_SLUG}`, '/classisex', '/assine-ja']) {
       for (const headers of [{} as Record<string, string>, { RSC: '1' }]) {
         const res = await anon.get(path, { headers })
-        expect(res.status(), path).toBe(200)
+        expect(res.status(), path).toBe(200) // /recados follows its 308 to /assine-ja
         const body = await res.text()
         expectNone(body, [
           SENTINELS.recadoApelido,
@@ -363,33 +362,31 @@ test.describe('contos and public previews', () => {
           SENTINELS.contoRestrito,
           PHONE_DIGITS,
           '/area-do-assinante/mensagens',
+          'Casal tranquilo procurando amigos',
         ])
-        if (!headers.RSC) expect(body, path).toMatch(/href="\/assine-ja"[^>]*>\s*Assine Já/)
+        if (!headers.RSC && path !== '/assine-ja') expect(body, path).toMatch(/href="\/assine-ja"[^>]*>\s*Assine Já/)
       }
     }
-    // the teaser exists (control) and shows the beginning only
-    const teaser = await (await anon.get('/recados')).text()
-    expect(teaser).toContain('Casal tranquilo procurando amigos')
     await anon.dispose()
   })
 
   test('the sitemap lists the previews and no members URL', async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({ baseURL })
     const xml = await (await anon.get('/sitemap.xml')).text()
-    expect(xml).toContain('/recados')
+    expect(xml).not.toContain('/recados') // mural removed 2026-10-20 (R-08)
     expect(xml).toContain('/contos')
     expect(xml).toContain(`/contos/${CONTO_SLUG}`)
     expect(xml).not.toContain('/area-do-assinante')
     await anon.dispose()
   })
 
-  test('when Ana\'s access ends her teaser disappears and nobody can write to her', async ({ request, browser, baseURL, playwright }) => {
+  test('when Ana\'s access ends nobody can send her a recado and her ad shows no Enviar recado', async ({
+    request,
+    browser,
+    baseURL,
+  }) => {
     const api = await staffApi(request)
     await api.encerrar(s.ids.ana!, 'Fim do cenário da fase 5')
-    const anon = await playwright.request.newContext({ baseURL })
-    const teaser = await (await anon.get('/recados')).text()
-    expect(teaser).not.toContain('Casal tranquilo procurando amigos')
-    await anon.dispose()
 
     const beto = await asContext(browser, baseURL!, BETO)
     await beto.page.goto(`${M}/${s.conv.beto}`)
@@ -397,6 +394,11 @@ test.describe('contos and public previews', () => {
     await beto.page.getByRole('button', { name: 'Enviar' }).click()
     await expect(
       beto.page.getByText('Esta pessoa está sem assinatura ativa e não recebe recados agora.'),
+    ).toBeVisible()
+    await beto.page.goto(`/area-do-assinante/classisex/${s.adId}`)
+    await expect(beto.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+    await expect(
+      beto.page.getByText('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.'),
     ).toBeVisible()
     await beto.context.close()
     await api.dispose()
