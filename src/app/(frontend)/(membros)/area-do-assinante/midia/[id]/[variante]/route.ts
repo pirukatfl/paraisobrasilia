@@ -5,6 +5,7 @@ import { getPayload } from 'payload'
 import { Readable } from 'stream'
 
 import { accessStatusFor } from '@/lib/assinantes/status'
+import { coverOf, tierOf } from '@/lib/assinantes/tier'
 import { canViewMedia, MEDIA_VARIANTS, type MediaVariant, type Principal } from '@/lib/classisex/media-access'
 import { parseRange } from '@/lib/classisex/range'
 import { privateMediaDir } from '@/lib/classisex/storage'
@@ -15,7 +16,7 @@ export const dynamic = 'force-dynamic'
  * Protected ClassiSex media (CLAS-06, D-05): GET /area-do-assinante/midia/{id}/{miniatura|foto|video}
  *
  * T-04-02: one auth check per request (canViewMedia): staff, the owner, or a subscriber with
- *          active access looking at a visible ad. Everybody else: 403 (no/inactive session) or 404.
+ *          active access looking at a visible ad (G-05: only the cover when the author is a free account). Everybody else: 403 (no/inactive session) or 404.
  * T-04-05: the viewer's entitlement is recomputed on every request (never cached).
  * T-04-08: `Cache-Control: private` + `Vary: Cookie` — no CDN/proxy keeps these bytes; never
  *          passed to the Next image optimizer.
@@ -77,9 +78,22 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     ? await payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true, disableErrors: true })
     : null
   const authorId = relId(ad?.author)
-  const author = authorId
-    ? await payload.findByID({ collection: 'assinantes', id: authorId, depth: 0, overrideAccess: true, disableErrors: true })
-    : null
+  // G-05: the author's tier is recomputed per request; only the cover of a free author is public to members
+  const authorTier = authorId ? tierOf(await accessStatusFor(payload, authorId, now)) : 'gratis'
+  let isCover = false
+  if (adId && media.kind === 'foto') {
+    const { docs: photos } = await payload.find({
+      collection: 'ad-media',
+      where: { and: [{ ad: { equals: adId } }, { kind: { equals: 'foto' } }] },
+      select: { kind: true, order: true },
+      sort: 'order',
+      depth: 0,
+      limit: 50,
+      pagination: false,
+      overrideAccess: true,
+    })
+    isCover = coverOf(photos as unknown as { id: number; kind: 'foto'; order?: number | null }[])?.id === media.id
+  }
   const viewerActive =
     principal?.collection === 'assinantes' ? (await accessStatusFor(payload, principal.id, now)).state === 'ativa' : false
 
@@ -88,9 +102,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     viewerActive,
     media: { owner: relId(media.owner), kind: media.kind },
     ad: ad ? { status: ad.status } : null,
-    authorAccessUntil: author?.accessUntil ?? null,
+    authorTier,
+    isCover,
     variante: variante as MediaVariant,
-    now,
   })
   if (decision === 'unauthenticated') return denied(403)
   if (decision === 'not-found') return denied(404)

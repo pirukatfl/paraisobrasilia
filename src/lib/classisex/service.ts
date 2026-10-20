@@ -13,7 +13,8 @@ import { withRequestState } from '../assinantes/context'
 
 import { spDate, spMidnight } from '../assinantes/periods'
 import { accessStatusFor } from '../assinantes/status'
-import { uploadCodeFor, VIDEO_MIME_TYPES } from './media-messages'
+import { TIER_LABELS, tierOf } from '../assinantes/tier'
+import { MAX_AD_PHOTOS, MAX_AD_VIDEOS, uploadCodeFor, VIDEO_MIME_TYPES } from './media-messages'
 import {
   contatoOf,
   relId,
@@ -324,13 +325,13 @@ export async function listOwnAds(payload: Payload, assinanteId: number, now: Dat
     categoryLabels(payload),
     accessStatusFor(payload, assinanteId, now),
   ])
-  const authorActive = access.state === 'ativa'
+  const authorTier = tierOf(access)
   const media = await mediaByAd(
     payload,
     docs.map((d) => d.id),
   )
   return (docs as unknown as AdDocLike[]).map((doc) =>
-    toOwnerAdDTO(doc, { authorActive, euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) }),
+    toOwnerAdDTO(doc, { authorTier, euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) }),
   )
 }
 
@@ -343,7 +344,7 @@ export async function mediaByAd(payload: Payload, adIds: number[]): Promise<Map<
     where: { ad: { in: adIds } },
     sort: 'order',
     depth: 0,
-    limit: adIds.length * 6,
+    limit: adIds.length * (MAX_AD_PHOTOS + MAX_AD_VIDEOS),
     pagination: false,
     overrideAccess: true,
   })
@@ -359,7 +360,8 @@ export async function mediaByAd(payload: Payload, adIds: number[]): Promise<Map<
 export async function getOwnAdMedia(payload: Payload, assinanteId: number, id: number | string): Promise<OwnerMediaDTO | null> {
   try {
     const ad = await loadOwnedAd(payload, assinanteId, id)
-    return toOwnerMediaDTO((await mediaByAd(payload, [ad.id])).get(ad.id) ?? [])
+    const authorTier = tierOf(await accessStatusFor(payload, assinanteId, new Date()))
+    return toOwnerMediaDTO((await mediaByAd(payload, [ad.id])).get(ad.id) ?? [], { authorTier })
   } catch (err) {
     if (err instanceof ServiceError && err.code === 'nao-encontrado') return null
     throw err
@@ -713,6 +715,8 @@ export type ModerationView = {
   id: number
   status: AdStatus
   statusLabel: string
+  /** Tier of the ad author right now (Conta gratuita shows only the cover on the board) */
+  contaAutor: 'Conta gratuita' | 'Assinante'
   motivo: string | null
   /** Exactly what the open area shows (T-04-01): apelido (contacts removed on the server) and tipo */
   publicApelido: string
@@ -739,10 +743,14 @@ export async function getModerationView(req: PayloadRequest, id: number | string
   }
   const apelido = redactContacts(ad.apelido ?? '')
   const labels = await categoryLabels(req.payload)
+  const authorId = relId(ad.author)
+  const contaAutor: ModerationView['contaAutor'] =
+    authorId === null ? TIER_LABELS.gratis : TIER_LABELS[tierOf(await accessStatusFor(req.payload, authorId, new Date(), req))]
   return {
     id: ad.id,
     status: ad.status,
     statusLabel: STAFF_STATUS_LABELS[ad.status],
+    contaAutor,
     motivo: ad.motivo ?? null,
     publicApelido: apelido.text,
     euSouLabel: labels.get(relId(ad.euSou) ?? -1) ?? '',

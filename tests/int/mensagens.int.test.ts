@@ -129,11 +129,24 @@ describe('messaging (REC-02, D-02, D-04, T-05-05..10, T-05-12)', () => {
     it('answers null for hidden items and propria for own items', async () => {
       const pending = await seedAd(payload, { author: b.id })
       expect(await resolveTarget(payload, { origem: 'anuncio', id: pending.id, viewerId: a.id, now: NOW })).toBeNull()
-      const expired = await person('exp@teste.local', 'Exp', { active: false })
-      const hidden = await seedAd(payload, { author: expired.id, status: 'aprovado' })
+      const hidden = await seedAd(payload, { author: b.id, status: 'despublicado' })
       expect(await resolveTarget(payload, { origem: 'anuncio', id: hidden.id, viewerId: a.id, now: NOW })).toBeNull()
       const own = await adOf(a.id)
       expect(await resolveTarget(payload, { origem: 'anuncio', id: own.id, viewerId: a.id, now: NOW })).toEqual({ error: 'propria' })
+    })
+  })
+
+  describe('ad of a free author (G-02, G-04)', () => {
+    it('resolves a target, but a free account cannot receive messages (the UI hides the link)', async () => {
+      const free = await person('livre@teste.local', 'Livre', { active: false })
+      const ad = await seedAd(payload, { author: free.id, status: 'aprovado', apelido: 'Casal Livre' })
+      const target = await resolveTarget(payload, { origem: 'anuncio', id: ad.id, viewerId: a.id, now: NOW })
+      expect(target).toMatchObject({ recipientId: free.id, recipientApelido: 'Casal Livre' })
+      expect(await canSend(payload, { senderId: a.id, recipientId: free.id, now: NOW })).toBe('destinatarioInativo')
+      await expect(
+        startConversation(payload, { senderId: a.id, origem: 'anuncio', id: ad.id, texto: 'Oi!', apelido: 'Ana', now: NOW }),
+      ).rejects.toMatchObject({ code: 'destinatarioInativo' })
+      expect((await payload.count({ collection: 'conversations', overrideAccess: true })).totalDocs).toBe(0)
     })
   })
 

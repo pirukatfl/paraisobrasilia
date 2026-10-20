@@ -235,11 +235,11 @@ describe('owner service (CLAS-03, CLAS-04, D-02, D-03, T-04-04)', () => {
     await seedAd(payload, { author: owner.id, status: 'recusado', motivo: 'Contato no texto' })
     await seedAd(payload, { author: owner.id, status: 'despublicado' })
     await seedAd(payload, { author: other.id })
-    // owner has no active period: the approved ad is off the board
+    // owner has no active period: the approved ad stays up as a free account (G-05)
     const list = await listOwnAds(payload, owner.id, NOW)
     expect(list).toHaveLength(4)
     expect(list.map((a) => a.statusLabel).sort()).toEqual(
-      ['Despublicado pela equipe', 'Em análise pela equipe', 'Fora do ar: assinatura vencida', 'Recusado'].sort(),
+      ['Despublicado pela equipe', 'Em análise pela equipe', 'Publicado como conta gratuita (só a capa aparece)', 'Recusado'].sort(),
     )
     expect(list.find((a) => a.status === 'recusado')?.motivo).toBe('Contato no texto')
     expect(list[0].euSou).toBe('Casal')

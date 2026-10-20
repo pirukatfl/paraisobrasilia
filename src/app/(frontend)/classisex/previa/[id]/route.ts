@@ -4,6 +4,7 @@ import path from 'path'
 import { getPayload } from 'payload'
 import { Readable } from 'stream'
 
+import { coverOf } from '@/lib/assinantes/tier'
 import { relId } from '@/lib/classisex/dto'
 import { privateMediaDir } from '@/lib/classisex/storage'
 import { isAdVisible } from '@/lib/classisex/visibility'
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic'
  * T-04-11: serves only the blurred derivative stored in `previa` (16 px blur, ≤ 480 px, made on
  * the server at upload). The original and its sizes are never read here — only the protected
  * route /area-do-assinante/midia/… opens those.
- * Hidden ads (pending, refused, unpublished, author without access) and videos: 404.
+ * Hidden ads (pending, refused, unpublished), videos and every photo that is not the cover: 404.
  */
 const notFound = () =>
   new Response('Não encontrado.', {
@@ -44,11 +45,19 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   const ad = adId
     ? await payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true, disableErrors: true })
     : null
-  const authorId = relId(ad?.author)
-  const author = authorId
-    ? await payload.findByID({ collection: 'assinantes', id: authorId, depth: 0, overrideAccess: true, disableErrors: true })
-    : null
-  if (!ad || !isAdVisible({ status: ad.status }, author?.accessUntil ?? null, new Date())) return notFound()
+  if (!ad || !isAdVisible({ status: ad.status })) return notFound()
+  // The open area only ever shows the cover (G-04/G-05), whatever the author's tier
+  const { docs: photos } = await payload.find({
+    collection: 'ad-media',
+    where: { and: [{ ad: { equals: adId } }, { kind: { equals: 'foto' } }] },
+    select: { kind: true, order: true },
+    sort: 'order',
+    depth: 0,
+    limit: 50,
+    pagination: false,
+    overrideAccess: true,
+  })
+  if (coverOf(photos as unknown as { id: number; kind: 'foto'; order?: number | null }[])?.id !== mediaId) return notFound()
 
   const blurred = path.join(privateMediaDir(), path.basename(media.previa))
   let size: number

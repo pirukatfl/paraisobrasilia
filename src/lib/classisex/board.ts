@@ -5,6 +5,8 @@
  */
 import type { Payload, Where } from 'payload'
 
+import { tierFromAccessUntil, type Tier } from '../assinantes/tier'
+import { MAX_AD_PHOTOS, MAX_AD_VIDEOS } from './media-messages'
 import {
   relId,
   toMemberAdDTO,
@@ -75,22 +77,57 @@ export async function findVisibleAdDocs(
   }
 }
 
+/**
+ * Tier of each ad's author from the denormalised `assinantes.accessUntil` (same approximation as the
+ * old visibility rule). One query for the whole page (no N+1). Keyed by ad id.
+ */
+export async function authorTiersByAd(payload: Payload, docs: AdDocLike[], now: Date): Promise<Map<number, Tier>> {
+  const out = new Map<number, Tier>()
+  const authorOf = (d: AdDocLike) => relId((d as unknown as { author?: unknown }).author)
+  const authorIds = [...new Set(docs.map(authorOf).filter((v): v is number => v !== null))]
+  const until = new Map<number, string | null>()
+  if (authorIds.length) {
+    const { docs: authors } = await payload.find({
+      collection: 'assinantes',
+      where: { id: { in: authorIds } },
+      select: { accessUntil: true },
+      depth: 0,
+      limit: authorIds.length,
+      pagination: false,
+      overrideAccess: true,
+    })
+    for (const a of authors) until.set(a.id as number, (a as { accessUntil?: string | null }).accessUntil ?? null)
+  }
+  for (const d of docs) {
+    const authorId = authorOf(d)
+    out.set(d.id, tierFromAccessUntil(authorId === null ? null : (until.get(authorId) ?? null), now))
+  }
+  return out
+}
+
 export async function findMemberAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<MemberAdDTO>> {
   const { items, labels, ...rest } = await findVisibleAdDocs(payload, filters, now)
   // One query for the media of the whole page (no N+1)
-  const media = await mediaByAd(
-    payload,
-    items.map((d) => d.id),
-  )
+  const [media, tiers] = await Promise.all([
+    mediaByAd(
+      payload,
+      items.map((d) => d.id),
+    ),
+    authorTiersByAd(payload, items, now),
+  ])
   return {
     ...rest,
     items: items.map((doc) =>
-      toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) }),
+      toMemberAdDTO(doc, {
+        euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
+        media: media.get(doc.id),
+        authorTier: tiers.get(doc.id) ?? 'gratis',
+      }),
     ),
   }
 }
 
-/** One visible ad, or null (unknown, not approved, author without access). */
+/** One visible (approved) ad, or null (unknown, not approved). */
 export async function findVisibleAdDoc(payload: Payload, id: number | string, now: Date): Promise<AdDocLike | null> {
   const numericId = Number(id)
   if (!Number.isInteger(numericId) || numericId <= 0) return null
@@ -107,8 +144,16 @@ export async function findVisibleAdDoc(payload: Payload, id: number | string, no
 export async function findMemberAd(payload: Payload, id: number | string, now: Date): Promise<MemberAdDTO | null> {
   const doc = await findVisibleAdDoc(payload, id, now)
   if (!doc) return null
-  const [labels, media] = await Promise.all([categoryLabels(payload), mediaByAd(payload, [doc.id])])
-  return toMemberAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: media.get(doc.id) })
+  const [labels, media, tiers] = await Promise.all([
+    categoryLabels(payload),
+    mediaByAd(payload, [doc.id]),
+    authorTiersByAd(payload, [doc], now),
+  ])
+  return toMemberAdDTO(doc, {
+    euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
+    media: media.get(doc.id),
+    authorTier: tiers.get(doc.id) ?? 'gratis',
+  })
 }
 
 /**
@@ -128,7 +173,7 @@ export async function findPublicAds(payload: Payload, filters: BoardFilters, now
       select: { ad: true, kind: true, order: true, previa: true },
       sort: 'order',
       depth: 0,
-      limit: ids.length * 6,
+      limit: ids.length * (MAX_AD_PHOTOS + MAX_AD_VIDEOS),
       pagination: false,
       overrideAccess: true,
     })

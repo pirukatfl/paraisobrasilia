@@ -10,7 +10,7 @@ import type { AccessState } from './status'
 
 export type Tier = 'gratis' | 'assinante'
 
-export const TIER_LABELS: Record<Tier, string> = { gratis: 'Conta gratuita', assinante: 'Assinante' }
+export const TIER_LABELS: Record<Tier, 'Conta gratuita' | 'Assinante'> = { gratis: 'Conta gratuita', assinante: 'Assinante' }
 
 export const TIER_LIMITS: Record<Tier, { fotos: number; videos: number; anunciosAtivos: number }> = {
   gratis: { fotos: 1, videos: 0, anunciosAtivos: ACTIVE_LIMIT },
