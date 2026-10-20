@@ -329,23 +329,25 @@ describe('conta gratuita runbook and staff guide (G-01..G-06, 2026-10-20)', () =
 })
 
 describe('Phase 5 staff guide and runbook 7.4 (plan 05-12)', () => {
-  it('the staff guide has Contos, Recados (placeholder) and Mensagens sections', () => {
+  it('the staff guide has the Contos section and the private Recados section (quick recados-privados)', () => {
     const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
     expect(guide).toMatch(/^## Contos$/m)
-    expect(guide).toMatch(/^## Recados$/m)
-    expect(guide).toMatch(/^## Mensagens entre assinantes$/m)
+    expect(guide).toMatch(/^## Recados \(conversas privadas entre assinantes\)$/m)
+    expect(guide).not.toMatch(/^## Mensagens entre assinantes$/m)
     for (const heading of [
       'Publicar um conto',
       'Parágrafos abertos',
       'Contos do site antigo',
-      'Denúncias de mensagens',
-      'Suspender mensagens',
-      'Privacidade das mensagens',
+      'Denúncias de recados',
+      'Suspender o envio de recados',
+      'Privacidade dos recados',
       'Testar com dois assinantes',
     ]) {
       expect(guide).toContain(`### ${heading}`)
     }
-    expect(guide).toContain('Recados: em revisão')
+    expect(guide).not.toContain('em revisão')
+    expect(guide).toContain('Desde 20/10/2026 não existe mais mural de recados')
+    expect(guide).toContain('Recados: N denúncias abertas')
     expect(guide).toContain('A equipe não lê as conversas')
     expect(guide).toContain('janela anônima')
     expect(guide).toContain('menor de idade')

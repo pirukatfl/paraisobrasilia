@@ -47,11 +47,11 @@ created: 2026-10-20
 | 5-04-01 | 04 | 3 | PAINEL-03, D-03 | T-05-14, T-05-15, T-05-23 | bylines/contacts stripped; report without text; idempotent; staff edits kept | unit + int | `pnpm exec vitest run tests/unit/contos-import.test.ts tests/int/contos-import.int.test.ts` | ❌ created by task | ⬜ pending |
 | 5-04-02 | 04 | 3 | PAINEL-03 | T-05-15 | CLI dry-run writes nothing; export refused inside repo; bundle loader idempotent | int | `pnpm exec vitest run tests/int/contos-import.int.test.ts` | ✅ (extended) | ⬜ pending |
 | 5-04-03 | 04 | 3 | PAINEL-03 | T-05-14, T-05-24 | real-dump run + carrier decision | manual (ORCHESTRATOR) | checkpoint | n/a | ⬜ pending |
-| 5-05-01 | 05 | 4 | REC-01, D-01 | T-05-03, T-05-04, T-05-12 | contacts never stored; /api/recados staff-only; cascade; expiry hides | unit + int | `pnpm exec vitest run tests/unit/recado-rules.test.ts tests/int/recados.int.test.ts` | ❌ created by task | ⬜ pending |
-| 5-05-02 | 05 | 4 | REC-01, D-01 | T-05-02, T-05-04, T-05-25 | board only for active; 3 active; owner-only delete; REST 403 in-page | int + e2e | `pnpm exec vitest run tests/int/recados.int.test.ts && pnpm exec playwright test tests/e2e/recados.spec.ts` | ❌ created by task | ⬜ pending |
-| 5-06-01 | 06 | 5 | REC-04 | T-05-04, T-05-11, T-05-26 | moderation endpoints staff-only; audit; status not editable outside the service | int | `pnpm exec vitest run tests/int/recados-moderation.int.test.ts` | ❌ created by task | ⬜ pending |
-| 5-06-02 | 06 | 5 | REC-04 | T-05-26 | panel shows members' view; Salvar after Aprovar keeps status | e2e (desktop) | `pnpm exec playwright test tests/e2e/moderacao-recados.spec.ts --project=desktop` | ❌ created by task | ⬜ pending |
-| 5-07-01 | 07 | 6 | PREV-02, D-05 | T-05-03, T-05-19 | teaser without apelido/id/contact | unit + int | `pnpm exec vitest run tests/unit/recado-teaser.test.ts tests/int/recados.int.test.ts` | ❌ created by task | ⬜ pending |
+| 5-05-01 | 05 | 4 | REC-01, D-01 | T-05-03, T-05-04, T-05-12 | contacts never stored; /api/recados staff-only; cascade; expiry hides | unit + int | `pnpm exec vitest run tests/unit/recado-rules.test.ts tests/int/recados.int.test.ts` | ❌ created by task | ⚠ superseded by quick recados-privados (tests replaced: recados-legado.int, recados-privados.spec) |
+| 5-05-02 | 05 | 4 | REC-01, D-01 | T-05-02, T-05-04, T-05-25 | board only for active; 3 active; owner-only delete; REST 403 in-page | int + e2e | `pnpm exec vitest run tests/int/recados.int.test.ts && pnpm exec playwright test tests/e2e/recados.spec.ts` | ❌ created by task | ⚠ superseded by quick recados-privados (tests replaced: recados-legado.int, recados-privados.spec) |
+| 5-06-01 | 06 | 5 | REC-04 | T-05-04, T-05-11, T-05-26 | moderation endpoints staff-only; audit; status not editable outside the service | int | `pnpm exec vitest run tests/int/recados-moderation.int.test.ts` | ❌ created by task | ⚠ superseded by quick recados-privados (tests replaced: recados-legado.int, recados-privados.spec) |
+| 5-06-02 | 06 | 5 | REC-04 | T-05-26 | panel shows members' view; Salvar after Aprovar keeps status | e2e (desktop) | `pnpm exec playwright test tests/e2e/moderacao-recados.spec.ts --project=desktop` | ❌ created by task | ⚠ superseded by quick recados-privados (tests replaced: recados-legado.int, recados-privados.spec) |
+| 5-07-01 | 07 | 6 | PREV-02, D-05 | T-05-03, T-05-19 | teaser without apelido/id/contact | unit + int | `pnpm exec vitest run tests/unit/recado-teaser.test.ts tests/int/recados.int.test.ts` | ❌ created by task | ⚠ superseded by quick recados-privados (tests replaced: recados-legado.int, recados-privados.spec) |
 | 5-07-02 | 07 | 6 | PREV-02, PREV-04 | T-05-19, T-05-27 | /recados HTML/RSC clean; Assine Já on every preview | unit + e2e | `pnpm exec vitest run tests/unit/sitemap.test.ts && pnpm exec playwright test tests/e2e/previas.spec.ts tests/e2e/shell.spec.ts` | ❌ created by task | ⬜ pending |
 | 5-08-01 | 08 | 7 | REC-02 | T-05-09, T-05-12 | conversations/messages closed to REST for everybody; cascade | unit + int | `pnpm exec vitest run tests/unit/mensagens-rules.test.ts tests/int/mensagens.int.test.ts` | ❌ created by task | ⬜ pending |
 | 5-08-02 | 08 | 7 | REC-02, D-04 | T-05-05, T-05-06, T-05-08, T-05-10 | participant-only; both active; limits; recipient derived server-side; unread count | int | `pnpm exec vitest run tests/int/mensagens.int.test.ts` | ✅ (extended) | ⬜ pending |
@@ -80,9 +80,10 @@ Existing infrastructure covers the phase (Vitest, Playwright, `tests/helpers/see
 |----------|-------------|------------|-------------------|
 | Import of the real 50 contos (counts, flags, carrier decision) | PAINEL-03, D-03 | real dump lives outside git; only the orchestrator may read it | 05-04 Task 3 |
 | Two real phones exchange messages; unread number appears and clears | REC-02, D-04 | real devices and sessions | 05-12 Task 2 step 3 |
-| Staff moderate recados, resolve a message report and publish a conto alone with the guide | REC-04, REC-03, PAINEL-03 | real staff, real admin | 05-12 Task 2 steps 2, 4, 6 |
+| Staff resolve a recado report and publish a conto alone with the guide | REC-03, PAINEL-03 | real staff, real admin | 05-12 Task 2 steps 7, 9 |
 | Imported contos read naturally (bylines/contacts gone, excerpt sensible) | PREV-03, D-03 | editorial judgement | 05-04 Task 3 step 3 and 05-12 Task 2 step 7 |
-| Recados of an expired author disappear at midnight | D-01 | real date passage | test subscriber with 1-day access: the next day after 00:10 Brasília their recado is gone from the board and /recados |
+| Private recado from a paying ad, reply, unread number, block/report | REC-01, REC-02, REC-03 | real devices and sessions | 05-12 Task 2 steps 1, 2, 7 (quick recados-privados D2) |
+| A third subscriber cannot see the conversation | REC-01 | real second account | 05-12 Task 2 step 3 |
 
 ---
 

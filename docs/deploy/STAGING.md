@@ -261,10 +261,10 @@ Vídeo ocupa muito mais espaço que foto, então:
   Ative os backups e crie um snapshot da Hostinger agora.
 
 
-### 7.4 Mensagens e contos (Fase 5)
+### 7.4 Recados e contos (Fase 5)
 
 - **Migrações:** o timer roda sozinho, antes de reiniciar o site, as migrações da Fase 5: `contos`, `contos_wp_bundle`,
-  `mensagens` e `mensagens_seguranca` (mais as de recados, em revisão). Sem SQL manual.
+  `mensagens` e `mensagens_seguranca`. As migrações de recados (`recados`, `recados_moderation`) continuam no histórico; a tabela fica guardada sem tela (mural desativado em 20/10/2026). Nenhuma migração nova. Sem SQL manual.
 - **Sem volume novo e sem rodar o bootstrap de novo:** nada muda no `docker-compose` nem no `.env.staging`.
 - **Contos importados:** a migração `20261020_173000_contos_wp_bundle_carga` (bundle `contos_wp_bundle`) carrega os **48
   contos** do site antigo a partir de `src/migrations/seed/contos-wp.json`, que vai dentro da imagem. É idempotente: rodar de
@@ -276,7 +276,7 @@ Vídeo ocupa muito mais espaço que foto, então:
   ```
 
   Depois abra `/contos` (deve listar os contos) e, no painel, **Contos** (48 importados).
-- **Onde ficam as mensagens:** no Postgres (`pgdata`). O backup de `pgdata` as cobre; backup fora do servidor chega na Fase 7.
+- **Onde ficam os recados:** no Postgres (`pgdata`). O backup de `pgdata` os cobre; backup fora do servidor chega na Fase 7.
 
 ---
 ### 7.5 Conta gratuita (20/10/2026)

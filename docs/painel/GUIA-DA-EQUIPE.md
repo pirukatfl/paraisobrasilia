@@ -361,47 +361,59 @@ Se o trecho ficou curto ou longo demais, mude o número e olhe o quadro de novo.
 Autor e contatos que estavam nos textos antigos foram retirados na importação. Se ainda achar algum telefone ou e-mail dentro
 de um conto, apague e salve.
 
-## Recados
+## Recados (conversas privadas entre assinantes)
 
-Recados: em revisão, seção será atualizada.
+**Desde 20/10/2026 não existe mais mural de recados.** O que antes se chamava "Mensagens" passou a se chamar **Recados**:
+cada recado é uma conversa **privada** entre duas pessoas. Nada precisa de aprovação da equipe e não há fila de recados no
+painel.
 
-## Mensagens entre assinantes
+- **Quem manda:** só **assinante com acesso ativo**, a partir do botão **Enviar recado** no anúncio de **outro assinante
+  que também está com acesso ativo** (pagante para pagante). No próprio anúncio e no anúncio de uma conta gratuita o botão
+  não aparece; no anúncio de conta gratuita o assinante vê "Este anúncio é de uma conta gratuita e não recebe recados. Use os
+  contatos do anúncio."
+- **Quem vê:** a página **Recados** da área do assinante lista **só as conversas que a pessoa começou ou recebeu**. Um
+  terceiro assinante não vê nada e, se digitar o endereço de uma conversa alheia, cai na página "não encontrada".
+- **Conta gratuita:** não manda nem recebe. Na área aberta (ClassiSex) todo cartão mostra o botão **Enviar recado**
+  trancado, que leva ao **Assine Já** (aparece em todos os cartões, para não revelar quem é assinante).
+- **Endereços antigos:** `/recados` leva ao Assine Já e `/area-do-assinante/recados` leva à página Recados.
+- **Recados do mural antigo:** os textos já guardados continuam no banco, sem tela e sem aparecer em lugar nenhum do site.
+  São apagados junto com a conta da pessoa.
+- **Número de novos:** o item **Recados** do menu da área do assinante mostra quantos recados novos a pessoa tem.
 
-Assinantes (com acesso ativo) trocam mensagens privadas, a partir de um anúncio. Quem tem conta gratuita não manda nem
-recebe.
-
-### Privacidade das mensagens
+### Privacidade dos recados
 
 **A equipe não lê as conversas.** Não existe tela com as conversas e vocês não veem quem fala com quem. Só quando alguém
-**denuncia**, a denúncia guarda as **últimas 20 mensagens** daquela conversa, e só isso fica visível para vocês. Os bloqueios
+**denuncia**, a denúncia guarda os **últimos 20 recados** daquela conversa, e só isso fica visível para vocês. Os bloqueios
 são de cada assinante: a equipe não vê nem desfaz.
 
-### Denúncias de mensagens
+### Denúncias de recados
 
-1. No painel inicial, a caixa **Mensagens** mostra "N denúncias abertas". Clique para ver a lista: as **urgentes** (motivo
+1. No painel inicial, a caixa mostra **"Recados: N denúncias abertas"**. Clique para ver a lista: as **urgentes** (motivo
    "Pessoa menor de idade") aparecem primeiro. **Urgente é para agir na hora.**
-2. Abra a denúncia: veja o motivo, os detalhes, o apelido da pessoa denunciada e as mensagens guardadas.
+2. Abra a denúncia: veja o motivo, os detalhes, o apelido da pessoa denunciada e os recados guardados.
 3. Escolha uma ação:
    - **Descartar**: não há problema (denúncia sem fundamento).
    - **Resolver**: o problema existe e foi tratado de outra forma (por exemplo, conversa com a pessoa pelo WhatsApp). A nota
      é obrigatória.
-   - **Suspender mensagens**: a pessoa denunciada deixa de enviar mensagens. A nota é obrigatória e fica no
+   - **Suspender mensagens**: a pessoa denunciada deixa de mandar recados. A nota é obrigatória e fica no
      **Registro de ações**.
-4. Denúncia de **menor de idade**: o site **suspende as mensagens da pessoa denunciada sozinho, na mesma hora**, antes de
+4. Denúncia de **menor de idade**: o site **suspende o envio da pessoa denunciada sozinho, na mesma hora**, antes de
    vocês abrirem a denúncia. Leiam em seguida, decidam se mantêm (**Suspender mensagens**) ou se foi engano (**Descartar** e
    libere a pessoa), e tratem a conta como no ClassiSex (anúncio e acesso).
 
-### Suspender mensagens
+### Suspender o envio de recados
 
-A pessoa suspensa continua entrando no site e usando o resto, mas ao tentar enviar vê "Seu envio de mensagens foi suspenso
+A pessoa suspensa continua entrando no site e usando o resto, mas ao tentar enviar vê "Seu envio de recados foi suspenso
 pela equipe. Fale com a casa pelo WhatsApp." Para **liberar**, abra a conta em **Assinantes** e desmarque **Mensagens
 suspensas**.
 
 ### Testar com dois assinantes
 
-Crie dois assinantes de teste e libere 30 dias para os dois. Entre com um numa **janela anônima** e com o outro em outra
-janela anônima de outro navegador (ou em outro celular). Mande uma mensagem a partir de um anúncio, responda, veja o número de
-mensagens novas, bloqueie e denuncie. Depois exclua os dois assinantes de teste (as conversas vão junto).
+Crie dois assinantes de teste, libere 30 dias para os dois e publique (e aprove) um anúncio para cada. Entre com um numa
+**janela anônima** e com o outro em outra janela anônima de outro navegador (ou em outro celular). Abra o anúncio do outro e
+toque em **Enviar recado**, responda, veja o número de recados novos, bloqueie e denuncie. Libere 30 dias para um terceiro
+assinante de teste e confira que a conversa dos dois **não aparece** na página Recados dele. Depois exclua os assinantes de
+teste (as conversas vão junto).
 
 ## Contas gratuitas
 
@@ -417,7 +429,7 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
 | Vídeos por anúncio | não | até 2 |
 | Anúncios ativos | até 3 | até 3 |
 | Ver anúncios do ClassiSex | só os seus | todos, com WhatsApp e Telegram |
-| Mensagens e recados | não | sim |
+| Recados (conversas privadas) | não | manda e recebe |
 | Contos completos | só o início | sim |
 
 - Esse mesmo quadro aparece para a pessoa em **/cadastro**, **/assine-ja**, **Meus anúncios** e **Novo anúncio**, com o
@@ -427,7 +439,7 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
 - Na tela de **Moderação** do anúncio há a linha **"Conta do anunciante"**: "Conta gratuita — no ClassiSex aparece só a
   capa, sem vídeos" ou "Assinante". Use para saber o que a pessoa vai mostrar depois de aprovado.
 - O assinante que vê o anúncio de uma conta gratuita enxerga o **WhatsApp e o Telegram** do anúncio, mas **não tem o botão
-  "Enviar mensagem"** (conta gratuita não recebe mensagens). Conta gratuita também não manda mensagens nem recados.
+  "Enviar recado"** (conta gratuita não recebe recados). Conta gratuita também não manda recados.
 
 ### Cadastro pelo site
 
@@ -478,7 +490,7 @@ Mudou a regra antiga ("anúncio some quando vence"). Agora, quando a assinatura 
 - as outras fotos e os vídeos **não são apagados**: ficam **Guardados** e aparecem de novo quando a pessoa renovar. Na tela
   de edição ela vê o aviso "Guardada: volta a aparecer quando você assinar";
 - a pessoa não pode acrescentar foto enquanto já tem uma, nem enviar vídeo, até assinar de novo;
-- **Recados e mensagens** continuam como antes: saem do ar com a assinatura ("Fora do ar: assinatura vencida").
+- **Recados**: a pessoa sem assinatura ativa não manda nem recebe recados (as conversas ficam guardadas e voltam quando ela renovar).
 
 Isso vale também para contas **encerradas** pela equipe. Para tirar um anúncio do ar de verdade, use **Despublicar**.
 

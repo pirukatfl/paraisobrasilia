@@ -151,6 +151,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-20 | classisex-ajustes | ClassiSex per client choices: 10 photos + 2 videos, WhatsApp/Telegram only, Casal/Mulher/Homem/Trans, required apelido, public preview = apelido + tipo + 1 blurred photo (see .planning/quick/2026-10-20-classisex-ajustes/) |
 | 2026-10-20 | classisex-midia-na-criacao | Photos and videos chosen in the create-ad form (see .planning/quick/2026-10-20-classisex-midia-na-criacao/) |
 | 2026-10-20 | email-hostinger | Transactional e-mail through the Hostinger SMTP; /esqueci-senha (see .planning/quick/2026-10-20-email-hostinger/) |
+| 2026-10-20 | recados-privados | R-01 UNIFICAR: mural and recados moderation removed; Recados = private conversations between paying members, started by Enviar recado on a paying member's ad; locked button on the open ClassiSex; /recados -> /assine-ja (308); legacy recados table hidden, no migration (R-01..R-08; see .planning/quick/2026-10-20-recados-privados/). The 05-12 client checklist uses step D2 for recados |
 | 2026-10-20 | conta-gratuita | Open sign-up with e-mail confirmation, free vs paying tiers on the ClassiSex, ads stay online as free (cover only) after expiry, Grátis x Assinante table (G-01..G-06); migration 20261020_172550_conta_gratuita; gate: Vitest 539, Playwright 391 passed / 0 failed, build ok (see .planning/quick/2026-10-20-conta-gratuita/) |
 
 ## Deferred Items

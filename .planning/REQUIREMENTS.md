@@ -21,7 +21,7 @@
 ### Área aberta — Prévias e contos (PREV)
 
 - [x] **PREV-01**: Visitante vê chamadas (prévias) de perfis do ClassiSex, sem nenhum contato ou dado identificável
-- [x] **PREV-02**: Visitante vê chamadas de recados/mensagens, sem contato
+- [x] **PREV-02**: Visitante vê o convite para mandar recados (botão Enviar recado trancado que leva ao Assine Já), sem contato (revisado 2026-10-20, quick recados-privados)
 - [x] **PREV-03**: Visitante lê o início de cada conto; o restante aparece só para assinantes
 - [x] **PREV-04**: Toda prévia tem chamada clara para assinar ("Assine Já")
 
@@ -53,10 +53,10 @@
 
 ### Recados e mensagens (REC)
 
-- [x] **REC-01**: Assinante publica recado visível para outros assinantes
-- [x] **REC-02**: Assinante envia mensagem a outro perfil e vê as respostas
+- [x] **REC-01**: Assinante manda recado privado ao dono de um anúncio pagante e vê só os recados que mandou ou recebeu (revisado 2026-10-20, quick recados-privados)
+- [x] **REC-02**: Assinante envia mensagem a outro perfil e vê as respostas (recados = conversas privadas)
 - [x] **REC-03**: Assinante bloqueia ou denuncia quem envia mensagem
-- [x] **REC-04**: Recados passam por moderação da equipe
+- [x] ~~Recados passam por moderação da equipe~~ **REC-04**: substituído em 2026-10-20 (R-01): sem mural, recados são privados, com bloqueio e denúncia (REC-03)
 
 ### Painel da equipe (PAINEL)
 
@@ -74,7 +74,7 @@
 Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisões G-01..G-06).
 
 - [x] **CONTA-01**: Qualquer pessoa com 18+ cria a própria conta em /cadastro (e-mail, senha, apelido), aceita Termos e Privacidade e confirma o e-mail antes de entrar; a equipe continua criando contas
-- [x] **CONTA-02**: Conta gratuita cria anúncio com 1 foto e sem vídeo, vê só os próprios anúncios e não troca mensagens nem recados
+- [x] **CONTA-02**: Conta gratuita cria anúncio com 1 foto e sem vídeo, vê só os próprios anúncios e não manda nem recebe recados
 - [x] **CONTA-03**: Ao vencer a assinatura o anúncio continua no ar como gratuito (só a capa, sem vídeos); as outras mídias ficam guardadas e voltam ao renovar
 - [x] **CONTA-04**: O quadro Grátis × Assinante é visível em /cadastro, Meus anúncios, Novo anúncio e /assine-ja, e a equipe vê a conta e a origem na lista de assinantes e na moderação
 
@@ -144,19 +144,19 @@ Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisõ
 | PAINEL-07 | Fase 4 | Complete |
 | PREV-01 | Fase 4 | Complete |
 | PAINEL-03 | Fase 5 | Complete |
-| PREV-02 | Fase 5 | Complete |
+| PREV-02 | Fase 5; revisado em Quick 2026-10-20-recados-privados | Complete |
 | PREV-03 | Fase 5 | Complete |
 | PREV-04 | Fase 5 | Complete |
-| REC-01 | Fase 5 | Complete |
+| REC-01 | Fase 5; revisado em Quick 2026-10-20-recados-privados | Complete |
 | REC-02 | Fase 5 | Complete |
 | REC-03 | Fase 5 | Complete |
-| REC-04 | Fase 5 | Complete |
+| REC-04 | Fase 5; substituído em Quick 2026-10-20-recados-privados | Complete |
 | MIG-01 | Fase 6 | Pending |
 | MIG-02 | Fase 6 | Pending |
 | MIG-03 | Fase 6 | Pending |
 | MIG-04 | Fase 7 | Pending |
 | CONTA-01 | Quick 2026-10-20-conta-gratuita | Complete |
-| CONTA-02 | Quick 2026-10-20-conta-gratuita | Complete |
+| CONTA-02 | Quick 2026-10-20-conta-gratuita; texto revisado em Quick 2026-10-20-recados-privados | Complete |
 | CONTA-03 | Quick 2026-10-20-conta-gratuita | Complete |
 | CONTA-04 | Quick 2026-10-20-conta-gratuita | Complete |
 
