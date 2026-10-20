@@ -170,6 +170,13 @@ export const Contos: CollectionConfig = {
           : CONTO_MESSAGES.open,
     },
     {
+      // What visitors will read, from the same splitConto rule as the public page (05-03)
+      name: 'trechoAberto',
+      type: 'ui',
+      label: 'Trecho aberto',
+      admin: { components: { Field: '/components/admin/contos/TrechoAbertoPanel#TrechoAbertoPanel' } },
+    },
+    {
       name: 'wpId',
       type: 'number',
       unique: true,
