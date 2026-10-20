@@ -16,6 +16,7 @@ import * as migration_20261019_194154_ad_media from './20261019_194154_ad_media'
 import * as migration_20261019_211202_ad_reports from './20261019_211202_ad_reports';
 import * as migration_20261020_022629_classisex_ajustes from './20261020_022629_classisex_ajustes';
 import * as migration_20261020_131108_contos from './20261020_131108_contos';
+import * as migration_20261020_132231_contos_wp_bundle from './20261020_132231_contos_wp_bundle';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20261020_131108_contos.up,
     down: migration_20261020_131108_contos.down,
-    name: '20261020_131108_contos'
+    name: '20261020_131108_contos',
+  },
+  {
+    up: migration_20261020_132231_contos_wp_bundle.up,
+    down: migration_20261020_132231_contos_wp_bundle.down,
+    name: '20261020_132231_contos_wp_bundle'
   },
 ];

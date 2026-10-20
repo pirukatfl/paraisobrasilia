@@ -52,3 +52,8 @@ next-env.d.ts
 
 # Claude Code / GSD tooling (local only)
 .claude/
+
+# WordPress import (05-04): the dump and raw exports never enter git (T-05-15)
+/private/
+*.sql.gz
+contos-export*.json
