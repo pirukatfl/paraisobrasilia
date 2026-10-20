@@ -176,17 +176,17 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
   5. Equipe publica contos e define o trecho aberto sem ajuda técnica
 
 **Plans**: 12 plans
-- [ ] 05-01-PLAN.md — Importação dos contos (núcleo): leitor do dump do WP e HTML/Elementor → Lexical, só com dados sintéticos (wave 1)
-- [ ] 05-02-PLAN.md — Contos no painel: coleção com rascunho, "Parágrafos abertos" e prévia do trecho aberto (wave 1)
-- [ ] 05-03-PLAN.md — Leitura dos contos: início aberto com Assine Já, texto completo para assinantes, menu e sitemap (wave 2)
-- [ ] 05-04-PLAN.md — Script idempotente de importação (WP_DUMP_PATH), pacote revisado + migração; execução no dump real pelo orquestrador (wave 3)
-- [ ] 05-05-PLAN.md — Recados: apelido, envio com contatos removidos, limite de 3, mural do assinante (wave 4)
-- [ ] 05-06-PLAN.md — Moderação de recados: aprovar, recusar, despublicar, fila e registro (wave 5)
-- [ ] 05-07-PLAN.md — Prévia pública /recados sem apelido nem contato e Assine Já em todas as prévias (wave 6)
-- [ ] 05-08-PLAN.md — Mensagens privadas (dados e regras): conversas fechadas, só ativos, a partir de anúncio/recado, não lidas (wave 7)
-- [ ] 05-09-PLAN.md — Mensagens na tela: Enviar mensagem, caixa de entrada, conversa, contador no menu (wave 8)
-- [ ] 05-10-PLAN.md — Bloquear e denunciar mensagens; equipe resolve e suspende envio (wave 9)
-- [ ] 05-11-PLAN.md — Matriz de vazamento da Fase 5: recados, mensagens, bloqueio e contos (wave 10)
+- [x] 05-01-PLAN.md — Importação dos contos (núcleo): leitor do dump do WP e HTML/Elementor → Lexical, só com dados sintéticos (wave 1)
+- [x] 05-02-PLAN.md — Contos no painel: coleção com rascunho, "Parágrafos abertos" e prévia do trecho aberto (wave 1)
+- [x] 05-03-PLAN.md — Leitura dos contos: início aberto com Assine Já, texto completo para assinantes, menu e sitemap (wave 2)
+- [x] 05-04-PLAN.md — Script idempotente de importação (WP_DUMP_PATH), pacote revisado + migração; execução no dump real pelo orquestrador (wave 3)
+- [x] 05-05-PLAN.md — Recados: apelido, envio com contatos removidos, limite de 3, mural do assinante (wave 4)
+- [x] 05-06-PLAN.md — Moderação de recados: aprovar, recusar, despublicar, fila e registro (wave 5)
+- [x] 05-07-PLAN.md — Prévia pública /recados sem apelido nem contato e Assine Já em todas as prévias (wave 6)
+- [x] 05-08-PLAN.md — Mensagens privadas (dados e regras): conversas fechadas, só ativos, a partir de anúncio/recado, não lidas (wave 7)
+- [x] 05-09-PLAN.md — Mensagens na tela: Enviar mensagem, caixa de entrada, conversa, contador no menu (wave 8)
+- [x] 05-10-PLAN.md — Bloquear e denunciar mensagens; equipe resolve e suspende envio (wave 9)
+- [x] 05-11-PLAN.md — Matriz de vazamento da Fase 5: recados, mensagens, bloqueio e contos (wave 10)
 - [ ] 05-12-PLAN.md — Guia, runbook, smoke, deploy e conferência do cliente (wave 11)
 **UI hint**: yes
 
@@ -225,6 +225,6 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
 | 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
-| 5. Recados, mensagens e contos | 0/12 | Planned | - |
+| 5. Recados, mensagens e contos | 11/12 | In Progress|  |
 | 6. Migração do WordPress | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |

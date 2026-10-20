@@ -21,9 +21,9 @@
 ### Área aberta — Prévias e contos (PREV)
 
 - [x] **PREV-01**: Visitante vê chamadas (prévias) de perfis do ClassiSex, sem nenhum contato ou dado identificável
-- [ ] **PREV-02**: Visitante vê chamadas de recados/mensagens, sem contato
-- [ ] **PREV-03**: Visitante lê o início de cada conto; o restante aparece só para assinantes
-- [ ] **PREV-04**: Toda prévia tem chamada clara para assinar ("Assine Já")
+- [x] **PREV-02**: Visitante vê chamadas de recados/mensagens, sem contato
+- [x] **PREV-03**: Visitante lê o início de cada conto; o restante aparece só para assinantes
+- [x] **PREV-04**: Toda prévia tem chamada clara para assinar ("Assine Já")
 
 ### Área aberta — Institucional (INST)
 
@@ -53,16 +53,16 @@
 
 ### Recados e mensagens (REC)
 
-- [ ] **REC-01**: Assinante publica recado visível para outros assinantes
-- [ ] **REC-02**: Assinante envia mensagem a outro perfil e vê as respostas
-- [ ] **REC-03**: Assinante bloqueia ou denuncia quem envia mensagem
-- [ ] **REC-04**: Recados passam por moderação da equipe
+- [x] **REC-01**: Assinante publica recado visível para outros assinantes
+- [x] **REC-02**: Assinante envia mensagem a outro perfil e vê as respostas
+- [x] **REC-03**: Assinante bloqueia ou denuncia quem envia mensagem
+- [x] **REC-04**: Recados passam por moderação da equipe
 
 ### Painel da equipe (PAINEL)
 
 - [x] **PAINEL-01**: Equipe publica, edita e despublica festas com flyer, sem ajuda técnica
 - [x] **PAINEL-02**: Equipe envia fotos e vídeos do espaço e das modelos, registrando a autorização de uso de imagem
-- [ ] **PAINEL-03**: Equipe publica contos e define o trecho aberto
+- [x] **PAINEL-03**: Equipe publica contos e define o trecho aberto
 - [x] **PAINEL-04**: Equipe edita Quem Somos, Normas, Regras, Dicas e dados de contato
 - [x] **PAINEL-05**: Equipe libera, renova e encerra a assinatura de um cliente, registrando o pagamento
 - [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
@@ -134,14 +134,14 @@
 | CLAS-06 | Fase 4 | Complete |
 | PAINEL-07 | Fase 4 | Complete |
 | PREV-01 | Fase 4 | Complete |
-| PAINEL-03 | Fase 5 | Pending |
-| PREV-02 | Fase 5 | Pending |
-| PREV-03 | Fase 5 | Pending |
-| PREV-04 | Fase 5 | Pending |
-| REC-01 | Fase 5 | Pending |
-| REC-02 | Fase 5 | Pending |
-| REC-03 | Fase 5 | Pending |
-| REC-04 | Fase 5 | Pending |
+| PAINEL-03 | Fase 5 | Complete |
+| PREV-02 | Fase 5 | Complete |
+| PREV-03 | Fase 5 | Complete |
+| PREV-04 | Fase 5 | Complete |
+| REC-01 | Fase 5 | Complete |
+| REC-02 | Fase 5 | Complete |
+| REC-03 | Fase 5 | Complete |
+| REC-04 | Fase 5 | Complete |
 | MIG-01 | Fase 6 | Pending |
 | MIG-02 | Fase 6 | Pending |
 | MIG-03 | Fase 6 | Pending |
