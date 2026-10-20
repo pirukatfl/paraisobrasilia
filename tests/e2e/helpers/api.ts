@@ -321,6 +321,42 @@ export async function staffApi(request: APIRequestContext) {
       const res = await request.patch(`/api/contos/${id}`, { headers, data })
       return (await check(res, 'update conto')).doc
     },
+    /** Recado written by staff REST (05-05); the member flow goes through the server action instead. */
+    async createRecado(data: {
+      author: number
+      apelido?: string
+      texto?: string
+      status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+      publishedAt?: string
+    }) {
+      const status = data.status ?? 'pendente'
+      const now = new Date().toISOString()
+      const res = await request.post('/api/recados', {
+        headers,
+        data: {
+          apelido: 'Apelido Teste',
+          texto: 'Recado de teste criado pela equipe.',
+          submittedAt: now,
+          ...data,
+          ...(status === 'aprovado' ? { publishedAt: data.publishedAt ?? now } : {}),
+          status,
+        },
+      })
+      return (await check(res, 'create recado')).doc
+    },
+    /** Staff status change by REST (05-06 adds the audited endpoints). */
+    async setRecadoStatus(id: number, status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado', motivo?: string) {
+      const res = await request.patch(`/api/recados/${id}`, {
+        headers,
+        data: { status, ...(status === 'aprovado' ? { publishedAt: new Date().toISOString() } : {}), ...(motivo ? { motivo } : {}) },
+      })
+      return (await check(res, 'set recado status')).doc
+    },
+    async findRecados(where = '') {
+      const res = await request.get(`/api/recados?limit=100&depth=0&sort=-createdAt${where ? `&${where}` : ''}`, { headers })
+      if (!res.ok()) throw new Error(`find recados failed: ${res.status()}`)
+      return ((await res.json()) as { docs: { id: number; apelido: string; texto: string; status: string; author?: number }[] }).docs
+    },
     async deleteAll(collection: string) {
       const res = await request.delete(`/api/${collection}?where[id][exists]=true&limit=500`, { headers })
       if (!res.ok()) throw new Error(`delete ${collection} failed: ${res.status()}`)
