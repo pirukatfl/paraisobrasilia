@@ -235,6 +235,12 @@ export interface Assinante {
    */
   apelido?: string | null;
   /**
+   * Quem criou a conta: a equipe ou a própria pessoa pelo site.
+   */
+  origem?: ('equipe' | 'cadastro') | null;
+  declaracao18Em?: string | null;
+  termosAceitosEm?: string | null;
+  /**
    * Só a equipe vê. Não anote dados bancários nem comprovantes.
    */
   staffNotes?: string | null;
@@ -268,6 +274,8 @@ export interface Assinante {
   salt?: string | null;
   hash?: string | null;
   resetPasswordRequestedAt?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -1234,6 +1242,9 @@ export interface AssinantesSelect<T extends boolean = true> {
   name?: T;
   whatsapp?: T;
   apelido?: T;
+  origem?: T;
+  declaracao18Em?: T;
+  termosAceitosEm?: T;
   staffNotes?: T;
   mensagensSuspensas?: T;
   accessUntil?: T;
@@ -1248,6 +1259,8 @@ export interface AssinantesSelect<T extends boolean = true> {
   salt?: T;
   hash?: T;
   resetPasswordRequestedAt?: T;
+  _verified?: T;
+  _verificationToken?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:

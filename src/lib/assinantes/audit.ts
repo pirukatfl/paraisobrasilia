@@ -61,7 +61,7 @@ export const SECRET_FIELDS = [
   'updatedAt',
   'createdAt',
 ]
-const SKIPPED_FIELDS = [...SECRET_FIELDS, 'id', 'collection', '_strategy', '_verified', 'periodos', 'historico']
+const SKIPPED_FIELDS = [...SECRET_FIELDS, 'id', 'collection', '_strategy', '_verificationToken', 'periodos', 'historico']
 /** Changes reported without their content (free text may hold personal data). */
 const REDACTED_FIELDS = ['staffNotes']
 

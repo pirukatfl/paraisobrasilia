@@ -21,6 +21,7 @@ import * as migration_20261020_132752_recados from './20261020_132752_recados';
 import * as migration_20261020_133947_recados_moderation from './20261020_133947_recados_moderation';
 import * as migration_20261020_135558_mensagens from './20261020_135558_mensagens';
 import * as migration_20261020_141021_mensagens_seguranca from './20261020_141021_mensagens_seguranca';
+import * as migration_20261020_172550_conta_gratuita from './20261020_172550_conta_gratuita';
 
 export const migrations = [
   {
@@ -136,6 +137,11 @@ export const migrations = [
   {
     up: migration_20261020_141021_mensagens_seguranca.up,
     down: migration_20261020_141021_mensagens_seguranca.down,
-    name: '20261020_141021_mensagens_seguranca'
+    name: '20261020_141021_mensagens_seguranca',
+  },
+  {
+    up: migration_20261020_172550_conta_gratuita.up,
+    down: migration_20261020_172550_conta_gratuita.down,
+    name: '20261020_172550_conta_gratuita'
   },
 ];

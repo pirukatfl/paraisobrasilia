@@ -14,6 +14,7 @@ import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
 import { expire } from '../lib/cache/expire'
 import { emailEnabled } from '../lib/email/config'
+import { buildVerifyEmail, VERIFY_SUBJECT, verifyUrl } from '../lib/email/verify-account'
 import { recadoApelidoError } from '../lib/recados/rules'
 
 export const MIN_PASSWORD_LENGTH = 8
@@ -26,9 +27,13 @@ const secureCookies = (process.env.NEXT_PUBLIC_SERVER_URL ?? '').startsWith('htt
 
 /**
  * Guards the operations Payload exposes for every auth collection.
- * - create: only staff, or trusted server code (migrations, imports, tests) via `req.context.trustedCreate`.
+ * - create: only staff, trusted server code (migrations, imports, tests) via `req.context.trustedCreate`,
+ *   or the public sign-up service (`req.context.selfSignup`, G-01) while e-mail is configured.
  *   Closes POST /api/assinantes/first-register, which creates with overrideAccess while the
- *   collection is empty (T-03-02).
+ *   collection is empty (T-03-02). Staff and trusted creates are born confirmed and never send the
+ *   verification e-mail (T-CG-07); a self sign-up is born unconfirmed with origem 'cadastro' and
+ *   server-clock consent dates, whatever the input says (T-CG-05, T-CG-11). Payload's own
+ *   verification mail is always off: the sign-up service sends it (background, neutral answer).
  * - forgotPassword: only the staff "link de nova senha" service (`req.context.staffPasswordLink`)
  *   or the rate-limited /esqueci-senha action (`req.context.emailedPasswordLink`, and only while
  *   e-mail is configured). The public REST endpoint cannot set either flag, so it stays closed
@@ -37,8 +42,33 @@ const secureCookies = (process.env.NEXT_PUBLIC_SERVER_URL ?? '').startsWith('htt
  */
 const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }) => {
   const staff = isStaff({ req })
-  if (operation === 'create' && !staff && req.context?.trustedCreate !== true) {
-    throw new Forbidden(req.t)
+  if (operation === 'create') {
+    const selfSignup = !staff && req.context?.trustedCreate !== true && req.context?.selfSignup === true && emailEnabled()
+    if (!staff && req.context?.trustedCreate !== true && !selfSignup) throw new Forbidden(req.t)
+    ;(args as { disableVerificationEmail?: boolean }).disableVerificationEmail = true
+    const createArgs = args as { data?: Record<string, unknown> }
+    const input = createArgs.data ?? {}
+    if (selfSignup) {
+      const nowIso = new Date().toISOString()
+      const {
+        accessUntil: _a,
+        staffNotes: _s,
+        mensagensSuspensas: _m,
+        mustChangePassword: _p,
+        _verificationToken: _t,
+        ...rest
+      } = input
+      void [_a, _s, _m, _p, _t]
+      createArgs.data = {
+        ...rest,
+        _verified: false,
+        origem: 'cadastro',
+        declaracao18Em: nowIso,
+        termosAceitosEm: nowIso,
+      }
+    } else {
+      createArgs.data = { ...input, _verified: true }
+    }
   }
   if (operation === 'forgotPassword') {
     // Staff link (no e-mail), or the "Esqueci minha senha" action — only while e-mail is configured
@@ -177,6 +207,10 @@ const FIELD_LABELS: Record<string, string> = {
   accessUntil: 'acesso até',
   apelido: 'apelido',
   mensagensSuspensas: 'mensagens suspensas',
+  _verified: 'e-mail confirmado',
+  origem: 'origem da conta',
+  declaracao18Em: 'declaração de 18+',
+  termosAceitosEm: 'aceite dos Termos',
 }
 
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
@@ -192,10 +226,14 @@ const auditAccount: CollectionAfterChangeHook = async ({ doc, previousDoc, opera
   if (operation === 'create') {
     const details = diffForAudit(null, doc)
     delete details.mustChangePassword
+    delete details._verified
     await writeAudit(req, {
       action: 'conta-criada',
       assinante: doc,
-      summary: `Conta criada${passwordSetBy === 'equipe' ? ' com senha provisória' : ''}: ${assinanteLabel(doc)}`,
+      summary:
+        req.context?.selfSignup === true
+          ? `Conta criada pelo cadastro do site: ${assinanteLabel(doc)}`
+          : `Conta criada${passwordSetBy === 'equipe' ? ' com senha provisória' : ''}: ${assinanteLabel(doc)}`,
       details,
     })
     return doc
@@ -264,6 +302,17 @@ export const Assinantes: CollectionConfig = {
     cookies: { sameSite: 'Lax', secure: secureCookies },
     // Staff-generated "nova senha" link (D-04): 48 hours, single use
     forgotPassword: { expiration: 172_800_000 },
+    // G-01: e-mail confirmation for self sign-ups. Every account created by staff, seeds or the
+    // migration is confirmed (guardOperations / migration backfill), otherwise the JWT strategy
+    // would log it out. The link goes to /cadastro/confirmar, never to the admin.
+    verify: {
+      generateEmailSubject: () => VERIFY_SUBJECT,
+      generateEmailHTML: ({ token, user }) =>
+        buildVerifyEmail({
+          name: String((user as { name?: string } | undefined)?.name ?? ''),
+          url: verifyUrl(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000', String(token)),
+        }).html,
+    },
   },
   access: {
     // T-03-07: a subscriber reads only its own account
@@ -324,6 +373,33 @@ export const Assinantes: CollectionConfig = {
         const apelido = String(value ?? '').replace(/\s+/g, ' ').trim()
         return apelido ? (recadoApelidoError(apelido) ?? true) : true
       },
+    },
+    {
+      name: 'origem',
+      type: 'select',
+      defaultValue: 'equipe',
+      label: 'Origem da conta',
+      options: [
+        { label: 'Equipe', value: 'equipe' },
+        { label: 'Cadastro no site', value: 'cadastro' },
+      ],
+      // Set by the server only (guardOperations); staff read it, nobody edits it
+      access: { create: () => false, update: () => false },
+      admin: { readOnly: true, position: 'sidebar', description: 'Quem criou a conta: a equipe ou a própria pessoa pelo site.' },
+    },
+    {
+      name: 'declaracao18Em',
+      type: 'date',
+      label: 'Declarou 18+ em',
+      access: { create: () => false, update: () => false },
+      admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' } },
+    },
+    {
+      name: 'termosAceitosEm',
+      type: 'date',
+      label: 'Aceitou Termos e Privacidade em',
+      access: { create: () => false, update: () => false },
+      admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' } },
     },
     {
       name: 'staffNotes',
