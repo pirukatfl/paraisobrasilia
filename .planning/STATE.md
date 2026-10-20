@@ -144,6 +144,12 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 - Our environment cannot reach novo.swingbrasilia.com.br (egress proxy) nor SSH to the VPS: staging verification depends on the client or CI
 - The /mnt/project-files mount rewrites committed image files about 30 s after write, so the canonical working tree shows modified PNG/JPG/WebP; blobs in git are correct
 
+## Quick Tasks Completed
+
+| Date | Slug | Description |
+|------|------|-------------|
+| 2026-10-20 | classisex-ajustes | ClassiSex per client choices: 10 photos + 2 videos, WhatsApp/Telegram only, Casal/Mulher/Homem/Trans, required apelido, public preview = apelido + tipo + 1 blurred photo (see .planning/quick/2026-10-20-classisex-ajustes/) |
+
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |

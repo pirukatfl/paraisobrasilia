@@ -245,8 +245,11 @@ painel ou vê a área do assinante com o usuário errado.
 ## ClassiSex
 
 No site novo o ClassiSex é um **mural de anúncios** — o roteiro antigo chamava de "perfis". O assinante com acesso ativo
-escreve o anúncio, com fotos e um vídeo curto; **nada vai ao ar sem a sua aprovação**. Quem não é assinante vê só uma
-prévia, com as fotos desfocadas e sem nenhum contato.
+escreve o anúncio, com **até 10 fotos e até 2 vídeos curtos (cada um com até 60 segundos)**; **nada vai ao ar sem a sua
+aprovação**. Quem não é assinante vê só uma prévia: o **apelido**, o **tipo** (Casal, Mulher, Homem ou Trans) e **uma foto
+desfocada**, com o botão "Assine para ver". O texto, a cidade, todas as fotos, os vídeos e os contatos (**WhatsApp e
+Telegram**, pelo menos um; não há campo de e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
+vence, os anúncios da pessoa saem do ar até ela renovar.
 
 ### Fila de moderação
 
@@ -257,16 +260,17 @@ prévia, com as fotos desfocadas e sem nenhum contato.
 ### Aprovar, recusar ou despublicar
 
 1. Abra o anúncio. No topo está o quadro **Moderação**.
-2. Confira **Como aparece na área aberta**: é exatamente o que o visitante vai ver (telefones, e-mails e links são trocados
-   por "[contato só para assinantes]"). Confira também as fotos e o vídeo em **Fotos e vídeo**.
-3. Se estiver tudo certo, clique em **Aprovar**. Você pode corrigir o texto antes de aprovar.
+2. Confira **Como aparece na área aberta**: é exatamente o que o visitante vai ver (apelido, tipo e uma foto desfocada).
+   O **apelido** não pode ter telefone, e-mail, @ ou link: o site já recusa isso ao salvar, mas confira mesmo assim. Confira
+   também o texto, as fotos e os vídeos em **Fotos e vídeos**.
+3. Se estiver tudo certo, clique em **Aprovar**. Você pode corrigir o apelido ou o texto antes de aprovar.
 4. **Recusar** (anúncio em análise) e **Despublicar** (anúncio que já está no ar) pedem sempre um **motivo**, e o
    anunciante lê esse motivo em Meus anúncios. Escreva de forma simples: "Telefone escrito no texto", "Foto de outra pessoa".
 5. Tudo o que você faz fica no **Registro de ações**.
 
 ### O que recusar
 
-- contato escrito no texto ou dentro das fotos (telefone, @, link);
+- contato escrito no apelido, no texto ou dentro das fotos (telefone, @, link);
 - foto ou vídeo de outra pessoa, sem autorização dela;
 - **qualquer sinal de menor de idade**;
 - golpe ou cobrança;
@@ -293,13 +297,14 @@ prévia, com as fotos desfocadas e sem nenhum contato.
 
 ### Opções "Eu sou"
 
-Em **ClassiSex → Opções "Eu sou"** você edita o nome, a ordem e se a opção está ativa (Casal, Solteiro, Solteira…).
+Em **ClassiSex → Opções "Eu sou"** você edita o nome, a ordem e se a opção está ativa (hoje: Casal, Mulher, Homem e Trans). O
+visitante e o assinante filtram os anúncios por essa opção.
 Para parar de usar uma opção, **desative**; **não apague** uma opção que já está em uso.
 
 ### Fotos e vídeos dos anúncios
 
-- Ficam **fora da área pública**: só a equipe, o dono do anúncio e assinantes ativos abrem. O visitante vê apenas a
-  versão desfocada das fotos, e um link de foto copiado não abre fora da área do assinante.
+- Ficam **fora da área pública**: só a equipe, o dono do anúncio e assinantes ativos abrem. O visitante vê apenas uma
+  versão desfocada da primeira foto, e um link de foto copiado não abre fora da área do assinante.
 - **Pedido de remoção** (como em Remoção de imagem): em até **24 horas**, abra o anúncio, apague a foto ou o vídeo em
   **ClassiSex → Mídias de anúncios → ⋯ → Excluir**, ou **Excluir o anúncio inteiro**. Na dúvida, remova.
 - Quando a pessoa pede para apagar a conta, **Excluir** a conta do assinante apaga também os anúncios, as fotos e os vídeos.

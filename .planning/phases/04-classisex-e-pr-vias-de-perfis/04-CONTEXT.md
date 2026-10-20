@@ -20,6 +20,15 @@
 - **D-07 Lista:** mais recentes primeiro, filtro por Eu sou e cidade, paginação.
 - **D-08 Denúncia (CLAS-05):** assinante denuncia um anúncio com motivo; a equipe vê na fila e pode despublicar.
 
+## Revisão 2026-10-20 (escolhas explícitas do cliente)
+Valem no lugar do que D-01, D-04 e D-07 diziam; o restante segue como está.
+- **Mídia por anúncio:** até **10 fotos** e até **2 vídeos** de até 60 s cada (antes: 5 fotos e 1 vídeo).
+- **Contatos (D-01):** só **WhatsApp e Telegram**, ambos opcionais, pelo menos um. O campo e-mail foi removido do anúncio (coluna apagada; ficou só dado de teste).
+- **Organização por tipo (D-01, D-07):** "Eu sou" = **Casal, Mulher, Homem, Trans** (continua editável no painel). Migração renomeia Solteira→Mulher e Solteiro→Homem (os anúncios mantêm a referência) e cria Trans. Filtro por tipo; o filtro por cidade fica só na área do assinante.
+- **Apelido (novo campo obrigatório):** até 40 caracteres, passa pela mesma redação de contatos e é recusado se tiver telefone, e-mail, @ ou link. Anúncios que já existiam recebem "Anônimo".
+- **Área aberta (D-04):** o visitante vê só **apelido, tipo e uma foto desfocada** (a capa), com o botão "Assine para ver". Sem texto, cidade, vídeo ou contato. O assinante continua vendo tudo (apelido, tipo, cidade, texto, fotos, vídeos e contatos).
+- **Vencimento (D-06):** mantido; os anúncios somem quando a assinatura vence.
+
 ## Deferred
 - Migração dos 205 anúncios antigos (decisão LGPD do cliente) — Fase 6.
 - Mensagens entre assinantes — Fase 5.

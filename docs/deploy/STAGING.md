@@ -215,6 +215,9 @@ Vídeo ocupa muito mais espaço que foto, então:
 
 - **Migrações:** a Fase 4 traz quatro migrações (`classisex_ads` com as opções "Eu sou" iniciais, `classisex_moderation`,
   `ad_media`, `ad_reports`). O timer roda `migrate` antes de reiniciar o site; não há SQL manual.
+  Depois dela, a migração `classisex_ajustes` (revisão de 20/10/2026) acrescenta o apelido (anúncios antigos recebem
+  "Anônimo" até o dono editar), apaga a coluna de e-mail dos anúncios e renomeia as opções Solteira→Mulher e
+  Solteiro→Homem (mantendo os anúncios) e cria Trans.
 - **Volume novo `private_media`**, montado em `/app/private-media`: guarda as fotos e vídeos dos anúncios. O Caddy nunca
   serve esses arquivos; só o site, depois de conferir o login (um link de foto copiado não abre fora da área do assinante).
 - **Passo único (cliente): rodar o `bootstrap-vps.sh` mais uma vez.** O servidor foi preparado antes da Fase 4 e o
