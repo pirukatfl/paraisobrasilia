@@ -45,6 +45,8 @@ export async function getTestPayload(): Promise<Payload> {
 }
 
 const RESET_ORDER = [
+  // Recados (Phase 5): before the accounts that own them
+  'recados',
   // Contos (Phase 5)
   'contos',
   // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
@@ -456,6 +458,56 @@ export async function seedVisibleAd(
   const { authorEmail: _e, authorName: _n, now: _now, days: _d, ...ad } = input
   const created = await seedAd(payload, { ...ad, author: author.id, status: 'aprovado' })
   return { author, ad: created }
+}
+
+export interface SeedRecadoInput {
+  author: number
+  apelido?: string
+  texto?: string
+  status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+  publishedAt?: string
+  motivo?: string
+}
+
+/** Creates a recado through the Local API (default: pendente). Staff path: redaction still applies. */
+export async function seedRecado(payload: Payload, input: SeedRecadoInput) {
+  const status = input.status ?? 'pendente'
+  const now = new Date().toISOString()
+  return payload.create({
+    collection: 'recados' as never,
+    data: {
+      author: input.author,
+      apelido: input.apelido ?? 'Apelido Teste',
+      texto: input.texto ?? 'Recado de teste da casa.',
+      status,
+      submittedAt: now,
+      ...(status === 'aprovado' ? { publishedAt: input.publishedAt ?? now } : {}),
+      ...(input.motivo ? { motivo: input.motivo } : {}),
+    } as never,
+    overrideAccess: true,
+    context: { skipAudit: true },
+  }) as Promise<{ id: number; apelido: string; texto: string; status: string; publishedAt?: string | null }>
+}
+
+/** Subscriber with a period covering `now` and one approved recado. */
+export async function seedVisibleRecado(
+  payload: Payload,
+  input: { authorEmail: string; authorName?: string; now?: Date; days?: number } & Omit<SeedRecadoInput, 'author' | 'status'>,
+) {
+  const now = input.now ?? new Date()
+  const author = await seedAssinante(payload, {
+    email: input.authorEmail,
+    password: 'senha-recado-123',
+    name: input.authorName ?? 'Autor de Recado',
+  })
+  await seedSubscription(payload, {
+    assinanteId: author.id,
+    startsAt: new Date(now.getTime() - 86_400_000).toISOString(),
+    endsAt: new Date(now.getTime() + (input.days ?? 30) * 86_400_000).toISOString(),
+  })
+  const { authorEmail: _e, authorName: _n, now: _now, days: _d, ...recado } = input
+  const created = await seedRecado(payload, { ...recado, author: author.id, status: 'aprovado' })
+  return { author, recado: created }
 }
 
 /** Uploads a fixture (photo or espaco.mp4) to an ad through the Local API (staff path). */

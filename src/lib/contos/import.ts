@@ -10,7 +10,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { Payload, PayloadRequest } from 'payload'
 
-import { REDACTED_LABEL, redactContacts } from '../classisex/redact'
+import { redactContacts } from '../classisex/redact'
 import { htmlToLexical, type LexicalNode, type LexicalState } from './html-to-lexical'
 import {
   DEFAULT_OPEN_BLOCKS,
@@ -70,23 +70,15 @@ const LEFTOVER_SHORTCODE = /\[\/?[A-Za-z][\w-]*\s[^\]]*\]/
 const MOJIBAKE = /Ã.|â€/
 const OPEN_TOO_MUCH = 0.4
 const OPEN_TOO_SHORT_WORDS = 60
-// Any e-mail, whatever its TLD: redactContacts only knows the common ones and imported stories may hold others
-const ANY_EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g
 
 /** Applies redactContacts to every text node, returns how many contacts were replaced. */
 function redactTextNodes(node: LexicalNode): number {
   let removed = 0
   if (node.type === 'text' && typeof node.text === 'string') {
     const result = redactContacts(node.text)
-    let text = result.text
-    let count = result.removed
-    text = text.replace(ANY_EMAIL, () => {
-      count++
-      return REDACTED_LABEL
-    })
-    if (count > 0) {
-      node.text = text
-      removed += count
+    if (result.removed > 0) {
+      node.text = result.text
+      removed += result.removed
     }
   }
   if (Array.isArray(node.children)) {

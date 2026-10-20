@@ -14,6 +14,7 @@ import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
 import { expire } from '../lib/cache/expire'
 import { emailEnabled } from '../lib/email/config'
+import { recadoApelidoError } from '../lib/recados/rules'
 
 export const MIN_PASSWORD_LENGTH = 8
 export const PASSWORD_TOO_SHORT = 'A senha precisa ter pelo menos 8 caracteres.'
@@ -82,6 +83,16 @@ const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
       req,
     }),
   )
+  // Phase 5 (T-05-12, LGPD): the account's recados go too (recados.author is required)
+  await withRequestState(req, () =>
+    req.payload.delete({
+      collection: 'recados',
+      where: { author: { equals: id } },
+      overrideAccess: true,
+      context: { skipAudit: true, assinanteBeingDeleted: true },
+      req,
+    }),
+  )
   await withRequestState(req, () =>
     req.payload.delete({
       collection: 'ads',
@@ -111,12 +122,13 @@ const FIELD_LABELS: Record<string, string> = {
   staffNotes: 'observações',
   mustChangePassword: 'senha provisória',
   accessUntil: 'acesso até',
+  apelido: 'apelido',
 }
 
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
 /** D-06: a new access end date moves the author's ads on/off the public preview. */
 const expireAdsOnAccessChange: CollectionAfterChangeHook = ({ doc, previousDoc }) => {
-  if ((doc.accessUntil ?? null) !== (previousDoc?.accessUntil ?? null)) expire(['ads'])
+  if ((doc.accessUntil ?? null) !== (previousDoc?.accessUntil ?? null)) expire(['ads', 'recados'])
   return doc
 }
 
@@ -246,6 +258,18 @@ export const Assinantes: CollectionConfig = {
         value === undefined || value === null || value === '' || /^55\d{10,11}$/.test(String(value))
           ? true
           : 'Use só números, com 55 e DDD (ex.: 5561999998888).',
+    },
+    {
+      // One nickname per account for recados and messages (orchestrator default 4); ads keep their own
+      name: 'apelido',
+      type: 'text',
+      maxLength: 40,
+      label: 'Apelido nos recados e mensagens',
+      admin: { description: 'Escolhido pelo assinante. Nunca use o nome verdadeiro.' },
+      validate: (value: unknown) => {
+        const apelido = String(value ?? '').replace(/\s+/g, ' ').trim()
+        return apelido ? (recadoApelidoError(apelido) ?? true) : true
+      },
     },
     {
       name: 'staffNotes',

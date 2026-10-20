@@ -21,6 +21,9 @@ const EMAIL = new RegExp(
   'gi',
 )
 
+// Any other e-mail, whatever its TLD (05-04: imported stories and recados may hold .info, .edu, .test …).
+const ANY_EMAIL = /[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g
+
 // URLs with scheme, www. hosts and bare domains with a known TLD (wa.me, t.me, linktr.ee …).
 const URL_WITH_SCHEME = /\bhttps?:\/\/[^\s]*[^\s.,;:!?)\]]/gi
 const URL_WWW = /\bwww\.[^\s]*[^\s.,;:!?)\]]/gi
@@ -66,6 +69,7 @@ export function redactContacts(text: string): { text: string; removed: number } 
 
   let out = text
   out = replaceAll(out, EMAIL)
+  out = replaceAll(out, ANY_EMAIL)
   out = replaceAll(out, URL_WITH_SCHEME)
   out = replaceAll(out, URL_WWW)
   out = replaceAll(out, BARE_DOMAIN)

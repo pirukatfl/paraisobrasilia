@@ -18,6 +18,7 @@ import { Contos } from './collections/Contos'
 import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
+import { Recados } from './collections/Recados'
 import { SpaceItems } from './collections/SpaceItems'
 import { Subscriptions } from './collections/Subscriptions'
 import { Parties } from './collections/Parties'
@@ -83,6 +84,7 @@ export default buildConfig({
     Ads,
     { ...AdMedia, upload: { ...(typeof AdMedia.upload === 'object' ? AdMedia.upload : {}), staticDir: privateDir } },
     AdReports,
+    Recados,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

@@ -77,6 +77,7 @@ export interface Config {
     ads: Ad;
     'ad-media': AdMedia;
     'ad-reports': AdReport;
+    recados: Recado;
     media: Media;
     videos: Video;
     parties: Party;
@@ -109,6 +110,7 @@ export interface Config {
     ads: AdsSelect<false> | AdsSelect<true>;
     'ad-media': AdMediaSelect<false> | AdMediaSelect<true>;
     'ad-reports': AdReportsSelect<false> | AdReportsSelect<true>;
+    recados: RecadosSelect<false> | RecadosSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -220,6 +222,10 @@ export interface Assinante {
    * Só números, com 55 e DDD. Usado pela equipe para enviar senha e avisos.
    */
   whatsapp?: string | null;
+  /**
+   * Escolhido pelo assinante. Nunca use o nome verdadeiro.
+   */
+  apelido?: string | null;
   /**
    * Só a equipe vê. Não anote dados bancários nem comprovantes.
    */
@@ -543,6 +549,49 @@ export interface AdReport {
   resolvidaPor?: (number | null) | User;
   resolvidaEm?: string | null;
   nota?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Recados dos assinantes. Novos entram como "Em análise" e só aparecem depois de aprovados.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recados".
+ */
+export interface Recado {
+  id: number;
+  /**
+   * Calculado: apelido — início do texto.
+   */
+  resumo?: string | null;
+  /**
+   * Quem escreveu o recado. Só a equipe vê; no site aparece só o apelido.
+   */
+  author: number | Assinante;
+  /**
+   * O que os assinantes veem. Sem telefone, e-mail, @ ou link.
+   */
+  apelido: string;
+  /**
+   * Até 500 caracteres. Telefones, e-mails, @ e links são retirados ao salvar.
+   */
+  texto: string;
+  /**
+   * Quantos contatos o sistema retirou do texto.
+   */
+  contatosRemovidos?: number | null;
+  /**
+   * Use os botões de moderação.
+   */
+  status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
+  /**
+   * Preenchido ao recusar ou despublicar.
+   */
+  motivo?: string | null;
+  submittedAt?: string | null;
+  publishedAt?: string | null;
+  moderatedAt?: string | null;
+  moderatedBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -955,6 +1004,10 @@ export interface PayloadLockedDocument {
         value: number | AdReport;
       } | null)
     | ({
+        relationTo: 'recados';
+        value: number | Recado;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1065,6 +1118,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface AssinantesSelect<T extends boolean = true> {
   name?: T;
   whatsapp?: T;
+  apelido?: T;
   staffNotes?: T;
   accessUntil?: T;
   periodos?: T;
@@ -1236,6 +1290,25 @@ export interface AdReportsSelect<T extends boolean = true> {
   resolvidaPor?: T;
   resolvidaEm?: T;
   nota?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "recados_select".
+ */
+export interface RecadosSelect<T extends boolean = true> {
+  resumo?: T;
+  author?: T;
+  apelido?: T;
+  texto?: T;
+  contatosRemovidos?: T;
+  status?: T;
+  motivo?: T;
+  submittedAt?: T;
+  publishedAt?: T;
+  moderatedAt?: T;
+  moderatedBy?: T;
   updatedAt?: T;
   createdAt?: T;
 }
