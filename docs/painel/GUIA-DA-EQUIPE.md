@@ -317,3 +317,8 @@ abra numa **outra janela anônima, sem login**: ela **não** deve abrir. É o es
 - O painel mostra o erro em vermelho ao lado do campo (ex.: "A imagem passa de 15 MB. Reduza o tamanho e envie de novo.").
 - Mudança que não apareceu no site: confira se clicou em **Publicar** (e não só em Salvar rascunho) e recarregue a página.
 - Qualquer outro problema: fale com o desenvolvedor com um print da tela.
+
+## Problemas comuns
+
+### O painel desloga sozinho logo depois do login
+Confira o relógio do computador. O painel calcula a validade do login (2 horas) pelo relógio do próprio computador; se ele estiver adiantado ou com o fuso errado, o painel acha que o login venceu e sai na hora. No Windows: botão direito no relógio → Ajustar data/hora → ligar "Definir horário automaticamente" e o fuso (UTC-03:00) Brasília → Sincronizar agora. Para conferir, abra https://time.is.
