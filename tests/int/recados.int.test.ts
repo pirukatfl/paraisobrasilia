@@ -57,8 +57,8 @@ describe('recados collection (REC-01, D-01, T-05-03, T-05-04, T-05-12)', () => {
     }
     const staffAs = { overrideAccess: false, user: staff as never }
     expect((await payload.find({ collection: 'recados', ...staffAs })).totalDocs).toBe(1)
-    const updated = await payload.update({ collection: 'recados', id: r.id, ...staffAs, data: { motivo: 'ok' } as never })
-    expect(updated.motivo).toBe('ok')
+    const updated = await payload.update({ collection: 'recados', id: r.id, ...staffAs, data: { apelido: 'Ok Apelido' } as never })
+    expect(updated.apelido).toBe('Ok Apelido')
   })
 
   it('validates in pt, computes the resumo and defaults the status to pendente', async () => {

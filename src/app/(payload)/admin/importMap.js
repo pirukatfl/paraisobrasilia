@@ -1,6 +1,7 @@
 import { AssinaturaPanel as AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24 } from '../../../components/admin/assinantes/AssinaturaPanel'
 import { ModeracaoPanel as ModeracaoPanel_ec761e6491e5a1911a27084fe817e462 } from '../../../components/admin/classisex/ModeracaoPanel'
 import { DenunciaPanel as DenunciaPanel_38859cfdaab329474f1feee2c26931b5 } from '../../../components/admin/classisex/DenunciaPanel'
+import { RecadoModeracaoPanel as RecadoModeracaoPanel_818a18865a538418b61508e45914b4ff } from '../../../components/admin/recados/RecadoModeracaoPanel'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { LexicalDiffComponent as LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -30,6 +31,7 @@ export const importMap = {
   "/components/admin/assinantes/AssinaturaPanel#AssinaturaPanel": AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24,
   "/components/admin/classisex/ModeracaoPanel#ModeracaoPanel": ModeracaoPanel_ec761e6491e5a1911a27084fe817e462,
   "/components/admin/classisex/DenunciaPanel#DenunciaPanel": DenunciaPanel_38859cfdaab329474f1feee2c26931b5,
+  "/components/admin/recados/RecadoModeracaoPanel#RecadoModeracaoPanel": RecadoModeracaoPanel_818a18865a538418b61508e45914b4ff,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#LexicalDiffComponent": LexicalDiffComponent_44fe37237e0ebf4470c9990d8cb7b07e,

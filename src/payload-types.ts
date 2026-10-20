@@ -363,7 +363,10 @@ export interface AuditLog {
     | 'anuncio-aprovado'
     | 'anuncio-recusado'
     | 'anuncio-despublicado'
-    | 'denuncia-resolvida';
+    | 'denuncia-resolvida'
+    | 'recado-aprovado'
+    | 'recado-recusado'
+    | 'recado-despublicado';
   actorType: 'equipe' | 'assinante' | 'sistema';
   actor?: (number | null) | User;
   actorLabel?: string | null;
@@ -581,11 +584,11 @@ export interface Recado {
    */
   contatosRemovidos?: number | null;
   /**
-   * Use os botões de moderação.
+   * Use os botões do quadro Moderação.
    */
   status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
   /**
-   * Preenchido ao recusar ou despublicar.
+   * Preenchido pelos botões Recusar e Despublicar.
    */
   motivo?: string | null;
   submittedAt?: string | null;

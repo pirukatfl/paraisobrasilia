@@ -4,17 +4,21 @@
  *
  * T-05-04: ownership is checked on every write; author and status never come from the form.
  */
-import type { Payload } from 'payload'
+import type { Payload, PayloadRequest } from 'payload'
 
+import { isStaff } from '../../access/roles'
+import { writeAudit, type AuditAction } from '../assinantes/audit'
+import { withRequestState } from '../assinantes/context'
 import { accessStatusFor } from '../assinantes/status'
-import { ServiceError } from '../classisex/service'
-import { relId, toOwnRecadoDTO, type OwnRecadoDTO, type RecadoDocLike } from './dto'
+import { MOTIVO_MAX, MOTIVO_MESSAGE, ServiceError } from '../classisex/service'
+import { OWN_STATUS_LABELS, relId, toOwnRecadoDTO, type OwnRecadoDTO, type RecadoDocLike } from './dto'
 import {
   RECADO_ACTIVE_LIMIT,
   RECADO_ACTIVE_STATUSES,
   RECADO_MESSAGES,
   validateRecadoInput,
   type RecadoInput,
+  type RecadoStatus,
 } from './rules'
 
 const notFound = () => new ServiceError('nao-encontrado', 'Recado não encontrado.', 404)
@@ -113,4 +117,134 @@ export async function listOwnRecados(
   ])
   const authorActive = access.state === 'ativa'
   return (docs as unknown as RecadoDocLike[]).map((doc) => toOwnRecadoDTO(doc, { authorActive }))
+}
+
+// ---------------------------------------------------------------------------------------------
+// Staff moderation (REC-04, same shape as moderateAd). T-05-06: audited, staff only.
+// ---------------------------------------------------------------------------------------------
+
+export type RecadoModeration = 'aprovar' | 'recusar' | 'despublicar'
+
+const STATE_WORDS: Record<RecadoStatus, string> = {
+  pendente: 'em análise',
+  aprovado: 'publicado',
+  recusado: 'recusado',
+  despublicado: 'despublicado',
+}
+
+const TRANSITIONS: Record<
+  RecadoModeration,
+  { from: RecadoStatus[]; to: RecadoStatus; action: AuditAction; verb: string }
+> = {
+  aprovar: { from: ['pendente', 'recusado', 'despublicado'], to: 'aprovado', action: 'recado-aprovado', verb: 'aprovado' },
+  recusar: { from: ['pendente'], to: 'recusado', action: 'recado-recusado', verb: 'recusado' },
+  despublicar: { from: ['aprovado', 'pendente'], to: 'despublicado', action: 'recado-despublicado', verb: 'despublicado' },
+}
+
+function cleanMotivo(motivo: unknown): string {
+  const text = typeof motivo === 'string' ? motivo.replace(/\s+/g, ' ').trim() : ''
+  if (text.length < 3 || text.length > MOTIVO_MAX) throw new ServiceError('motivo', MOTIVO_MESSAGE, 400)
+  return text
+}
+
+type StaffRecadoDoc = RecadoDocLike & { resumo?: string | null; moderatedAt?: string | null; moderatedBy?: unknown }
+
+async function loadForStaff(req: PayloadRequest, id: number | string): Promise<StaffRecadoDoc> {
+  const numericId = Number(id)
+  const doc =
+    Number.isInteger(numericId) && numericId > 0
+      ? ((await withRequestState(req, () =>
+          req.payload.findByID({ collection: 'recados', id: numericId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+        )) as StaffRecadoDoc | null)
+      : null
+  if (!doc) throw notFound()
+  return doc
+}
+
+export async function moderateRecado(
+  req: PayloadRequest,
+  id: number | string,
+  kind: RecadoModeration,
+  { motivo, now }: { motivo?: unknown; now: Date },
+): Promise<{ status: RecadoStatus; statusLabel: string }> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  const t = TRANSITIONS[kind]
+  const doc = await loadForStaff(req, id)
+  if (!t.from.includes(doc.status)) {
+    throw new ServiceError('transicao', `Este recado já está ${STATE_WORDS[doc.status]}.`, 409)
+  }
+  const reason = kind === 'aprovar' ? null : cleanMotivo(motivo)
+  const staffId = (req.user as { id?: number } | null)?.id ?? null
+  await withRequestState(req, () =>
+    req.payload.update({
+      collection: 'recados',
+      id: doc.id,
+      data: {
+        status: t.to,
+        motivo: reason,
+        moderatedAt: now.toISOString(),
+        moderatedBy: staffId,
+        ...(kind === 'aprovar' ? { publishedAt: now.toISOString() } : {}),
+      },
+      overrideAccess: true,
+      context: { moderation: kind },
+      req,
+    }),
+  )
+  const authorId = relId(doc.author)
+  const author =
+    authorId === null
+      ? null
+      : await withRequestState(req, () =>
+          req.payload.findByID({ collection: 'assinantes', id: authorId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+        )
+  await writeAudit(req, {
+    action: t.action,
+    assinante: author ? { id: author.id, name: author.name, email: author.email } : null,
+    summary: `Recado #${doc.id} (${doc.resumo ?? ''}) ${t.verb}${reason ? `: ${reason}` : ''}`,
+    details: { recado: doc.id, motivo: reason },
+  })
+  return { status: t.to, statusLabel: OWN_STATUS_LABELS[t.to] }
+}
+
+export type RecadoModerationView = {
+  id: number
+  status: RecadoStatus
+  statusLabel: string
+  motivo: string | null
+  apelido: string
+  texto: string
+  contatosRemovidos: number
+  fields: Record<string, unknown>
+}
+
+/** Data for the Moderação panel (staff only): the text exactly as the board shows it. */
+export async function getRecadoModerationView(req: PayloadRequest, id: number | string): Promise<RecadoModerationView> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  const doc = await loadForStaff(req, id)
+  return {
+    id: doc.id,
+    status: doc.status,
+    statusLabel: OWN_STATUS_LABELS[doc.status],
+    motivo: doc.motivo ?? null,
+    apelido: doc.apelido ?? '',
+    texto: doc.texto,
+    contatosRemovidos: doc.contatosRemovidos ?? 0,
+    fields: {
+      status: doc.status,
+      motivo: doc.motivo ?? null,
+      publishedAt: doc.publishedAt ?? null,
+      moderatedAt: doc.moderatedAt ?? null,
+      moderatedBy: relId(doc.moderatedBy),
+    },
+  }
+}
+
+export async function countPendingRecados(payload: Payload): Promise<number> {
+  const { totalDocs } = await payload.count({
+    collection: 'recados',
+    where: { status: { equals: 'pendente' } },
+    overrideAccess: true,
+  })
+  return totalDocs
 }

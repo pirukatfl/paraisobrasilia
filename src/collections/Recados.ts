@@ -6,6 +6,7 @@ import {
 } from 'payload'
 
 import { isStaff } from '../access/roles'
+import { recadoEndpoints } from '../lib/recados/endpoints'
 import { expire } from '../lib/cache/expire'
 import { redactContacts } from '../lib/classisex/redact'
 import { APELIDO_MAX } from '../lib/classisex/rules'
@@ -64,6 +65,19 @@ const computeDerived: CollectionBeforeChangeHook = ({ data, originalDoc, operati
   return data
 }
 
+/**
+ * T-05-06: status and motivo change only through the audited moderation service. A write by a
+ * signed-in principal (REST or the admin form) that does not carry context.moderation keeps the
+ * stored values.
+ */
+const guardModeration: CollectionBeforeChangeHook = ({ data, originalDoc, operation, req, context }) => {
+  if (operation !== 'update' || !req.user || context?.moderation || !originalDoc) return data
+  for (const key of ['status', 'motivo', 'publishedAt', 'moderatedAt', 'moderatedBy'] as const) {
+    if (key in data) data[key] = (originalDoc as Record<string, unknown>)[key]
+  }
+  return data
+}
+
 const dateAdmin = {
   readOnly: true,
   position: 'sidebar' as const,
@@ -93,9 +107,11 @@ export const Recados: CollectionConfig = {
     update: isStaff,
     delete: isStaff,
   },
+  // Staff-only moderation actions for the Moderação panel (src/lib/recados/endpoints.ts)
+  endpoints: recadoEndpoints,
   hooks: {
     beforeValidate: [normaliseAndRedact],
-    beforeChange: [computeDerived],
+    beforeChange: [guardModeration, computeDerived],
     afterChange: [
       ({ doc }) => {
         expire(['recados'])
@@ -110,6 +126,13 @@ export const Recados: CollectionConfig = {
     ],
   },
   fields: [
+    {
+      // Aprovar / Recusar / Despublicar with the public preview; hidden on create
+      name: 'moderacao',
+      type: 'ui',
+      label: 'Moderação',
+      admin: { components: { Field: '/components/admin/recados/RecadoModeracaoPanel#RecadoModeracaoPanel' } },
+    },
     {
       name: 'resumo',
       type: 'text',
@@ -158,14 +181,14 @@ export const Recados: CollectionConfig = {
       options: RECADO_STATUS_OPTIONS.map((o) => ({ ...o })),
       // Owners never set the status (T-05-04); staff use the audited buttons (05-06)
       access: { create: isStaff, update: isStaff },
-      admin: { position: 'sidebar', description: 'Use os botões de moderação.' },
+      admin: { position: 'sidebar', readOnly: true, description: 'Use os botões do quadro Moderação.' },
     },
     {
       name: 'motivo',
       type: 'text',
       maxLength: 300,
       label: 'Motivo (aparece para quem escreveu)',
-      admin: { position: 'sidebar', description: 'Preenchido ao recusar ou despublicar.' },
+      admin: { position: 'sidebar', readOnly: true, description: 'Preenchido pelos botões Recusar e Despublicar.' },
     },
     { name: 'submittedAt', type: 'date', index: true, label: 'Enviado em', admin: dateAdmin },
     { name: 'publishedAt', type: 'date', index: true, label: 'Publicado em', admin: dateAdmin },

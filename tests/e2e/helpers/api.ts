@@ -344,13 +344,18 @@ export async function staffApi(request: APIRequestContext) {
       })
       return (await check(res, 'create recado')).doc
     },
-    /** Staff status change by REST (05-06 adds the audited endpoints). */
-    async setRecadoStatus(id: number, status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado', motivo?: string) {
-      const res = await request.patch(`/api/recados/${id}`, {
-        headers,
-        data: { status, ...(status === 'aprovado' ? { publishedAt: new Date().toISOString() } : {}), ...(motivo ? { motivo } : {}) },
-      })
-      return (await check(res, 'set recado status')).doc
+    /** Audited staff moderation (05-06): the same endpoints as the Moderação panel. */
+    async aprovarRecado(id: number) {
+      const res = await request.post(`/api/recados/${id}/aprovar`, { headers, data: {} })
+      if (!res.ok()) throw new Error(`aprovar recado failed: ${res.status()}`)
+    },
+    async recusarRecado(id: number, motivo: string) {
+      const res = await request.post(`/api/recados/${id}/recusar`, { headers, data: { motivo } })
+      if (!res.ok()) throw new Error(`recusar recado failed: ${res.status()}`)
+    },
+    async despublicarRecado(id: number, motivo: string) {
+      const res = await request.post(`/api/recados/${id}/despublicar`, { headers, data: { motivo } })
+      if (!res.ok()) throw new Error(`despublicar recado failed: ${res.status()}`)
     },
     async findRecados(where = '') {
       const res = await request.get(`/api/recados?limit=100&depth=0&sort=-createdAt${where ? `&${where}` : ''}`, { headers })

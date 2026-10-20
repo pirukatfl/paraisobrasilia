@@ -88,10 +88,10 @@ test('a posted recado is redacted, pending and invisible to others until approve
   const davi = await login(browser, baseURL!, DAVI)
   await expect(davi.page.getByRole('region', { name: 'Mural de recados' })).not.toContainText('Rita e Beto')
 
-  // Approve (staff REST; the audited buttons arrive in 05-06)
+  // Approve through the audited staff endpoint (05-06)
   const api = await staffApi(request)
   const [recado] = await api.findRecados(`where[author][equals]=${ritaId}`)
-  await api.setRecadoStatus(recado!.id, 'aprovado')
+  await api.aprovarRecado(recado!.id)
   await api.dispose()
 
   await davi.page.reload()
