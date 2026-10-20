@@ -96,11 +96,13 @@ test('approve, then unpublish with a reason; saving the page keeps the new situa
   // A staff edit saved after the action must not bring back the old situation
   await page.locator('#field-cidade').fill('Taguatinga')
   await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(page.getByText(/sucesso/i).first()).toBeVisible()
   const api = await staffApi(request)
+  // poll the saved record instead of trusting a toast that may belong to the previous action
+  await expect
+    .poll(async () => ((await api.get(`/api/ads/${adB}?depth=0`)) as unknown as { cidade: string }).cidade, { timeout: 20_000 })
+    .toBe('Taguatinga')
   const saved = (await api.get(`/api/ads/${adB}?depth=0`)) as unknown as { status: string; cidade: string }
   expect(saved.status).toBe('aprovado')
-  expect(saved.cidade).toBe('Taguatinga')
   await api.dispose()
 
   await panel.getByLabel('Motivo (para Recusar ou Despublicar)').fill('Pedido do anunciante')

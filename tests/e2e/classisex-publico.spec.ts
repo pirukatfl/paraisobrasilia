@@ -16,6 +16,7 @@ const TEXTO_OTTO = 'Texto do Otto que venceu ontem.'
 const TEXTO_PENDENTE = 'Texto pendente secreto'
 const APELIDO_NINA = 'Nina e Beto'
 const APELIDO_PENDENTE = 'Pendente Fogo'
+const APELIDO_OTTO = 'Otto Sem Assinatura'
 const SECRETS = [
   '98877',
   '-6655', // (a bare 4-digit string could match a build hash)
@@ -67,7 +68,7 @@ test.beforeAll(async ({ request }) => {
     startsAt: new Date(Date.now() - 31 * DAY).toISOString(),
     endsAt: new Date(Date.now() - DAY).toISOString(),
   })
-  await api.createAd({ author: ottoId, texto: TEXTO_OTTO, status: 'aprovado' })
+  await api.createAd({ author: ottoId, apelido: APELIDO_OTTO, texto: TEXTO_OTTO, status: 'aprovado' })
   await api.dispose()
 })
 
@@ -90,7 +91,12 @@ test('visitors see apelido, tipo and one blurred photo with a call to subscribe'
   const main = page.locator('main')
   await expect(page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
   await expect(main).toContainText('O texto, a cidade, as fotos, os vídeos e os contatos ficam na área do assinante.')
-  const cards = main.getByRole('article')
+  const all = main.getByRole('article')
+  // G-05: Otto's subscription ended yesterday, his approved ad stays online (cover only, no photo here)
+  await expect(all).toHaveCount(2)
+  await expect(all.filter({ hasText: APELIDO_OTTO })).toHaveCount(1)
+  await expect(all.filter({ hasText: APELIDO_OTTO })).not.toContainText(TEXTO_OTTO)
+  const cards = all.filter({ hasText: APELIDO_NINA })
   await expect(cards).toHaveCount(1)
   await expect(cards.first()).toContainText(APELIDO_NINA)
   await expect(cards.first()).toContainText('Casal')
@@ -142,9 +148,9 @@ test('filters by Eu sou only; the city is not a public filter', async ({ browser
   await main.getByLabel('Eu sou').selectOption({ label: 'Todos' })
   await main.getByRole('button', { name: 'Filtrar' }).click()
   await expect(main.getByLabel('Cidade')).toHaveCount(0)
-  await expect(main.getByRole('article')).toHaveCount(1)
+  await expect(main.getByRole('article')).toHaveCount(2) // Nina + Otto (expired, G-05)
   await page.goto('/classisex?cidade=recife')
-  await expect(main.getByRole('article')).toHaveCount(1)
+  await expect(main.getByRole('article')).toHaveCount(2)
   await main.getByRole('link', { name: 'Limpar filtros' }).click()
   await expect(page).toHaveURL(/\/classisex$/)
   await context.close()
@@ -156,15 +162,16 @@ test('approving shows the ad at once; unpublishing removes it and its previews',
   const main = page.locator('main')
   await api.aprovar(pendingAd)
   await page.goto('/classisex')
-  await expect(main.getByRole('article')).toHaveCount(2)
+  await expect(main.getByRole('article')).toHaveCount(3)
   await expect(main).toContainText(APELIDO_PENDENTE)
   await expect(main).not.toContainText(TEXTO_PENDENTE)
 
   await api.despublicar(ninaAd, 'Teste da prévia pública')
   await api.despublicar(pendingAd, 'Teste da prévia pública')
   await page.goto('/classisex')
-  await expect(main.getByRole('article')).toHaveCount(0)
-  await expect(main).toContainText('Ainda não há anúncios publicados.')
+  // only Otto's ad (author without a subscription, still approved) is left
+  await expect(main.getByRole('article')).toHaveCount(1)
+  await expect(main).toContainText(APELIDO_OTTO)
   await expect(main.getByRole('link', { name: 'Assine Já' }).first()).toHaveAttribute('href', '/assine-ja')
   const anon = await playwright.request.newContext({ baseURL })
   expect((await anon.get(`/classisex/previa/${photoIds[0]}`)).status()).toBe(404)
