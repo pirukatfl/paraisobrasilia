@@ -13,6 +13,7 @@ test('home renders inside the branded shell with site metadata', async ({ page }
   await expect(logoLink.locator('img')).toHaveAttribute('src', /\/brand\/logo-/)
 
   const footer = page.locator('footer')
+  await expect(footer.getByRole('link', { name: 'Recados' })).toHaveAttribute('href', '/recados')
   await expect(footer).toContainText('Proibido para menores de 18 anos')
   await expect(footer).toContainText(String(new Date().getFullYear()))
 
@@ -46,6 +47,7 @@ test('mobile menu opens, lists the sections and closes with Escape', async ({ pa
   const menu = page.getByRole('navigation', { name: 'Menu' })
   await expect(menu.getByRole('link', { name: 'Festas' })).toBeVisible()
   await expect(menu.getByRole('link', { name: 'ClassiSex' })).toHaveAttribute('href', '/classisex')
+  await expect(menu.getByRole('link', { name: 'Recados' })).toHaveAttribute('href', '/recados')
   await expect(menu.getByRole('link', { name: 'Contos' })).toHaveAttribute('href', '/contos')
   await expect(menu.getByRole('link', { name: 'Contato' })).toBeVisible()
   await expect(menu.getByRole('link', { name: 'Assine Já' })).toHaveAttribute('href', '/assine-ja')
@@ -62,6 +64,7 @@ test('desktop navigation is inline and marks the current page', async ({ page, i
   await expect(nav.getByRole('link', { name: 'Festas' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'Contato' })).toHaveAttribute('aria-current', 'page')
   await expect(nav.getByRole('link', { name: 'ClassiSex' })).toHaveAttribute('href', '/classisex')
+  await expect(nav.getByRole('link', { name: 'Recados' })).toHaveAttribute('href', '/recados')
   await expect(nav.getByRole('link', { name: 'Contos' })).toHaveAttribute('href', '/contos')
   await expect(nav.getByRole('link', { name: 'Assine Já' })).toHaveAttribute('href', '/assine-ja')
   await expect(nav.getByRole('link', { name: 'Área do assinante' })).toHaveAttribute('href', '/area-do-assinante')

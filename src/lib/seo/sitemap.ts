@@ -27,6 +27,7 @@ export function buildSitemap({ base, parties, pages, hasModels, contos = [] }: S
     // Members (/area-do-assinante) and auth pages (/entrar, /nova-senha) are never listed (T-03-05)
     { url: `${root}/assine-ja`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${root}/classisex`, changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${root}/recados`, changeFrequency: 'weekly', priority: 0.6 },
     { url: `${root}/contos`, changeFrequency: 'weekly', priority: 0.6 },
     ...contos.map((c) => ({
       url: `${root}/contos/${c.slug}`,

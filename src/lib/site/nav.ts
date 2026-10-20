@@ -26,6 +26,8 @@ export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels:
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     // PREV-01: open preview; the full board lives in the members area
     { href: '/classisex', label: 'ClassiSex' },
+    // PREV-02: open teaser of the recados (05-07)
+    { href: '/recados', label: 'Recados' },
     // PREV-03: open excerpts of the contos (05-03)
     { href: '/contos', label: 'Contos' },
     { href: '/contato', label: 'Contato' },

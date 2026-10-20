@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
+import { AssineJaCta } from '@/components/contos/AssineJaCta'
 import { AdFilters } from '@/components/classisex/AdFilters'
 import { Pagination } from '@/components/classisex/Pagination'
 import { PublicAdCard } from '@/components/classisex/PublicAdCard'
@@ -50,6 +51,11 @@ export default async function ClassisexPublicPage({
           Já é assinante? Ver anúncios completos
         </Link>
       </p>
+      <AssineJaCta
+        title="Veja os anúncios completos"
+        text="Assinantes veem texto, cidade, fotos, vídeos e contatos, e anunciam também."
+        membersHref="/area-do-assinante/classisex"
+      />
       <AdFilters action={PATH} categories={categories} euSou={filters.euSou} showCidade={false} />
       {result.items.length === 0 ? (
         filtered ? (

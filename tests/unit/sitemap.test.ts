@@ -23,11 +23,12 @@ describe('sitemap (INST-06, T-02-13)', () => {
         '/politica-de-privacidade',
         '/assine-ja',
         '/classisex',
+        '/recados',
         '/contos',
       ]),
     )
     expect(urls).not.toContain('/modelos')
-    expect(urls).toHaveLength(12)
+    expect(urls).toHaveLength(13)
   })
 
   it('includes /modelos and upcoming parties when present', () => {

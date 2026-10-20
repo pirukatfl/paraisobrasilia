@@ -165,7 +165,7 @@ test('approving shows the ad at once; unpublishing removes it and its previews',
   await page.goto('/classisex')
   await expect(main.getByRole('article')).toHaveCount(0)
   await expect(main).toContainText('Ainda não há anúncios publicados.')
-  await expect(main.getByRole('link', { name: 'Assine Já' })).toHaveAttribute('href', '/assine-ja')
+  await expect(main.getByRole('link', { name: 'Assine Já' }).first()).toHaveAttribute('href', '/assine-ja')
   const anon = await playwright.request.newContext({ baseURL })
   expect((await anon.get(`/classisex/previa/${photoIds[0]}`)).status()).toBe(404)
   await anon.dispose()

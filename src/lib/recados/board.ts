@@ -5,7 +5,7 @@
  */
 import type { Payload } from 'payload'
 
-import { toRecadoDTO, type RecadoDocLike, type RecadoDTO } from './dto'
+import { toPublicRecadoTeaser, toRecadoDTO, type PublicRecadosDTO, type RecadoDocLike, type RecadoDTO } from './dto'
 import { visibleRecadosWhere } from './visibility'
 
 export const RECADOS_PAGE_SIZE = 20
@@ -60,4 +60,43 @@ export async function findVisibleRecadoDoc(
     overrideAccess: true,
   })
   return (docs[0] as unknown as RecadoDocLike | undefined) ?? null
+}
+
+const WEEK_MS = 7 * 86_400_000
+const TEASER_COUNT = 6
+
+/**
+ * Open-area teaser: weekly count and up to 6 short snippets of visible recados.
+ * D-05 / T-05-19: selects only texto and publishedAt (never apelido or author).
+ */
+export async function findPublicRecadosTeaser(payload: Payload, now: Date): Promise<PublicRecadosDTO> {
+  const weekAgo = new Date(now.getTime() - WEEK_MS).toISOString()
+  const visible = visibleRecadosWhere(now)
+  const [week, latest] = await Promise.all([
+    payload.count({
+      collection: 'recados',
+      where: { and: [visible, { publishedAt: { greater_than_equal: weekAgo } }] },
+      overrideAccess: true,
+    }),
+    payload.find({
+      collection: 'recados',
+      where: visible,
+      sort: '-publishedAt',
+      depth: 0,
+      limit: TEASER_COUNT * 2,
+      select: { texto: true, publishedAt: true },
+      overrideAccess: true,
+    }),
+  ])
+  const trechos = (latest.docs as unknown as { texto: string; publishedAt?: string | null }[])
+    .map((doc) => ({
+      texto: toPublicRecadoTeaser(doc.texto),
+      quando: (doc.publishedAt && doc.publishedAt >= weekAgo ? 'esta semana' : 'há mais de uma semana') as
+        | 'esta semana'
+        | 'há mais de uma semana',
+    }))
+    .filter((t) => t.texto !== '')
+    .slice(0, TEASER_COUNT)
+    .map((t, i) => ({ key: String(i), ...t }))
+  return { semana: week.totalDocs, trechos }
 }

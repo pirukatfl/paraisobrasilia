@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { expire } from '../../src/lib/cache/expire'
+import { findPublicRecadosTeaser } from '../../src/lib/recados/board'
 import { visibleRecadosWhere } from '../../src/lib/recados/visibility'
 import { expectFieldError } from '../helpers/errors'
 import {
@@ -247,5 +248,35 @@ describe('recados service and board (REC-01, D-01)', () => {
     const json = JSON.stringify(page1)
     expect(json).not.toContain('@teste.local')
     expect(json).not.toMatch(/"author"/)
+  })
+
+  it('public teaser: weekly count and snippets only from visible recados, nothing identifying', async () => {
+    const mk = async (email: string, days: number, startOffsetDays = 1) =>
+      seedVisibleRecado(payload, {
+        authorEmail: email,
+        authorName: 'Autor Sigiloso',
+        now: NOW,
+        days,
+        apelido: 'ApelidoSentinela',
+        texto: `Texto ${email.split('@')[0]} chama 61 98877-6655`,
+        publishedAt: new Date(NOW.getTime() - startOffsetDays * DAY).toISOString(),
+      })
+    await mk('a1@teste.local', 30, 1)
+    await mk('a2@teste.local', 30, 2)
+    await mk('a3@teste.local', 30, 3)
+    await mk('a4@teste.local', 30, 10)
+    const expired = await seedAssinante(payload, { email: 'venc@teste.local', password: 'senha-venc-1234', name: 'Vencido' })
+    await seedRecado(payload, { author: expired.id, status: 'pendente', texto: 'Pendente nao aparece' })
+    await seedRecado(payload, { author: expired.id, status: 'aprovado', texto: 'Autor sem acesso nao aparece' })
+
+    const teaser = await findPublicRecadosTeaser(payload, NOW)
+    expect(teaser.semana).toBe(3)
+    expect(teaser.trechos).toHaveLength(4)
+    expect(teaser.trechos.map((t) => t.quando)).toEqual(['esta semana', 'esta semana', 'esta semana', 'há mais de uma semana'])
+    expect(teaser.trechos[0]!.texto).toContain('Texto a1')
+    const json = JSON.stringify(teaser)
+    for (const forbidden of ['ApelidoSentinela', 'Autor Sigiloso', '98877', '"id"', 'author', 'Pendente', 'sem acesso']) {
+      expect(json).not.toContain(forbidden)
+    }
   })
 })

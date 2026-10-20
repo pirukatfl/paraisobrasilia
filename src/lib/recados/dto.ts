@@ -3,6 +3,7 @@
  * Never return Payload documents (author id and e-mail stay on the server).
  */
 import { formatShortDate } from '../format/date'
+import { REDACTED_LABEL, redactContacts } from '../classisex/redact'
 import type { RecadoStatus } from './rules'
 
 export type RecadoDocLike = {
@@ -73,4 +74,30 @@ export function toOwnRecadoDTO(doc: RecadoDocLike, { authorActive }: { authorAct
     contatosRemovidos: Number(doc.contatosRemovidos ?? 0),
     dateLabel: formatShortDate(doc.submittedAt ?? doc.createdAt ?? doc.updatedAt),
   }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Public teaser (PREV-02). D-05 / T-05-19: no apelido, no contact, no id, no exact date.
+// ---------------------------------------------------------------------------------------------
+
+export const TEASER_MAX = 80
+
+export type PublicRecadosDTO = {
+  semana: number
+  trechos: { key: string; texto: string; quando: 'esta semana' | 'há mais de uma semana' }[]
+}
+
+/** Redacts again, drops placeholders and @handles, cuts at 80 characters on a word boundary. */
+export function toPublicRecadoTeaser(texto: string): string {
+  const clean = redactContacts(texto)
+    .text.split(REDACTED_LABEL)
+    .join(' ')
+    .replace(/@\S+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  if (clean.length <= TEASER_MAX) return clean
+  const cut = clean.slice(0, TEASER_MAX + 1)
+  const lastSpace = cut.lastIndexOf(' ')
+  const base = (lastSpace > 20 ? cut.slice(0, lastSpace) : clean.slice(0, TEASER_MAX)).replace(/[\s,;:.-]+$/, '')
+  return `${base}…`
 }
