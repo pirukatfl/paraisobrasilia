@@ -12,3 +12,12 @@
 ## Deferred
 - "Dicas Hot" (30 posts) — avaliar junto com contos se der; não é requisito.
 - Envio de conto pelo assinante (CONT-01, v2).
+
+## Orchestrator defaults for planner's open questions (2026-10-20, client may override)
+1. Contos reach staging via (A): reviewed export committed as src/migrations/seed/contos-wp.json (repo is private).
+2. All 50 contos partial, as D-03 says.
+3. Recados: max 3 active per person, no expiry besides the subscription.
+4. One apelido per account for recados/messages; ads keep their own apelido.
+5. A "menor de idade" report on a message suspends the reported person's messaging immediately (like ads), pending staff review.
+6. Contos text only (no covers) until the uploads backup arrives.
+7. /recados and /contos in the sitemap.
