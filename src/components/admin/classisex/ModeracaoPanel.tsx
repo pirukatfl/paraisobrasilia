@@ -19,6 +19,7 @@ type View = {
   motivo: string | null
   publicApelido: string
   euSouLabel: string
+  contaAutor: 'Conta gratuita' | 'Assinante'
   removed: number
   contato: { whatsapp: string | null; telegram: string | null }
   fields: Record<string, unknown>
@@ -150,6 +151,13 @@ export function ModeracaoPanel() {
       {view && (
         <>
           <p style={{ margin: 'calc(var(--base) * 0.5) 0 0', fontWeight: 600 }}>{situation}</p>
+
+          <p style={{ margin: 'calc(var(--base) * 0.25) 0 0' }}>
+            Conta do anunciante:{' '}
+            {view.contaAutor === 'Conta gratuita'
+              ? 'Conta gratuita — no ClassiSex aparece só a capa, sem vídeos.'
+              : 'Assinante'}
+          </p>
 
           <div role="region" aria-labelledby="moderacao-publico" style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
             <h4 id="moderacao-publico" style={{ margin: 0 }}>

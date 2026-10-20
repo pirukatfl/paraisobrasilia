@@ -7,10 +7,13 @@
 import type { Payload, PayloadRequest } from 'payload'
 
 import { PAYMENT_METHODS, type PaymentMethod } from '../../collections/Subscriptions'
+import { isStaff } from '../../access/roles'
 import { assinanteLabel, writeAudit } from './audit'
 import { withRequestState } from './context'
 import { daysLeft, renewalWindow, validUntilLabel } from './periods'
 import { accessStatusFor, accessStatusOf, findPeriods, type AccessStatus } from './status'
+
+const isStaffUser = (req: PayloadRequest) => isStaff({ req })
 
 /** Validation problem shown to staff as-is (400). */
 export class ServiceError extends Error {
@@ -160,6 +163,29 @@ export async function endAccess(
     details: { motivo: reason, periodosEncerrados: open.length },
   })
   return { ended: open.length }
+}
+
+/**
+ * Staff marks an account's e-mail as confirmed (or not): for a person who cannot get the
+ * confirmation e-mail. Audited as 'conta-editada' by the collection hook (G-01).
+ */
+export async function setEmailConfirmed(
+  payload: Payload,
+  input: { assinanteId: number | string; confirmed: boolean; req: PayloadRequest },
+): Promise<{ confirmed: boolean }> {
+  const { req } = input
+  if (!isStaffUser(req)) throw new ServiceError('Sem permissão.', 403)
+  await withRequestState(req, () => loadAssinante(payload, input.assinanteId, req))
+  await withRequestState(req, () =>
+    payload.update({
+      collection: 'assinantes',
+      id: input.assinanteId,
+      data: { _verified: input.confirmed, ...(input.confirmed ? { _verificationToken: null } : {}) } as never,
+      overrideAccess: true,
+      req,
+    }),
+  )
+  return { confirmed: input.confirmed }
 }
 
 export type Situacao = {

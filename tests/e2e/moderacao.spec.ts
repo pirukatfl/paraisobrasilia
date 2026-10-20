@@ -59,6 +59,7 @@ test('panel shows the public preview (apelido and tipo) without contacts; refuse
   await expect(preview).toContainText('Cris BSB · Casal')
   await expect(preview).not.toContainText('Casal procura casal')
   await expect(preview).not.toContainText('99988')
+  await expect(panel).toContainText('Conta do anunciante: Assinante')
   await expect(panel).toContainText('5561999889772')
   await expect(panel).toContainText('@cris_bsb')
   await expect(panel.getByRole('button', { name: 'Aprovar' })).toBeEnabled()

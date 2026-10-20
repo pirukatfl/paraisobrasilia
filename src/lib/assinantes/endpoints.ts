@@ -2,13 +2,14 @@ import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
 import { whatsappUrl } from '../site/contact'
-import { createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError } from './service'
+import { createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError, setEmailConfirmed } from './service'
 
 /**
  * Staff-only actions on a subscriber, used by the "Assinatura" panel in /admin:
  *   GET  /api/assinantes/:id/situacao
  *   POST /api/assinantes/:id/liberar   { planId, durationDays?, amount?, method, paidAt?, note? }
  *   POST /api/assinantes/:id/encerrar  { reason }
+ *   POST /api/assinantes/:id/email-confirmado { confirmado }
  *   POST /api/assinantes/:id/link-senha (single-use 48 h link to send by WhatsApp, D-04)
  * Period dates are never read from the request: the service computes them (T-03-15).
  */
@@ -75,6 +76,15 @@ export const assinanteEndpoints: Endpoint[] = [
       if (!isStaff({ req })) return forbidden()
       const body = await readBody(req)
       return run(() => endAccess(req.payload, { assinanteId: idOf(req), reason: text(body.reason) ?? '', req }))
+    },
+  },
+  {
+    path: '/:id/email-confirmado',
+    method: 'post',
+    handler: async (req) => {
+      if (!isStaff({ req })) return forbidden()
+      const body = await readBody(req)
+      return run(() => setEmailConfirmed(req.payload, { assinanteId: idOf(req), confirmed: body.confirmado === true, req }))
     },
   },
   {

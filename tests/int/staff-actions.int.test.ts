@@ -2,9 +2,10 @@ import { createLocalReq, type Payload, type PayloadRequest } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { assinanteEndpoints } from '../../src/lib/assinantes/endpoints'
-import { endAccess, getSituacao, grantOrRenew } from '../../src/lib/assinantes/service'
+import { endAccess, getSituacao, grantOrRenew, setEmailConfirmed } from '../../src/lib/assinantes/service'
 import { accessStatusFor } from '../../src/lib/assinantes/status'
-import { getTestPayload, resetDatabase, seedAssinante, seedPlan, seedStaffUser } from '../helpers/seed'
+import { getModerationView } from '../../src/lib/classisex/service'
+import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante, seedPlan, seedStaffUser } from '../helpers/seed'
 
 const NOW = new Date('2026-10-19T18:00:00.000Z')
 
@@ -124,6 +125,29 @@ describe('liberar / renovar / encerrar (PAINEL-05, D-05, D-06, T-03-06, T-03-15)
     expect(s.assinante.name).toBe('Ação Teste')
   })
 
+  it('staff marks the e-mail as confirmed (audited) and the list shows Conta / E-mail confirmado', async () => {
+    await payload.update({ collection: 'assinantes', id: acc.id, data: { _verified: false } as never, overrideAccess: true, context: { skipAudit: true } })
+    const before = await payload.findByID({ collection: 'assinantes', id: acc.id, overrideAccess: true })
+    expect(before.contaTipo).toBe('Gratuita')
+    expect(before.emailStatus).toBe('Não')
+    expect(await setEmailConfirmed(payload, { assinanteId: acc.id, confirmed: true, req: staffReq })).toEqual({ confirmed: true })
+    const after = await payload.findByID({ collection: 'assinantes', id: acc.id, overrideAccess: true })
+    expect(after.emailStatus).toBe('Sim')
+    const rows = await auditRows('conta-editada')
+    expect(rows.some((r) => String(r.summary).includes('e-mail confirmado'))).toBe(true)
+    await grantOrRenew(payload, { assinanteId: acc.id, planId: mensal.id, method: 'pix', req: staffReq, now: new Date() })
+    const paid = await payload.findByID({ collection: 'assinantes', id: acc.id, overrideAccess: true })
+    expect(paid.contaTipo).toMatch(/^Assinante até \d{2}\/\d{2}\/\d{4}$/)
+  })
+
+  it('the moderation view names the advertiser account tier', async () => {
+    await seedAdCategories(payload)
+    const ad = await seedAd(payload, { author: acc.id })
+    expect((await getModerationView(staffReq, ad.id)).contaAutor).toBe('Conta gratuita')
+    await grantOrRenew(payload, { assinanteId: acc.id, planId: mensal.id, method: 'pix', req: staffReq, now: new Date() })
+    expect((await getModerationView(staffReq, ad.id)).contaAutor).toBe('Assinante')
+  })
+
   describe('endpoints', () => {
     const handler = (path: string, method: string) => assinanteEndpoints.find((e) => e.path === path && e.method === method)!.handler
 
@@ -134,6 +158,14 @@ describe('liberar / renovar / encerrar (PAINEL-05, D-05, D-06, T-03-06, T-03-15)
       const res = await handler(path, method)(req)
       return { status: res.status, body: (await res.json()) as Record<string, unknown> }
     }
+
+    it('email-confirmado is staff-only', async () => {
+      const sub = { ...acc, collection: 'assinantes' }
+      for (const user of [sub, null]) {
+        expect((await call('/:id/email-confirmado', 'post', user, { confirmado: true })).status).toBe(403)
+      }
+      expect((await call('/:id/email-confirmado', 'post', staffUser, { confirmado: true })).status).toBe(200)
+    })
 
     it('refuse subscribers and anonymous callers', async () => {
       const sub = { ...acc, collection: 'assinantes' }

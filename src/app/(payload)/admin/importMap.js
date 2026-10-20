@@ -1,4 +1,5 @@
 import { AssinaturaPanel as AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24 } from '../../../components/admin/assinantes/AssinaturaPanel'
+import { EmailConfirmado as EmailConfirmado_44d794be48c9769b8d6c2b3ca9391713 } from '../../../components/admin/assinantes/EmailConfirmado'
 import { ModeracaoPanel as ModeracaoPanel_ec761e6491e5a1911a27084fe817e462 } from '../../../components/admin/classisex/ModeracaoPanel'
 import { DenunciaPanel as DenunciaPanel_38859cfdaab329474f1feee2c26931b5 } from '../../../components/admin/classisex/DenunciaPanel'
 import { RecadoModeracaoPanel as RecadoModeracaoPanel_818a18865a538418b61508e45914b4ff } from '../../../components/admin/recados/RecadoModeracaoPanel'
@@ -30,6 +31,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 /** @type import('payload').ImportMap */
 export const importMap = {
   "/components/admin/assinantes/AssinaturaPanel#AssinaturaPanel": AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24,
+  "/components/admin/assinantes/EmailConfirmado#EmailConfirmado": EmailConfirmado_44d794be48c9769b8d6c2b3ca9391713,
   "/components/admin/classisex/ModeracaoPanel#ModeracaoPanel": ModeracaoPanel_ec761e6491e5a1911a27084fe817e462,
   "/components/admin/classisex/DenunciaPanel#DenunciaPanel": DenunciaPanel_38859cfdaab329474f1feee2c26931b5,
   "/components/admin/recados/RecadoModeracaoPanel#RecadoModeracaoPanel": RecadoModeracaoPanel_818a18865a538418b61508e45914b4ff,

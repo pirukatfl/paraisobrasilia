@@ -27,6 +27,11 @@ test.afterAll(async ({ request }) => {
 test('release, renew and end access with the payment record', async ({ page }) => {
   test.setTimeout(180_000)
   await loginAsStaff(page)
+  await page.goto('/admin/collections/assinantes')
+  const biaRow = page.locator('table tbody tr', { hasText: 'bia@teste.local' })
+  await expect(biaRow).toContainText('Gratuita')
+  await expect(biaRow).toContainText('Equipe')
+  await expect(biaRow).toContainText('Sim')
   await page.goto(`/admin/collections/assinantes/${biaId}`)
   const panel = page.locator('section', { has: page.getByRole('heading', { name: 'Assinatura', exact: true }) })
   await expect(panel).toContainText('Situação: Sem assinatura')
@@ -45,6 +50,9 @@ test('release, renew and end access with the payment record', async ({ page }) =
 
   await page.reload()
   await expect(panel).toContainText(`Situação: Ativa — válida até ${firstLabel}`)
+  await page.goto('/admin/collections/assinantes')
+  await expect(page.locator('table tbody tr', { hasText: 'bia@teste.local' })).toContainText('Assinante até')
+  await page.goto(`/admin/collections/assinantes/${biaId}`)
   await expect(page.locator('#field-periodos')).toContainText('Mensal')
   await expect(page.locator('#field-historico')).toContainText('Acesso liberado')
 

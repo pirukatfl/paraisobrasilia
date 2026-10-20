@@ -240,6 +240,8 @@ export interface Assinante {
   origem?: ('equipe' | 'cadastro') | null;
   declaracao18Em?: string | null;
   termosAceitosEm?: string | null;
+  contaTipo?: string | null;
+  emailStatus?: string | null;
   /**
    * Só a equipe vê. Não anote dados bancários nem comprovantes.
    */
@@ -1245,6 +1247,8 @@ export interface AssinantesSelect<T extends boolean = true> {
   origem?: T;
   declaracao18Em?: T;
   termosAceitosEm?: T;
+  contaTipo?: T;
+  emailStatus?: T;
   staffNotes?: T;
   mensagensSuspensas?: T;
   accessUntil?: T;

@@ -15,6 +15,7 @@ import { assinanteEndpoints } from '../lib/assinantes/endpoints'
 import { expire } from '../lib/cache/expire'
 import { emailEnabled } from '../lib/email/config'
 import { buildVerifyEmail, VERIFY_SUBJECT, verifyUrl } from '../lib/email/verify-account'
+import { formatShortDate } from '../lib/format/date'
 import { recadoApelidoError } from '../lib/recados/rules'
 
 export const MIN_PASSWORD_LENGTH = 8
@@ -289,7 +290,7 @@ export const Assinantes: CollectionConfig = {
   admin: {
     group: 'Assinantes',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'email', 'accessUntil', 'updatedAt'],
+    defaultColumns: ['name', 'email', 'contaTipo', 'origem', 'emailStatus', 'updatedAt'],
     listSearchableFields: ['name', 'email', 'whatsapp'],
     description:
       'Crie a conta depois de conferir o comprovante. A conta pode existir sem acesso; o acesso é liberado em "Assinatura".',
@@ -400,6 +401,40 @@ export const Assinantes: CollectionConfig = {
       label: 'Aceitou Termos e Privacidade em',
       access: { create: () => false, update: () => false },
       admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' } },
+    },
+    {
+      // Read-only summary for the list (G-01/G-02): derived on read, never stored, staff only
+      name: 'contaTipo',
+      type: 'text',
+      label: 'Conta',
+      virtual: true,
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: { readOnly: true, disableBulkEdit: true },
+      hooks: {
+        afterRead: [
+          ({ siblingData }) => {
+            const until = (siblingData as { accessUntil?: string | null }).accessUntil
+            const time = until ? new Date(until).getTime() : NaN
+            return Number.isFinite(time) && time > Date.now()
+              ? `Assinante até ${formatShortDate(new Date(time - 1).toISOString())}`
+              : 'Gratuita'
+          },
+        ],
+      },
+    },
+    {
+      name: 'emailStatus',
+      type: 'text',
+      label: 'E-mail confirmado',
+      virtual: true,
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: {
+        disableBulkEdit: true,
+        components: { Field: '/components/admin/assinantes/EmailConfirmado#EmailConfirmado' },
+      },
+      hooks: {
+        afterRead: [({ siblingData }) => ((siblingData as { _verified?: boolean })._verified ? 'Sim' : 'Não')],
+      },
     },
     {
       name: 'staffNotes',

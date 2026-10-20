@@ -69,10 +69,24 @@ test('promo price, PagBank link and inactive plans follow the panel', async ({ p
   await expect(card.getByRole('link', { name: /Combinar pelo WhatsApp/ })).toHaveCount(0)
 })
 
+test('Grátis × Assinante comparison sits above the plans (G-06)', async ({ page }) => {
+  await page.goto('/assine-ja')
+  const quadro = page.getByTestId('comparativo-planos')
+  await expect(quadro).toBeVisible()
+  await expect(quadro).toContainText('Grátis')
+  await expect(quadro).toContainText('Assinante')
+  await expect(quadro).toContainText('Fotos por anúncio')
+  const quadroY = (await quadro.boundingBox())!.y
+  const planosY = (await page.locator('main ul[role="list"] > li').first().boundingBox())!.y
+  expect(quadroY).toBeLessThan(planosY)
+})
+
 test('Como assinar explains the steps and links to WhatsApp and /entrar', async ({ page }) => {
   await page.goto('/assine-ja')
   const como = page.locator('section', { has: page.getByRole('heading', { name: 'Como assinar' }) })
-  await expect(como.locator('ol > li')).toHaveCount(3)
+  await expect(como.locator('ol > li')).toHaveCount(4)
+  await expect(como.locator('ol > li').nth(0)).toContainText('Crie sua conta grátis')
+  await expect(como.locator('ol > li').nth(3)).toContainText('libera a assinatura na sua conta')
   await expect(como.getByRole('link', { name: /Enviar comprovante pelo WhatsApp/ })).toHaveAttribute(
     'href',
     /^https:\/\/wa\.me\/5561999889772\?text=/,

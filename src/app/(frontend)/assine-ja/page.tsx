@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { EmptyState } from '@/components/EmptyState'
 import { ExternalLink } from '@/components/ExternalLink'
 import { WhatsAppIcon } from '@/components/icons'
+import { PlanComparison } from '@/components/assinantes/PlanComparison'
+import { emailEnabled } from '@/lib/email/config'
 import { getActivePlans, type PlanDTO } from '@/lib/assinantes/plans'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { whatsappUrl } from '@/lib/site/contact'
@@ -73,6 +75,8 @@ export default async function AssineJaPage() {
         contatos, e os recados dos assinantes.
       </p>
 
+      <PlanComparison signupLink={emailEnabled()} assineLink={false} id="comparativo-assine" />
+
       {plans.length === 0 ? (
         <EmptyState
           heading="Planos"
@@ -97,11 +101,18 @@ export default async function AssineJaPage() {
           Como assinar
         </h2>
         <ol className="mt-4 flex list-decimal flex-col gap-2 pl-6 text-body">
-          <li>Escolha o plano e pague pelo link do PagBank.</li>
-          <li>Envie o comprovante pelo WhatsApp com seu nome e e-mail.</li>
           <li>
-            A equipe cria seu acesso e envia sua senha provisória pelo WhatsApp. No primeiro acesso, troque a senha.
+            {emailEnabled() ? (
+              <>
+                Crie sua conta grátis em <Link href="/cadastro" className="underline">/cadastro</Link> — ou entre, se já tem.
+              </>
+            ) : (
+              'Envie seu nome e e-mail pelo WhatsApp; a equipe cria sua conta.'
+            )}
           </li>
+          <li>Escolha o plano e pague pelo link do PagBank.</li>
+          <li>Envie o comprovante pelo WhatsApp com o e-mail da sua conta.</li>
+          <li>A equipe libera a assinatura na sua conta (sem senha nova).</li>
         </ol>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           {contact.whatsapp && (
