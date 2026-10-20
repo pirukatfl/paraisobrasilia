@@ -327,3 +327,35 @@ describe('conta gratuita runbook and staff guide (G-01..G-06, 2026-10-20)', () =
     expect(guide).not.toMatch(/saem do ar até ela renovar/)
   })
 })
+
+describe('Phase 5 staff guide and runbook 7.4 (plan 05-12)', () => {
+  it('the staff guide has Contos, Recados (placeholder) and Mensagens sections', () => {
+    const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+    expect(guide).toMatch(/^## Contos$/m)
+    expect(guide).toMatch(/^## Recados$/m)
+    expect(guide).toMatch(/^## Mensagens entre assinantes$/m)
+    for (const heading of [
+      'Publicar um conto',
+      'Parágrafos abertos',
+      'Contos do site antigo',
+      'Denúncias de mensagens',
+      'Suspender mensagens',
+      'Privacidade das mensagens',
+      'Testar com dois assinantes',
+    ]) {
+      expect(guide).toContain(`### ${heading}`)
+    }
+    expect(guide).toContain('Recados: em revisão')
+    expect(guide).toContain('A equipe não lê as conversas')
+    expect(guide).toContain('janela anônima')
+    expect(guide).toContain('menor de idade')
+    expect(guide).toContain('48 contos')
+  })
+
+  it('the runbook 7.4 lists the migrations, the contos bundle and the log check', () => {
+    const runbook = read('docs/deploy/STAGING.md')
+    for (const text of ['7.4', 'contos_wp_bundle', 'mensagens_seguranca', '20261020_173000_contos_wp_bundle_carga', 'journalctl -u paraiso-update']) {
+      expect(runbook).toContain(text)
+    }
+  })
+})

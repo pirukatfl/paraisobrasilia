@@ -327,6 +327,82 @@ abra numa **outra janela anônima, sem login**: ela **não** deve abrir. É o es
 
 ---
 
+## Contos
+
+Os contos ficam em **/contos**. O visitante lê só o começo e vê o convite "Assine Já"; o assinante lê o conto inteiro.
+
+### Publicar um conto
+
+1. No painel, abra **Contos** e clique em **Criar novo**.
+2. Preencha o **Título**, o **Texto** (cole ou escreva; cada parágrafo é um bloco) e a **Data de publicação**.
+3. Clique em **Publicar**. O conto aparece no site na hora. **Despublicar** tira o conto do ar sem apagar.
+4. Confira no site, numa **janela anônima** (como visitante) e logado como assinante (como em "Testar como assinante").
+
+### Parágrafos abertos
+
+O campo **Parágrafos abertos** diz quantos parágrafos o visitante pode ler antes do "Assine Já". O quadro **Trecho aberto**
+mostra exatamente o que o visitante vai ler. Duas regras valem sempre, mesmo que você ponha um número maior:
+
+- o trecho aberto tem no máximo **cerca de 150 palavras, ou 15% do conto** (vale o maior dos dois);
+- **pelo menos um parágrafo fica só para assinantes**.
+
+Se o trecho ficou curto ou longo demais, mude o número e olhe o quadro de novo.
+
+### Contos do site antigo
+
+**48 contos** vieram do site antigo (WordPress) já prontos. Dois cuidados:
+
+- **3 deles não tinham título** e receberam um título gerado automaticamente (o começo do texto). Abra esses três em
+  **Contos**, troque por um título de verdade e salve. Se a lista mostrar títulos que começam igual ao texto, são eles.
+- Os campos da lateral ("Código no site antigo", "Endereço no site antigo", "No site antigo era só para assinantes",
+  "Importado em") são só para consulta. **Não mexa neles** e não troque o **Endereço** do conto sem necessidade: os links
+  antigos passam a apontar para ele.
+
+Autor e contatos que estavam nos textos antigos foram retirados na importação. Se ainda achar algum telefone ou e-mail dentro
+de um conto, apague e salve.
+
+## Recados
+
+Recados: em revisão, seção será atualizada.
+
+## Mensagens entre assinantes
+
+Assinantes (com acesso ativo) trocam mensagens privadas, a partir de um anúncio. Quem tem conta gratuita não manda nem
+recebe.
+
+### Privacidade das mensagens
+
+**A equipe não lê as conversas.** Não existe tela com as conversas e vocês não veem quem fala com quem. Só quando alguém
+**denuncia**, a denúncia guarda as **últimas 20 mensagens** daquela conversa, e só isso fica visível para vocês. Os bloqueios
+são de cada assinante: a equipe não vê nem desfaz.
+
+### Denúncias de mensagens
+
+1. No painel inicial, a caixa **Mensagens** mostra "N denúncias abertas". Clique para ver a lista: as **urgentes** (motivo
+   "Pessoa menor de idade") aparecem primeiro. **Urgente é para agir na hora.**
+2. Abra a denúncia: veja o motivo, os detalhes, o apelido da pessoa denunciada e as mensagens guardadas.
+3. Escolha uma ação:
+   - **Descartar**: não há problema (denúncia sem fundamento).
+   - **Resolver**: o problema existe e foi tratado de outra forma (por exemplo, conversa com a pessoa pelo WhatsApp). A nota
+     é obrigatória.
+   - **Suspender mensagens**: a pessoa denunciada deixa de enviar mensagens. A nota é obrigatória e fica no
+     **Registro de ações**.
+4. Denúncia de **menor de idade**: o site **suspende as mensagens da pessoa denunciada sozinho, na mesma hora**, antes de
+   vocês abrirem a denúncia. Leiam em seguida, decidam se mantêm (**Suspender mensagens**) ou se foi engano (**Descartar** e
+   libere a pessoa), e tratem a conta como no ClassiSex (anúncio e acesso).
+
+### Suspender mensagens
+
+A pessoa suspensa continua entrando no site e usando o resto, mas ao tentar enviar vê "Seu envio de mensagens foi suspenso
+pela equipe. Fale com a casa pelo WhatsApp." Para **liberar**, abra a conta em **Assinantes** e desmarque **Mensagens
+suspensas**.
+
+### Testar com dois assinantes
+
+Crie dois assinantes de teste e libere 30 dias para os dois. Entre com um numa **janela anônima** e com o outro em outra
+janela anônima de outro navegador (ou em outro celular). Mande uma mensagem a partir de um anúncio, responda, veja o número de
+mensagens novas, bloqueie e denuncie. Depois exclua os dois assinantes de teste (as conversas vão junto).
+
 ## Contas gratuitas
 
 Desde 20/10/2026 qualquer pessoa com 18 anos ou mais cria a própria conta em **/cadastro** (e-mail, senha e apelido), sem
