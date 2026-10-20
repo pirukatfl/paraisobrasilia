@@ -9,7 +9,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 - [x] **Phase 1: Fundação e vitrine de festas** - Site no ar em staging com festas, age gate e SEO, mais descoberta do WordPress e parecer jurídico (completed 2026-10-19)
 - [x] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas (completed 2026-10-19)
 - [x] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe (completed 2026-10-19)
-- [ ] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato
+- [x] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato (completed 2026-10-20)
 - [ ] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
 - [ ] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
 - [ ] **Phase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
@@ -158,7 +158,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 04-07-PLAN.md — Prévia pública /classisex sem contatos, fotos desfocadas, menu e sitemap (wave 6)
 - [x] 04-08-PLAN.md — Denúncias: assinante denuncia, equipe resolve ou despublica (wave 7)
 - [x] 04-09-PLAN.md — Matriz de vazamento: mídia, contatos, APIs e cabeçalhos (wave 8)
-- [ ] 04-10-PLAN.md — Guia, runbook, smoke, deploy, volume na VPS e conferência do cliente (wave 9)
+- [x] 04-10-PLAN.md — Guia, runbook, smoke, deploy, volume na VPS e conferência do cliente (wave 9)
 **UI hint**: yes
 
 ### Phase 5: Recados, mensagens e contos
@@ -212,7 +212,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 1. Fundação e vitrine de festas | 10/10 | Complete    | 2026-10-19 |
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
-| 4. ClassiSex e prévias de perfis | 9/10 | In Progress|  |
+| 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
 | 5. Recados, mensagens e contos | 0/? | Not started | - |
 | 6. Migração do WordPress | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |

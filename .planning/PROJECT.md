@@ -20,6 +20,7 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - ✓ Endereço, mapa OSM, "Como chegar" (Google Maps/Waze), WhatsApp e redes — Fase 2 (INST-02, INST-03)
 - ✓ Quem Somos com Normas, Regras e Dicas, editáveis no painel — Fase 2 (INST-01, PAINEL-04)
 - ✓ Login de assinante (sessão de 30 dias), validade por data sem cron, Assine Já com planos/preços/links PagBank editáveis, liberar/renovar/encerrar com pagamento, vencimentos em 7 dias e registro de ações — Fase 3 (ASS-01, 03..05, PAINEL-05/06/08; ASS-02 por senha provisória/link via WhatsApp, e-mail adiado)
+- ✓ ClassiSex como mural de anúncios (Eu sou, cidade, texto, contatos em campos, até 5 fotos e 1 vídeo), moderação, denúncias (menor de idade oculta na hora), mídia privada em volume próprio e prévia aberta sem contato com fotos desfocadas — Fase 4 (CLAS-01..06, PREV-01, PAINEL-07)
 - ✓ Termos de Uso e Política de Privacidade — Fase 2 (INST-06; rascunho com marcas [VALIDAR] até o parecer jurídico)
 
 ### Active
@@ -29,7 +30,6 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 - [ ] Contos e conteúdo curioso; parte dos contos aberta para gerar curiosidade, o restante para assinantes
 
 **Área controlada (só assinantes):**
-- [ ] ClassiSex: perfil completo com fotos e vídeos
 - [ ] Recados e mensagens com contato
 
 **Operação:**
@@ -98,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-19 after Phase 3 (aprovada pelo cliente)*
+*Last updated: 2026-10-20 after Phase 4 (ClassiSex aprovado no celular)*
