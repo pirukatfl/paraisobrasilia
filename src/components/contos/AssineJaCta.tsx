@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 /**
- * Shared "Assine Já" call for every open preview (PREV-04): contos, recados and ClassiSex.
+ * Shared "Assine Já" call for every open preview (PREV-04): contos and ClassiSex.
  * The primary link text is exactly "Assine Já" and goes to /assine-ja.
  */
 export function AssineJaCta({

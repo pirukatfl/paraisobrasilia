@@ -78,8 +78,9 @@ test('Modelos appears in nav, footer and sitemap only while a model is published
 
   await api.createModel({ name: 'Aurora', photos: 1 })
   links = await navLinks()
-  // UI-SPEC order, pinned explicitly: Recados (05-07) and Contos (05-03) sit between ClassiSex and Contato
-  const order = ['Festas', 'Quem somos', 'Espaço', 'Modelos', 'ClassiSex', 'Recados', 'Contos', 'Contato', 'Assine Já', 'Área do assinante']
+  // UI-SPEC order, pinned explicitly: Contos (05-03) sits between ClassiSex and Contato.
+  // Recados removed 2026-10-20 (quick recados-privados, R-08)
+  const order = ['Festas', 'Quem somos', 'Espaço', 'Modelos', 'ClassiSex', 'Contos', 'Contato', 'Assine Já', 'Área do assinante']
   await expect(links).toHaveText(order)
   if (!isMobile) {
     // the ten items stay on one line at 1280 px

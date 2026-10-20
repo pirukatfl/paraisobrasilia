@@ -4,7 +4,7 @@ import type { PublicAdDTO } from '@/lib/classisex/dto'
 
 /**
  * One ad in the open preview (PREV-01, D-04; revisão 2026-10-20): apelido, tipo and a single
- * blurred photo (/classisex/previa/…, plain <img>), plus the call to subscribe. No text, city,
+ * blurred photo (/classisex/previa/…, plain <img>), plus the call to subscribe and a locked "Enviar recado" (same on every card). No text, city,
  * contact, video or author.
  */
 export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
@@ -31,10 +31,23 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
         {ad.apelido}
       </h2>
       <p className="type-label mt-1 text-muted">{ad.euSou}</p>
-      <div className="mt-4 flex flex-1 items-end">
+      <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
         <Link href="/assine-ja" className="btn-primary">
           Assine para ver
         </Link>
+        {/* Locked on EVERY card, whoever pays: nothing here says which advertisers are subscribers (I-1, T-RP-05) */}
+        <Link
+          href="/assine-ja"
+          aria-label="Enviar recado: só para assinantes"
+          className="btn-secondary inline-flex items-center justify-center gap-2"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="5" y="11" width="14" height="9" rx="2" />
+            <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </svg>
+          Enviar recado
+        </Link>
+        <p className="type-label text-muted">Recados privados só entre assinantes.</p>
       </div>
     </article>
   )

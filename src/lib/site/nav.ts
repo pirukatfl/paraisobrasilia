@@ -1,7 +1,7 @@
 /**
  * Site navigation registry (header menu, mobile menu, footer).
- * Fixed order (UI-SPEC Phase 2, updated by 05-03/05-07): Festas · Quem somos · Espaço · Modelos · ClassiSex ·
- * Recados (05-07) · Contos (05-03) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
+ * Fixed order (UI-SPEC Phase 2, updated by 05-03; Recados removed 2026-10-20, quick recados-privados): Festas · Quem somos ·
+ * Espaço · Modelos · ClassiSex · Contos (05-03) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
  * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
@@ -27,8 +27,6 @@ export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels:
     ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
     // PREV-01: open preview; the full board lives in the members area
     { href: '/classisex', label: 'ClassiSex' },
-    // PREV-02: open teaser of the recados (05-07)
-    { href: '/recados', label: 'Recados' },
     // PREV-03: open excerpts of the contos (05-03)
     { href: '/contos', label: 'Contos' },
     { href: '/contato', label: 'Contato' },

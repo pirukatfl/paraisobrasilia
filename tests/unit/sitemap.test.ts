@@ -23,12 +23,12 @@ describe('sitemap (INST-06, T-02-13)', () => {
         '/politica-de-privacidade',
         '/assine-ja',
         '/classisex',
-        '/recados',
         '/contos',
       ]),
     )
     expect(urls).not.toContain('/modelos')
-    expect(urls).toHaveLength(13)
+    expect(urls).not.toContain('/recados') // mural removed 2026-10-20 (R-08)
+    expect(urls).toHaveLength(12)
   })
 
   it('includes /modelos and upcoming parties when present', () => {

@@ -53,7 +53,7 @@ export default async function ClassisexPublicPage({
       </p>
       <AssineJaCta
         title="Veja os anúncios completos"
-        text="Assinantes veem texto, cidade, fotos, vídeos e contatos, e anunciam também."
+        text="Assinantes veem texto, cidade, fotos, vídeos e contatos, mandam recados privados e anunciam também."
         membersHref="/area-do-assinante/classisex"
       />
       <AdFilters action={PATH} categories={categories} euSou={filters.euSou} showCidade={false} />

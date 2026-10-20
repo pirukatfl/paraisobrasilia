@@ -11,6 +11,13 @@ const isProduction = process.env.SITE_ENV === 'production'
 const nextConfig: NextConfig = {
   // Self-contained server for the Docker image (.next/standalone/server.js)
   output: 'standalone',
+  // R-05 (quick recados-privados): the public mural is gone. Fixed destinations, nothing user-controlled.
+  async redirects() {
+    return [
+      { source: '/recados', destination: '/assine-ja', permanent: true },
+      { source: '/area-do-assinante/recados', destination: '/area-do-assinante/mensagens', permanent: true },
+    ]
+  },
   async headers() {
     return [
       {
