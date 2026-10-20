@@ -24,6 +24,7 @@ import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
+import { buildEmailAdapter } from './lib/email/config'
 import { assertOutsidePublicMedia, privateMediaDir } from './lib/classisex/storage'
 
 const filename = fileURLToPath(import.meta.url)
@@ -112,6 +113,8 @@ export default buildConfig({
     // Schema push only on developer machines; test, staging and production run migrations.
     push: process.env.SITE_ENV === 'development',
   }),
+  // Hostinger SMTP when SMTP_USER/SMTP_PASS are set; otherwise Payload's console fallback
+  email: buildEmailAdapter(),
   sharp,
   upload: {
     limits: {

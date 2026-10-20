@@ -1,6 +1,7 @@
 import { createLocalReq, type Payload } from 'payload'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { requestPasswordEmail, deliver } from '../../src/lib/assinantes/reset-email'
 import { createPasswordLink, passwordLinkIsValid } from '../../src/lib/assinantes/service'
 import { getTestPayload, resetDatabase, seedAssinante, seedStaffUser } from '../helpers/seed'
 
@@ -149,5 +150,85 @@ describe('passwords without e-mail (ASS-02 substitute, D-04, T-03-04, T-03-11)',
     await expect(
       payload.forgotPassword({ collection: 'assinantes', data: { email: 'gabi@teste.local' }, disableEmail: true }),
     ).rejects.toThrow(/permiss|forbidden|not allowed/i)
+  })
+})
+
+describe('emailed password link (ASS-02)', () => {
+  let payload: Payload
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    delete process.env.EMAIL_CAPTURE_DIR
+  })
+
+  afterAll(() => {
+    delete process.env.EMAIL_CAPTURE_DIR
+  })
+
+  it('without e-mail configured nothing is attempted and the emailed flag is refused', async () => {
+    await seedAssinante(payload, { email: 'eva@teste.local', password: 'senha-eva-1234', name: 'Eva' })
+    const spy = vi.spyOn(payload, 'sendEmail')
+    expect(await requestPasswordEmail(payload, { email: 'eva@teste.local', ip: '1.1.1.1' })).toBe('desligado')
+    expect(spy).not.toHaveBeenCalled()
+    await expect(
+      payload.forgotPassword({
+        collection: 'assinantes',
+        data: { email: 'eva@teste.local' },
+        disableEmail: true,
+        context: { emailedPasswordLink: true },
+      }),
+    ).rejects.toThrow(/permiss|forbidden|not allowed/i)
+    spy.mockRestore()
+  })
+
+  it('with e-mail on: sends the Portuguese link, the token resets the password, old link is replaced', async () => {
+    process.env.EMAIL_CAPTURE_DIR = '/tmp/ignored-by-int-test'
+    const acc = await seedAssinante(payload, { email: 'fabi@teste.local', password: 'senha-fabi-1234', name: 'Fabi' })
+    const sent: { to: string; subject: string; text: string; html: string }[] = []
+    const spy = vi.spyOn(payload, 'sendEmail').mockImplementation((async (m: never) => {
+      sent.push(m)
+    }) as never)
+    expect(await deliver(payload, 'fabi@teste.local')).toBe(true)
+    expect(await deliver(payload, 'ninguem@teste.local')).toBe(false)
+    expect(sent).toHaveLength(1)
+    expect(sent[0]!.to).toBe('fabi@teste.local')
+    const first = /nova-senha\?token=([a-f0-9]+)/.exec(sent[0]!.text)![1]!
+    expect(sent[0]!.html).toContain(first)
+
+    // A newer e-mail cancels the older link
+    await deliver(payload, 'fabi@teste.local')
+    const second = /nova-senha\?token=([a-f0-9]+)/.exec(sent[1]!.text)![1]!
+    expect(second).not.toBe(first)
+    expect(await passwordLinkIsValid(payload, first)).toBe(false)
+    expect(await passwordLinkIsValid(payload, second)).toBe(true)
+
+    const reset = await payload.resetPassword({
+      collection: 'assinantes',
+      data: { token: second, password: 'nova-senha-fabi-1' },
+      overrideAccess: true,
+    })
+    expect(reset.token).toBeTruthy()
+    await expect(
+      payload.login({ collection: 'assinantes', data: { email: 'fabi@teste.local', password: 'senha-fabi-1234' } }),
+    ).rejects.toThrow()
+    expect((await payload.login({ collection: 'assinantes', data: { email: 'fabi@teste.local', password: 'nova-senha-fabi-1' } })).token).toBeTruthy()
+    expect(acc.id).toBeTruthy()
+    spy.mockRestore()
+  })
+
+  it('rate limit: 5 per e-mail per hour, counted whether or not the account exists', async () => {
+    process.env.EMAIL_CAPTURE_DIR = '/tmp/ignored-by-int-test'
+    const spy = vi.spyOn(payload, 'sendEmail').mockResolvedValue(undefined as never)
+    const now = Date.UTC(2026, 9, 20, 15)
+    const results: string[] = []
+    for (let i = 0; i < 6; i++) {
+      results.push(await requestPasswordEmail(payload, { email: 'fantasma@teste.local', ip: `10.9.0.${i}`, now }))
+    }
+    expect(results).toEqual(['enviado', 'enviado', 'enviado', 'enviado', 'enviado', 'limite'])
+    spy.mockRestore()
   })
 })

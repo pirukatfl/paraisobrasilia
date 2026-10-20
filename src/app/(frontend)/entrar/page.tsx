@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 
 import { FormField } from '@/components/assinantes/FormField'
 import { ExternalLink } from '@/components/ExternalLink'
+import { emailEnabled } from '@/lib/email/config'
 import { entrar } from '@/lib/assinantes/actions'
 import { safeNext } from '@/lib/assinantes/redirect'
 import { getAssinante } from '@/lib/assinantes/session'
@@ -57,7 +58,20 @@ export default async function EntrarPage({
         </button>
       </form>
       <p className="mt-6 text-body text-muted">
-        Esqueceu a senha? Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova.{' '}
+        {emailEnabled() ? (
+          <>
+            <Link
+              href="/esqueci-senha"
+              className="type-label inline-flex min-h-11 items-center text-accent underline underline-offset-4"
+            >
+              Esqueci minha senha
+            </Link>
+            <br />
+            Se não receber o e-mail, fale com a equipe pelo WhatsApp:{' '}
+          </>
+        ) : (
+          <>Esqueceu a senha? Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova. </>
+        )}
         {contact.whatsapp && (
           <ExternalLink
             href={whatsappUrl(contact.whatsapp)}

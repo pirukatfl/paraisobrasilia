@@ -261,3 +261,39 @@ echo "DOMAIN_OUT=$DOMAIN"`
     })
   })
 })
+
+describe('e-mail settings (ASS-02, 2026-10-20)', () => {
+  const vars = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_FROM_ADDRESS', 'EMAIL_FROM_NAME']
+
+  it('the staging env example and the bootstrap carry the SMTP variables, user and password empty', () => {
+    const env = read('.env.staging.example')
+    const bootstrap = read('scripts/deploy/bootstrap-vps.sh')
+    for (const name of vars) {
+      expect(env).toMatch(new RegExp(`^${name}=`, 'm'))
+      expect(bootstrap).toContain(`${name}=`)
+    }
+    expect(env).toMatch(/^SMTP_USER=$/m)
+    expect(env).toMatch(/^SMTP_PASS=$/m)
+    expect(bootstrap).toMatch(/^SMTP_PASS=$/m)
+  })
+
+  it('the bootstrap only appends missing SMTP lines and never generates or logs the SMTP password', () => {
+    const bootstrap = read('scripts/deploy/bootstrap-vps.sh')
+    expect(bootstrap).toContain('grep -q "^${pair%%=*}=" "$ENV_FILE" ||')
+    expect(bootstrap).not.toMatch(/SMTP_PASS=.*openssl/)
+    expect(bootstrap).not.toMatch(/echo[^\n]*SMTP_PASS/)
+  })
+
+  it('the app container reads .env.staging; the runbook documents the silent password prompt', () => {
+    for (const file of ['docker-compose.staging.yml', 'docker-compose.staging.ghcr.yml']) {
+      expect(service(read(file), 'app')).toContain('env_file: .env.staging')
+      expect(read(file)).not.toMatch(/SMTP_PASS:/)
+    }
+    const runbook = read('docs/deploy/STAGING.md')
+    expect(runbook).toContain('read -rsp')
+    expect(runbook).toContain('update.sh --force')
+    expect(runbook).toContain('send-test-email.mjs')
+    expect(runbook).toMatch(/SPF/)
+    expect(runbook).toMatch(/DKIM/)
+  })
+})
