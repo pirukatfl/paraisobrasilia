@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-stopped_at: Phase 5 code complete 11/12 (05-12 deploy + client check pending); quick conta-gratuita in progress (A1 done)
-last_updated: 2026-10-20T17:00:00.000Z
+status: executing
+stopped_at: Completed 04-07-PLAN.md
+last_updated: "2026-10-20T20:02:24.582Z"
 last_activity: 2026-10-20
 progress:
   total_phases: 7
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-10-19)
 
 Phase: 5 of 7 (recados, mensagens e contos)
 Plan: 05-01..05-11 done (code gate green 2026-10-20); 05-12 (deploy + client check) pending
-Status: In progress; quick task 2026-10-20-conta-gratuita running before 05-12
+Status: In progress; quick task 2026-10-20-conta-gratuita code complete (gate green); client checkpoint F3 and deploy 05-12 pending
 Last activity: 2026-10-20
 
 Progress: [█████████░] 98% (44/45 plans); Phase 5: 11/12
@@ -151,7 +151,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-20 | classisex-ajustes | ClassiSex per client choices: 10 photos + 2 videos, WhatsApp/Telegram only, Casal/Mulher/Homem/Trans, required apelido, public preview = apelido + tipo + 1 blurred photo (see .planning/quick/2026-10-20-classisex-ajustes/) |
 | 2026-10-20 | classisex-midia-na-criacao | Photos and videos chosen in the create-ad form (see .planning/quick/2026-10-20-classisex-midia-na-criacao/) |
 | 2026-10-20 | email-hostinger | Transactional e-mail through the Hostinger SMTP; /esqueci-senha (see .planning/quick/2026-10-20-email-hostinger/) |
-| 2026-10-20 | conta-gratuita | Open sign-up, free vs paying tiers on the ClassiSex (G-01..G-06) (see .planning/quick/2026-10-20-conta-gratuita/) |
+| 2026-10-20 | conta-gratuita | Open sign-up with e-mail confirmation, free vs paying tiers on the ClassiSex, ads stay online as free (cover only) after expiry, Grátis x Assinante table (G-01..G-06); migration 20261020_172550_conta_gratuita; gate: Vitest 539, Playwright 391 passed / 0 failed, build ok (see .planning/quick/2026-10-20-conta-gratuita/) |
 
 ## Deferred Items
 
@@ -161,6 +161,6 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 
 ## Session Continuity
 
-Last session: 2026-10-19T21:54:51.448Z
+Last session: 2026-10-20T20:02:24.557Z
 Stopped at: Completed 04-07-PLAN.md
 Resume file: None
