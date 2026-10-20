@@ -13,6 +13,7 @@ import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audi
 import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
 import { expire } from '../lib/cache/expire'
+import { emailEnabled } from '../lib/email/config'
 
 export const MIN_PASSWORD_LENGTH = 8
 export const PASSWORD_TOO_SHORT = 'A senha precisa ter pelo menos 8 caracteres.'
@@ -27,8 +28,10 @@ const secureCookies = (process.env.NEXT_PUBLIC_SERVER_URL ?? '').startsWith('htt
  * - create: only staff, or trusted server code (migrations, imports, tests) via `req.context.trustedCreate`.
  *   Closes POST /api/assinantes/first-register, which creates with overrideAccess while the
  *   collection is empty (T-03-02).
- * - forgotPassword: only the staff "link de nova senha" service (`req.context.staffPasswordLink`);
- *   the public endpoint would otherwise mint tokens and overwrite a staff-generated link (T-03-03).
+ * - forgotPassword: only the staff "link de nova senha" service (`req.context.staffPasswordLink`)
+ *   or the rate-limited /esqueci-senha action (`req.context.emailedPasswordLink`, and only while
+ *   e-mail is configured). The public REST endpoint cannot set either flag, so it stays closed
+ *   (T-03-03). A newer token (staff link or e-mail) replaces the older one.
  * - password writes: minimum length; a password typed by staff is temporary (D-04).
  */
 const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }) => {
@@ -36,8 +39,11 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
   if (operation === 'create' && !staff && req.context?.trustedCreate !== true) {
     throw new Forbidden(req.t)
   }
-  if (operation === 'forgotPassword' && req.context?.staffPasswordLink !== true) {
-    throw new Forbidden(req.t)
+  if (operation === 'forgotPassword') {
+    // Staff link (no e-mail), or the "Esqueci minha senha" action — only while e-mail is configured
+    const staffLink = req.context?.staffPasswordLink === true
+    const emailed = req.context?.emailedPasswordLink === true && emailEnabled()
+    if (!staffLink && !emailed) throw new Forbidden(req.t)
   }
   const writeArgs = args as { data?: Record<string, unknown> }
   const data = operation === 'create' || operation === 'update' ? writeArgs.data : undefined

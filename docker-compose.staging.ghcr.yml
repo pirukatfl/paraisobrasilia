@@ -43,6 +43,8 @@ services:
   app:
     image: ${GHCR_IMAGE:?set GHCR_IMAGE in .env.staging}:${IMAGE_TAG:-staging}
     restart: unless-stopped
+    # SMTP_HOST/PORT/USER/PASS and EMAIL_FROM_* reach the app through this env_file (empty = no e-mail).
+    # Never put the SMTP password in this compose file.
     env_file: .env.staging
     environment:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso

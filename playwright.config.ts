@@ -21,6 +21,8 @@ const testEnv: Record<string, string> = {
   SITE_ENV: process.env.SITE_ENV ?? 'staging',
   NEXT_PUBLIC_AGE_GATE_PROVIDER: process.env.NEXT_PUBLIC_AGE_GATE_PROVIDER ?? 'self-declaration',
   TZ: process.env.TZ ?? 'America/Sao_Paulo',
+  // E-mail never leaves the test machine: messages are written here and read back by the specs
+  EMAIL_CAPTURE_DIR: process.env.EMAIL_CAPTURE_DIR ?? path.resolve(dirname, 'test-results/emails'),
 }
 
 export default defineConfig({

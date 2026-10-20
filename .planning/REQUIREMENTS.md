@@ -37,7 +37,7 @@
 ### Assinantes (ASS)
 
 - [x] **ASS-01**: Assinante entra com e-mail e senha e continua logado entre visitas
-- [x] **ASS-02**: Assinante redefine a senha por link enviado ao e-mail (v1: link/senha provisória gerados pela equipe e enviados pelo WhatsApp; e-mail adiado — decisão do cliente 2026-10-19)
+- [x] **ASS-02**: Assinante redefine a senha por link enviado ao e-mail (v1: link/senha provisória gerados pela equipe e enviados pelo WhatsApp; e-mail adiado — decisão do cliente 2026-10-19; e-mail ligado em 2026-10-20: "Esqueci minha senha" em /esqueci-senha envia o link pelo SMTP da Hostinger (suporte@swingbrasilia.com.br), com a senha provisória/link da equipe mantidos)
 - [x] **ASS-03**: Assinante vê até quando sua assinatura vale
 - [x] **ASS-04**: Assinatura vencida perde acesso ao conteúdo restrito automaticamente na data
 - [x] **ASS-05**: Visitante vê na página "Assine Já" os planos e como pagar (pagamento manual)

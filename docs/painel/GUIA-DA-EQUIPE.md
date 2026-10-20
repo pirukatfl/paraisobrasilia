@@ -144,8 +144,9 @@ imagem do site nunca causa problema.
 ## Assinantes
 
 Tudo sobre assinantes fica no menu **Assinantes** do painel: **Assinantes** (as contas), **Planos**,
-**Assinaturas e pagamentos** e **Registro de ações**. O site **não manda e-mail**: tudo o que o assinante precisa
-receber (senha, link, aviso de vencimento) vai pelo **WhatsApp da casa**, direto para o WhatsApp do próprio assinante.
+**Assinaturas e pagamentos** e **Registro de ações**. O site só manda e-mail quando o assinante pede **"Esqueci minha senha"**
+(link para criar nova senha). Tudo o mais que o assinante precisa receber (senha provisória, aviso de vencimento)
+vai pelo **WhatsApp da casa**, direto para o WhatsApp do próprio assinante.
 
 ### Novo assinante
 
@@ -186,12 +187,17 @@ Registro de ações — nada é apagado.
 
 ### Senha provisória e link de nova senha
 
-Quando o assinante esquece a senha, há dois jeitos:
+Quando o assinante esquece a senha, ele mesmo pode abrir **Entrar → Esqueci minha senha**, digitar o e-mail
+e receber um link por e-mail (de suporte@swingbrasilia.com.br; vale 48 horas, uso único; no máximo 5 pedidos por hora).
+O site responde sempre igual, exista a conta ou não. Se o e-mail não chegar (olhe o spam) ou o assinante não
+conseguir, use um dos jeitos abaixo:
 
 - **Link de nova senha (preferido):** na ficha, quadro **Assinatura** → **Senha** → **Gerar link de nova senha**.
   Clique em **Enviar pelo WhatsApp** (abre a conversa com o assinante já com a mensagem) ou em **Copiar** e cole
   na conversa dele. O link **vale por 48 horas e só pode ser usado uma vez**; gerar um link novo cancela o anterior.
   O assinante abre o link, escolhe a senha nova e já entra.
+  O mesmo vale entre os dois caminhos: se o assinante pedir um link por e-mail depois de você gerar o seu, só o mais
+  recente funciona (e vice-versa). Se ele disser que o link "expirou", gere outro e avise para usar só esse.
 - **Senha provisória:** escreva uma senha nova (8+ caracteres) no campo **Senha** da ficha e clique em **Salvar**.
   O assinante sai de todos os aparelhos e, ao entrar com a senha provisória, o site pede para trocar.
 

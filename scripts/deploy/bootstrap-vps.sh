@@ -124,6 +124,8 @@ services:
   app:
     image: ${GHCR_IMAGE:?set GHCR_IMAGE in .env.staging}:${IMAGE_TAG:-staging}
     restart: unless-stopped
+    # SMTP_HOST/PORT/USER/PASS and EMAIL_FROM_* reach the app through this env_file (empty = no e-mail).
+    # Never put the SMTP password in this compose file.
     env_file: .env.staging
     environment:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
@@ -192,6 +194,12 @@ if [ -f "$ENV_FILE" ]; then
   else
     printf 'GHCR_IMAGE=%s\n' "$GHCR_IMAGE" >>"$ENV_FILE"
   fi
+  # E-mail settings: add only the lines that are missing (empty). Existing values, including
+  # SMTP_USER/SMTP_PASS, are never read, changed or printed.
+  for pair in 'SMTP_HOST=smtp.hostinger.com' 'SMTP_PORT=465' 'SMTP_USER=' 'SMTP_PASS=' \
+    'EMAIL_FROM_ADDRESS=suporte@swingbrasilia.com.br' 'EMAIL_FROM_NAME=Paraíso Brasília'; do
+    grep -q "^${pair%%=*}=" "$ENV_FILE" || printf '%s\n' "$pair" >>"$ENV_FILE"
+  done
 else
   DOMAIN="${DOMAIN:-}"
   while [ -z "$DOMAIN" ]; do
@@ -216,6 +224,14 @@ MEDIA_DIR=/app/media
 GHCR_IMAGE=$GHCR_IMAGE
 # Voltar versão: troque "staging" por "sha-<commit>" e rode: /opt/paraiso-site/update.sh --force
 IMAGE_TAG=staging
+# E-mail (suporte@swingbrasilia.com.br). Vazio = site sem envio de e-mail. A senha é colocada
+# depois, à mão, SEM ecoar: veja docs/deploy/STAGING.md (seção E-mail).
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_USER=
+SMTP_PASS=
+EMAIL_FROM_ADDRESS=suporte@swingbrasilia.com.br
+EMAIL_FROM_NAME=Paraíso Brasília
 EOF
   umask 022
   ok "criado com senhas novas (só neste servidor)"

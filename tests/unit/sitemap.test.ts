@@ -43,7 +43,7 @@ describe('sitemap (INST-06, T-02-13)', () => {
     expect(urls).toContain('/assine-ja')
     expect(urls).toContain('/classisex') // public preview (PREV-01); the full board is members-only
     for (const url of urls) {
-      expect(url).not.toMatch(/^\/(area-do-assinante|entrar|nova-senha)/)
+      expect(url).not.toMatch(/^\/(area-do-assinante|entrar|nova-senha|esqueci-senha)/)
     }
   })
 })

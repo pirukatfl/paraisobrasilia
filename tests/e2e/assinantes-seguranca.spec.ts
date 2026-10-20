@@ -197,8 +197,8 @@ test.describe('logged-in subscriber', () => {
 test('sitemap and noindex on auth pages', async ({ request }) => {
   const sitemap = await (await request.get('/sitemap.xml')).text()
   expect(sitemap).toContain('/assine-ja')
-  for (const path of ['/area-do-assinante', '/entrar', '/nova-senha']) expect(sitemap).not.toContain(path)
-  for (const path of ['/entrar', '/nova-senha']) {
+  for (const path of ['/area-do-assinante', '/entrar', '/nova-senha', '/esqueci-senha']) expect(sitemap).not.toContain(path)
+  for (const path of ['/entrar', '/nova-senha', '/esqueci-senha']) {
     const res = await request.get(path)
     expect(res.headers()['x-robots-tag']).toContain('noindex')
   }

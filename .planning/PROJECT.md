@@ -79,6 +79,7 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 | Hospedagem: Hostinger VPS (mesma conta do site atual) | Aceita conteúdo adulto por escrito | ✓ Good — staging no ar em novo.swingbrasilia.com.br (2026-10-19) |
 | Fotos e vídeos no disco da própria VPS, sem Backblaze B2 | Decisão do cliente (2026-10-17): menos contas e custos; backup precisa incluir a mídia | ✓ Implementado (volume media); ⚠️ backup fora do servidor pendente (Fase 7) |
 | Deploy por pull: GitHub Actions → GHCR → timer systemd na VPS | Nosso ambiente não tem SSH para a VPS; o cliente roda um script uma vez | ✓ Good — run 39162346021 publicou as imagens; site no ar |
+| E-mail transacional pela caixa suporte@swingbrasilia.com.br (SMTP Hostinger) | Pedido do cliente 2026-10-20: "Esqueci minha senha" por e-mail (ASS-02); decisão D-04 (sem e-mail) revista | ✓ Implementado (2026-10-20); credenciais só no .env.staging do servidor, site segue sem e-mail se vazias |
 
 ## Evolution
 

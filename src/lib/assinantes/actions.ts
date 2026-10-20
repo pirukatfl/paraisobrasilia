@@ -2,7 +2,7 @@
 
 import config from '@payload-config'
 import { logout } from '@payloadcms/next/auth'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AuthenticationError, createLocalReq, getPayload, LockedAuth, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
@@ -10,6 +10,7 @@ import { generatePayloadCookie } from 'payload/shared'
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
 import { writeAudit } from './audit'
 import { safeNext } from './redirect'
+import { requestPasswordEmail } from './reset-email'
 import { requireAssinante } from './session'
 
 type LoginError = 'credenciais' | 'bloqueado'
@@ -157,4 +158,17 @@ export async function definirNovaSenha(formData: FormData): Promise<void> {
     summary: 'Senha criada pelo link enviado pela equipe',
   })
   redirect('/area-do-assinante?ok=senha')
+}
+
+/**
+ * "Esqueci minha senha" form (/esqueci-senha). The visible answer is the same whether or not the
+ * e-mail has an account (no enumeration); only the rate limit and "e-mail off" differ.
+ */
+export async function pedirNovaSenha(formData: FormData): Promise<void> {
+  const email = field(formData, 'email')
+  const h = await headers()
+  const ip = (h.get('x-forwarded-for')?.split(',')[0] ?? h.get('x-real-ip') ?? 'desconhecido').trim()
+  const payload = await getPayload({ config })
+  const result = await requestPasswordEmail(payload, { email, ip })
+  redirect(result === 'enviado' ? '/esqueci-senha?enviado=1' : `/esqueci-senha?erro=${result}`)
 }

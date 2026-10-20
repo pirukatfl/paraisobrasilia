@@ -199,9 +199,10 @@ Vídeo ocupa muito mais espaço que foto, então:
 - **Migrações:** a Fase 3 traz quatro migrações (`assinantes`, `plans` com os quatro planos iniciais,
   `subscriptions`, `audit_log`). O timer roda `migrate` antes de reiniciar o site, como sempre; não há SQL manual.
   Os planos só são criados se a tabela estiver vazia.
-- **Sem e-mail:** o site funciona **sem e-mail** configurado (decisão D-04). Não existe "esqueci minha senha" público:
-  a troca de senha é feita pela equipe (senha provisória ou link de nova senha de 48 horas, enviado pelo WhatsApp).
-  O aviso "No email adapter provided" no log é esperado.
+- **E-mail:** desde 2026-10-20 o site pode enviar e-mail pela caixa `suporte@swingbrasilia.com.br` (Hostinger) —
+  veja a seção 11. Enquanto `SMTP_USER`/`SMTP_PASS` estiverem vazios, o site funciona **sem e-mail**: "Esqueci minha
+  senha" fica desligado e a troca de senha é feita pela equipe (senha provisória ou link de 48 horas pelo WhatsApp).
+  O aviso "No email adapter provided" no log é esperado nesse caso.
 - **Sessões:** o login do assinante dura 30 dias. Cinco senhas erradas seguidas bloqueiam a conta por 10 minutos.
 - **Primeiro assinante:** ninguém cria conta de fora (o cadastro público e o `first-register` estão fechados para
   `assinantes`). A equipe cria as contas no painel, como em `GUIA-DA-EQUIPE.md` → Assinantes.
@@ -291,6 +292,74 @@ servidos pelo próprio site, rascunhos invisíveis para visitantes, as páginas 
 Termos, Privacidade, Contato com o link do WhatsApp, Espaço), as páginas da Fase 3 (Assine Já com os planos, Entrar com
 `noindex`, área do assinante pedindo login, dados de assinantes fechados para visitantes) e a porta do banco (5432)
 fechada. Não cria nem altera nada.
+
+---
+
+## 11. E-mail (suporte@swingbrasilia.com.br)
+
+O site envia e-mail pelo servidor SMTP da Hostinger. Hoje serve para **"Esqueci minha senha"** do assinante
+(`/entrar` → `/esqueci-senha`) e para a recuperação de senha da equipe no `/admin`. Sem usuário e senha de e-mail
+preenchidos, nada é enviado e o site continua funcionando como antes.
+
+### 11.1 Colocar usuário e senha no servidor (cliente, ~3 minutos)
+
+A senha **nunca** vai para o chat, para o GitHub nem aparece na tela. Entre no servidor (hPanel → VPS → Terminal)
+e cole este bloco inteiro. Ele pergunta o usuário, pergunta a senha **sem mostrar o que você digita**, grava no
+arquivo `.env.staging` e reinicia o site:
+
+```bash
+cd /opt/paraiso-site
+read -rp "Usuário do e-mail [suporte@swingbrasilia.com.br]: " SMTP_U
+SMTP_U="${SMTP_U:-suporte@swingbrasilia.com.br}"
+read -rsp "Senha do e-mail (não aparece ao digitar): " SMTP_P; echo
+case "$SMTP_P" in *"'"*) echo "A senha não pode ter aspas simples (')."; SMTP_P="" ;; esac
+if [ -n "$SMTP_P" ]; then
+  sed -i '/^SMTP_USER=/d;/^SMTP_PASS=/d' .env.staging
+  printf "SMTP_USER=%s\nSMTP_PASS='%s'\n" "$SMTP_U" "$SMTP_P" >> .env.staging
+  chmod 600 .env.staging
+  /opt/paraiso-site/update.sh --force
+fi
+unset SMTP_U SMTP_P
+```
+
+O `update.sh --force` reinicia o site (leva cerca de um minuto). Outras linhas do `.env.staging` não mudam. Para
+trocar a senha depois, repita o bloco. Para **desligar** o e-mail, apague as linhas `SMTP_USER` e `SMTP_PASS`
+(ou deixe-as vazias) e rode `/opt/paraiso-site/update.sh --force`.
+
+Valores padrão (já estão no arquivo; só mude se a Hostinger pedir): `SMTP_HOST=smtp.hostinger.com`,
+`SMTP_PORT=465` (conexão segura), `EMAIL_FROM_ADDRESS=suporte@swingbrasilia.com.br`, `EMAIL_FROM_NAME=Paraíso Brasília`.
+
+### 11.2 Testar o envio (uma linha, no servidor)
+
+```bash
+cd /opt/paraiso-site && docker compose --env-file .env.staging run --rm migrate node scripts/deploy/send-test-email.mjs SEU-EMAIL@exemplo.com
+```
+
+Mostra "Conexão ... ok" e "Enviado para ..." (a senha nunca é impressa); confira também a pasta de spam. Se
+falhar, a mensagem diz o motivo (login recusado, porta bloqueada etc.). Teste completo pelo site: abra
+`/esqueci-senha` numa janela anônima, digite o e-mail de uma conta de teste e confira a caixa de entrada.
+
+### 11.3 SPF e DKIM (para o e-mail não cair no spam)
+
+Os e-mails saem do domínio `swingbrasilia.com.br`. A Hostinger configura SPF e DKIM sozinha quando o e-mail e o DNS
+do domínio estão na Hostinger. Para conferir: hPanel → **E-mails** → o domínio → **Configurações de DNS / Entregabilidade**
+(deve mostrar SPF e DKIM como "ativos"). Pelo servidor:
+
+```bash
+dig +short TXT swingbrasilia.com.br | grep -i spf          # deve conter "include:_spf.mail.hostinger.com"
+dig +short TXT hostingermail1._domainkey.swingbrasilia.com.br   # chave DKIM (também hostingermail2 e 3)
+```
+
+Se o DNS do domínio estiver em outro lugar (ex.: Cloudflare), os mesmos registros precisam existir lá.
+
+### 11.4 Regras do "Esqueci minha senha"
+
+- A resposta é sempre a mesma ("Se o e-mail existir, enviamos um link…"), exista a conta ou não.
+- Limite de 5 pedidos por hora por endereço de IP e por e-mail (contado na memória do site; reiniciar o site zera).
+- O link vale por 48 horas e só pode ser usado uma vez. **Um link novo cancela o anterior**: se a equipe gerar um
+  link pelo painel e, em seguida, o assinante pedir por e-mail (ou o contrário), só o mais recente funciona.
+- A API pública `/api/assinantes/forgot-password` continua fechada; só o formulário do site (com e-mail ligado)
+  e o painel da equipe geram links.
 
 ---
 
