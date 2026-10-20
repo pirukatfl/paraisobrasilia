@@ -1,4 +1,4 @@
-# Guia da equipe — painel do site (Fases 2 a 4)
+# Guia da equipe — painel do site (Fases 2 a 5 e contas gratuitas)
 
 Este guia explica, passo a passo, como a equipe mantém sozinha a parte aberta do site: fotos e vídeos do espaço,
 modelos, textos, contato e pedidos de remoção de imagem — e, desde a Fase 3, os assinantes (contas, pagamentos,
@@ -251,11 +251,12 @@ painel ou vê a área do assinante com o usuário errado.
 ## ClassiSex
 
 No site novo o ClassiSex é um **mural de anúncios** — o roteiro antigo chamava de "perfis". O assinante com acesso ativo
-escreve o anúncio, com **até 10 fotos e até 2 vídeos curtos (cada um com até 60 segundos)**; **nada vai ao ar sem a sua
+escreve o anúncio, com **até 10 fotos e até 2 vídeos curtos (cada um com até 60 segundos)** (a conta gratuita tem 1 foto e
+nenhum vídeo: veja **Contas gratuitas**); **nada vai ao ar sem a sua
 aprovação**. Quem não é assinante vê só uma prévia: o **apelido**, o **tipo** (Casal, Mulher, Homem ou Trans) e **uma foto
 desfocada**, com o botão "Assine para ver". O texto, a cidade, todas as fotos, os vídeos e os contatos (**WhatsApp e
 Telegram**, pelo menos um; não há campo de e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
-vence, os anúncios da pessoa saem do ar até ela renovar.
+vence, o anúncio da pessoa **continua no ar como gratuito**: só a capa, sem vídeos, até ela renovar.
 
 O assinante já pode anexar as fotos e os vídeos **na hora de criar o anúncio** (em Meus anúncios → Novo anúncio); os arquivos
 sobem logo depois de enviar o formulário e chegam para você na mesma fila de aprovação. As regras e os limites são os mesmos.
@@ -323,6 +324,90 @@ Para parar de usar uma opção, **desative**; **não apague** uma opção que j�
 Sempre numa **janela anônima** (no celular: aba anônima/privada), como em "Testar o login de um assinante". Entre em
 `/entrar`, abra **ClassiSex** e confira os anúncios. Para testar o link direto de uma foto, copie o endereço da foto e
 abra numa **outra janela anônima, sem login**: ela **não** deve abrir. É o esperado.
+
+---
+
+## Contas gratuitas
+
+Desde 20/10/2026 qualquer pessoa com 18 anos ou mais cria a própria conta em **/cadastro** (e-mail, senha e apelido), sem
+pagar. A conta nasce **gratuita**. A assinatura continua sendo liberada por vocês, como sempre (Assinantes → Assinatura →
+Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
+
+### Grátis e Assinante
+
+| | Grátis | Assinante |
+|---|---|---|
+| Fotos por anúncio | 1 | até 10 |
+| Vídeos por anúncio | não | até 2 |
+| Anúncios ativos | até 3 | até 3 |
+| Ver anúncios do ClassiSex | só os seus | todos, com WhatsApp e Telegram |
+| Mensagens e recados | não | sim |
+| Contos completos | só o início | sim |
+
+- Esse mesmo quadro aparece para a pessoa em **/cadastro**, **/assine-ja**, **Meus anúncios** e **Novo anúncio**, com o
+  botão "Assine Já".
+- O anúncio de uma conta gratuita **passa pela sua aprovação como qualquer outro**. Depois de aprovado ele aparece na
+  lista dos assinantes (com **só a capa**) e na área aberta (apelido, tipo e a foto desfocada).
+- Na tela de **Moderação** do anúncio há a linha **"Conta do anunciante"**: "Conta gratuita — no ClassiSex aparece só a
+  capa, sem vídeos" ou "Assinante". Use para saber o que a pessoa vai mostrar depois de aprovado.
+- O assinante que vê o anúncio de uma conta gratuita enxerga o **WhatsApp e o Telegram** do anúncio, mas **não tem o botão
+  "Enviar mensagem"** (conta gratuita não recebe mensagens). Conta gratuita também não manda mensagens nem recados.
+
+### Cadastro pelo site
+
+- A pessoa marca "Tenho 18 anos ou mais" e "Li e aceito os Termos de Uso e a Política de Privacidade". A data e a hora das
+  duas marcações ficam gravadas na conta (campos **Declarou 18+ em** e **Aceitou Termos e Privacidade em**, só leitura).
+- Depois de enviar o formulário a pessoa recebe um **e-mail com um link** (vale 7 dias). Só depois de clicar nele ela consegue
+  entrar. Contas que não confirmam em 7 dias são apagadas sozinhas (a limpeza roda quando alguém novo se cadastra).
+- Na lista **Assinantes** há as colunas **Conta** ("Gratuita" ou "Assinante até dd/mm/aaaa"), **Origem** ("Equipe" ou
+  "Cadastro no site") e **E-mail confirmado** ("Sim" ou "Não"). Para ver só quem veio pelo site, filtre por **Origem**.
+- Contas criadas por vocês no painel já nascem com o e-mail confirmado e continuam funcionando como antes.
+- O cadastro **só funciona com o e-mail do site ligado** (veja o runbook, seção 11). Se o e-mail estiver desligado, /cadastro
+  mostra o aviso de **cadastro fechado** e o botão de criar conta some; as contas continuam sendo criadas por vocês.
+- Há limite de tentativas por internet e por e-mail (5 cadastros por hora por internet, 3 por e-mail); passou do limite, a
+  pessoa vê um aviso para tentar mais tarde. O limite zera se o site for reiniciado.
+
+### E-mail não chegou
+
+1. Peça para olhar a caixa de **spam/lixo eletrônico** e procurar por "suporte@swingbrasilia.com.br".
+2. Na tela de entrar, a própria pessoa pede **"Reenviar link"** (vale o mesmo limite de tentativas).
+3. Se ainda assim não chegar (e-mail digitado errado, provedor que bloqueia): abra a conta em **Assinantes**, confira o
+   e-mail e, se tiver certeza de que a pessoa é ela, clique em **"Marcar e-mail como confirmado"** no campo **E-mail
+   confirmado**. A ação fica no **Registro de ações** ("Conta editada (e-mail confirmado)").
+4. Se o e-mail estava errado, é mais simples excluir a conta e pedir que a pessoa se cadastre de novo.
+
+### Liberar assinatura de quem já tem conta
+
+Quem pagou e já tem conta (feita pelo site ou por vocês) **não precisa de senha nova**:
+
+1. Confira o comprovante e o **e-mail da conta** que a pessoa informou no WhatsApp.
+2. Abra a conta em **Assinantes** (busque pelo e-mail) → **Assinatura** → **Liberar acesso**, como no passo de sempre.
+3. Pronto: ao recarregar a página, a pessoa já tem 10 fotos, 2 vídeos e a lista completa do ClassiSex. Os anúncios dela
+   continuam os mesmos e as fotos extras que estavam "Guardadas" voltam a aparecer.
+
+### Vencimento: o anúncio continua como gratuito
+
+Mudou a regra antiga ("anúncio some quando vence"). Agora, quando a assinatura vence ou é encerrada:
+
+- o anúncio **continua no ar**, mostrando **só a capa** (a primeira foto) e nenhum vídeo;
+- as outras fotos e os vídeos **não são apagados**: ficam **Guardados** e aparecem de novo quando a pessoa renovar. Na tela
+  de edição ela vê o aviso "Guardada: volta a aparecer quando você assinar";
+- a pessoa não pode acrescentar foto enquanto já tem uma, nem enviar vídeo, até assinar de novo;
+- **Recados e mensagens** continuam como antes: saem do ar com a assinatura ("Fora do ar: assinatura vencida").
+
+Isso vale também para contas **encerradas** pela equipe. Para tirar um anúncio do ar de verdade, use **Despublicar**.
+
+### Termos de Uso e Política de Privacidade (rascunho para validar)
+
+> **[VALIDAR com o advogado antes de publicar]** "Ao criar uma conta no Paraíso Brasília você declara ter 18 anos ou mais
+> e concorda com os Termos de Uso e a Política de Privacidade. Guardamos seu e-mail, seu apelido, a data em que você
+> confirmou ter 18 anos e aceitou estes documentos, e os anúncios que você publicar, para operar o serviço, evitar abusos e
+> cumprir obrigações legais (LGPD). Contas não confirmadas por e-mail em 7 dias são apagadas. Você pode pedir a exclusão da
+> conta e dos anúncios a qualquer momento pelo WhatsApp da casa. O anúncio publicado por conta gratuita mostra apenas uma
+> foto; fotos e vídeos adicionais ficam guardados e só aparecem para assinantes. Você é responsável pelo conteúdo que
+> envia e declara que todas as pessoas nas fotos e vídeos são maiores de idade e autorizaram a publicação."
+
+Esse texto **ainda não está** nas páginas Termos e Privacidade do site: cole e ajuste em **Textos** depois da validação.
 
 ---
 

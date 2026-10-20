@@ -297,3 +297,33 @@ describe('e-mail settings (ASS-02, 2026-10-20)', () => {
     expect(runbook).toMatch(/DKIM/)
   })
 })
+
+describe('conta gratuita runbook and staff guide (G-01..G-06, 2026-10-20)', () => {
+  it('the runbook documents the migration, the SMTP dependency and the closed sign-up', () => {
+    const runbook = read('docs/deploy/STAGING.md')
+    expect(runbook).toContain('### 7.5 Conta gratuita')
+    expect(runbook).toContain('conta_gratuita')
+    expect(runbook).toContain('SMTP_USER')
+    expect(runbook).toContain('cadastro fechado')
+    expect(runbook).toContain('_verified = true')
+  })
+
+  it('the staff guide explains the free account, the e-mail fallback and the expiry rule', () => {
+    const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+    expect(guide).toContain('## Contas gratuitas')
+    for (const heading of [
+      'Grátis e Assinante',
+      'Cadastro pelo site',
+      'E-mail não chegou',
+      'Liberar assinatura de quem já tem conta',
+      'Vencimento: o anúncio continua como gratuito',
+    ]) {
+      expect(guide).toContain(`### ${heading}`)
+    }
+    expect(guide).toContain('só a capa')
+    expect(guide).toContain('Guardada')
+    expect(guide).toMatch(/\[VALIDAR/)
+    // the old rule must not survive anywhere in the guide
+    expect(guide).not.toMatch(/saem do ar até ela renovar/)
+  })
+})

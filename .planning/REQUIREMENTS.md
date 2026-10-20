@@ -39,7 +39,7 @@
 - [x] **ASS-01**: Assinante entra com e-mail e senha e continua logado entre visitas
 - [x] **ASS-02**: Assinante redefine a senha por link enviado ao e-mail (v1: link/senha provisória gerados pela equipe e enviados pelo WhatsApp; e-mail adiado — decisão do cliente 2026-10-19; e-mail ligado em 2026-10-20: "Esqueci minha senha" em /esqueci-senha envia o link pelo SMTP da Hostinger (suporte@swingbrasilia.com.br), com a senha provisória/link da equipe mantidos)
 - [x] **ASS-03**: Assinante vê até quando sua assinatura vale
-- [x] **ASS-04**: Assinatura vencida perde acesso ao conteúdo restrito automaticamente na data
+- [x] **ASS-04**: Assinatura vencida perde acesso ao conteúdo restrito automaticamente na data (desde 2026-10-20 o anúncio da própria pessoa continua no ar como gratuito: só a capa, sem vídeos — CONTA-03)
 - [x] **ASS-05**: Visitante vê na página "Assine Já" os planos e como pagar (pagamento manual)
 
 ### ClassiSex (CLAS)
@@ -68,6 +68,15 @@
 - [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
 - [x] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
 - [x] **PAINEL-08**: Toda ação da equipe sobre assinantes fica registrada (quem, quando, o quê)
+
+### Conta gratuita (CONTA)
+
+Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisões G-01..G-06).
+
+- [x] **CONTA-01**: Qualquer pessoa com 18+ cria a própria conta em /cadastro (e-mail, senha, apelido), aceita Termos e Privacidade e confirma o e-mail antes de entrar; a equipe continua criando contas
+- [x] **CONTA-02**: Conta gratuita cria anúncio com 1 foto e sem vídeo, vê só os próprios anúncios e não troca mensagens nem recados
+- [x] **CONTA-03**: Ao vencer a assinatura o anúncio continua no ar como gratuito (só a capa, sem vídeos); as outras mídias ficam guardadas e voltam ao renovar
+- [x] **CONTA-04**: O quadro Grátis × Assinante é visível em /cadastro, Meus anúncios, Novo anúncio e /assine-ja, e a equipe vê a conta e a origem na lista de assinantes e na moderação
 
 ### Migração e lançamento (MIG)
 
@@ -146,12 +155,16 @@
 | MIG-02 | Fase 6 | Pending |
 | MIG-03 | Fase 6 | Pending |
 | MIG-04 | Fase 7 | Pending |
+| CONTA-01 | Quick 2026-10-20-conta-gratuita | Complete |
+| CONTA-02 | Quick 2026-10-20-conta-gratuita | Complete |
+| CONTA-03 | Quick 2026-10-20-conta-gratuita | Complete |
+| CONTA-04 | Quick 2026-10-20-conta-gratuita | Complete |
 
 **Coverage:**
-- v1 requirements: 44 total
-- Mapped to phases: 44
+- v1 requirements: 48 total (44 + 4 de conta gratuita, quick task)
+- Mapped to phases: 48
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-17*
-*Last updated: 2026-10-19 after Phase 1 completion*
+*Last updated: 2026-10-20 after quick task conta-gratuita*

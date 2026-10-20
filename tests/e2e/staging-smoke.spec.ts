@@ -205,3 +205,27 @@ test('ClassiSex originals and collections are closed to anonymous visitors', asy
   expect(file.status() === 200 && /^image\//.test(file.headers()['content-type'] ?? '')).toBe(false)
   await anon.dispose()
 })
+
+test('sign-up page is noindex and shows the form or the closed message; Assine Já compares Grátis x Assinante', async ({ playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: BASE, extraHTTPHeaders: { Cookie: 'pb_age_ok=1' } })
+  const cadastro = await anon.get('/cadastro')
+  expect(cadastro.status()).toBe(200)
+  const html = await cadastro.text()
+  expect(html).toMatch(/<meta name="robots" content="[^"]*noindex/)
+  expect(html).toMatch(/Criar conta grátis|cadastro pelo site está fechado/)
+
+  const assine = await (await anon.get('/assine-ja')).text()
+  expect(assine).toContain('Grátis')
+  expect(assine).toContain('Assinante')
+  await anon.dispose()
+})
+
+test('anonymous sign-up through the REST API is refused', async ({ playwright }) => {
+  const anon = await playwright.request.newContext({ baseURL: BASE })
+  const res = await anon.post('/api/assinantes', {
+    data: { email: 'smoke-nao-criar@example.invalid', password: 'senha-de-teste-123', name: 'Smoke' },
+  })
+  expect(res.status()).toBeGreaterThanOrEqual(400)
+  expect(res.ok()).toBe(false)
+  await anon.dispose()
+})

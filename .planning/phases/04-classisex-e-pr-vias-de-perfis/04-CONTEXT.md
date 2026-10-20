@@ -17,6 +17,7 @@
 - **D-04 Área aberta (PREV-01):** lista com Eu sou, cidade e texto; telefones, e-mails, links e @ do texto são removidos automaticamente no servidor; fotos aparecem desfocadas (derivado borrado gerado no servidor, nunca o original); botão "Assine para ver o contato". Nada de nome, e-mail ou contato.
 - **D-05 Assinante:** vê tudo, incluindo contatos e mídia original servida por rota protegida (CLAS-06: link direto não abre para quem não é assinante).
 - **D-06 Vencimento:** quando a assinatura vence, os anúncios da pessoa somem da lista (pública e restrita) até renovar.
+  - **Atualização 2026-10-20 (conta gratuita):** substituído por G-05. Quando a assinatura vence (ou a equipe encerra), o anúncio **continua no ar como gratuito**: só a primeira foto (capa), nenhum vídeo; as demais mídias ficam guardadas e voltam ao renovar. Recados e mensagens seguem a regra antiga (saem do ar).
 - **D-07 Lista:** mais recentes primeiro, filtro por Eu sou e cidade, paginação.
 - **D-08 Denúncia (CLAS-05):** assinante denuncia um anúncio com motivo; a equipe vê na fila e pode despublicar.
 
@@ -27,7 +28,7 @@ Valem no lugar do que D-01, D-04 e D-07 diziam; o restante segue como está.
 - **Organização por tipo (D-01, D-07):** "Eu sou" = **Casal, Mulher, Homem, Trans** (continua editável no painel). Migração renomeia Solteira→Mulher e Solteiro→Homem (os anúncios mantêm a referência) e cria Trans. Filtro por tipo; o filtro por cidade fica só na área do assinante.
 - **Apelido (novo campo obrigatório):** até 40 caracteres, passa pela mesma redação de contatos e é recusado se tiver telefone, e-mail, @ ou link. Anúncios que já existiam recebem "Anônimo".
 - **Área aberta (D-04):** o visitante vê só **apelido, tipo e uma foto desfocada** (a capa), com o botão "Assine para ver". Sem texto, cidade, vídeo ou contato. O assinante continua vendo tudo (apelido, tipo, cidade, texto, fotos, vídeos e contatos).
-- **Vencimento (D-06):** mantido; os anúncios somem quando a assinatura vence.
+- **Vencimento (D-06):** ~~mantido; os anúncios somem quando a assinatura vence~~ — substituído em 2026-10-20 (conta gratuita, G-05): o anúncio continua no ar com só a capa e sem vídeos.
 
 ## Deferred
 - Migração dos 205 anúncios antigos (decisão LGPD do cliente) — Fase 6.

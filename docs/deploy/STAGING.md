@@ -204,8 +204,9 @@ Vídeo ocupa muito mais espaço que foto, então:
   senha" fica desligado e a troca de senha é feita pela equipe (senha provisória ou link de 48 horas pelo WhatsApp).
   O aviso "No email adapter provided" no log é esperado nesse caso.
 - **Sessões:** o login do assinante dura 30 dias. Cinco senhas erradas seguidas bloqueiam a conta por 10 minutos.
-- **Primeiro assinante:** ninguém cria conta de fora (o cadastro público e o `first-register` estão fechados para
-  `assinantes`). A equipe cria as contas no painel, como em `GUIA-DA-EQUIPE.md` → Assinantes.
+- **Primeiro assinante:** o `first-register` e o `POST /api/assinantes` de fora continuam fechados. A equipe cria contas
+  no painel, como em `GUIA-DA-EQUIPE.md` → Assinantes; o cadastro aberto do site (conta gratuita) passa pelo serviço do
+  próprio site e só funciona com e-mail ligado (veja 7.5).
 - **GraphQL desligado:** o site e o painel usam só a API REST; `/api/graphql` responde 404.
 - **`NEXT_PUBLIC_SERVER_URL`** precisa ser o endereço público do site: monta o link de nova senha e a lista de
   origens aceitas para o cookie de login.
@@ -260,6 +261,30 @@ Vídeo ocupa muito mais espaço que foto, então:
   Ative os backups e crie um snapshot da Hostinger agora.
 
 ---
+### 7.5 Conta gratuita (20/10/2026)
+
+- **Migração:** `conta_gratuita` (nome completo `20261020_172550_conta_gratuita`). Acrescenta à tabela `assinantes` as colunas
+  `origem`, `declaracao18_em`, `termos_aceitos_em`, `_verified` e `_verificationtoken` e **marca todas as contas que já
+  existem como confirmadas** (`_verified = true`); sem isso os assinantes de antes seriam deslogados. O timer a roda
+  sozinho antes de reiniciar o site. Confira antes de avisar o cliente:
+
+  ```bash
+  journalctl -u paraiso-update -n 80 | grep -i conta_gratuita     # "Migrated: 20261020_172550_conta_gratuita"
+  ```
+
+- **Cadastro aberto só com e-mail:** `/cadastro` depende das mesmas variáveis da seção 11 (`SMTP_USER` e `SMTP_PASS`). Com
+  elas vazias o site responde **cadastro fechado** (a página mostra o aviso, o formulário não existe e a criação de conta
+  pela API é recusada). Para fechar o cadastro de propósito, apague as duas linhas e rode `update.sh --force`.
+- **Confirmação por e-mail:** o link vale 7 dias e aponta para `/cadastro/confirmar` no endereço de
+  `NEXT_PUBLIC_SERVER_URL`. Contas criadas pelo site e não confirmadas em 7 dias são apagadas sozinhas (a limpeza roda
+  a cada novo cadastro; o link de uma conta com mais de 7 dias também é recusado).
+- **Limites de tentativas** (cadastro por IP e por e-mail, reenvio, confirmação) ficam **na memória do site**: reiniciar o
+  container zera. Atrás do Caddy o IP vem do cabeçalho `X-Forwarded-For`.
+- **Sem novo volume nem variável:** nada muda no `docker-compose` nem no `.env.staging`.
+- **Teste rápido depois de publicar:** abra `/cadastro` numa janela anônima (deve ter formulário e o quadro Grátis ×
+  Assinante), crie uma conta com um e-mail seu, clique no link recebido, entre e confira "Sua conta: Conta gratuita".
+  Depois exclua a conta de teste no painel.
+
 
 ## 8. Jeito B — publicar por SSH (alternativa)
 
@@ -298,7 +323,7 @@ fechada. Não cria nem altera nada.
 ## 11. E-mail (suporte@swingbrasilia.com.br)
 
 O site envia e-mail pelo servidor SMTP da Hostinger. Hoje serve para **"Esqueci minha senha"** do assinante
-(`/entrar` → `/esqueci-senha`) e para a recuperação de senha da equipe no `/admin`. Sem usuário e senha de e-mail
+(`/entrar` → `/esqueci-senha`), para a confirmação de e-mail do **cadastro** (`/cadastro`, seção 7.5) e para a recuperação de senha da equipe no `/admin`. Sem usuário e senha de e-mail
 preenchidos, nada é enviado e o site continua funcionando como antes.
 
 ### 11.1 Colocar usuário e senha no servidor (cliente, ~3 minutos)

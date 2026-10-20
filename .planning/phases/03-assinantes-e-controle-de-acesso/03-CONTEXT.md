@@ -6,6 +6,7 @@
 ## Decisions
 
 - **D-01 Cadastro pela equipe:** o cliente paga, envia o comprovante e a equipe cria a conta no painel. Não há cadastro aberto no site. A equipe pode criar uma conta **sem** acesso à área de assinantes (conta existe, assinatura inativa) e liberar depois.
+  - **Atualização 2026-10-20 (conta gratuita):** a parte "não há cadastro aberto" foi revogada. Qualquer pessoa 18+ cria conta gratuita em /cadastro (confirmação por e-mail); a equipe continua criando contas e liberando a assinatura. `first-register` e o `POST /api/assinantes` de fora seguem fechados. Ver quick task `2026-10-20-conta-gratuita` (G-01).
 - **D-02 Pagamento:** links do PagBank por plano (como no site atual). Cada plano no painel tem nome, duração, preço, link de pagamento e um preço promocional opcional ("de / por"). A página "Assine Já" mostra os planos com botão "Pagar" (link PagBank) e a instrução de enviar o comprovante pelo WhatsApp (5561999889772).
   - Links atuais (backup do WP, valores antigos): A pag.ae/7_KBczdX8, B pag.ae/7_KBijcHP, C pag.ae/7_KBjEXQv, D pag.ae/7_KBkGS7R, E pag.ae/7_KBmziQt. Com preços novos, o cliente precisa gerar links novos no PagBank (o valor fica fixo no link).
 - **D-03 Preços novos:** o cliente quer subir os preços ("a partir de uns R$ 30") e aceita promoção. **Confirmado pelo cliente (2026-10-19):** Mensal R$ 30, Trimestral R$ 75, Semestral R$ 135, Anual R$ 240. Planos são editáveis no painel, então a tabela pode mudar sem desenvolvedor.

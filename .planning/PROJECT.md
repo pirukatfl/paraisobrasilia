@@ -80,6 +80,7 @@ Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas 
 | Fotos e vídeos no disco da própria VPS, sem Backblaze B2 | Decisão do cliente (2026-10-17): menos contas e custos; backup precisa incluir a mídia | ✓ Implementado (volume media); ⚠️ backup fora do servidor pendente (Fase 7) |
 | Deploy por pull: GitHub Actions → GHCR → timer systemd na VPS | Nosso ambiente não tem SSH para a VPS; o cliente roda um script uma vez | ✓ Good — run 39162346021 publicou as imagens; site no ar |
 | E-mail transacional pela caixa suporte@swingbrasilia.com.br (SMTP Hostinger) | Pedido do cliente 2026-10-20: "Esqueci minha senha" por e-mail (ASS-02); decisão D-04 (sem e-mail) revista | ✓ Implementado (2026-10-20); credenciais só no .env.staging do servidor, site segue sem e-mail se vazias |
+| Conta gratuita com cadastro aberto | Pedido do cliente 2026-10-20: quem não paga vê só os próprios anúncios e cria anúncio com 1 foto; assinante mantém 10 fotos e 2 vídeos; o vencimento deixa o anúncio no ar só com a capa; quadro Grátis × Assinante visível | ✓ Implementado (2026-10-20, quick task conta-gratuita); termos/política a validar com advogado |
 
 ## Evolution
 
