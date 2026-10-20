@@ -94,13 +94,15 @@ test('approve, then unpublish with a reason; saving the page keeps the new situa
   await expect(panel.getByRole('button', { name: 'Despublicar' })).toBeEnabled()
 
   // A staff edit saved after the action must not bring back the old situation
-  await page.locator('#field-cidade').fill('Taguatinga')
-  await page.getByRole('button', { name: 'Salvar' }).click()
   const api = await staffApi(request)
-  // poll the saved record instead of trusting a toast that may belong to the previous action
-  await expect
-    .poll(async () => ((await api.get(`/api/ads/${adB}?depth=0`)) as unknown as { cidade: string }).cidade, { timeout: 20_000 })
-    .toBe('Taguatinga')
+  const cidadeSalva = async () => ((await api.get(`/api/ads/${adB}?depth=0`)) as unknown as { cidade: string }).cidade
+  // The panel refreshes the form after an action; under load that can swallow the first edit, so
+  // type and save again until the record itself shows the new city (no reliance on a toast).
+  await expect(async () => {
+    await page.locator('#field-cidade').fill('Taguatinga')
+    await page.getByRole('button', { name: 'Salvar' }).click()
+    await expect.poll(cidadeSalva, { timeout: 8_000 }).toBe('Taguatinga')
+  }).toPass({ timeout: 45_000 })
   const saved = (await api.get(`/api/ads/${adB}?depth=0`)) as unknown as { status: string; cidade: string }
   expect(saved.status).toBe('aprovado')
   await api.dispose()

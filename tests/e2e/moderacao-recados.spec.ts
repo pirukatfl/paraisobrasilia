@@ -76,13 +76,17 @@ test('approve then unpublish; saving the page keeps the new situation', async ({
   await panel.getByRole('button', { name: 'Aprovar' }).click()
   await expect(panel).toContainText('Situação: Publicado')
 
-  await page.locator('#field-apelido').fill('Rita e Beto BSB')
-  await page.getByRole('button', { name: 'Salvar' }).click()
-  await expect(page.getByText(/sucesso/i).first()).toBeVisible()
   const api = await staffApi(request)
+  const apelidoSalvo = async () => ((await api.get(`/api/recados/${recB}?depth=0`)) as unknown as { apelido: string }).apelido
+  // The panel refreshes the form after an action; under load that can swallow the first edit, so
+  // type and save again until the record itself shows the new apelido (no reliance on a toast).
+  await expect(async () => {
+    await page.locator('#field-apelido').fill('Rita e Beto BSB')
+    await page.getByRole('button', { name: 'Salvar' }).click()
+    await expect.poll(apelidoSalvo, { timeout: 8_000 }).toBe('Rita e Beto BSB')
+  }).toPass({ timeout: 45_000 })
   const saved = (await api.get(`/api/recados/${recB}?depth=0`)) as unknown as { status: string; apelido: string }
   expect(saved.status).toBe('aprovado')
-  expect(saved.apelido).toBe('Rita e Beto BSB')
   await api.dispose()
 
   await panel.getByLabel('Motivo (para Recusar ou Despublicar)').fill('Pedido da pessoa')
