@@ -1,10 +1,9 @@
 /**
  * Streaming reader for a WordPress (MariaDB/MySQL `mysqldump`) SQL dump, plus the Contos extractor.
  * Pure Node: no database, no Payload, no Next. Only the tables asked for are ever buffered.
- *
- * // T-05-14: users/usermeta are never requested; post_author is dropped.
- * // T-05-16: memory is bounded to one INSERT statement of a wanted table at a time.
  */
+// T-05-14: users/usermeta are never requested; post_author is dropped.
+// T-05-16: memory is bounded to one INSERT statement of a wanted table at a time.
 import fs from 'node:fs'
 import { StringDecoder } from 'node:string_decoder'
 import zlib from 'node:zlib'

@@ -1,5 +1,5 @@
 /**
- * WordPress / Elementor HTML -> Lexical editor state, without JSDOM (05-RESEARCH Finding 1).
+ * WordPress / Elementor HTML -> Lexical editor state, without a DOM library (05-RESEARCH Finding 1).
  * Handles classic "autop" text (blank line = paragraph, newline = <br>), Gutenberg comments,
  * Elementor wrapper markup, shortcodes and entities.
  *
