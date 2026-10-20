@@ -14,7 +14,7 @@ coverage
 media
 private-media
 docs
-scripts
+# scripts/ is kept: the migrate image runs scripts/deploy (e-mail test) and scripts/import
 *.log
 # Secrets and local config: .env, .env.staging, .env.test ... (the image reads env at runtime)
 .env*
