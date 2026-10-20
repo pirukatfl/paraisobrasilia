@@ -45,6 +45,8 @@ export async function getTestPayload(): Promise<Payload> {
 }
 
 const RESET_ORDER = [
+  // Contos (Phase 5)
+  'contos',
   // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
   'ad-reports',
   'ad-media',
@@ -206,6 +208,56 @@ export function lexicalParagraph(text: string) {
       ],
     },
   }
+}
+
+/** Lexical editor state with one paragraph per text. */
+export function lexicalParagraphs(texts: string[]) {
+  const base = lexicalParagraph('')
+  return {
+    root: {
+      ...base.root,
+      children: texts.map((text) => ({
+        ...base.root.children[0]!,
+        children: [{ type: 'text', text, format: 0, detail: 0, mode: 'normal', style: '', version: 1 }],
+      })),
+    },
+  }
+}
+
+export interface SeedContoInput {
+  title: string
+  slug?: string
+  /** One paragraph per entry (default: 5 generic paragraphs) */
+  texto?: string[]
+  paragrafosAbertos?: number
+  status?: 'published' | 'draft'
+  publishedAt?: string
+  wpId?: number
+  wpSlug?: string
+  wpRestrito?: boolean
+}
+
+/** Creates a conto through the Local API (published by default). */
+export async function seedConto(payload: Payload, input: SeedContoInput) {
+  const status = input.status ?? 'published'
+  return payload.create({
+    collection: 'contos' as never,
+    draft: status === 'draft',
+    data: {
+      _status: status,
+      title: input.title,
+      ...(input.slug ? { slug: input.slug } : {}),
+      publishedAt: input.publishedAt ?? '2025-06-01T12:00:00.000Z',
+      texto: lexicalParagraphs(
+        input.texto ?? [1, 2, 3, 4, 5].map((i) => `Parágrafo ${i} do conto ${input.title}.`),
+      ),
+      ...(input.paragrafosAbertos !== undefined ? { paragrafosAbertos: input.paragrafosAbertos } : {}),
+      ...(input.wpId !== undefined ? { wpId: input.wpId } : {}),
+      ...(input.wpSlug !== undefined ? { wpSlug: input.wpSlug } : {}),
+      ...(input.wpRestrito !== undefined ? { wpRestrito: input.wpRestrito } : {}),
+    } as never,
+    overrideAccess: true,
+  }) as unknown as Promise<{ id: number; slug: string; title: string; _status?: string }>
 }
 
 const FIXTURES = path.join(rootDir, 'tests/fixtures')

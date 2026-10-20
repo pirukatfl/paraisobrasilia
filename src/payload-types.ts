@@ -81,6 +81,7 @@ export interface Config {
     videos: Video;
     parties: Party;
     pages: Page;
+    contos: Conto;
     'space-items': SpaceItem;
     models: Model;
     'payload-kv': PayloadKv;
@@ -112,6 +113,7 @@ export interface Config {
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    contos: ContosSelect<false> | ContosSelect<true>;
     'space-items': SpaceItemsSelect<false> | SpaceItemsSelect<true>;
     models: ModelsSelect<false> | ModelsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -774,6 +776,56 @@ export interface Page {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Contos do site. Visitantes leem só os primeiros parágrafos; o resto é para assinantes.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contos".
+ */
+export interface Conto {
+  id: number;
+  title: string;
+  /**
+   * Endereço: /contos/…  Se ficar vazio, é criado a partir do título. Mudar o endereço quebra links já compartilhados.
+   */
+  slug: string;
+  /**
+   * Aparece no conto e ordena a lista: mais recentes primeiro.
+   */
+  publishedAt: string;
+  texto: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Quantos parágrafos do início qualquer visitante lê. O resto é só para assinantes.
+   */
+  paragrafosAbertos: number;
+  /**
+   * Preenchido pela importação. Não mexa.
+   */
+  wpId?: number | null;
+  /**
+   * Usado para redirecionar o link antigo para este conto.
+   */
+  wpSlug?: string | null;
+  wpRestrito?: boolean | null;
+  importadoEm?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Fotos e vídeos dos ambientes. Sem nudez explícita: esta galeria é aberta ao público.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -917,6 +969,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'pages';
         value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'contos';
+        value: number | Conto;
       } | null)
     | ({
         relationTo: 'space-items';
@@ -1329,6 +1385,24 @@ export interface PagesSelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contos_select".
+ */
+export interface ContosSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  publishedAt?: T;
+  texto?: T;
+  paragrafosAbertos?: T;
+  wpId?: T;
+  wpSlug?: T;
+  wpRestrito?: T;
+  importadoEm?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
