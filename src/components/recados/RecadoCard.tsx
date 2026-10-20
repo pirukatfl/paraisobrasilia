@@ -1,4 +1,4 @@
-import { EnviarMensagemLink } from '@/components/mensagens/EnviarMensagemLink'
+import { EnviarRecadoLink } from '@/components/mensagens/EnviarRecadoLink'
 import type { RecadoDTO } from '@/lib/recados/dto'
 
 /** One recado on the members board. The apelido is all that identifies the author. */
@@ -14,7 +14,7 @@ export function RecadoCard({ recado }: { recado: RecadoDTO }) {
       </div>
       <p className="mt-2 whitespace-pre-line text-body">{recado.texto}</p>
       <p className="type-label mt-3 text-muted">Publicado em {recado.publishedLabel}</p>
-      {!recado.isOwn && <EnviarMensagemLink origem="recado" id={recado.id} />}
+      {!recado.isOwn && <EnviarRecadoLink origem="recado" id={recado.id} />}
     </article>
   )
 }

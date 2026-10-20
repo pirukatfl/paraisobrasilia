@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 /**
- * Unread messages number next to "Mensagens" in the members menu (D-04). The members layout does
+ * Unread messages number next to "Recados" in the members menu (D-04). The members layout does
  * not re-run on client navigation, so this island refetches on every pathname change and when the
  * tab becomes visible again. No polling timer.
  */
@@ -37,7 +37,7 @@ export function UnreadBadge() {
   if (count <= 0) return null
   return (
     <span
-      aria-label={`${count > 99 ? '99+' : count} mensagens não lidas`}
+      aria-label={`${count > 99 ? '99+' : count} ${count === 1 ? 'recado não lido' : 'recados não lidos'}`}
       className="ml-2 inline-flex min-w-5 items-center justify-center rounded-full bg-accent px-1.5 text-xs font-semibold text-bg"
     >
       {count > 99 ? '99+' : count}

@@ -53,7 +53,7 @@ export async function loginPage(browser: Browser, baseURL: string, who: Who, nex
 async function startViaUi(browser: Browser, baseURL: string, who: Who, adId: number, apelido: string, texto: string) {
   const { context, page } = await loginPage(browser, baseURL, who, `/area-do-assinante/mensagens/nova?anuncio=${adId}`)
   await page.getByLabel('Seu apelido').fill(apelido)
-  await page.getByLabel('Mensagem', { exact: true }).fill(texto)
+  await page.getByLabel('Recado', { exact: true }).fill(texto)
   await page.getByRole('button', { name: 'Enviar' }).click()
   await expect(page).toHaveURL(/\/area-do-assinante\/mensagens\/\d+$/)
   const id = Number(page.url().split('/').pop())
@@ -109,7 +109,7 @@ export type Captured = { url: string; headers: Record<string, string>; body: Buf
 
 /** Sends a reply through the real form and records the server-action request for replay. */
 export async function captureReply(page: Page, texto: string): Promise<Captured> {
-  await page.getByLabel('Mensagem', { exact: true }).fill(texto)
+  await page.getByLabel('Recado', { exact: true }).fill(texto)
   const [request] = await Promise.all([
     page.waitForRequest((r) => r.method() === 'POST' && 'next-action' in r.headers()),
     page.getByRole('button', { name: 'Enviar' }).click(),

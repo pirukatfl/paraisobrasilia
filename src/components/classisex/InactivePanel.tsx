@@ -7,7 +7,7 @@ import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 
 /**
- * Restricted pages (ClassiSex board/detail, recados, mensagens, contos) for an account without an
+ * Restricted pages (ClassiSex board/detail, recados, contos) for an account without an
  * active subscription: a panel only, no restricted markup (T-03-05). A free account is told what the
  * free tier does and what paying adds (G-02, G-06).
  */
@@ -22,7 +22,7 @@ export async function InactivePanel({ access }: { access: AccessStatus }) {
           <h2 className="type-heading mb-4">Disponível para assinantes</h2>
           <p className="text-body">
             Com a conta gratuita você publica seus anúncios em Meus anúncios. Assine para ver todos os anúncios com
-            contatos, mandar mensagens e ler os recados.
+            contatos e mandar e receber recados.
           </p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link href="/assine-ja" className="btn-primary">

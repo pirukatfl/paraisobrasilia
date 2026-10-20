@@ -58,9 +58,9 @@ async function login(browser: Browser, baseURL: string, who: typeof ANA, next = 
   return { context, page }
 }
 
-const badge = (page: Page) => page.getByRole('navigation', { name: 'Área do assinante' }).getByLabel(/mensagens não lidas/)
+const badge = (page: Page) => page.getByRole('navigation', { name: 'Área do assinante' }).getByLabel(/recados? não lidos?/)
 
-test('the sub-nav lists Mensagens; own content has no Enviar mensagem', async ({ browser, baseURL }) => {
+test('the sub-nav lists Mensagens; own content has no Enviar recado', async ({ browser, baseURL }) => {
   const ana = await login(browser, baseURL!, ANA, `/area-do-assinante/classisex/${adId}`)
   const labels = await ana.page.getByRole('navigation', { name: 'Área do assinante' }).getByRole('link').allTextContents()
   expect(labels.map((l) => l.trim())).toEqual([
@@ -73,14 +73,14 @@ test('the sub-nav lists Mensagens; own content has no Enviar mensagem', async ({
     'Trocar senha',
   ])
   await expect(ana.page.getByRole('heading', { name: /AnaBSB/, level: 1 })).toBeVisible()
-  await expect(ana.page.getByRole('link', { name: 'Enviar mensagem' })).toHaveCount(0)
+  await expect(ana.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
   await ana.page.goto(`${BASE}/nova?anuncio=${adId}`)
-  await expect(ana.page.getByText('Este anúncio ou recado é seu.')).toBeVisible()
+  await expect(ana.page.getByText('Este anúncio é seu.')).toBeVisible()
   await expect(ana.page.getByRole('button', { name: 'Enviar' })).toHaveCount(0)
   const rita = await login(browser, baseURL!, RITA, '/area-do-assinante/recados')
   const board = rita.page.getByRole('region', { name: 'Mural de recados' })
   await expect(board.getByRole('article').filter({ hasText: 'Rita e Beto' })).toHaveCount(1)
-  await expect(board.getByRole('link', { name: 'Enviar mensagem' })).toHaveCount(0)
+  await expect(board.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
   await ana.context.close()
   await rita.context.close()
 })
@@ -88,21 +88,21 @@ test('the sub-nav lists Mensagens; own content has no Enviar mensagem', async ({
 test('Beto writes to Ana from her ad; empty text keeps the apelido; the thread opens', async ({ browser, baseURL }) => {
   const beto = await login(browser, baseURL!, BETO, `/area-do-assinante/classisex/${adId}`)
   const { page } = beto
-  await page.getByRole('link', { name: 'Enviar mensagem' }).click()
+  await page.getByRole('link', { name: 'Enviar recado' }).click()
   await expect(page).toHaveURL(new RegExp(`/mensagens/nova\\?anuncio=${adId}$`))
-  await expect(page.getByRole('heading', { name: 'Mensagem para AnaBSB', level: 1 })).toBeVisible()
-  await expect(page.getByLabel('Mensagem', { exact: true })).toHaveAttribute('maxlength', '2000')
+  await expect(page.getByRole('heading', { name: 'Recado para AnaBSB', level: 1 })).toBeVisible()
+  await expect(page.getByLabel('Recado', { exact: true })).toHaveAttribute('maxlength', '2000')
   await page.getByLabel('Seu apelido').fill('BetoDF')
   await page.getByRole('button', { name: 'Enviar' }).click()
-  await expect(page.getByText('Escreva a mensagem.')).toBeVisible()
+  await expect(page.getByText('Escreva o recado.')).toBeVisible()
   await expect(page.getByLabel('Seu apelido')).toHaveValue('BetoDF')
-  await page.getByLabel('Mensagem', { exact: true }).fill('Oi, vi seu anúncio')
+  await page.getByLabel('Recado', { exact: true }).fill('Oi, vi seu anúncio')
   await page.getByRole('button', { name: 'Enviar' }).click()
   await expect(page).toHaveURL(new RegExp(`${BASE}/\\d+$`))
   conversaId = Number(page.url().split('/').pop())
   await expect(page.getByRole('heading', { name: 'Conversa com AnaBSB', level: 1 })).toBeVisible()
   await expect(page.getByText('Anúncio: AnaBSB · Casal')).toBeVisible()
-  const mine = page.getByRole('list', { name: 'Mensagens' }).getByRole('listitem').filter({ hasText: 'Oi, vi seu anúncio' })
+  const mine = page.getByRole('list', { name: 'Recados' }).getByRole('listitem').filter({ hasText: 'Oi, vi seu anúncio' })
   await expect(mine).toContainText('Você')
   await beto.context.close()
 })
@@ -113,7 +113,7 @@ test('Ana sees the unread number, opens and replies; Beto reads the reply; the n
 }) => {
   const ana = await login(browser, baseURL!, ANA, '/area-do-assinante/classisex')
   await expect(badge(ana.page)).toHaveText('1')
-  await expect(badge(ana.page)).toHaveAttribute('aria-label', '1 mensagens não lidas')
+  await expect(badge(ana.page)).toHaveAttribute('aria-label', '1 recado não lido')
   await ana.page.getByRole('navigation', { name: 'Área do assinante' }).getByRole('link', { name: /Mensagens/ }).click()
   const item = ana.page.getByRole('link', { name: /BetoDF/ })
   await expect(item).toContainText('Oi, vi seu anúncio')
@@ -125,13 +125,13 @@ test('Ana sees the unread number, opens and replies; Beto reads the reply; the n
   await expect(ana.page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
   await expect(badge(ana.page)).toHaveCount(0)
   await ana.page.goto(`${BASE}/${conversaId}`)
-  await ana.page.getByLabel('Mensagem', { exact: true }).fill('Oi Beto!')
+  await ana.page.getByLabel('Recado', { exact: true }).fill('Oi Beto!')
   await ana.page.getByRole('button', { name: 'Enviar' }).click()
-  await expect(ana.page.getByRole('list', { name: 'Mensagens' })).toContainText('Oi Beto!')
+  await expect(ana.page.getByRole('list', { name: 'Recados' })).toContainText('Oi Beto!')
   await ana.context.close()
 
   const beto = await login(browser, baseURL!, BETO, `${BASE}/${conversaId}`)
-  await expect(beto.page.getByRole('list', { name: 'Mensagens' })).toContainText('Oi Beto!')
+  await expect(beto.page.getByRole('list', { name: 'Recados' })).toContainText('Oi Beto!')
   await beto.context.close()
 })
 
@@ -141,10 +141,10 @@ test('a recado starts another conversation; the same person from the ad reuses t
 }) => {
   const beto = await login(browser, baseURL!, BETO, '/area-do-assinante/recados')
   const card = beto.page.getByRole('region', { name: 'Mural de recados' }).getByRole('article').filter({ hasText: 'Rita e Beto' })
-  await card.getByRole('link', { name: 'Enviar mensagem' }).click()
-  await expect(beto.page.getByRole('heading', { name: 'Mensagem para Rita e Beto', level: 1 })).toBeVisible()
+  await card.getByRole('link', { name: 'Enviar recado' }).click()
+  await expect(beto.page.getByRole('heading', { name: 'Recado para Rita e Beto', level: 1 })).toBeVisible()
   await expect(beto.page.getByLabel('Seu apelido')).toHaveCount(0) // saved on the account already
-  await beto.page.getByLabel('Mensagem', { exact: true }).fill('Gostei do seu recado')
+  await beto.page.getByLabel('Recado', { exact: true }).fill('Gostei do seu recado')
   await beto.page.getByRole('button', { name: 'Enviar' }).click()
   await expect(beto.page.getByRole('heading', { name: 'Conversa com Rita e Beto', level: 1 })).toBeVisible()
   await expect(beto.page.getByText(/^Recado: /)).toBeVisible()
@@ -163,7 +163,7 @@ test('a third subscriber gets 404 and an empty inbox; the unread route is privat
   const res = await caio.page.request.get(`${BASE}/${conversaId}`)
   expect(res.status()).toBe(404)
   await caio.page.goto(BASE)
-  await expect(caio.page.getByText('Nenhuma conversa ainda.')).toBeVisible()
+  await expect(caio.page.getByText('Nenhum recado ainda.')).toBeVisible()
   const own = await caio.page.request.get(`${BASE}/nao-lidas`)
   expect(own.status()).toBe(200)
   expect(await own.json()).toEqual({ count: 0 })
@@ -209,10 +209,10 @@ test('replying to someone whose access ended shows the inactive-recipient messag
   await api.encerrar(ids.ana!, 'Fim do teste de mensagens')
   await api.dispose()
   const beto = await login(browser, baseURL!, BETO, `${BASE}/${conversaId}`)
-  await beto.page.getByLabel('Mensagem', { exact: true }).fill('Ainda aí?')
+  await beto.page.getByLabel('Recado', { exact: true }).fill('Ainda aí?')
   await beto.page.getByRole('button', { name: 'Enviar' }).click()
   await expect(
-    beto.page.getByText('Esta pessoa está sem assinatura ativa e não pode receber mensagens agora.'),
+    beto.page.getByText('Esta pessoa está sem assinatura ativa e não recebe recados agora.'),
   ).toBeVisible()
   await beto.context.close()
 })

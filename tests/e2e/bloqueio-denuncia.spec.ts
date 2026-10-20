@@ -13,7 +13,7 @@ const PASSWORD = 'senha-bloqueio-12345'
 const ANA = { email: 'ana.bloqueio@teste.local', name: 'Ana Bloqueio', password: PASSWORD }
 const BETO = { email: 'beto.bloqueio@teste.local', name: 'Beto Bloqueio', password: PASSWORD }
 const BASE = '/area-do-assinante/mensagens'
-const NEUTRAL = 'Não é possível enviar mensagens para esta pessoa.'
+const NEUTRAL = 'Não é possível mandar recados para esta pessoa.'
 let anaId = 0
 let adId = 0
 let conversaId = 0
@@ -47,15 +47,15 @@ async function login(browser: Browser, baseURL: string, who: typeof ANA, next = 
 }
 
 async function reply(page: Page, texto: string) {
-  await page.getByLabel('Mensagem', { exact: true }).fill(texto)
+  await page.getByLabel('Recado', { exact: true }).fill(texto)
   await page.getByRole('button', { name: 'Enviar' }).click()
 }
 
 test('Beto starts a conversation from the ad; Ana blocks him from the thread', async ({ browser, baseURL }) => {
   const beto = await login(browser, baseURL!, BETO, `/area-do-assinante/classisex/${adId}`)
-  await beto.page.getByRole('link', { name: 'Enviar mensagem' }).click()
+  await beto.page.getByRole('link', { name: 'Enviar recado' }).click()
   await beto.page.getByLabel('Seu apelido').fill('BetoDF')
-  await beto.page.getByLabel('Mensagem', { exact: true }).fill('Oi, vi seu anúncio')
+  await beto.page.getByLabel('Recado', { exact: true }).fill('Oi, vi seu anúncio')
   await beto.page.getByRole('button', { name: 'Enviar' }).click()
   await expect(beto.page).toHaveURL(new RegExp(`${BASE}/\\d+$`))
   conversaId = Number(beto.page.url().split('/').pop())
@@ -90,14 +90,14 @@ test('unblocking restores the conversation', async ({ browser, baseURL }) => {
   await ana.context.close()
   const beto = await login(browser, baseURL!, BETO, `${BASE}/${conversaId}`)
   await reply(beto.page, 'Voltei')
-  await expect(beto.page.getByRole('list', { name: 'Mensagens' })).toContainText('Voltei')
+  await expect(beto.page.getByRole('list', { name: 'Recados' })).toContainText('Voltei')
   await beto.context.close()
 })
 
 test('Beto reports the conversation and blocks Ana at the same time', async ({ browser, baseURL }) => {
   const ana = await login(browser, baseURL!, ANA, `${BASE}/${conversaId}`)
   await reply(ana.page, 'Oi Beto!')
-  await expect(ana.page.getByRole('list', { name: 'Mensagens' })).toContainText('Oi Beto!')
+  await expect(ana.page.getByRole('list', { name: 'Recados' })).toContainText('Oi Beto!')
   await ana.context.close()
 
   const beto = await login(browser, baseURL!, BETO, `${BASE}/${conversaId}`)
@@ -145,7 +145,7 @@ test.describe('staff', () => {
     const ana = await login(browser, baseURL!, ANA, `${BASE}/${conversaId}`)
     await reply(ana.page, 'Posso falar?')
     await expect(
-      ana.page.getByText('Seu envio de mensagens foi suspenso pela equipe. Fale com a casa pelo WhatsApp.'),
+      ana.page.getByText('Seu envio de recados foi suspenso pela equipe. Fale com a casa pelo WhatsApp.'),
     ).toBeVisible()
 
     await loginAsStaff(page)

@@ -51,6 +51,6 @@ export const TIER_COMPARISON: { item: string; gratis: string; assinante: string 
   { item: 'Vídeos por anúncio', gratis: 'não', assinante: `até ${MAX_AD_VIDEOS}` },
   { item: 'Anúncios ativos', gratis: `até ${ACTIVE_LIMIT}`, assinante: `até ${ACTIVE_LIMIT}` },
   { item: 'Ver anúncios do ClassiSex', gratis: 'só os seus', assinante: 'todos, com contatos' },
-  { item: 'Mensagens e recados', gratis: 'não', assinante: 'sim' },
+  { item: 'Recados (conversas privadas)', gratis: 'não', assinante: 'manda e recebe' },
   { item: 'Contos completos', gratis: 'só o início', assinante: 'sim' },
 ]

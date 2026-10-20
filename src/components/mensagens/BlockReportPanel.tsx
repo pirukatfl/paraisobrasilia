@@ -30,7 +30,7 @@ export function BlockReportPanel({ conversaId, euBloqueei }: { conversaId: numbe
           <summary className="type-label cursor-pointer text-muted">Bloquear</summary>
           <form action={bloquear} className="mt-4 flex flex-col gap-3">
             <input type="hidden" name="conversa" value={conversaId} />
-            <p className="text-body text-muted">A pessoa não poderá mais enviar mensagens para você. Você pode desbloquear quando quiser.</p>
+            <p className="text-body text-muted">A pessoa não poderá mais mandar recados para você. Você pode desbloquear quando quiser.</p>
             <div>
               <button type="submit" className="min-h-11 rounded-lg border border-line px-5 text-body text-text hover:border-accent">
                 Sim, bloquear

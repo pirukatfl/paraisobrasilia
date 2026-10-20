@@ -62,7 +62,7 @@ export function MessageForm({
       )}
       <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
-          Mensagem
+          Recado
         </label>
         <textarea
           id="texto"

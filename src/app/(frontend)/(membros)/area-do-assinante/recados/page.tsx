@@ -88,7 +88,7 @@ export default async function RecadosPage({
     <section aria-labelledby="titulo-recados">
       {header}
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Deixe um recado para os outros assinantes. Para trocar contato, use Enviar mensagem. Você pode ter até 3
+        Deixe um recado para os outros assinantes. Para trocar contato, use Enviar recado. Você pode ter até 3
         recados ativos; todo recado novo passa pela equipe antes de aparecer.
       </p>
       <section aria-labelledby="titulo-novo-recado" className="mt-8">

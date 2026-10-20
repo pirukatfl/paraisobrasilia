@@ -3,13 +3,14 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
-import { EnviarMensagemLink } from '@/components/mensagens/EnviarMensagemLink'
+import { EnviarRecadoLink } from '@/components/mensagens/EnviarRecadoLink'
 import { ContactLinks } from '@/components/classisex/ContactLinks'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { MediaGallery } from '@/components/classisex/MediaGallery'
 import { ReportForm } from '@/components/classisex/ReportForm'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberAd, isOwnAd } from '@/lib/classisex/queries'
+import { RECADO_ANUNCIO_GRATUITO } from '@/lib/mensagens/rules'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,9 +57,9 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
         <ContactLinks contato={ad.contato} />
         {canReport &&
           (ad.autorGratuito ? (
-            <p className="type-label mt-4 text-muted">Conta gratuita: use os contatos do anúncio.</p>
+            <p className="type-label mt-4 text-muted">{RECADO_ANUNCIO_GRATUITO}</p>
           ) : (
-            <EnviarMensagemLink origem="anuncio" id={ad.id} />
+            <EnviarRecadoLink id={ad.id} />
           ))}
       </section>
       {canReport && <ReportForm adId={ad.id} />}

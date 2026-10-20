@@ -12,11 +12,11 @@ export function ThreadView({ thread }: { thread: ThreadDTO }) {
             href={`/area-do-assinante/mensagens/${thread.id}?antes=${thread.antesDe}`}
             className="type-label text-accent underline underline-offset-4"
           >
-            Ver mensagens anteriores
+            Ver recados anteriores
           </Link>
         </p>
       )}
-      <ol aria-label="Mensagens" className="flex flex-col gap-3">
+      <ol aria-label="Recados" className="flex flex-col gap-3">
         {thread.mensagens.map((m) => (
           <li
             key={m.id}

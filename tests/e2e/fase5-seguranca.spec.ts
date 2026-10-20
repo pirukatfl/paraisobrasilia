@@ -124,7 +124,7 @@ test.describe('anonymous', () => {
     const beto = await asContext(browser, baseURL!, BETO)
     await beto.page.goto(`${M}/${s.conv.beto}`)
     const captured = await captureReply(beto.page, REPLAY)
-    await expect(beto.page.getByRole('list', { name: 'Mensagens' })).toContainText(REPLAY)
+    await expect(beto.page.getByRole('list', { name: 'Recados' })).toContainText(REPLAY)
     // positive control: Ana's thread has the real message
     replayCount = occurrences(await anaThread(browser, baseURL!, s.conv.beto), REPLAY)
     expect(replayCount).toBeGreaterThan(0)
@@ -175,7 +175,7 @@ test.describe('active subscriber outside the conversation (Caio)', () => {
       expectNone(await res.text(), [SENTINELS.mensagem, REPLAY, 'BetoDF'])
     }
     await caio.page.goto(M)
-    await expect(caio.page.getByText('Nenhuma conversa ainda.')).toBeVisible()
+    await expect(caio.page.getByText('Nenhum recado ainda.')).toBeVisible()
     await expectNoData(await caio.context.request.get('/api/recados?limit=50&depth=0'))
     await caio.context.close()
   })
@@ -193,15 +193,15 @@ test.describe('blocked (Bia) and suspended (Susi)', () => {
   test('Bia keeps her thread but every send gets the neutral message and nothing is created', async ({ browser, baseURL }) => {
     const bia = await asContext(browser, baseURL!, BIA)
     await bia.page.goto(`${M}/${s.conv.bia}`)
-    await bia.page.getByLabel('Mensagem', { exact: true }).fill('BLOQ-1-SENTINELA')
+    await bia.page.getByLabel('Recado', { exact: true }).fill('BLOQ-1-SENTINELA')
     await bia.page.getByRole('button', { name: 'Enviar' }).click()
-    await expect(bia.page.getByText('Não é possível enviar mensagens para esta pessoa.')).toBeVisible()
+    await expect(bia.page.getByText('Não é possível mandar recados para esta pessoa.')).toBeVisible()
     // a new conversation attempt from Ana's recado lands on the same blocked thread
     await bia.page.goto(`${M}/nova?recado=${s.recadoId}`)
     await expect(bia.page).toHaveURL(new RegExp(`${M}/${s.conv.bia}$`))
-    await bia.page.getByLabel('Mensagem', { exact: true }).fill('BLOQ-2-SENTINELA')
+    await bia.page.getByLabel('Recado', { exact: true }).fill('BLOQ-2-SENTINELA')
     await bia.page.getByRole('button', { name: 'Enviar' }).click()
-    await expect(bia.page.getByText('Não é possível enviar mensagens para esta pessoa.')).toBeVisible()
+    await expect(bia.page.getByText('Não é possível mandar recados para esta pessoa.')).toBeVisible()
     const html = await anaThread(browser, baseURL!, s.conv.bia)
     expect(html).toContain('Oi, tudo bem?')
     expectNone(html, ['BLOQ-1-SENTINELA', 'BLOQ-2-SENTINELA'])
@@ -211,10 +211,10 @@ test.describe('blocked (Bia) and suspended (Susi)', () => {
   test('Susi is told her messaging was suspended and nothing is created', async ({ browser, baseURL }) => {
     const susi = await asContext(browser, baseURL!, SUSI)
     await susi.page.goto(`${M}/${s.conv.susi}`)
-    await susi.page.getByLabel('Mensagem', { exact: true }).fill('SUSP-SENTINELA')
+    await susi.page.getByLabel('Recado', { exact: true }).fill('SUSP-SENTINELA')
     await susi.page.getByRole('button', { name: 'Enviar' }).click()
     await expect(
-      susi.page.getByText('Seu envio de mensagens foi suspenso pela equipe. Fale com a casa pelo WhatsApp.'),
+      susi.page.getByText('Seu envio de recados foi suspenso pela equipe. Fale com a casa pelo WhatsApp.'),
     ).toBeVisible()
     expectNone(await anaThread(browser, baseURL!, s.conv.susi), ['SUSP-SENTINELA'])
     await susi.context.close()
@@ -393,10 +393,10 @@ test.describe('contos and public previews', () => {
 
     const beto = await asContext(browser, baseURL!, BETO)
     await beto.page.goto(`${M}/${s.conv.beto}`)
-    await beto.page.getByLabel('Mensagem', { exact: true }).fill('AGORA-NAO-VAI')
+    await beto.page.getByLabel('Recado', { exact: true }).fill('AGORA-NAO-VAI')
     await beto.page.getByRole('button', { name: 'Enviar' }).click()
     await expect(
-      beto.page.getByText('Esta pessoa está sem assinatura ativa e não pode receber mensagens agora.'),
+      beto.page.getByText('Esta pessoa está sem assinatura ativa e não recebe recados agora.'),
     ).toBeVisible()
     await beto.context.close()
     await api.dispose()

@@ -37,7 +37,7 @@ export default async function ConversaPage({
       <section aria-labelledby="titulo-conversa">
         <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
         <h1 id="titulo-conversa" className="type-display mt-2">
-          Mensagens
+          Recados
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -49,7 +49,7 @@ export default async function ConversaPage({
   return (
     <section aria-labelledby="titulo-conversa">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Mensagens</p>
+      <p className="type-eyebrow text-muted">Recados</p>
       <h1 id="titulo-conversa" className="type-display mt-2">
         Conversa com {thread.outroApelido}
       </h1>
@@ -68,7 +68,7 @@ export default async function ConversaPage({
       <BlockReportPanel conversaId={thread.id} euBloqueei={euBloqueei} />
       <p className="mt-8">
         <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Voltar para Mensagens
+          Voltar para Recados
         </Link>
       </p>
     </section>

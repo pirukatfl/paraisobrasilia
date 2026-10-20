@@ -71,7 +71,7 @@ export function RecadoForm({
           className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text focus:border-accent"
         />
         <p id="ajuda-texto" className="type-label text-muted">
-          Telefones, e-mails, @ e links são retirados. Para trocar contato, use Enviar mensagem.
+          Telefones, e-mails, @ e links são retirados. Para trocar contato, use Enviar recado.
         </p>
         <p className="type-label text-muted" aria-live="polite">
           {length}/{RECADO_MAX}

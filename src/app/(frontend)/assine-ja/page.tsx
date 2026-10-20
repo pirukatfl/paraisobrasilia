@@ -72,7 +72,7 @@ export default async function AssineJaPage() {
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
         A assinatura libera a área de assinantes do Paraíso: perfis completos do ClassiSex com fotos, vídeos e
-        contatos, e os recados dos assinantes.
+        contatos, e recados privados entre assinantes.
       </p>
 
       <PlanComparison signupLink={emailEnabled()} assineLink={false} id="comparativo-assine" />

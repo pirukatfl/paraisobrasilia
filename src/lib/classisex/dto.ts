@@ -179,7 +179,7 @@ export type MemberAdDTO = {
   contato: { whatsapp: ContactLinkDTO | null; telegram: ContactLinkDTO | null }
   fotos: MemberPhotoDTO[]
   videos: MemberVideoDTO[]
-  /** Author is a free account: no "Enviar mensagem" (G-02). No author identity here. */
+  /** Author is a free account: no "Enviar recado" (G-02). No author identity here. */
   autorGratuito: boolean
 }
 

@@ -16,7 +16,7 @@ export const RECADO_MESSAGES = {
   apelidoVazio: 'Escolha um apelido.',
   vazio: 'Escreva o recado.',
   longo: 'O recado pode ter até 500 caracteres.',
-  soContato: 'Escreva um recado além do contato. Para trocar contato, use Enviar mensagem.',
+  soContato: 'Escreva um recado além do contato. Para trocar contato, use Enviar recado.',
   limite: 'Você já tem 3 recados ativos. Apague um para publicar outro.',
 } as const
 

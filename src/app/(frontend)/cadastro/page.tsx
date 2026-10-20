@@ -72,7 +72,7 @@ export default async function CadastroPage({
           )}
           <p className="mt-4 max-w-[560px] text-body text-muted">
             Com a conta gratuita você publica seus anúncios no ClassiSex (até 3, com 1 foto cada). Assinantes veem todos
-            os anúncios, com contatos, e trocam mensagens e recados.
+            os anúncios, com contatos, e mandam recados privados entre si.
           </p>
           <SignupForm />
         </>

@@ -265,7 +265,7 @@ test.describe('paying viewer', () => {
     await context.close()
   })
 
-  test('on a free advertiser’s ad: one photo, the contacts, no “Enviar mensagem”', async ({ browser, baseURL }) => {
+  test('on a free advertiser’s ad: one photo, the contacts, no “Enviar recado”', async ({ browser, baseURL }) => {
     test.setTimeout(150_000)
     const { page, context } = await asSubscriber(browser, baseURL!, VIEWER)
     const detail = await fetchAs(page, 'GET', `/area-do-assinante/classisex/${s.ads.gratis}`)
@@ -273,24 +273,24 @@ test.describe('paying viewer', () => {
     expect(mediaIdsIn(detail.body)).toEqual([s.media.gratis[0]!.id])
     expect(detail.body).toContain(CONTACTS.gratis.whatsapp)
     expect(detail.body).toContain(CONTACTS.gratis.telegram)
-    expect(detail.body).not.toContain('Enviar mensagem')
-    expect(detail.body).toContain('Conta gratuita: use os contatos do anúncio.')
+    expect(detail.body).not.toContain('Enviar recado')
+    expect(detail.body).toContain('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.')
     // control: a paying advertiser's ad does offer the button
     const paid = await fetchAs(page, 'GET', `/area-do-assinante/classisex/${s.ads.pago}`)
-    expect(paid.body).toContain('Enviar mensagem')
+    expect(paid.body).toContain('Enviar recado')
     expect(mediaIdsIn(paid.body).length).toBe(3)
     await context.close()
   })
 
-  test('typing the compose URL for a free advertiser creates no message', async ({ browser, baseURL }) => {
+  test('typing the compose URL for a free advertiser shows the note and no form, and creates no recado', async ({ browser, baseURL }) => {
     test.setTimeout(150_000)
     const { page, context } = await asSubscriber(browser, baseURL!, VIEWER, `${M}/nova?anuncio=${s.ads.gratis}`)
-    await page.getByLabel('Seu apelido').fill('ViewerTeste')
-    await page.getByLabel('Mensagem', { exact: true }).fill('MSG-PARA-GRATIS-SENTINELA')
-    await page.getByRole('button', { name: 'Enviar' }).click()
-    await expect(page.getByText('Esta pessoa está sem assinatura ativa e não pode receber mensagens agora.')).toBeVisible()
+    await expect(
+      page.getByText('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.'),
+    ).toBeVisible()
+    await expect(page.locator('textarea')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Enviar' })).toHaveCount(0)
     const inbox = await fetchAs(page, 'GET', M)
-    expect(inbox.body).not.toContain('MSG-PARA-GRATIS-SENTINELA')
     expect(inbox.body).not.toContain('Gabi')
     await context.close()
   })
@@ -299,12 +299,12 @@ test.describe('paying viewer', () => {
     test.setTimeout(180_000)
     const { page, context } = await asSubscriber(browser, baseURL!, VIEWER, `${M}/nova?anuncio=${s.ads.pago2}`)
     await page.getByLabel('Seu apelido').fill('ViewerPapo')
-    await page.getByLabel('Mensagem', { exact: true }).fill('PRIMEIRA-MSG-SENTINELA')
+    await page.getByLabel('Recado', { exact: true }).fill('PRIMEIRA-MSG-SENTINELA')
     await page.getByRole('button', { name: 'Enviar' }).click()
     await expect(page).toHaveURL(/\/area-do-assinante\/mensagens\/\d+$/)
     const thread = page.url()
     const captured = await captureReply(page, 'REPLAY-SENTINELA-CG')
-    await expect(page.getByRole('list', { name: 'Mensagens' })).toContainText('REPLAY-SENTINELA-CG')
+    await expect(page.getByRole('list', { name: 'Recados' })).toContainText('REPLAY-SENTINELA-CG')
     const occurrences = (text: string) => text.split('REPLAY-SENTINELA-CG').length - 1
     const before = occurrences((await fetchAs(page, 'GET', new URL(thread).pathname)).body)
     expect(before).toBeGreaterThan(0)
@@ -317,9 +317,9 @@ test.describe('paying viewer', () => {
 
     // and through the real form the person is told why
     await page.goto(thread)
-    await page.getByLabel('Mensagem', { exact: true }).fill('DEPOIS-DE-VENCER-SENTINELA')
+    await page.getByLabel('Recado', { exact: true }).fill('DEPOIS-DE-VENCER-SENTINELA')
     await page.getByRole('button', { name: 'Enviar' }).click()
-    await expect(page.getByText('Esta pessoa está sem assinatura ativa e não pode receber mensagens agora.')).toBeVisible()
+    await expect(page.getByText('Esta pessoa está sem assinatura ativa e não recebe recados agora.')).toBeVisible()
     expect((await fetchAs(page, 'GET', new URL(thread).pathname)).body).not.toContain('DEPOIS-DE-VENCER-SENTINELA')
     await context.close()
   })

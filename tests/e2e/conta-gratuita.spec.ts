@@ -136,7 +136,7 @@ test('free account sees the Assine Já panel on board, detail, recados and mensa
   await context.close()
 })
 
-test('after approval a paying member sees the free ad with 1 photo and contacts, no Enviar mensagem; the visitor sees it blurred', async ({
+test('after approval a paying member sees the free ad with 1 photo and contacts, no Enviar recado; the visitor sees it blurred', async ({
   browser,
   baseURL,
   request,
@@ -155,8 +155,8 @@ test('after approval a paying member sees the free ad with 1 photo and contacts,
   const main = page.locator('main')
   await expect(main.getByRole('list', { name: 'Fotos do anúncio' }).locator('img')).toHaveCount(1)
   await expect(main.getByRole('link', { name: /WhatsApp/ })).toBeVisible()
-  await expect(main.getByRole('link', { name: 'Enviar mensagem' })).toHaveCount(0)
-  await expect(main.getByText('Conta gratuita: use os contatos do anúncio.')).toBeVisible()
+  await expect(main.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+  await expect(main.getByText('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.')).toBeVisible()
 
   const visitor = await ctx(browser, baseURL!)
   await visitor.page.goto('/classisex')
@@ -201,7 +201,7 @@ test('Liberar lets the owner add media; when the subscription ends only the cove
     return {
       fotos: await viewerMain.getByRole('list', { name: 'Fotos do anúncio' }).locator('img').count(),
       videos: await viewerMain.locator('video').count(),
-      mensagem: await viewerMain.getByRole('link', { name: 'Enviar mensagem' }).count(),
+      mensagem: await viewerMain.getByRole('link', { name: 'Enviar recado' }).count(),
     }
   }
   expect(await seen()).toEqual({ fotos: 2, videos: 1, mensagem: 1 })

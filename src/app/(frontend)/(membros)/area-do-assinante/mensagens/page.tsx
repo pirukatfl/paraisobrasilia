@@ -12,7 +12,7 @@ import { getInbox } from '@/lib/mensagens/queries'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Mensagens',
+  title: 'Recados',
   robots: { index: false, follow: false },
 }
 
@@ -30,8 +30,9 @@ export default async function MensagensPage({
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
       <p className="type-eyebrow text-muted">Área do assinante</p>
       <h1 id="titulo-mensagens" className="type-display mt-2">
-        Mensagens
+        Recados
       </h1>
+      <p className="mt-2 max-w-[560px] text-body text-muted">Só você e a outra pessoa veem cada conversa.</p>
     </>
   )
   if (check.inactive) {
@@ -49,11 +50,10 @@ export default async function MensagensPage({
       {header}
       {inbox.items.length === 0 ? (
         <EmptyState
-          heading="Nenhuma conversa ainda."
-          body="Comece pelo botão Enviar mensagem em um anúncio ou recado."
+          heading="Nenhum recado ainda."
+          body="Para mandar um recado, abra um anúncio do ClassiSex e toque em Enviar recado. Aqui aparecem só os recados que você mandou ou recebeu."
           actions={[
             { href: '/area-do-assinante/classisex', label: 'Ver ClassiSex', variant: 'secondary' },
-            { href: '/area-do-assinante/recados', label: 'Ver recados', variant: 'secondary' },
           ]}
         />
       ) : (
