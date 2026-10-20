@@ -61,12 +61,15 @@ export function AdForm({
   initial,
   adId,
   withMedia = false,
+  limits,
 }: {
   action: (state: AdFormState, formData: FormData) => Promise<AdFormState>
   categories: { id: number; name: string }[]
   initial: AdFormValues
   adId?: number
   withMedia?: boolean
+  /** Photos and videos per ad of the account's tier (the server decides again) */
+  limits?: { fotos: number; videos: number }
 }) {
   const [state, formAction, pending] = useActionState(action, null)
   const router = useRouter()
@@ -246,7 +249,7 @@ export function AdForm({
       {withMedia && hydrated && (
         <>
           <input type="hidden" name="comMidia" value={hasFiles ? 'sim' : ''} />
-          <AdMediaPicker photos={photos} videos={videos} onPhotos={setPhotos} onVideos={setVideos} disabled={busy} />
+          <AdMediaPicker photos={photos} videos={videos} onPhotos={setPhotos} onVideos={setVideos} disabled={busy} limits={limits} />
         </>
       )}
 

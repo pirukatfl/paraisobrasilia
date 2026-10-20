@@ -182,11 +182,11 @@ test('other subscribers, anonymous and cross-site posts cannot upload', async ({
   expect(evil.status()).toBe(403)
   await lia.context.close()
 
-  // Expired owner: back to the edit page with the inactive code, nothing stored
+  // Expired owner (G-05: a free account now): may edit, but a video is refused with the free code, nothing stored
   const rui = await asSubscriber(browser, baseURL!, RUI)
-  const expired = await postFromPage(rui.page, midiaPost(ruiAd))
+  const expired = await postFromPage(rui.page, `${midiaPost(ruiAd)}?tipo=video`)
   expect(expired.url).toContain('midia=erro')
-  expect(expired.url).toContain('codigo=inativo')
+  expect(expired.url).toContain('codigo=video-gratis')
   await rui.context.close()
 
   expect((await api.findAdMedia(liaAd)).length).toBe(before)

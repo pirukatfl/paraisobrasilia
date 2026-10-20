@@ -8,7 +8,7 @@ const mediaSummary = (fotos: number, videos: number) =>
 
 /** One ad in Meus anúncios (owner view): status, refusal reason, text, contacts, edit/delete. */
 export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean }) {
-  const published = ad.status === 'aprovado' && ad.statusLabel === 'Publicado'
+  const published = ad.status === 'aprovado'
   return (
     <article className="rounded-xl border border-line bg-surface p-5" aria-label={`Anúncio: ${ad.statusLabel}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">

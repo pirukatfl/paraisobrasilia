@@ -4,7 +4,7 @@ import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 
 // CLAS-01 / CLAS-02 / D-05 / D-06 / D-07: subscribers browse, filter and open ads with contacts;
-// expired authors vanish and return on renewal; inactive viewers get no ad markup (T-04-05).
+// expired authors stay as free ads (G-05) and keep their data on renewal; inactive viewers get no ad markup (T-04-05).
 test.describe.configure({ mode: 'serial' })
 
 const DAY = 86_400_000
@@ -65,7 +65,7 @@ test.beforeAll(async ({ request }) => {
     startsAt: new Date(Date.now() - 31 * DAY).toISOString(),
     endsAt: new Date(Date.now() - DAY).toISOString(),
   })
-  eliAd = (await api.createAd({ author: eliId, texto: TEXTO_ELI, status: 'aprovado' })).id
+  eliAd = (await api.createAd({ author: eliId, texto: TEXTO_ELI, cidade: 'Gama', status: 'aprovado' })).id
 
   const gilId = (await api.createAssinante(GIL)).id
   await api.liberar(gilId, { durationDays: 30, method: 'cortesia', amount: 0 })
@@ -100,10 +100,11 @@ test('active subscriber sees visible ads only, newest first', async ({ browser, 
   const main = page.locator('main')
   await expect(page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
   const cards = main.getByRole('article')
-  await expect(cards).toHaveCount(2)
-  await expect(cards.nth(0)).toContainText(TEXTO_SOLTEIRA)
-  await expect(cards.nth(1)).toContainText(TEXTO_CASAL)
-  await expect(main).not.toContainText(TEXTO_ELI)
+  // Eli's subscription ended: the ad stays as a free ad (G-05), newest first
+  await expect(cards).toHaveCount(3)
+  await expect(cards.nth(0)).toContainText(TEXTO_ELI)
+  await expect(cards.nth(1)).toContainText(TEXTO_SOLTEIRA)
+  await expect(cards.nth(2)).toContainText(TEXTO_CASAL)
   await expect(main).not.toContainText(TEXTO_PENDENTE)
   await context.close()
 })
@@ -130,7 +131,7 @@ test('filters by Eu sou and cidade; Limpar filtros resets', async ({ browser, ba
 
   await main.getByRole('link', { name: 'Limpar filtros' }).click()
   await expect(page).toHaveURL(/\/area-do-assinante\/classisex$/)
-  await expect(main.getByRole('article')).toHaveCount(2)
+  await expect(main.getByRole('article')).toHaveCount(3)
   await context.close()
 })
 
@@ -152,11 +153,17 @@ test('full ad shows contacts; hidden ads answer 404', async ({ browser, baseURL 
   await page.goto(`/area-do-assinante/classisex/${solteiraAd}`)
   await expect(main.getByRole('link', { name: /^Telegram/ })).toHaveAttribute('href', 'https://t.me/duda_bsb')
 
-  for (const id of [eliAd, pendingAd, 99999999]) {
+  for (const id of [pendingAd, 99999999]) {
     const res = await page.goto(`/area-do-assinante/classisex/${id}`)
     expect(res?.status()).toBe(404)
     await expect(main).toContainText('Página não encontrada')
   }
+  // the ad of an expired author is open, as a free ad: contacts yes, "Enviar mensagem" no (G-02, G-04)
+  const res = await page.goto(`/area-do-assinante/classisex/${eliAd}`)
+  expect(res?.status()).toBe(200)
+  await expect(main).toContainText(TEXTO_ELI)
+  await expect(main.getByRole('link', { name: 'Enviar mensagem' })).toHaveCount(0)
+  await expect(main.getByText('Conta gratuita: use os contatos do anúncio.')).toBeVisible()
   await context.close()
 })
 
@@ -191,18 +198,22 @@ test('anonymous visitors go to /entrar; pages are private and noindex', async ({
   await context.close()
 })
 
-test('ending the author access hides the ads; renewing brings them back', async ({ browser, baseURL, request }) => {
+test('ending the author access keeps the ads on the board as free ads; renewing changes nothing else', async ({ browser, baseURL, request }) => {
   const api = await staffApi(request)
   await api.encerrar(dudaId, 'Teste de vencimento')
   const { page, context } = await asSubscriber(browser, baseURL!, GIL)
   await page.goto('/area-do-assinante/classisex')
   const main = page.locator('main')
-  await expect(main.getByRole('article')).toHaveCount(0)
-  await expect(main).toContainText('Ainda não há anúncios publicados.')
+  await expect(main.getByRole('article')).toHaveCount(3)
+  await page.goto(`/area-do-assinante/classisex/${casalAd}`)
+  await expect(main.getByRole('link', { name: /^WhatsApp/ })).toBeVisible()
+  await expect(main.getByRole('link', { name: 'Enviar mensagem' })).toHaveCount(0)
 
   await api.liberar(dudaId, { durationDays: 30, method: 'cortesia', amount: 0 })
   await page.reload()
-  await expect(main.getByRole('article')).toHaveCount(2)
+  await expect(main.getByRole('link', { name: 'Enviar mensagem' })).toBeVisible()
+  await page.goto('/area-do-assinante/classisex')
+  await expect(main.getByRole('article')).toHaveCount(3)
   await api.dispose()
   await context.close()
 })

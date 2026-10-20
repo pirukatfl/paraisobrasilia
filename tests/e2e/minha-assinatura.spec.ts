@@ -112,7 +112,9 @@ test('account without subscription sees the plans link', async ({ browser, baseU
   await expect(main).toContainText('Sua conta ainda não tem uma assinatura ativa.')
   await expect(main.getByRole('link', { name: 'Ver planos' })).toHaveAttribute('href', '/assine-ja')
   await page.goto('/area-do-assinante/classisex')
-  await expect(main).toContainText('Sua assinatura não está ativa')
+  // never subscribed: the free-account panel (G-02) instead of the expiry panel
+  await expect(main.getByRole('heading', { name: 'Disponível para assinantes' })).toBeVisible()
+  await expect(main.getByRole('link', { name: 'Assine Já' })).toHaveAttribute('href', '/assine-ja')
   expect(await page.content()).not.toContain(RESTRICTED)
   await context.close()
 })

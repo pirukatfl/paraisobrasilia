@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
+import { PlanComparison } from '@/components/assinantes/PlanComparison'
 import { SubscriptionStatus } from '@/components/assinantes/SubscriptionStatus'
+import Link from 'next/link'
+
 import { getAccessStatus } from '@/lib/assinantes/access'
 import { requireAssinante } from '@/lib/assinantes/session'
+import { TIER_LABELS, tierOf } from '@/lib/assinantes/tier'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 
@@ -22,6 +26,7 @@ export default async function AreaDoAssinantePage({
   const assinante = await requireAssinante('/area-do-assinante')
   const [access, contact] = await Promise.all([getAccessStatus(assinante.id), getContact()])
   const { ok } = await searchParams
+  const tier = tierOf(access)
   return (
     <section aria-labelledby="titulo-area">
       {ok === 'senha' && (
@@ -40,6 +45,23 @@ export default async function AreaDoAssinantePage({
         </h2>
         <SubscriptionStatus access={access} whatsappHref={contact.whatsapp ? whatsappUrl(contact.whatsapp) : null} />
       </section>
+      {tier === 'gratis' && (
+        <section aria-labelledby="titulo-tipo-conta" className="mt-8 max-w-[560px]">
+          <h2 id="titulo-tipo-conta" className="type-heading mb-2">
+            Sua conta: {TIER_LABELS[tier]}
+          </h2>
+          <p className="text-body">
+            Você pode publicar até 3 anúncios com 1 foto cada. Para ver os anúncios dos outros, contatos, mensagens e
+            recados, assine.
+          </p>
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <Link href="/area-do-assinante/meus-anuncios" className="btn-primary">
+              Meus anúncios
+            </Link>
+          </div>
+          <PlanComparison id="comparativo-home" />
+        </section>
+      )}
       <section aria-labelledby="titulo-conta" className="mt-8">
         <h2 id="titulo-conta" className="type-heading">
           Dados da conta

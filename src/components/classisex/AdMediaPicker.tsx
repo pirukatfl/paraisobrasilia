@@ -134,10 +134,17 @@ export function AdMediaPicker({
   return (
     <fieldset className="flex flex-col gap-4" disabled={disabled}>
       <legend className="type-label text-text">Fotos e vídeos (opcional)</legend>
-      <p className="type-label text-muted">
-        Até {MAX_AD_PHOTOS} fotos JPG, PNG ou WebP (15 MB cada) e até {MAX_AD_VIDEOS} vídeos MP4 ou MOV (100 MB e {MAX_VIDEO_SECONDS} segundos
-        cada). A primeira foto é a capa. Na área aberta, só uma foto desfocada aparece. Você também pode adicionar depois, editando o anúncio.
-      </p>
+      {MAX_AD_VIDEOS > 0 ? (
+        <p className="type-label text-muted">
+          Até {MAX_AD_PHOTOS} fotos JPG, PNG ou WebP (15 MB cada) e até {MAX_AD_VIDEOS} vídeos MP4 ou MOV (100 MB e {MAX_VIDEO_SECONDS} segundos
+          cada). A primeira foto é a capa. Na área aberta, só uma foto desfocada aparece. Você também pode adicionar depois, editando o anúncio.
+        </p>
+      ) : (
+        <p className="type-label text-muted">
+          {MAX_AD_PHOTOS} foto JPG, PNG ou WebP (15 MB). Ela é a capa. Na área aberta, só uma foto desfocada aparece. Você também pode
+          trocar depois, editando o anúncio.
+        </p>
+      )}
       {notes.length > 0 && (
         <ul role="alert" className="flex flex-col gap-1 rounded-lg border border-danger px-4 py-2 text-body text-text">
           {notes.map((n) => (
@@ -170,6 +177,7 @@ export function AdMediaPicker({
         )}
       </div>
 
+      {MAX_AD_VIDEOS > 0 && (
       <div className="flex flex-col gap-2">
         <label htmlFor="escolher-videos" className="type-label text-text">
           Escolher vídeos ({videos.length} de {MAX_AD_VIDEOS})
@@ -193,6 +201,7 @@ export function AdMediaPicker({
           </ul>
         )}
       </div>
+      )}
     </fieldset>
   )
 }

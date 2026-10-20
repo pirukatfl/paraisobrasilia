@@ -187,7 +187,7 @@ test("another subscriber cannot open Bia's ad; nobody but staff uses /api/ads", 
   await anon.dispose()
 })
 
-test('after access ends: list and delete only, no form', async ({ browser, baseURL, request }) => {
+test('after access ends: the ads stay as a free account, editing and deleting still work (G-05)', async ({ browser, baseURL, request }) => {
   const api = await staffApi(request)
   await api.encerrar(biaId, 'Teste de fim de acesso')
   await api.dispose()
@@ -197,14 +197,16 @@ test('after access ends: list and delete only, no form', async ({ browser, baseU
   await page.goto('/area-do-assinante/meus-anuncios')
   const main = page.locator('main')
   await expect(main.getByRole('article')).toHaveCount(2)
-  await expect(main.getByRole('link', { name: 'Novo anúncio' })).toHaveCount(0)
-  await expect(main.getByRole('article').filter({ hasText: 'Fora do ar: assinatura vencida' })).toHaveCount(1)
+  await expect(main.getByRole('link', { name: 'Novo anúncio' })).toBeVisible()
+  await expect(main.getByRole('article').filter({ hasText: 'Publicado como conta gratuita (só a capa aparece)' })).toHaveCount(1)
+  await expect(main).not.toContainText('Fora do ar: assinatura vencida')
+  await expect(main.getByTestId('comparativo-planos')).toBeVisible()
 
   for (const path of ['/area-do-assinante/meus-anuncios/novo', `/area-do-assinante/meus-anuncios/${ad.id}/editar`]) {
     await page.goto(path)
-    await expect(main).toContainText('Sua assinatura não está ativa')
-    await expect(main.getByRole('button', { name: 'Enviar para aprovação' })).toHaveCount(0)
-    await expect(main.getByLabel('Texto do anúncio')).toHaveCount(0)
+    await expect(main).not.toContainText('Sua assinatura não está ativa')
+    await expect(main.getByRole('button', { name: 'Enviar para aprovação' })).toBeVisible()
+    await expect(main.getByLabel('Texto do anúncio')).toBeVisible()
   }
 
   await page.goto('/area-do-assinante/meus-anuncios')

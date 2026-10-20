@@ -3,9 +3,9 @@ import { notFound } from 'next/navigation'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { AdForm } from '@/components/classisex/AdForm'
-import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { OwnerMediaManager } from '@/components/classisex/OwnerMediaManager'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
+import { tierOf } from '@/lib/assinantes/tier'
 import { salvarAnuncio } from '@/lib/classisex/actions'
 import { MEDIA_OK_MESSAGES, uploadErrorMessage, batchNotice } from '@/lib/classisex/media-messages'
 import { getActiveAdCategories, getOwnAdForEdit } from '@/lib/classisex/queries'
@@ -50,14 +50,7 @@ export default async function EditarAnuncioPage({
       </h1>
     </>
   )
-  if (check.inactive) {
-    return (
-      <section aria-labelledby="titulo-editar-anuncio">
-        {header}
-        <InactivePanel access={check.access} />
-      </section>
-    )
-  }
+  const tier = tierOf(check.access)
   // Only the owner's ads; anything else is a plain 404 (T-04-04)
   const ad = await getOwnAdForEdit(check.assinante.id, id)
   if (!ad) notFound()
@@ -87,7 +80,7 @@ export default async function EditarAnuncioPage({
           telegram: ad.telegram,
         }}
       />
-      <OwnerMediaManager adId={ad.id} media={ad.media} />
+      <OwnerMediaManager adId={ad.id} media={ad.media} tier={tier} />
     </section>
   )
 }
