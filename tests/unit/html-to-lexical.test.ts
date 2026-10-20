@@ -98,4 +98,27 @@ describe('htmlToLexical', () => {
     expect(htmlToLexical('').root.children).toEqual([])
     expect(htmlToLexical('   \n ').root.children).toEqual([])
   })
+
+  it('treats <br><br> and double newlines as paragraph breaks', () => {
+    const b = blocks('<p>Um dois.<br><br>Tres quatro.<br /> <br/>Cinco.<br>seis</p>')
+    expect(b.map(plain)).toEqual(['Um dois.', 'Tres quatro.', 'Cinco.\nseis'])
+  })
+
+  it('splits paragraphs over 120 words into groups of whole sentences', () => {
+    const sentence = (i: number) => `${Array.from({ length: 29 }, (_, k) => `s${i}w${k}`).join(' ')} fim${i}.`
+    const html = `<p>${Array.from({ length: 10 }, (_, i) => sentence(i)).join(' ')}</p>`
+    const b = blocks(html)
+    expect(b.length).toBeGreaterThan(1)
+    for (const block of b) {
+      const text = plain(block)
+      expect(text.trim().split(/\s+/).length).toBeLessThanOrEqual(120)
+      expect(text.trim().endsWith('.')).toBe(true) // never cut mid-sentence
+    }
+    expect(b.map(plain).join(' ')).toBe(Array.from({ length: 10 }, (_, i) => sentence(i)).join(' '))
+  })
+
+  it('keeps a single sentence longer than the limit intact', () => {
+    const long = Array.from({ length: 200 }, (_, i) => `w${i}`).join(' ') + '.'
+    expect(blocks(`<p>${long}</p>`).map(plain)).toEqual([long])
+  })
 })

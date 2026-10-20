@@ -95,3 +95,50 @@ describe('slugify / SLUG_RE', () => {
     for (const bad of ['A', 'a--b', '-a', 'a-', 'a b', '']) expect(SLUG_RE.test(bad)).toBe(false)
   })
 })
+
+describe('splitConto open cap', () => {
+  const w = (n: number, prefix = 'p') => Array.from({ length: n }, (_, i) => `${prefix}${i}`).join(' ')
+  const sentences = (n: number, prefix = 's') =>
+    Array.from({ length: n }, (_, i) => `${prefix}${i} a b c d e f g h.`).join(' ')
+
+  it('cuts a giant first paragraph so most of the story stays for subscribers', () => {
+    const split = splitConto(state([para(sentences(100)), para(w(20))]), 3)
+    expect(split.openWords).toBeLessThanOrEqual(150)
+    expect(split.openWords).toBeGreaterThanOrEqual(40)
+    expect(split.totalWords).toBeGreaterThan(900)
+    expect(split.openWords / split.totalWords).toBeLessThan(0.2)
+    expect(plainTextOf(split.open).trim().endsWith('.')).toBe(true) // cut at a sentence
+  })
+
+  it('caps a staff setting of many paragraphs at max(150 words, 15%)', () => {
+    const many = state(Array.from({ length: 30 }, (_, i) => para(w(60, `q${i}x`))))
+    const split = splitConto(many, 20)
+    expect(split.openWords).toBeLessThanOrEqual(Math.max(150, Math.ceil(split.totalWords * 0.15)))
+    expect(split.openBlocks).toBeLessThan(30)
+    // a huge story is capped at 15%
+    const huge = state(Array.from({ length: 40 }, (_, i) => para(w(100, `h${i}x`))))
+    const h = splitConto(huge, 20)
+    expect(h.openWords).toBeLessThanOrEqual(Math.ceil(4000 * 0.15))
+  })
+
+  it('opens at least ~40 words when the story allows', () => {
+    const split = splitConto(state([para(w(10)), para(w(10)), para(w(10)), para(w(200)), para(w(200))]), 3)
+    expect(split.openWords).toBeGreaterThanOrEqual(40)
+    expect(split.openBlocks).toBeLessThan(5)
+  })
+
+  it('does not count leading title blocks and always leaves the last block', () => {
+    const body = [para(w(30, 'a')), para(w(30, 'b')), para(w(30, 'c')), para(w(30, 'd'))]
+    const split = splitConto(state([para('Titulo curto'), ...body]), 2)
+    expect(plainTextOf(split.open)).toContain('Titulo curto')
+    expect(split.openBlocks).toBe(3) // title + 2 content blocks
+    const all = splitConto(state([para('Titulo'), para(w(30, 'z'))]), 20)
+    expect(all.openBlocks).toBe(1)
+  })
+
+  it('never opens the whole story, even for a tiny one', () => {
+    const split = splitConto(state([para('um dois tres'), para('quatro cinco seis')]), 20)
+    expect(split.openBlocks).toBe(1)
+  })
+})
+

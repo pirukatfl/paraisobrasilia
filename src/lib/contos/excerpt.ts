@@ -65,9 +65,37 @@ function paragraphOf(text: string): unknown {
   }
 }
 
+/** Open words never exceed max(OPEN_CAP_MIN_WORDS, OPEN_CAP_RATIO of the total), whatever staff set. */
+export const OPEN_CAP_MIN_WORDS = 150
+export const OPEN_CAP_RATIO = 0.15
+/** Stories long enough get at least this many open words. */
+export const OPEN_FLOOR_WORDS = 40
+/** Leading blocks shorter than this (titles, headings) do not count toward the open blocks. */
+export const TITLE_BLOCK_WORDS = 8
+
+const SENTENCE_END = /[.!?…]["'”’)\]]*$/
+
+/** Cuts a block to at most `room` words, at a sentence end when that keeps at least half of them. */
+function cutBlock(text: string, room: number): string {
+  const words = text.trim().split(/\s+/).filter(Boolean)
+  if (words.length <= room) return words.join(' ')
+  let end = -1
+  for (let i = room - 1; i >= Math.floor(room / 2); i--) {
+    if (SENTENCE_END.test(words[i]!)) {
+      end = i + 1
+      break
+    }
+  }
+  if (end > 0) return words.slice(0, end).join(' ')
+  return `${words.slice(0, room).join(' ')}…`
+}
+
 /**
- * Open part of a conto. Top-level blocks: the first `n` stay open, but at least one block always
- * stays for subscribers; a single block is cut to its first SINGLE_BLOCK_WORDS words.
+ * Open part of a conto. Top-level blocks: the first `n` content blocks stay open (leading blocks
+ * under TITLE_BLOCK_WORDS words, like titles, do not count), but the open words are capped at
+ * max(150, 15% of the story), at least one block always stays for subscribers, and stories of
+ * 150+ words open at least ~40 words (a huge block is cut at a sentence). A single block is cut
+ * to its first SINGLE_BLOCK_WORDS words.
  */
 export function splitConto(state: LexicalStateLike | null | undefined, n: number): ContoSplit {
   const blocks = Array.isArray(state?.root?.children) ? state!.root.children : []
@@ -87,13 +115,58 @@ export function splitConto(state: LexicalStateLike | null | undefined, n: number
     return { open, openBlocks: 1, totalBlocks: 1, openWords: limit, totalWords }
   }
 
-  const openBlocks = Math.min(clamped, blocks.length - 1)
-  const open = emptyRoot(structuredClone(blocks.slice(0, openBlocks)))
+  const sizes = blocks.map((b) => wordCount(plainTextOf(b)))
+  const hasContent = sizes.some((w) => w >= TITLE_BLOCK_WORDS)
+  let lead = 0
+  if (hasContent) while (lead < blocks.length && sizes[lead]! < TITLE_BLOCK_WORDS) lead++
+
+  const cap = Math.max(OPEN_CAP_MIN_WORDS, Math.ceil(totalWords * OPEN_CAP_RATIO))
+  const floor = totalWords >= OPEN_CAP_MIN_WORDS ? OPEN_FLOOR_WORDS : 0
+  const maxBlocks = blocks.length - 1 // the last block always stays for subscribers
+  const target = Math.min(lead + clamped, maxBlocks)
+
+  const kept: unknown[] = []
+  let words = 0
+  let leadWords = 0
+  let i = 0
+  while (i < blocks.length) {
+    const contentWords = words - leadWords
+    const needMore = i < target || contentWords < floor
+    if (!needMore) break
+    const size = sizes[i]!
+    if (i < lead) {
+      kept.push(structuredClone(blocks[i]))
+      words += size
+      leadWords += size
+      i++
+      continue
+    }
+    if (i >= maxBlocks) {
+      // the last block always stays for subscribers
+      break
+    }
+    if (words + size <= cap) {
+      kept.push(structuredClone(blocks[i]))
+      words += size
+      i++
+      continue
+    }
+    // Next block busts the cap: cut it only when the open part is still under the floor
+    if (contentWords < floor || contentWords === 0) {
+      const room = Math.max(cap - words, 1)
+      const cut = cutBlock(plainTextOf(blocks[i]), room)
+      kept.push(paragraphOf(cut))
+      words += wordCount(cut.replace(/…$/, ''))
+    }
+    break
+  }
+
+  const open = emptyRoot(kept)
   return {
     open,
-    openBlocks,
+    openBlocks: kept.length,
     totalBlocks: blocks.length,
-    openWords: wordCount(plainTextOf(open)),
+    openWords: wordCount(plainTextOf(open).replace(/…$/, '')),
     totalWords,
   }
 }

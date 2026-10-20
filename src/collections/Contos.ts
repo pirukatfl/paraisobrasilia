@@ -162,7 +162,8 @@ export const Contos: CollectionConfig = {
       label: 'Parágrafos abertos',
       admin: {
         step: 1,
-        description: 'Quantos parágrafos do início qualquer visitante lê. O resto é só para assinantes.',
+        description:
+          'Quantos parágrafos do início qualquer visitante lê. O resto é só para assinantes. Mesmo que você aumente, o trecho aberto nunca passa de 150 palavras ou 15% do conto (vale o maior) e a última parte fica sempre para assinantes. Títulos curtos no começo não contam.',
       },
       validate: (value: unknown) =>
         typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= MAX_OPEN_BLOCKS

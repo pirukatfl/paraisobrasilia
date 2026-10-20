@@ -105,7 +105,8 @@ describe('buildImportRecords rules', () => {
     const six = paragraphs(words(5), words(5), words(5), words(5), words(5), words(5))
     expect(buildImportRecords([mk(six)]).report.rows[0]!.flags).toContain('curto')
 
-    const open = paragraphs(words(200), words(200), words(200), words(10))
+    // the open cap (max(150 words, 15%)) only leaves room for 'aberto-demais' on short stories
+    const open = paragraphs(words(40, 'a'), words(40, 'b'), words(40, 'c'), words(10, 'd'))
     expect(buildImportRecords([mk(open)]).report.rows[0]!.flags).toContain('aberto-demais')
 
     const single = buildImportRecords([mk(words(120))]).report.rows[0]!
@@ -127,11 +128,76 @@ describe('buildImportRecords rules', () => {
 
   it('gives colliding slugs a numeric suffix', () => {
     const { records, report } = buildImportRecords([
-      mk(words(80), { wpSlug: 'Mesmo-Nome' }),
-      mk(words(80), { wpSlug: 'mesmo-nome' }),
+      mk(words(80, 'um'), { wpSlug: 'Mesmo-Nome' }),
+      mk(words(80, 'dois'), { wpSlug: 'mesmo-nome' }),
     ])
     expect(records.map((r) => r.slug)).toEqual(['mesmo-nome', 'mesmo-nome-2'])
     expect(report.rows[1]!.flags).toContain('slug-alterado')
+  })
+})
+
+describe('buildImportRecords quality rules', () => {
+  const sent = (n: number, prefix: string) =>
+    Array.from({ length: n }, (_, i) => `${prefix}${i} um dois tres quatro cinco.`).join(' ')
+
+  it('splits a one-giant-paragraph story into real paragraphs and keeps the open part small', () => {
+    const { records, report } = buildImportRecords([mk(`<p>${sent(150, 'g')}</p>`)])
+    expect(records[0]!.texto.root.children.length).toBeGreaterThan(3)
+    const row = report.rows[0]!
+    expect(row.flags).not.toContain('sem-paragrafos')
+    expect(row.flags).not.toContain('aberto-demais')
+    expect(row.openWords).toBeLessThanOrEqual(150)
+  })
+
+  it('skips exact duplicates, keeping the oldest, and reports duplicado-de', () => {
+    const body = `<p>${words(60, 'dup')}</p><p>${words(60, 'dup2')}</p>`
+    const { records, report } = buildImportRecords([
+      mk(body, { wpSlug: 'meu-conto-copy', publishedAt: '2025-03-01T00:00:00.000Z' }),
+      mk(body.toUpperCase(), { wpSlug: 'meu-conto-copy-3', publishedAt: '2025-04-01T00:00:00.000Z' }),
+      mk(body, { wpSlug: 'meu-conto', publishedAt: '2024-01-01T00:00:00.000Z' }),
+      mk(`<p>${words(80, 'outro')}</p>`),
+    ])
+    expect(records[0]!.slug).toBe('meu-conto')
+    expect(records).toHaveLength(2)
+    expect(report.duplicados).toBe(2)
+    expect(report.rows[0]!.flags).toContain('duplicado-de:meu-conto')
+    expect(report.rows[1]!.flags).toContain('duplicado-de:meu-conto')
+    expect(formatReport(report)).toContain('duplicados: 2')
+  })
+
+  it('derives title and slug from the text for untitled posts with numeric slugs', () => {
+    const { records, report } = buildImportRecords([
+      mk(`<p>Era uma noite quente em Brasilia quando tudo comecou ${words(60)}</p><p>${words(40, 'x')}</p>`, {
+        wpSlug: '4384-2',
+        title: '',
+      }),
+    ])
+    expect(records[0]!.slug).toBe('era-uma-noite-quente-em-brasilia')
+    expect(records[0]!.title).toBe('Era uma noite quente em Brasilia quando tudo')
+    expect(report.rows[0]!.flags).toContain('sem-titulo')
+    expect(report.rows[0]!.flags).toContain('slug-alterado')
+  })
+
+  it('uses the title for a numeric slug that has a title', () => {
+    const { records, report } = buildImportRecords([
+      mk(paragraphs(words(60), words(60)), { wpSlug: '4464-2', title: 'Uma Noite Boa' }),
+    ])
+    expect(records[0]!.slug).toBe('uma-noite-boa')
+    expect(report.rows[0]!.flags).not.toContain('sem-titulo')
+  })
+
+  it('strips leftover shortcodes fully and does not flag the redaction label', () => {
+    const html = `<p>Antes [algo&nbsp;id=1 x=2] depois [/algo] ${words(40)} chame 61 98877-6655</p><p>${words(40, 'k')}</p>`
+    const { records, report } = buildImportRecords([mk(html)])
+    const text = plainTextOf(records[0]!.texto)
+    expect(text).not.toMatch(/\[\/?algo/)
+    expect(text).toContain('Antes depois')
+    expect(text).toContain('[contato só para assinantes]')
+    expect(report.rows[0]!.flags).toContain('shortcode-restante')
+
+    const onlyContact = buildImportRecords([mk(`<p>${words(40)} fulana@exemplo.test</p><p>${words(40, 'k')}</p>`)])
+    expect(onlyContact.report.rows[0]!.flags).toContain('contatos-removidos')
+    expect(onlyContact.report.rows[0]!.flags).not.toContain('shortcode-restante')
   })
 })
 

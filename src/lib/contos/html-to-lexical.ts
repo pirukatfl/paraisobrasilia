@@ -256,6 +256,114 @@ function inlinesToChildren(buffer: Inline[]): LexicalNode[] {
   return out.map((p) => (p.t === 'br' ? lineBreakNode() : textNode(p.text, p.format)))
 }
 
+// ---------------------------------------------------------------------------------------------
+// Paragraph shaping: <br><br> breaks and long-paragraph splitting
+// ---------------------------------------------------------------------------------------------
+
+/** Paragraphs longer than this are split into groups of whole sentences. */
+export const LONG_PARAGRAPH_WORDS = 120
+
+const SENTENCE_RE = /[^.!?…]*[.!?…]+["'”’)\]]*\s*|[^.!?…]+$/g
+
+function wordsIn(text: string): number {
+  const t = text.trim()
+  return t === '' ? 0 : t.split(/\s+/).length
+}
+
+/** Splits inline children at runs of 2+ line breaks (blank text between them is ignored). */
+function splitOnDoubleBreaks(children: LexicalNode[]): LexicalNode[][] {
+  const groups: LexicalNode[][] = [[]]
+  let i = 0
+  while (i < children.length) {
+    const node = children[i]!
+    if (node.type === 'linebreak') {
+      let j = i
+      let breaks = 0
+      while (j < children.length) {
+        const c = children[j]!
+        if (c.type === 'linebreak') breaks++
+        else if (!(c.type === 'text' && String(c.text ?? '').trim() === '')) break
+        j++
+      }
+      if (breaks >= 2) {
+        groups.push([])
+        i = j
+        continue
+      }
+    }
+    groups[groups.length - 1]!.push(node)
+    i++
+  }
+  return groups.filter((g) => g.length > 0)
+}
+
+/** Splits one long run of inline children into groups of whole sentences (<= LONG_PARAGRAPH_WORDS). */
+function splitLongChildren(children: LexicalNode[]): LexicalNode[][] {
+  const total = children.reduce((n, c) => n + (c.type === 'text' ? wordsIn(String(c.text)) : 0), 0)
+  if (total <= LONG_PARAGRAPH_WORDS) return [children]
+
+  // sentence units: pieces (possibly spanning formatted nodes) up to a terminal punctuation
+  const units: { nodes: LexicalNode[]; words: number }[] = []
+  let current: { nodes: LexicalNode[]; words: number } = { nodes: [], words: 0 }
+  const closeUnit = () => {
+    if (current.nodes.length) units.push(current)
+    current = { nodes: [], words: 0 }
+  }
+  for (const child of children) {
+    if (child.type !== 'text') {
+      current.nodes.push(child)
+      continue
+    }
+    const text = String(child.text)
+    const pieces = text.match(SENTENCE_RE) ?? [text]
+    for (const piece of pieces) {
+      if (piece === '') continue
+      current.nodes.push({ ...child, text: piece })
+      current.words += wordsIn(piece)
+      if (/[.!?…]["'”’)\]]*\s*$/.test(piece)) closeUnit()
+    }
+  }
+  closeUnit()
+
+  const groups: LexicalNode[][] = []
+  let group: LexicalNode[] = []
+  let groupWords = 0
+  for (const unit of units) {
+    if (group.length > 0 && groupWords + unit.words > LONG_PARAGRAPH_WORDS) {
+      groups.push(group)
+      group = []
+      groupWords = 0
+    }
+    group.push(...unit.nodes)
+    groupWords += unit.words
+  }
+  if (group.length) groups.push(group)
+  return groups
+}
+
+/** Trims edge spaces of a group and drops it when nothing is left. */
+function tidy(children: LexicalNode[]): LexicalNode[] {
+  const out = children.map((c) => ({ ...c }))
+  while (out.length && out[0]!.type === 'linebreak') out.shift()
+  while (out.length && out[out.length - 1]!.type === 'linebreak') out.pop()
+  const first = out[0]
+  if (first && first.type === 'text') first.text = String(first.text).replace(/^\s+/, '')
+  const last = out[out.length - 1]
+  if (last && last.type === 'text') last.text = String(last.text).replace(/\s+$/, '')
+  return out.filter((c) => c.type !== 'text' || String(c.text) !== '')
+}
+
+function shapeParagraph(children: LexicalNode[]): LexicalNode[] {
+  const nodes: LexicalNode[] = []
+  for (const run of splitOnDoubleBreaks(children)) {
+    for (const group of splitLongChildren(run)) {
+      const kids = tidy(group)
+      if (kids.length) nodes.push(paragraphNode(kids))
+    }
+  }
+  return nodes
+}
+
 export function htmlToLexical(html: string): LexicalState {
   const tokens = tokenize(preClean(html))
   const output: LexicalNode[] = []
@@ -278,7 +386,7 @@ export function htmlToLexical(html: string): LexicalState {
     } else if (kind === 'h2' || kind === 'h3') {
       emit(headingNode(kind, children))
     } else {
-      emit(paragraphNode(children))
+      for (const node of shapeParagraph(children)) emit(node)
     }
   }
 

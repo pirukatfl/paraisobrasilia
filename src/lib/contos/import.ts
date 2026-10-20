@@ -10,7 +10,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { Payload, PayloadRequest } from 'payload'
 
-import { redactContacts } from '../classisex/redact'
+import { REDACTED_LABEL, redactContacts } from '../classisex/redact'
 import { htmlToLexical, type LexicalNode, type LexicalState } from './html-to-lexical'
 import {
   DEFAULT_OPEN_BLOCKS,
@@ -39,6 +39,8 @@ export type ImportFlag =
   | 'builder'
   | 'mojibake'
   | 'vazio'
+  | 'sem-titulo'
+  | `duplicado-de:${string}`
 
 export type ContoRecord = {
   wpId: number
@@ -59,6 +61,7 @@ export type ImportReport = {
   restritos: number
   builder: number
   ignorados: number
+  duplicados: number
   rows: ReportRow[]
 }
 
@@ -66,7 +69,11 @@ export type LoadResult = { criados: string[]; existentes: string[]; renomeados: 
 
 const BYLINE_START = /^(?:por|autor|autora|enviado por|escrito por)\b|^[—–-]\s*\S/i
 const BYLINE_MAX_WORDS = 12
-const LEFTOVER_SHORTCODE = /\[\/?[A-Za-z][\w-]*\s[^\]]*\]/
+const LEFTOVER_SHORTCODE_STRICT = /\[\/[A-Za-z][\w-]*\]|\[[A-Za-z][\w-]*\s[^\]]*\]/g
+const NUMERIC_SLUG = /^\d+(?:-\d+)*$/
+const EMPTY_TITLE = /^(?:\d+|sem t[ií]tulo|untitled|auto[- ]draft|rascunho autom[aá]tico)$/i
+const TITLE_WORDS = 8
+const SLUG_WORDS = 6
 const MOJIBAKE = /Ã.|â€/
 const OPEN_TOO_MUCH = 0.4
 const OPEN_TOO_SHORT_WORDS = 60
@@ -87,6 +94,45 @@ function redactTextNodes(node: LexicalNode): number {
   return removed
 }
 
+/** Removes leftover shortcodes ([x a b], [/x]) from the text nodes; the redaction label is kept. */
+function stripShortcodes(node: LexicalNode): number {
+  let removed = 0
+  if (node.type === 'text' && typeof node.text === 'string') {
+    const parts = node.text.split(REDACTED_LABEL)
+    const cleaned = parts.map((part) => {
+      const next = part.replace(LEFTOVER_SHORTCODE_STRICT, () => {
+        removed++
+        return ''
+      })
+      return next
+    })
+    if (removed > 0) node.text = cleaned.join(REDACTED_LABEL).replace(/ {2,}/g, ' ')
+  }
+  if (Array.isArray(node.children)) {
+    for (const child of node.children as LexicalNode[]) removed += stripShortcodes(child)
+  }
+  return removed
+}
+
+/** Normalized text used to spot exact duplicates. */
+function dedupeKey(plain: string): string {
+  return plain
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+}
+
+function firstWords(plain: string, n: number): string {
+  return plain
+    .replace(/\[[^\]]*\]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => /[\p{L}\p{N}]/u.test(w))
+    .slice(0, n)
+    .join(' ')
+}
+
 function baseSlugOf(conto: WpConto): string {
   let decoded = conto.wpSlug
   try {
@@ -102,41 +148,97 @@ function withSuffix(base: string, n: number): string {
   return `${base.slice(0, SLUG_MAX - suffix.length).replace(/-+$/, '')}${suffix}`
 }
 
+type Prepared = {
+  conto: WpConto
+  texto: LexicalState
+  flags: ImportFlag[]
+  plain: string
+  totalWords: number
+  key: string
+}
+
+function prepare(conto: WpConto): Prepared {
+  const flags: ImportFlag[] = []
+  const texto = htmlToLexical(conto.html)
+  const blocks = texto.root.children
+
+  // Trailing byline ("Por Fulana"): authors are personal data (T-05-14)
+  const last = blocks[blocks.length - 1]
+  if (last) {
+    const lastText = plainTextOf(last).trim()
+    if (BYLINE_START.test(lastText) && wordCount(lastText) <= BYLINE_MAX_WORDS) {
+      blocks.pop()
+      flags.push('assinatura-removida')
+    }
+  }
+
+  let shortcodes = 0
+  for (const block of blocks) shortcodes += stripShortcodes(block)
+  if (shortcodes > 0) flags.push('shortcode-restante')
+
+  let removed = 0
+  for (const block of blocks) removed += redactTextNodes(block)
+  if (removed > 0) flags.push('contatos-removidos')
+
+  const plain = plainTextOf(texto)
+  return { conto, texto, flags, plain, totalWords: wordCount(plain), key: dedupeKey(plain) }
+}
+
 export function buildImportRecords(contos: WpConto[]): { records: ContoRecord[]; report: ImportReport } {
   const records: ContoRecord[] = []
   const rows: ReportRow[] = []
   const used = new Set<string>()
   let ignorados = 0
+  let duplicados = 0
 
-  for (const conto of contos) {
-    const flags: ImportFlag[] = []
-    const texto = htmlToLexical(conto.html)
-    const blocks = texto.root.children
+  const prepared = contos.map(prepare)
+  // The oldest conto of each identical text is kept (ties: the first one read)
+  const keeper = new Map<string, Prepared>()
+  for (const item of prepared) {
+    if (item.totalWords === 0) continue
+    const current = keeper.get(item.key)
+    if (!current || Date.parse(item.conto.publishedAt) < Date.parse(current.conto.publishedAt)) {
+      keeper.set(item.key, item)
+    }
+  }
+  const slugOf = new Map<Prepared, string>()
+  const pendingDupes: { row: ReportRow; of: Prepared }[] = []
 
-    // Trailing byline ("Por Fulana"): authors are personal data (T-05-14)
-    const last = blocks[blocks.length - 1]
-    if (last) {
-      const lastText = plainTextOf(last).trim()
-      if (BYLINE_START.test(lastText) && wordCount(lastText) <= BYLINE_MAX_WORDS) {
-        blocks.pop()
-        flags.push('assinatura-removida')
+  for (const item of prepared) {
+    const { conto, texto, flags, plain, totalWords } = item
+
+    if (totalWords > 0 && keeper.get(item.key) !== item) {
+      duplicados++
+      const row: ReportRow = {
+        slug: baseSlugOf(conto),
+        words: totalWords,
+        openWords: 0,
+        restrito: conto.restricted,
+        flags: [...flags],
       }
+      pendingDupes.push({ row, of: keeper.get(item.key)! })
+      rows.push(row)
+      continue
     }
 
-    let removed = 0
-    for (const block of blocks) removed += redactTextNodes(block)
-    if (removed > 0) flags.push('contatos-removidos')
+    let title = conto.title.trim()
+    const untitled = title === '' || EMPTY_TITLE.test(title)
+    let base = baseSlugOf(conto)
+    if (untitled && totalWords > 0) {
+      const derived = firstWords(plain, TITLE_WORDS).replace(/[,;:\s-]+$/, '')
+      title = derived.charAt(0).toUpperCase() + derived.slice(1)
+      flags.push('sem-titulo')
+      if (NUMERIC_SLUG.test(base)) base = slugify(firstWords(plain, SLUG_WORDS)) || base
+    } else if (NUMERIC_SLUG.test(base) && slugify(title)) {
+      base = slugify(title)
+    }
+    if (title === '') title = base
 
-    const plain = plainTextOf(texto)
-    const totalWords = wordCount(plain)
-
-    const base = baseSlugOf(conto)
     let slug = base
     for (let n = 2; used.has(slug); n++) slug = withSuffix(base, n)
     if (slug !== conto.wpSlug) flags.push('slug-alterado')
 
     if (MOJIBAKE.test(conto.title) || MOJIBAKE.test(plain.slice(0, 500))) flags.push('mojibake')
-    if (LEFTOVER_SHORTCODE.test(plain)) flags.push('shortcode-restante')
     if (conto.builder) flags.push('builder')
 
     if (totalWords === 0) {
@@ -146,6 +248,7 @@ export function buildImportRecords(contos: WpConto[]): { records: ContoRecord[];
       continue
     }
     used.add(slug)
+    slugOf.set(item, slug)
 
     const split = splitConto(texto as unknown as LexicalStateLike, DEFAULT_OPEN_BLOCKS)
     if (split.totalBlocks === 1) flags.push('sem-paragrafos')
@@ -156,7 +259,7 @@ export function buildImportRecords(contos: WpConto[]): { records: ContoRecord[];
       wpId: conto.wpId,
       wpSlug: conto.wpSlug,
       slug,
-      title: conto.title.slice(0, TITLE_MAX),
+      title: title.slice(0, TITLE_MAX),
       publishedAt: conto.publishedAt,
       wpRestrito: conto.restricted,
       paragrafosAbertos: DEFAULT_OPEN_BLOCKS,
@@ -164,6 +267,8 @@ export function buildImportRecords(contos: WpConto[]): { records: ContoRecord[];
     })
     rows.push({ slug, words: split.totalWords, openWords: split.openWords, restrito: conto.restricted, flags })
   }
+
+  for (const { row, of } of pendingDupes) row.flags.push(`duplicado-de:${slugOf.get(of) ?? '?'}`)
 
   return {
     records,
@@ -173,6 +278,7 @@ export function buildImportRecords(contos: WpConto[]): { records: ContoRecord[];
       restritos: contos.filter((c) => c.restricted).length,
       builder: contos.filter((c) => c.builder).length,
       ignorados,
+      duplicados,
       rows,
     },
   }
@@ -181,7 +287,7 @@ export function buildImportRecords(contos: WpConto[]): { records: ContoRecord[];
 /** Counts and one line per slug. NEVER titles or text (T-05-15). */
 export function formatReport(report: ImportReport, load?: LoadResult): string {
   const lines = [
-    `Contos encontrados: ${report.contos} · restritos no site antigo: ${report.restritos} · montados no Elementor: ${report.builder} · ignorados: ${report.ignorados}`,
+    `Contos encontrados: ${report.contos} · restritos no site antigo: ${report.restritos} · montados no Elementor: ${report.builder} · ignorados: ${report.ignorados}${report.duplicados ? ` · duplicados: ${report.duplicados}` : ''}`,
   ]
   for (const row of report.rows) {
     const flags = row.flags.length ? ` · ${row.flags.join(', ')}` : ''
