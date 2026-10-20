@@ -125,6 +125,7 @@ export async function createAd(
     collection: 'ads',
     data: {
       author: assinanteId,
+      apelido: value.apelido,
       euSou: value.euSou,
       cidade: value.cidade,
       texto: value.texto,
@@ -154,6 +155,7 @@ export async function updateAd(
     collection: 'ads',
     id: ad.id,
     data: {
+      apelido: value.apelido,
       euSou: value.euSou,
       cidade: value.cidade,
       texto: value.texto,
@@ -368,11 +370,11 @@ export type OwnAdFormValues = {
   id: number
   status: AdStatus
   euSou: number | null
+  apelido: string
   cidade: string
   texto: string
   whatsapp: string
   telegram: string
-  email: string
 }
 
 /** Values for the edit form, or null when the ad is not the owner's. */
@@ -386,12 +388,12 @@ export async function getOwnAdFormValues(
     return {
       id: ad.id,
       status: ad.status,
+      apelido: ad.apelido ?? '',
       euSou: relId(ad.euSou),
       cidade: ad.cidade ?? '',
       texto: ad.texto,
       whatsapp: ad.contato?.whatsapp ?? '',
       telegram: ad.contato?.telegram ? `@${ad.contato.telegram}` : '',
-      email: ad.contato?.email ?? '',
     }
   } catch (err) {
     if (err instanceof ServiceError && err.code === 'nao-encontrado') return null
@@ -712,9 +714,9 @@ export type ModerationView = {
   status: AdStatus
   statusLabel: string
   motivo: string | null
-  /** Exactly what the open area shows (T-04-01): contacts removed on the server */
-  publicText: string
-  publicCidade: string | null
+  /** Exactly what the open area shows (T-04-01): apelido (contacts removed on the server) and tipo */
+  publicApelido: string
+  euSouLabel: string
   removed: number
   contato: AdContatoDTO
   /** Current values of the moderation fields, to refresh the admin form after an action */
@@ -735,16 +737,16 @@ export async function getModerationView(req: PayloadRequest, id: number | string
     moderatedAt?: string | null
     moderatedBy?: unknown
   }
-  const text = redactContacts(ad.texto ?? '')
-  const cidade = ad.cidade ? redactContacts(ad.cidade).text : null
+  const apelido = redactContacts(ad.apelido ?? '')
+  const labels = await categoryLabels(req.payload)
   return {
     id: ad.id,
     status: ad.status,
     statusLabel: STAFF_STATUS_LABELS[ad.status],
     motivo: ad.motivo ?? null,
-    publicText: text.text,
-    publicCidade: cidade,
-    removed: text.removed,
+    publicApelido: apelido.text,
+    euSouLabel: labels.get(relId(ad.euSou) ?? -1) ?? '',
+    removed: apelido.removed,
     contato: contatoOf(ad),
     fields: {
       status: ad.status,

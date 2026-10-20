@@ -1,16 +1,19 @@
 import Link from 'next/link'
 
-/** Plain GET form (no client JS): Eu sou + cidade (D-07). */
+/** Plain GET form (no client JS): Eu sou (+ cidade for members) (D-07). */
 export function AdFilters({
   action,
   categories,
   euSou,
   cidade,
+  showCidade = true,
 }: {
   action: string
   categories: { id: number; name: string }[]
   euSou?: number
   cidade?: string
+  /** The open area filters by tipo only: the city is never shown there. */
+  showCidade?: boolean
 }) {
   return (
     <form method="get" action={action} role="search" aria-label="Filtrar anúncios" className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end">
@@ -32,6 +35,7 @@ export function AdFilters({
           ))}
         </select>
       </div>
+      {showCidade && (
       <div className="flex flex-col gap-2">
         <label htmlFor="filtro-cidade" className="type-label text-text">
           Cidade
@@ -45,6 +49,7 @@ export function AdFilters({
           className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
         />
       </div>
+      )}
       <div className="flex items-center gap-4">
         <button type="submit" className="btn-primary">
           Filtrar

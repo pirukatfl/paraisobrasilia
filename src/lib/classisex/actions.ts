@@ -14,12 +14,12 @@ const CLASSISEX = '/area-do-assinante/classisex'
 const MEUS_ANUNCIOS = '/area-do-assinante/meus-anuncios'
 
 export type AdFormValues = {
+  apelido: string
   euSou: string
   cidade: string
   texto: string
   whatsapp: string
   telegram: string
-  email: string
 }
 
 export type AdFormState = { errors: Record<string, string>; values: AdFormValues } | null
@@ -32,23 +32,23 @@ const field = (formData: FormData, name: string) => {
 /** What the subscriber typed. Never reads author or status from the form (T-04-04). */
 function readInput(formData: FormData): { input: AdInput; values: AdFormValues } {
   const values: AdFormValues = {
+    apelido: field(formData, 'apelido'),
     euSou: field(formData, 'euSou'),
     cidade: field(formData, 'cidade'),
     texto: field(formData, 'texto'),
     whatsapp: field(formData, 'whatsapp'),
     telegram: field(formData, 'telegram'),
-    email: field(formData, 'email'),
   }
   const euSou = Number.parseInt(values.euSou, 10)
   return {
     values,
     input: {
+      apelido: values.apelido,
       euSou: Number.isInteger(euSou) && euSou > 0 ? euSou : null,
       cidade: values.cidade,
       texto: values.texto,
       whatsapp: values.whatsapp,
       telegram: values.telegram,
-      email: values.email,
       consent: field(formData, 'consent') === 'sim',
     },
   }
@@ -111,7 +111,7 @@ export async function apagarAnuncio(formData: FormData): Promise<void> {
   redirect(`${MEUS_ANUNCIOS}?${failed ? 'erro=nao-encontrado' : 'ok=apagado'}`)
 }
 
-/** Remover / Usar como capa on "Fotos e vídeo" (CLAS-03, D-03): active access, owner only. */
+/** Remover / Usar como capa on "Fotos e vídeos" (CLAS-03, D-03): active access, owner only. */
 async function changeMedia(
   formData: FormData,
   change: (assinanteId: number, mediaId: string) => Promise<{ adId: number }>,

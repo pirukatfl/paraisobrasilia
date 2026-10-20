@@ -24,7 +24,7 @@ test.beforeAll(async ({ request }) => {
   await api.deleteAll('ads')
   crisId = (await api.createAssinante(CRIS)).id
   await api.liberar(crisId, { durationDays: 30, method: 'cortesia', amount: 0 })
-  adA = (await api.createAd({ author: crisId, texto: TEXTO_A, contato: { whatsapp: '5561999889772', telegram: 'cris_bsb' } })).id
+  adA = (await api.createAd({ author: crisId, apelido: 'Cris BSB', texto: TEXTO_A, contato: { whatsapp: '5561999889772', telegram: 'cris_bsb' } })).id
   adB = (await api.createAd({ author: crisId, texto: 'Solteira simpática procura casal.' })).id
   await api.dispose()
 })
@@ -49,14 +49,15 @@ test('dashboard queue counts pending ads and links to the list', async ({ page }
   await expect(page.locator('table tbody tr')).toHaveCount(2)
 })
 
-test('panel shows the public text without contacts; refuse needs a reason', async ({ page, browser, baseURL }) => {
+test('panel shows the public preview (apelido and tipo) without contacts; refuse needs a reason', async ({ page, browser, baseURL }) => {
   test.setTimeout(150_000)
   await loginAsStaff(page)
   await page.goto(`/admin/collections/ads/${adA}`)
   const panel = painel(page)
   await expect(panel).toContainText('Situação: Em análise')
   const preview = panel.getByRole('region', { name: 'Como aparece na área aberta' })
-  await expect(preview).toContainText('[contato só para assinantes]')
+  await expect(preview).toContainText('Cris BSB · Casal')
+  await expect(preview).not.toContainText('Casal procura casal')
   await expect(preview).not.toContainText('99988')
   await expect(panel).toContainText('5561999889772')
   await expect(panel).toContainText('@cris_bsb')

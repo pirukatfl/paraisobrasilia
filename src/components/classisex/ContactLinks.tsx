@@ -15,11 +15,6 @@ export function ContactLinks({ contato }: { contato: MemberAdDTO['contato'] }) {
           Telegram {contato.telegram.label}
         </ExternalLink>
       )}
-      {contato.email && (
-        <a href={contato.email.href} className="btn-secondary">
-          E-mail {contato.email.label}
-        </a>
-      )}
     </div>
   )
 }

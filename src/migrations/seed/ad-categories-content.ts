@@ -1,10 +1,11 @@
 import type { Payload, PayloadRequest } from 'payload'
 
-/** D-01: "Eu sou" options of today's ClassiSex form; staff edit the list in the panel. */
+/** D-01 (revisão 2026-10-20): "Eu sou" options by type: Casal, Mulher, Homem, Trans; staff edit the list in the panel. */
 export const AD_CATEGORIES_SEED = [
   { name: 'Casal', order: 0 },
-  { name: 'Solteiro', order: 1 },
-  { name: 'Solteira', order: 2 },
+  { name: 'Mulher', order: 1 },
+  { name: 'Homem', order: 2 },
+  { name: 'Trans', order: 3 },
 ] as const
 
 /** Creates the options only when the collection is empty (redeploys never overwrite staff edits). */

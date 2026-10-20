@@ -42,11 +42,11 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
       <p className="type-eyebrow text-muted">ClassiSex</p>
       <h1 id="titulo-anuncio" className="type-display mt-2">
-        {ad.euSou}
+        {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </h1>
       <p className="type-label mt-2 text-muted">Publicado em {ad.publishedLabel}</p>
-      <MediaGallery fotos={ad.fotos} video={ad.video} />
+      <MediaGallery fotos={ad.fotos} videos={ad.videos} />
       <p className="mt-6 whitespace-pre-line text-body">{ad.texto}</p>
       <section aria-labelledby="titulo-contato" className="mt-8">
         <h2 id="titulo-contato" className="type-heading mb-4">

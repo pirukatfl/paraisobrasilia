@@ -12,14 +12,14 @@ import { expire } from '../lib/cache/expire'
 import { adEndpoints } from '../lib/classisex/endpoints'
 import {
   AD_MESSAGES,
+  APELIDO_MAX,
   CIDADE_MAX,
   TEXT_MAX,
+  apelidoError,
   cidadeError,
-  isValidEmail,
   isValidTelegram,
   isValidWhatsapp,
   normaliseCidade,
-  normaliseEmail,
   normaliseTelegram,
   normaliseWhatsapp,
   resumoOf,
@@ -39,7 +39,7 @@ const relId = (value: unknown): number | string | null => {
   return value as number | string
 }
 
-type Contato = { whatsapp?: string | null; telegram?: string | null; email?: string | null }
+type Contato = { whatsapp?: string | null; telegram?: string | null }
 
 /**
  * Same normalisation as the members form (src/lib/classisex/rules.ts) for staff edits in the
@@ -53,14 +53,14 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
       ...c,
       ...('whatsapp' in c ? { whatsapp: normaliseWhatsapp(c.whatsapp) } : {}),
       ...('telegram' in c ? { telegram: normaliseTelegram(c.telegram) } : {}),
-      ...('email' in c ? { email: normaliseEmail(c.email) } : {}),
     }
   }
+  if (typeof data.apelido === 'string') data.apelido = data.apelido.replace(/\s+/g, ' ').trim()
   if (typeof data.cidade === 'string') data.cidade = data.cidade.replace(/\s+/g, ' ').trim() || null
   if (typeof data.texto === 'string') data.texto = data.texto.replace(/\r\n/g, '\n').trim()
 
   const merged = { ...((originalDoc?.contato as Contato | undefined) ?? {}), ...((data.contato as Contato) ?? {}) }
-  if (!merged.whatsapp && !merged.telegram && !merged.email) {
+  if (!merged.whatsapp && !merged.telegram) {
     throw new ValidationError(
       { collection: 'ads', errors: [{ path: 'contato.whatsapp', message: AD_MESSAGES.contato }], req },
       req.t,
@@ -89,7 +89,9 @@ const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, r
     )
     label = category?.name ?? ''
   }
-  data.resumo = resumoOf(label || 'Anúncio', cidade, String(merged.texto ?? ''))
+  const apelido = String(merged.apelido ?? '').trim()
+  const tipo = label || 'Anúncio'
+  data.resumo = resumoOf(apelido ? `${apelido} · ${tipo}` : tipo, cidade, String(merged.texto ?? ''))
   return data
 }
 
@@ -135,7 +137,7 @@ export const Ads: CollectionConfig = {
     group: 'ClassiSex',
     useAsTitle: 'resumo',
     defaultColumns: ['resumo', 'status', 'submittedAt', 'author'],
-    listSearchableFields: ['resumo', 'texto', 'cidade'],
+    listSearchableFields: ['resumo', 'apelido', 'texto', 'cidade'],
     description:
       'Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados.',
   },
@@ -190,6 +192,15 @@ export const Ads: CollectionConfig = {
       admin: { readOnly: true, description: 'Assinante que escreveu o anúncio. Não aparece no site.' },
     },
     {
+      name: 'apelido',
+      type: 'text',
+      required: true,
+      maxLength: APELIDO_MAX,
+      label: 'Apelido',
+      admin: { description: 'Aparece na área aberta. Sem telefone, e-mail, @ ou link.' },
+      validate: (value: unknown) => apelidoError(String(value ?? '').replace(/\s+/g, ' ').trim()) ?? true,
+    },
+    {
       type: 'row',
       fields: [
         {
@@ -205,7 +216,7 @@ export const Ads: CollectionConfig = {
           type: 'text',
           maxLength: CIDADE_MAX,
           label: 'Cidade',
-          admin: { description: 'Opcional. Só letras.' },
+          admin: { description: 'Opcional. Só letras. Só assinantes veem.' },
           validate: (value: unknown) => (value ? (cidadeError(String(value)) ?? true) : true),
         },
       ],
@@ -217,7 +228,7 @@ export const Ads: CollectionConfig = {
       required: true,
       label: 'Texto',
       admin: {
-        description: `Até ${TEXT_MAX} caracteres. Na área aberta, telefones, e-mails, links e @ são removidos automaticamente.`,
+        description: `Até ${TEXT_MAX} caracteres. Só assinantes veem o texto.`,
       },
       validate: (value: unknown) => textoError(String(value ?? '')) ?? true,
     },
@@ -225,7 +236,7 @@ export const Ads: CollectionConfig = {
       name: 'contato',
       type: 'group',
       label: 'Contato (só assinantes veem)',
-      admin: { description: 'Pelo menos um. Nunca aparece na área aberta.' },
+      admin: { description: 'WhatsApp ou Telegram, pelo menos um. Nunca aparece na área aberta.' },
       fields: [
         {
           name: 'whatsapp',
@@ -241,12 +252,6 @@ export const Ads: CollectionConfig = {
           admin: { description: 'Usuário sem o @.' },
           validate: optionalText(isValidTelegram, AD_MESSAGES.telegram),
         },
-        {
-          name: 'email',
-          type: 'text',
-          label: 'E-mail',
-          validate: optionalText(isValidEmail, AD_MESSAGES.email),
-        },
       ],
     },
     {
@@ -254,7 +259,7 @@ export const Ads: CollectionConfig = {
       type: 'join',
       collection: 'ad-media',
       on: 'ad',
-      label: 'Fotos e vídeo',
+      label: 'Fotos e vídeos',
       defaultSort: 'order',
       admin: { allowCreate: false },
     },

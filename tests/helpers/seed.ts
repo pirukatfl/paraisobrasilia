@@ -338,7 +338,7 @@ export async function seedModel(
   })
 }
 
-/** Eu sou options (Casal, Solteiro, Solteira) — same function the classisex_ads migration runs. */
+/** Eu sou options (Casal, Mulher, Homem, Trans) — same function the classisex_ads migration runs. */
 export async function seedAdCategories(payload: Payload): Promise<number> {
   const { seedAdCategoriesIfEmpty } = await import('../../src/migrations/seed/ad-categories-content')
   return seedAdCategoriesIfEmpty(payload)
@@ -346,10 +346,11 @@ export async function seedAdCategories(payload: Payload): Promise<number> {
 
 export interface SeedAdInput {
   author: number
+  apelido?: string
   euSou?: number
   cidade?: string
   texto?: string
-  contato?: { whatsapp?: string; telegram?: string; email?: string }
+  contato?: { whatsapp?: string; telegram?: string }
   status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
   publishedAt?: string
   motivo?: string
@@ -367,6 +368,7 @@ export async function seedAd(payload: Payload, input: SeedAdInput) {
     collection: 'ads' as never,
     data: {
       author: input.author,
+      apelido: input.apelido ?? 'Casal Teste',
       euSou,
       cidade: input.cidade ?? 'Brasília',
       texto: input.texto ?? 'Casal simpático procura amigos para a próxima festa.',

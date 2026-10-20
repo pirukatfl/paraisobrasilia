@@ -119,13 +119,14 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     )
   })
 
-  it('limits each ad to 5 photos and 1 video', async () => {
+  it('limits each ad to 10 photos and 2 videos', async () => {
     const photo = await jpegWithExif(200, 200)
-    for (let i = 0; i < 5; i++) await upload(photo, 'image/jpeg', `f${i}.jpg`)
-    await expect(upload(photo, 'image/jpeg', 'f6.jpg')).rejects.toThrow('Cada anúncio pode ter até 5 fotos.')
+    for (let i = 0; i < 10; i++) await upload(photo, 'image/jpeg', `f${i}.jpg`)
+    await expect(upload(photo, 'image/jpeg', 'f11.jpg')).rejects.toThrow('Cada anúncio pode ter até 10 fotos.')
     await upload(buildMp4({ durationSeconds: 10 }), 'video/mp4', 'v1.mp4')
-    await expect(upload(buildMp4({ durationSeconds: 10 }), 'video/mp4', 'v2.mp4')).rejects.toThrow(
-      'Cada anúncio pode ter 1 vídeo.',
+    await upload(buildMp4({ durationSeconds: 60 }), 'video/mp4', 'v2.mp4')
+    await expect(upload(buildMp4({ durationSeconds: 10 }), 'video/mp4', 'v3.mp4')).rejects.toThrow(
+      'Cada anúncio pode ter até 2 vídeos.',
     )
   })
 
@@ -223,12 +224,12 @@ describe('owner media service (CLAS-03, D-01, D-03, T-04-04)', () => {
   })
 
   it('turns hook refusals into ServiceError 400 with the same message', async () => {
-    for (let i = 0; i < 5; i++) await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile(`f${i}.jpg`), now })
-    const err = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile('f6.jpg'), now }).catch((e) => e)
+    for (let i = 0; i < 10; i++) await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile(`f${i}.jpg`), now })
+    const err = await attachMedia(payload, { assinanteId: owner.id, adId, file: await photoFile('f11.jpg'), now }).catch((e) => e)
     expect(err).toBeInstanceOf(ServiceError)
     expect(err.status).toBe(400)
     expect(err.code).toBe('limite-fotos')
-    expect(err.message).toBe('Cada anúncio pode ter até 5 fotos.')
+    expect(err.message).toBe('Cada anúncio pode ter até 10 fotos.')
     const long = buildMp4({ durationSeconds: 61 })
     const err2 = await attachMedia(payload, {
       assinanteId: owner.id,

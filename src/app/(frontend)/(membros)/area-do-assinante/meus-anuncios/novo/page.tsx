@@ -38,18 +38,18 @@ export default async function NovoAnuncioPage() {
     <section aria-labelledby="titulo-novo-anuncio">
       {header}
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        O anúncio aparece no ClassiSex depois que a equipe aprovar. Na área aberta, o texto aparece sem contatos.
+        O anúncio aparece no ClassiSex depois que a equipe aprovar. Na área aberta, aparecem só o apelido, o tipo e uma foto desfocada.
       </p>
       <AdForm
         action={criarAnuncio}
         categories={categories}
         initial={{
+          apelido: '',
           euSou: '',
           cidade: '',
           texto: '',
           whatsapp: check.assinante.whatsapp ?? '',
           telegram: '',
-          email: '',
         }}
       />
     </section>

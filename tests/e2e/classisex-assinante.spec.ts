@@ -33,7 +33,7 @@ test.beforeAll(async ({ request }) => {
   await api.deleteAll('assinantes')
   await api.deleteAll('ads')
   const cats = await api.findAdCategories()
-  solteiraCat = cats.find((c) => c.name === 'Solteira')!.id
+  solteiraCat = cats.find((c) => c.name === 'Mulher')!.id
   dudaId = (await api.createAssinante(DUDA)).id
   await api.liberar(dudaId, { durationDays: 30, method: 'cortesia', amount: 0 })
   casalAd = (
@@ -43,7 +43,7 @@ test.beforeAll(async ({ request }) => {
       cidade: 'Brasília',
       status: 'aprovado',
       publishedAt: new Date(Date.now() - 2 * DAY).toISOString(),
-      contato: { whatsapp: DUDA_WHATS, email: DUDA_EMAIL },
+      contato: { whatsapp: DUDA_WHATS },
     })
   ).id
   solteiraAd = (
@@ -112,7 +112,7 @@ test('filters by Eu sou and cidade; Limpar filtros resets', async ({ browser, ba
   const { page, context } = await asSubscriber(browser, baseURL!, GIL)
   await page.goto('/area-do-assinante/classisex')
   const main = page.locator('main')
-  await main.getByLabel('Eu sou').selectOption({ label: 'Solteira' })
+  await main.getByLabel('Eu sou').selectOption({ label: 'Mulher' })
   await main.getByRole('button', { name: 'Filtrar' }).click()
   await expect(page).toHaveURL(new RegExp(`eu-sou=${solteiraCat}`))
   await expect(main.getByRole('article')).toHaveCount(1)
@@ -143,7 +143,9 @@ test('full ad shows contacts; hidden ads answer 404', async ({ browser, baseURL 
   await expect(main).toContainText('Casal · Brasília')
   await expect(main).toContainText(TEXTO_CASAL)
   await expect(main.getByRole('link', { name: /^WhatsApp/ })).toHaveAttribute('href', new RegExp(`^https://wa\\.me/${DUDA_WHATS}`))
-  await expect(main.getByRole('link', { name: /^E-mail/ })).toHaveAttribute('href', `mailto:${DUDA_EMAIL}`)
+  // Revisão 2026-10-20: WhatsApp and Telegram only, no e-mail button
+  await expect(main.getByRole('link', { name: /^E-mail/ })).toHaveCount(0)
+  await expect(main).toContainText('Anúncio Teste · Casal · Brasília')
   await expect(main.getByRole('link', { name: /^Telegram/ })).toHaveCount(0)
   await expect(main.getByRole('link', { name: 'Voltar para o ClassiSex' })).toHaveAttribute('href', '/area-do-assinante/classisex')
 

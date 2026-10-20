@@ -2,7 +2,8 @@ import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 
-// PREV-01 / D-04 / D-07: anonymous visitors see contact-free previews with blurred photos only
+// PREV-01 / D-04 / D-07 (revisão 2026-10-20): anonymous visitors see only apelido, tipo and one
+// blurred photo per ad; never the text, city, video or contacts
 // (T-04-01, T-04-11, T-04-14).
 test.describe.configure({ mode: 'serial' })
 
@@ -13,6 +14,8 @@ const OTTO = { email: 'otto.conta@teste.local', name: 'Otto Vencido Secreto', pa
 const TEXTO_NINA = 'Casal liberal, chama no zap 61 98877-6655 ou nina@exemplo.com'
 const TEXTO_OTTO = 'Texto do Otto que venceu ontem.'
 const TEXTO_PENDENTE = 'Texto pendente secreto'
+const APELIDO_NINA = 'Nina e Beto'
+const APELIDO_PENDENTE = 'Pendente Fogo'
 const SECRETS = [
   '98877',
   '-6655', // (a bare 4-digit string could match a build hash)
@@ -25,6 +28,8 @@ const SECRETS = [
   OTTO.name,
   TEXTO_PENDENTE,
   TEXTO_OTTO,
+  TEXTO_NINA,
+  'Taguatinga',
   '/area-do-assinante/midia/',
   '/api/ad-media',
 ]
@@ -44,16 +49,17 @@ test.beforeAll(async ({ request }) => {
   ninaAd = (
     await api.createAd({
       author: ninaId,
-      cidade: 'Brasília',
+      apelido: APELIDO_NINA,
+      cidade: 'Taguatinga',
       texto: TEXTO_NINA,
       status: 'aprovado',
-      contato: { whatsapp: '5561977776666', telegram: 'nina_bsb', email: 'nina.contato@exemplo.com' },
+      contato: { whatsapp: '5561977776666', telegram: 'nina_bsb' },
     })
   ).id
   photoIds = [(await api.uploadAdMedia(ninaAd, 'flyer-square.jpg', 0)).id, (await api.uploadAdMedia(ninaAd, 'flyer-portrait.jpg', 1)).id]
   videoId = (await api.uploadAdMedia(ninaAd, 'espaco.mp4', 2)).id
   filenames = (await api.findAdMedia(ninaAd)).flatMap((m) => [m.filename, m.sizes?.card?.filename, m.previa]).filter(Boolean) as string[]
-  pendingAd = (await api.createAd({ author: ninaId, texto: TEXTO_PENDENTE })).id
+  pendingAd = (await api.createAd({ author: ninaId, apelido: APELIDO_PENDENTE, texto: TEXTO_PENDENTE })).id
 
   const ottoId = (await api.createAssinante(OTTO)).id
   await api.createSubscription({
@@ -77,29 +83,30 @@ async function visitor(browser: Browser, baseURL: string) {
   return { context, page: await context.newPage() }
 }
 
-test('visitors see the redacted preview with blurred photos and a call to subscribe', async ({ browser, baseURL, request }) => {
+test('visitors see apelido, tipo and one blurred photo with a call to subscribe', async ({ browser, baseURL, request }) => {
   const { context, page } = await visitor(browser, baseURL!)
   const res = await page.goto('/classisex')
   expect(res?.status()).toBe(200)
   const main = page.locator('main')
   await expect(page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
-  await expect(main).toContainText('Os contatos, as fotos e os vídeos completos ficam na área do assinante.')
+  await expect(main).toContainText('O texto, a cidade, as fotos, os vídeos e os contatos ficam na área do assinante.')
   const cards = main.getByRole('article')
   await expect(cards).toHaveCount(1)
+  await expect(cards.first()).toContainText(APELIDO_NINA)
   await expect(cards.first()).toContainText('Casal')
-  await expect(cards.first()).toContainText('Brasília')
-  await expect(cards.first()).toContainText('[contato só para assinantes]')
-  await expect(cards.first()).toContainText('vídeo')
-  await expect(cards.first().getByRole('link', { name: 'Assine para ver o contato' })).toHaveAttribute('href', '/assine-ja')
+  await expect(cards.first()).not.toContainText('Taguatinga')
+  await expect(cards.first()).not.toContainText('Casal liberal')
+  await expect(cards.first()).not.toContainText('vídeo')
+  await expect(cards.first().getByRole('link', { name: 'Assine para ver', exact: true })).toHaveAttribute('href', '/assine-ja')
   await expect(main.getByRole('link', { name: 'Já é assinante? Ver anúncios completos' })).toHaveAttribute(
     'href',
     '/area-do-assinante/classisex',
   )
 
   const imgs = cards.first().locator('img')
-  await expect(imgs).toHaveCount(2)
+  await expect(imgs).toHaveCount(1)
   const srcs = await imgs.evaluateAll((list) => list.map((i) => i.getAttribute('src')))
-  expect(srcs).toEqual(photoIds.map((id) => `/classisex/previa/${id}`))
+  expect(srcs).toEqual([`/classisex/previa/${photoIds[0]}`])
   await expect(imgs.first()).toHaveAttribute('alt', 'Foto desfocada do anúncio')
 
   const html = await page.content()
@@ -124,17 +131,19 @@ test('the blurred photo route serves only previews of visible ads', async ({ pla
   await anon.dispose()
 })
 
-test('filters by Eu sou and cidade', async ({ browser, baseURL }) => {
+test('filters by Eu sou only; the city is not a public filter', async ({ browser, baseURL }) => {
   const { context, page } = await visitor(browser, baseURL!)
   await page.goto('/classisex')
   const main = page.locator('main')
-  await main.getByLabel('Eu sou').selectOption({ label: 'Solteira' })
+  await main.getByLabel('Eu sou').selectOption({ label: 'Mulher' })
   await main.getByRole('button', { name: 'Filtrar' }).click()
   await expect(page).toHaveURL(/\/classisex\?eu-sou=/)
   await expect(main).toContainText('Nenhum anúncio encontrado.')
   await main.getByLabel('Eu sou').selectOption({ label: 'Todos' })
-  await main.getByLabel('Cidade').fill('brasilia')
   await main.getByRole('button', { name: 'Filtrar' }).click()
+  await expect(main.getByLabel('Cidade')).toHaveCount(0)
+  await expect(main.getByRole('article')).toHaveCount(1)
+  await page.goto('/classisex?cidade=recife')
   await expect(main.getByRole('article')).toHaveCount(1)
   await main.getByRole('link', { name: 'Limpar filtros' }).click()
   await expect(page).toHaveURL(/\/classisex$/)
@@ -148,7 +157,8 @@ test('approving shows the ad at once; unpublishing removes it and its previews',
   await api.aprovar(pendingAd)
   await page.goto('/classisex')
   await expect(main.getByRole('article')).toHaveCount(2)
-  await expect(main).toContainText(TEXTO_PENDENTE)
+  await expect(main).toContainText(APELIDO_PENDENTE)
+  await expect(main).not.toContainText(TEXTO_PENDENTE)
 
   await api.despublicar(ninaAd, 'Teste da prévia pública')
   await api.despublicar(pendingAd, 'Teste da prévia pública')

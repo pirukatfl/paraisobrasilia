@@ -1,16 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import { toPublicAdDTO } from '../../src/lib/classisex/dto'
-import { REDACTED_LABEL } from '../../src/lib/classisex/redact'
 
-// PREV-01 / D-04 / T-04-01: the open-area preview carries no contact and no author data.
+// PREV-01 / D-04 / T-04-01 (revisão 2026-10-20): the open-area preview carries only apelido, tipo
+// and one blurred photo. No text, city, contact, video or author data.
 const doc = {
   id: 12,
   author: { id: 4, name: 'Nome Real', email: 'real@x.com' },
+  apelido: 'Casal BSB',
   euSou: 1,
   cidade: 'Brasília',
   texto: 'Casal top, zap (61) 99988-9772 ou casal@gmail.com',
-  contato: { whatsapp: '5561999889772', telegram: 'casalbsb', email: 'casal@gmail.com' },
+  contato: { whatsapp: '5561999889772', telegram: 'casalbsb' },
   status: 'aprovado' as const,
   motivo: null,
   updatedAt: '2026-10-19T18:00:00.000Z',
@@ -25,38 +26,37 @@ const media = [
 ]
 
 describe('toPublicAdDTO (PREV-01, D-04)', () => {
-  it('redacts contacts from the text and keeps Eu sou and cidade', () => {
+  it('has exactly id, apelido, tipo and one photo', () => {
     const dto = toPublicAdDTO(doc, { euSouLabel: 'Casal', media })
+    expect(Object.keys(dto).sort()).toEqual(['apelido', 'euSou', 'foto', 'id'])
+    expect(dto.apelido).toBe('Casal BSB')
     expect(dto.euSou).toBe('Casal')
-    expect(dto.cidade).toBe('Brasília')
-    expect(dto.texto).toContain(REDACTED_LABEL)
-    expect(dto.texto).not.toContain('99988')
-    expect(dto.texto).not.toContain('casal@gmail')
-    expect(dto.publishedLabel).toBe('18/10/2026')
   })
 
-  it('only points at blurred previews, in order, and flags the video', () => {
-    const dto = toPublicAdDTO(doc, { euSouLabel: 'Casal', media })
-    expect(dto.fotos).toEqual([{ previewUrl: '/classisex/previa/51' }, { previewUrl: '/classisex/previa/52' }])
-    expect(dto.hasVideo).toBe(true)
-    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal' }).hasVideo).toBe(false)
+  it('points only at the blurred cover (first photo by order) and ignores the video', () => {
+    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media }).foto).toEqual({ previewUrl: '/classisex/previa/51' })
+    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal' }).foto).toBeNull()
+    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media: [media[3]] }).foto).toBeNull()
   })
 
-  it('redacts a contact typed in the cidade field', () => {
-    const dto = toPublicAdDTO({ ...doc, cidade: 'Brasília 61 99988-9772' }, { euSouLabel: 'Casal' })
-    expect(dto.cidade).not.toContain('99988')
+  it('redacts a contact that slipped into the apelido (staff edit, old data)', () => {
+    const dto = toPublicAdDTO({ ...doc, apelido: 'Casal 61 99988-9772' }, { euSouLabel: 'Casal' })
+    expect(dto.apelido).not.toContain('99988')
   })
 
-  it('never serialises contacts, author, member URLs or filenames', () => {
+  it('never serialises text, city, contacts, author, member URLs or filenames', () => {
     const json = JSON.stringify(toPublicAdDTO(doc, { euSouLabel: 'Casal', media }))
     for (const banned of [
       '5561999889772',
       'casalbsb',
       'casal@gmail.com',
+      'Casal top',
+      'Brasília',
       'Nome Real',
       'real@x.com',
-      // the key, not the word: the redaction label itself says "[contato só para assinantes]"
       '"contato"',
+      '"texto"',
+      '"cidade"',
       '"author"',
       '/area-do-assinante/midia',
       '/api/ad-media',

@@ -13,7 +13,7 @@ import { useHydrated } from '@/lib/gallery/use-hydrated'
  * fetch and cache private media without the viewer's session (T-04-07).
  * Without JavaScript each tile is a link to the large photo; afterwards it opens the lightbox.
  */
-export function MediaGallery({ fotos, video }: { fotos: MemberPhotoDTO[]; video: MemberVideoDTO | null }) {
+export function MediaGallery({ fotos, videos }: { fotos: MemberPhotoDTO[]; videos: MemberVideoDTO[] }) {
   const hydrated = useHydrated()
   const [index, setIndex] = useState<number | null>(null)
   const openers = useRef<(HTMLElement | null)[]>([])
@@ -40,7 +40,7 @@ export function MediaGallery({ fotos, video }: { fotos: MemberPhotoDTO[]; video:
     if (from !== null) openers.current[from]?.focus()
   }, [])
 
-  if (fotos.length === 0 && !video) return null
+  if (fotos.length === 0 && videos.length === 0) return null
   const tileClass =
     'relative block aspect-square w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-accent focus-visible:border-accent'
 
@@ -88,8 +88,8 @@ export function MediaGallery({ fotos, video }: { fotos: MemberPhotoDTO[]; video:
           })}
         </ul>
       )}
-      {video && (
-        <figure>
+      {videos.map((video, i) => (
+        <figure key={video.id}>
           <video
             controls
             playsInline
@@ -97,9 +97,9 @@ export function MediaGallery({ fotos, video }: { fotos: MemberPhotoDTO[]; video:
             src={video.src}
             className="aspect-video w-full rounded-lg border border-line bg-surface"
           />
-          <figcaption className="type-label mt-2 text-muted">Vídeo · {video.durationLabel}</figcaption>
+          <figcaption className="type-label mt-2 text-muted">Vídeo {videos.length > 1 ? `${i + 1} · ` : '· '}{video.durationLabel}</figcaption>
         </figure>
-      )}
+      ))}
       <Lightbox
         slides={slides}
         index={index}

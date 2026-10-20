@@ -117,7 +117,8 @@ export async function findMemberAd(payload: Payload, id: number | string, now: D
  * are read (never filenames).
  */
 export async function findPublicAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<PublicAdDTO>> {
-  const { items, labels, ...rest } = await findVisibleAdDocs(payload, filters, now)
+  // The city is not public: the open area never filters by it
+  const { items, labels, ...rest } = await findVisibleAdDocs(payload, { ...filters, cidade: undefined }, now)
   const ids = items.map((d) => d.id)
   const byAd = new Map<number, AdMediaDocLike[]>()
   if (ids.length) {

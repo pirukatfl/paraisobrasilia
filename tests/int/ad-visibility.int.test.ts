@@ -105,13 +105,13 @@ describe('ClassiSex visibility and members board (CLAS-01, CLAS-02, D-05, D-06, 
 
   it('filters by Eu sou and cidade (accent- and case-insensitive)', async () => {
     const acc = await author('filtro@teste.local', { start: -DAY, end: 10 * DAY })
-    const solteira = cats.find((c) => c.name === 'Solteira')!.id
+    const mulher = cats.find((c) => c.name === 'Mulher')!.id
     const a = await seedAd(payload, { author: acc.id, status: 'aprovado', cidade: 'Brasília' })
-    const b = await seedAd(payload, { author: acc.id, status: 'aprovado', cidade: 'BRASÍLIA - DF', euSou: solteira })
+    const b = await seedAd(payload, { author: acc.id, status: 'aprovado', cidade: 'BRASÍLIA - DF', euSou: mulher })
     await seedAd(payload, { author: acc.id, status: 'aprovado', cidade: 'Taguatinga' })
 
-    const bySolteira = await findMemberAds(payload, { euSou: solteira }, NOW)
-    expect(bySolteira.items.map((i) => i.id)).toEqual([b.id])
+    const byMulher = await findMemberAds(payload, { euSou: mulher }, NOW)
+    expect(byMulher.items.map((i) => i.id)).toEqual([b.id])
     const byCidade = await findMemberAds(payload, { cidade: 'brasilia' }, NOW)
     expect(byCidade.items.map((i) => i.id).sort()).toEqual([a.id, b.id].sort())
   })
@@ -179,9 +179,14 @@ describe('public preview read model (PREV-01, D-04, D-07)', () => {
 
     const page = await findPublicAds(payload, {}, NOW_P)
     expect(page.items.map((i) => i.id)).toEqual([recent.id, old.id])
-    expect(page.items[0].texto).not.toContain('99988')
+    // Revisão 2026-10-20: the open preview carries no ad text, city or contact at all
+    expect(Object.keys(page.items[0]).sort()).toEqual(['apelido', 'euSou', 'foto', 'id'])
+    expect(JSON.stringify(page)).not.toContain('99988')
+    expect(JSON.stringify(page)).not.toContain('Taguatinga')
+    expect(JSON.stringify(page)).not.toContain('Casal simpático')
     expect(JSON.stringify(page)).not.toContain('5561999990000')
-    expect((await findPublicAds(payload, { cidade: 'taguatinga' }, NOW_P)).items.map((i) => i.id)).toEqual([old.id])
+    // the city is not public: the open area ignores a cidade filter
+    expect((await findPublicAds(payload, { cidade: 'taguatinga' }, NOW_P)).items.map((i) => i.id)).toEqual([recent.id, old.id])
 
     // The cached wrapper calls through outside a Next server
     const cachedPage = await getPublicAds({})

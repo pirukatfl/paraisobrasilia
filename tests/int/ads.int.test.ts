@@ -12,7 +12,7 @@ import {
   seedSubscription,
 } from '../helpers/seed'
 
-const CONTATO_MSG = 'Informe pelo menos um contato: WhatsApp, Telegram ou e-mail.'
+const CONTATO_MSG = 'Informe pelo menos um contato: WhatsApp ou Telegram.'
 
 describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () => {
   let payload: Payload
@@ -36,10 +36,10 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
     casal = cats.docs[0].id as number
   })
 
-  it('seeds Casal, Solteiro, Solteira once, readable by anyone', async () => {
+  it('seeds Casal, Mulher, Homem, Trans once, readable by anyone', async () => {
     expect(await seedAdCategories(payload)).toBe(0)
     const { docs } = await payload.find({ collection: 'ad-categories', sort: 'order', overrideAccess: false })
-    expect(docs.map((d) => d.name)).toEqual(['Casal', 'Solteiro', 'Solteira'])
+    expect(docs.map((d) => d.name)).toEqual(['Casal', 'Mulher', 'Homem', 'Trans'])
   })
 
   it('refuses every REST operation on ads to subscribers', async () => {
@@ -48,7 +48,7 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
     await expect(
       payload.create({
         collection: 'ads',
-        data: { author: owner.id, euSou: casal, texto: 'Oi', contato: { email: 'a@b.com' } } as never,
+        data: { author: owner.id, apelido: 'Casal', euSou: casal, texto: 'Oi', contato: { telegram: 'casal_bsb' } } as never,
         ...asOwner,
       }),
     ).rejects.toThrow()
@@ -67,6 +67,7 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
       collection: 'ads',
       data: {
         author: owner.id,
+        apelido: 'Dupla BSB',
         euSou: casal,
         cidade: 'São Sebastião',
         texto: 'Casal procura amigos.',
@@ -76,7 +77,7 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
     })
     expect(created.status).toBe('pendente')
     expect(created.cidadeBusca).toBe('sao sebastiao')
-    expect(created.resumo).toBe('Casal · São Sebastião — Casal procura amigos.')
+    expect(created.resumo).toBe('Dupla BSB · Casal · São Sebastião — Casal procura amigos.')
     expect(created.contato?.whatsapp).toBe('5561999889772')
     expect(created.contato?.telegram).toBe('casal_bsb')
 
@@ -87,7 +88,7 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
       ...asStaff,
     })
     expect(updated.cidadeBusca).toBe('taguatinga')
-    expect(updated.resumo).toBe('Casal · Taguatinga — Novo texto')
+    expect(updated.resumo).toBe('Dupla BSB · Casal · Taguatinga — Novo texto')
 
     const read = await payload.find({ collection: 'ads', ...asStaff })
     expect(read.docs).toHaveLength(1)
@@ -98,7 +99,7 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
     await expectFieldError(
       payload.create({
         collection: 'ads',
-        data: { author: owner.id, euSou: casal, texto: 'Sem contato' } as never,
+        data: { author: owner.id, apelido: 'Casal', euSou: casal, texto: 'Sem contato' } as never,
         ...asStaff,
       }),
       CONTATO_MSG,
@@ -106,7 +107,7 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
     await expectFieldError(
       payload.create({
         collection: 'ads',
-        data: { author: owner.id, euSou: casal, texto: 'a'.repeat(601), contato: { email: 'a@b.com' } } as never,
+        data: { author: owner.id, apelido: 'Casal', euSou: casal, texto: 'a'.repeat(601), contato: { telegram: 'casal_bsb' } } as never,
         ...asStaff,
       }),
       'O texto pode ter até 600 caracteres.',
@@ -119,9 +120,9 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
       'Esta opção está em uso em anúncios. Desative em vez de excluir.',
     )
     const cats = await payload.find({ collection: 'ad-categories', sort: 'order', overrideAccess: true })
-    const solteira = cats.docs[2].id
-    await payload.delete({ collection: 'ad-categories', id: solteira, overrideAccess: true })
-    expect((await payload.count({ collection: 'ad-categories', overrideAccess: true })).totalDocs).toBe(2)
+    const trans = cats.docs[3].id
+    await payload.delete({ collection: 'ad-categories', id: trans, overrideAccess: true })
+    expect((await payload.count({ collection: 'ad-categories', overrideAccess: true })).totalDocs).toBe(3)
   })
 
   it('deletes the ads (and periods) together with the account', async () => {
@@ -142,12 +143,12 @@ describe('owner service (CLAS-03, CLAS-04, D-02, D-03, T-04-04)', () => {
   const NOW = new Date('2026-10-19T18:00:00.000Z')
 
   const input = (over: Partial<import('../../src/lib/classisex/rules').AdInput> = {}) => ({
+    apelido: 'Casal Teste',
     euSou: casal,
     cidade: 'Brasília',
     texto: 'Casal simpático procura amigos.',
     whatsapp: '5561988887777',
     telegram: '',
-    email: '',
     consent: true,
     ...over,
   })

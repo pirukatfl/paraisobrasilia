@@ -81,11 +81,11 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   const { page, context } = await asSubscriber(browser, baseURL!, LIA)
   await page.goto(editar(liaAd))
   const main = page.locator('main')
-  const section = main.getByRole('region', { name: 'Fotos e vídeo' })
-  await expect(section.getByRole('heading', { name: 'Fotos e vídeo' })).toBeVisible()
+  const section = main.getByRole('region', { name: 'Fotos e vídeos' })
+  await expect(section.getByRole('heading', { name: 'Fotos e vídeos' })).toBeVisible()
   await expect(section).toContainText('Nenhuma foto ainda.')
   await expect(section).toContainText(
-    'Fotos JPG, PNG ou WebP até 15 MB (até 5). Vídeo MP4 ou MOV até 100 MB e 60 segundos.',
+    'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 60 segundos.',
   )
   const fotoForm = section.getByRole('form', { name: 'Adicionar foto' })
   await expect(fotoForm.locator('input[type=file]')).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp')
@@ -112,9 +112,7 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   await page.goto(editar(liaAd))
   await enviar(page, 'video', path.join(FIXTURES, 'espaco.mp4'))
   await expect(main.getByRole('alert')).toContainText('Vídeo enviado. O anúncio volta para análise da equipe.')
-  await expect(section).toContainText(/Vídeo · \d+:\d\d/)
-  await enviar(page, 'video', path.join(FIXTURES, 'espaco.mp4'))
-  await expect(main.getByRole('alert')).toContainText('Cada anúncio pode ter 1 vídeo.')
+  await expect(section).toContainText(/Vídeo 1 · \d+:\d\d/)
 
   // Too long, not a photo
   const longo = testInfo.outputPath('longo.mp4')
@@ -126,6 +124,13 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   await expect(main.getByRole('alert')).toContainText('O vídeo pode ter até 60 segundos.')
   await enviar(page, 'foto', falso)
   await expect(main.getByRole('alert')).toContainText('Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.')
+
+  // Up to 2 videos: the second goes in, the third is refused
+  await enviar(page, 'video', path.join(FIXTURES, 'espaco.mp4'))
+  await expect(main.getByRole('alert')).toContainText('Vídeo enviado. O anúncio volta para análise da equipe.')
+  await expect(section).toContainText(/Vídeo 2 · \d+:\d\d/)
+  await enviar(page, 'video', path.join(FIXTURES, 'espaco.mp4'))
+  await expect(main.getByRole('alert')).toContainText('Cada anúncio pode ter até 2 vídeos.')
 
   // Second photo becomes the cover, then the first is removed
   await enviar(page, 'foto', path.join(FIXTURES, 'flyer-portrait.jpg'))

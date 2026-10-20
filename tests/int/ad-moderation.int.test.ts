@@ -94,12 +94,12 @@ describe('moderation (PAINEL-07, CLAS-04, D-03, T-04-04, T-04-13)', () => {
       assinanteId: author.id,
       id: ad.id,
       input: {
+        apelido: 'Casal Teste',
         euSou: cats.docs[0].id as number,
         cidade: '',
         texto: 'Texto sem telefone',
         whatsapp: '5561988887777',
         telegram: '',
-        email: '',
         consent: true,
       },
       now: NOW,

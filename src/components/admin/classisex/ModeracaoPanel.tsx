@@ -17,10 +17,10 @@ type View = {
   status: Status
   statusLabel: string
   motivo: string | null
-  publicText: string
-  publicCidade: string | null
+  publicApelido: string
+  euSouLabel: string
   removed: number
-  contato: { whatsapp: string | null; telegram: string | null; email: string | null }
+  contato: { whatsapp: string | null; telegram: string | null }
   fields: Record<string, unknown>
 }
 
@@ -156,13 +156,12 @@ export function ModeracaoPanel() {
               Como aparece na área aberta
             </h4>
             <p style={quote}>
-              {view.publicCidade ? `${view.publicCidade} — ` : ''}
-              {view.publicText}
+              {view.publicApelido} · {view.euSouLabel} (com uma foto desfocada)
             </p>
             <p style={{ margin: 'calc(var(--base) * 0.25) 0 0', opacity: 0.8 }}>
               {view.removed > 0
-                ? `Removemos ${view.removed === 1 ? '1 contato' : `${view.removed} contatos`} do texto. Confira se sobrou algum (número por extenso, @ disfarçado): nesse caso, recuse.`
-                : 'Nenhum contato encontrado no texto. Confira mesmo assim antes de aprovar.'}
+                ? 'O apelido tem um contato escondido: edite o apelido ou recuse o anúncio.'
+                : 'A área aberta mostra só o apelido, o tipo e uma foto desfocada. Confira o texto e as fotos antes de aprovar.'}
             </p>
           </div>
 
@@ -171,7 +170,6 @@ export function ModeracaoPanel() {
             <ul style={{ margin: 'calc(var(--base) * 0.25) 0 0', paddingLeft: '1.25rem' }}>
               {view.contato.whatsapp && <li>WhatsApp: {view.contato.whatsapp}</li>}
               {view.contato.telegram && <li>Telegram: @{view.contato.telegram}</li>}
-              {view.contato.email && <li>E-mail: {view.contato.email}</li>}
             </ul>
           </div>
 

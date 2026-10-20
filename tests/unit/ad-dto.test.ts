@@ -5,10 +5,11 @@ import { toMemberAdDTO } from '../../src/lib/classisex/dto'
 const doc = {
   id: 7,
   author: { id: 3, name: 'Duda Secreta', email: 'duda@segredo.local' },
+  apelido: 'Casal BSB',
   euSou: 1,
   cidade: 'Brasília',
   texto: 'Casal simpático procura amigos.',
-  contato: { whatsapp: '5561988887777', telegram: 'casal_bsb', email: 'c@x.com' },
+  contato: { whatsapp: '5561988887777', telegram: 'casal_bsb' },
   status: 'aprovado' as const,
   motivo: 'nota da equipe',
   moderatedBy: 9,
@@ -19,6 +20,7 @@ const doc = {
 describe('toMemberAdDTO (CLAS-02, D-05)', () => {
   it('builds contact links', () => {
     const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal' })
+    expect(dto.apelido).toBe('Casal BSB')
     expect(dto.euSou).toBe('Casal')
     expect(dto.cidade).toBe('Brasília')
     expect(dto.publishedLabel).toBe('18/10/2026')
@@ -27,16 +29,15 @@ describe('toMemberAdDTO (CLAS-02, D-05)', () => {
     )
     expect(dto.contato.whatsapp?.href.startsWith('https://wa.me/5561988887777?text=Ol%C3%A1!')).toBe(true)
     expect(dto.contato.telegram).toEqual({ label: '@casal_bsb', href: 'https://t.me/casal_bsb' })
-    expect(dto.contato.email).toEqual({ label: 'c@x.com', href: 'mailto:c@x.com' })
+    expect(Object.keys(dto.contato).sort()).toEqual(['telegram', 'whatsapp'])
     expect(dto.fotos).toEqual([])
-    expect(dto.video).toBeNull()
+    expect(dto.videos).toEqual([])
   })
 
   it('leaves empty contacts out', () => {
-    const dto = toMemberAdDTO({ ...doc, contato: { whatsapp: '', telegram: null, email: 'c@x.com' } }, { euSouLabel: 'Casal' })
+    const dto = toMemberAdDTO({ ...doc, contato: { whatsapp: '', telegram: null } }, { euSouLabel: 'Casal' })
     expect(dto.contato.whatsapp).toBeNull()
     expect(dto.contato.telegram).toBeNull()
-    expect(dto.contato.email).not.toBeNull()
   })
 
   it('never serialises author, staff fields, filenames or Payload URLs', () => {
@@ -67,7 +68,7 @@ describe('toMemberAdDTO media (CLAS-01, CLAS-02, T-04-07)', () => {
       thumbWidth: 480,
       thumbHeight: 720,
     })
-    expect(dto.video).toEqual({ id: 40, src: '/area-do-assinante/midia/40/video', durationLabel: '0:42' })
+    expect(dto.videos).toEqual([{ id: 40, src: '/area-do-assinante/midia/40/video', durationLabel: '0:42' }])
   })
 
   it('never serialises filenames, Payload URLs, the blurred twin or the owner', () => {
@@ -78,6 +79,15 @@ describe('toMemberAdDTO media (CLAS-01, CLAS-02, T-04-07)', () => {
   it('has no media when there is none', () => {
     const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: [] })
     expect(dto.fotos).toEqual([])
-    expect(dto.video).toBeNull()
+    expect(dto.videos).toEqual([])
+  })
+
+  it('keeps up to 2 videos in order', () => {
+    const two = [
+      { id: 41, kind: 'video' as const, order: 5, durationSeconds: 59 },
+      { id: 40, kind: 'video' as const, order: 3, durationSeconds: 42 },
+    ]
+    const dto = toMemberAdDTO(doc, { euSouLabel: 'Casal', media: two })
+    expect(dto.videos.map((v) => v.id)).toEqual([40, 41])
   })
 })

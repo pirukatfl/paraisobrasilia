@@ -48,6 +48,26 @@ export function AdForm({
         </p>
       )}
 
+      <div className="flex flex-col gap-2">
+        <label htmlFor="apelido" className="type-label text-text">
+          Apelido
+        </label>
+        <input
+          id="apelido"
+          name="apelido"
+          type="text"
+          maxLength={40}
+          autoComplete="off"
+          defaultValue={values.apelido}
+          aria-describedby={['ajuda-apelido', described('apelido')].filter(Boolean).join(' ')}
+          className={inputClass}
+        />
+        <p id="ajuda-apelido" className="type-label text-muted">
+          Aparece para todo mundo. Até 40 caracteres, sem telefone, e-mail, @ ou link.
+        </p>
+        <FieldError id="erro-apelido" message={errors.apelido} />
+      </div>
+
       <fieldset className="flex flex-col gap-2" aria-describedby={described('euSou')}>
         <legend className="type-label text-text">Eu sou</legend>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
@@ -69,7 +89,7 @@ export function AdForm({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="cidade" className="type-label text-text">
-          Cidade (opcional)
+          Cidade (opcional, só assinantes veem)
         </label>
         <input
           id="cidade"
@@ -104,7 +124,7 @@ export function AdForm({
       </div>
 
       <fieldset className="flex flex-col gap-4" aria-describedby={described('contato')}>
-        <legend className="type-label text-text">Contato (pelo menos um; só assinantes veem)</legend>
+        <legend className="type-label text-text">Contato (WhatsApp ou Telegram, pelo menos um; só assinantes veem)</legend>
         <FieldError id="erro-contato" message={errors.contato} />
         <div className="flex flex-col gap-2">
           <label htmlFor="whatsapp" className="type-label text-text">
@@ -138,21 +158,6 @@ export function AdForm({
             className={inputClass}
           />
           <FieldError id="erro-telegram" message={errors.telegram} />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="type-label text-text">
-            E-mail
-          </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            defaultValue={values.email}
-            aria-describedby={described('email')}
-            className={inputClass}
-          />
-          <FieldError id="erro-email" message={errors.email} />
         </div>
       </fieldset>
 

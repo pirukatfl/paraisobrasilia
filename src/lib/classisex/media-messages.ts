@@ -6,8 +6,8 @@ import { MAX_VIDEO_SECONDS } from './mp4'
 
 export const MAX_AD_PHOTO_BYTES = 15_000_000
 export const MAX_AD_VIDEO_BYTES = 100_000_000
-export const MAX_AD_PHOTOS = 5
-export const MAX_AD_VIDEOS = 1
+export const MAX_AD_PHOTOS = 10
+export const MAX_AD_VIDEOS = 2
 
 export const PHOTO_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 export const VIDEO_MIME_TYPES = ['video/mp4', 'video/quicktime']
@@ -21,8 +21,8 @@ export const AD_MEDIA_MESSAGES = {
   fotoIlegivel: 'Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.',
   videoIlegivel: 'Não conseguimos ler este vídeo. Envie um MP4 ou MOV gravado pelo celular.',
   videoLongo: `O vídeo pode ter até ${MAX_VIDEO_SECONDS} segundos.`,
-  fotos: 'Cada anúncio pode ter até 5 fotos.',
-  videos: 'Cada anúncio pode ter 1 vídeo.',
+  fotos: 'Cada anúncio pode ter até 10 fotos.',
+  videos: 'Cada anúncio pode ter até 2 vídeos.',
   semAnuncio: 'Anúncio não encontrado.',
 } as const
 

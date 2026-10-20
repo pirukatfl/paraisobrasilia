@@ -4,8 +4,8 @@ import type { MemberAdDTO } from '@/lib/classisex/dto'
 
 const EXCERPT = 180
 
-const mediaBadge = (fotos: number, video: boolean) =>
-  [fotos === 1 ? '1 foto' : fotos > 1 ? `${fotos} fotos` : null, video ? 'vídeo' : null].filter(Boolean).join(' · ')
+const mediaBadge = (fotos: number, videos: number) =>
+  [fotos === 1 ? '1 foto' : fotos > 1 ? `${fotos} fotos` : null, videos === 1 ? '1 vídeo' : videos > 1 ? `${videos} vídeos` : null].filter(Boolean).join(' · ')
 
 /**
  * One ad in the members list (CLAS-01): cover photo (plain <img> through the protected route,
@@ -15,7 +15,7 @@ export function MemberAdCard({ ad }: { ad: MemberAdDTO }) {
   const excerpt = ad.texto.length > EXCERPT ? `${ad.texto.slice(0, EXCERPT).trimEnd()}…` : ad.texto
   const titleId = `anuncio-${ad.id}`
   const cover = ad.fotos[0]
-  const badge = mediaBadge(ad.fotos.length, Boolean(ad.video))
+  const badge = mediaBadge(ad.fotos.length, ad.videos.length)
   return (
     <article aria-labelledby={titleId} className="flex flex-col rounded-xl border border-line bg-surface p-5">
       {cover ? (
@@ -35,7 +35,7 @@ export function MemberAdCard({ ad }: { ad: MemberAdDTO }) {
         </div>
       )}
       <h2 id={titleId} className="type-heading">
-        {ad.euSou}
+        {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </h2>
       {badge && <p className="type-label mt-1 text-muted">{badge}</p>}

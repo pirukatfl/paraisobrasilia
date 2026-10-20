@@ -1,10 +1,10 @@
 import type { OwnerMediaDTO } from '@/lib/classisex/dto'
 import { definirCapa, removerMidia } from '@/lib/classisex/actions'
 
-export const MEDIA_HINT = 'Fotos JPG, PNG ou WebP até 15 MB (até 5). Vídeo MP4 ou MOV até 100 MB e 60 segundos.'
+export const MEDIA_HINT = 'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 60 segundos.'
 
 /**
- * "Fotos e vídeo" on Editar anúncio (CLAS-03, D-01). Server component: plain forms work without
+ * "Fotos e vídeos" on Editar anúncio (CLAS-03, D-01). Server component: plain forms work without
  * JavaScript. Uploads post multipart to the route handler …/meus-anuncios/{id}/midia; Remover and
  * Usar como capa are server actions. Thumbnails are plain <img> through the protected route,
  * never the Next image optimizer (T-04-07).
@@ -15,7 +15,7 @@ export function OwnerMediaManager({ adId, media }: { adId: number; media: OwnerM
   return (
     <section aria-labelledby="titulo-midia" className="mt-12 max-w-[680px]">
       <h2 id="titulo-midia" className="type-heading">
-        Fotos e vídeo
+        Fotos e vídeos
       </h2>
       <p className="mt-2 text-body text-muted">{MEDIA_HINT}</p>
       <p className="mt-1 text-body text-muted">
@@ -61,18 +61,23 @@ export function OwnerMediaManager({ adId, media }: { adId: number; media: OwnerM
         </ul>
       )}
 
-      {media.video && (
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3">
-          <p className="text-body">Vídeo · {media.video.durationLabel}</p>
+      {media.videos.map((video, i) => (
+        <div
+          key={video.id}
+          className="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3"
+        >
+          <p className="text-body">
+            Vídeo {i + 1} · {video.durationLabel}
+          </p>
           <form action={removerMidia}>
-            <input type="hidden" name="id" value={media.video.id} />
+            <input type="hidden" name="id" value={video.id} />
             <input type="hidden" name="anuncio" value={adId} />
             <button type="submit" className="type-label text-danger underline underline-offset-4">
-              Remover vídeo
+              Remover vídeo {i + 1}
             </button>
           </form>
         </div>
-      )}
+      ))}
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
         <form

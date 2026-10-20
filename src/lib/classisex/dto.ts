@@ -7,15 +7,16 @@ import { whatsappUrl } from '../site/contact'
 import { redactContacts } from './redact'
 import type { AdStatus } from './rules'
 
-export type AdContatoDTO = { whatsapp: string | null; telegram: string | null; email: string | null }
+export type AdContatoDTO = { whatsapp: string | null; telegram: string | null }
 
 /** Structural shape of an `ads` document as read with depth 0 (euSou resolved by the caller). */
 export type AdDocLike = {
   id: number
+  apelido?: string | null
   euSou?: unknown
   cidade?: string | null
   texto: string
-  contato?: { whatsapp?: string | null; telegram?: string | null; email?: string | null } | null
+  contato?: { whatsapp?: string | null; telegram?: string | null } | null
   status: AdStatus
   motivo?: string | null
   updatedAt: string
@@ -24,6 +25,7 @@ export type AdDocLike = {
 
 export type OwnerAdDTO = {
   id: number
+  apelido: string
   euSou: string
   cidade: string | null
   texto: string
@@ -33,7 +35,7 @@ export type OwnerAdDTO = {
   motivo: string | null
   updatedLabel: string
   fotos: number
-  video: boolean
+  videos: number
   capa: ThumbDTO | null
 }
 
@@ -95,15 +97,20 @@ const thumbOf = (m: AdMediaDocLike): ThumbDTO => ({
 
 export type OwnerMediaDTO = {
   fotos: { id: number; thumb: ThumbDTO; capa: boolean }[]
-  video: { id: number; src: string; durationLabel: string } | null
+  videos: { id: number; src: string; durationLabel: string }[]
 }
+
+const videoOf = (m: AdMediaDocLike) => ({
+  id: m.id,
+  src: mediaUrl(m.id, 'video'),
+  durationLabel: durationLabel(m.durationSeconds),
+})
 
 export function toOwnerMediaDTO(media: AdMediaDocLike[]): OwnerMediaDTO {
   const fotos = media.filter((m) => m.kind === 'foto').sort(byOrder)
-  const video = media.find((m) => m.kind === 'video')
   return {
     fotos: fotos.map((m, i) => ({ id: m.id, thumb: thumbOf(m), capa: i === 0 })),
-    video: video ? { id: video.id, src: mediaUrl(video.id, 'video'), durationLabel: durationLabel(video.durationSeconds) } : null,
+    videos: media.filter((m) => m.kind === 'video').sort(byOrder).map(videoOf),
   }
 }
 
@@ -111,7 +118,6 @@ export function contatoOf(doc: Pick<AdDocLike, 'contato'>): AdContatoDTO {
   return {
     whatsapp: doc.contato?.whatsapp || null,
     telegram: doc.contato?.telegram || null,
-    email: doc.contato?.email || null,
   }
 }
 
@@ -123,6 +129,7 @@ export function toOwnerAdDTO(
   const statusLabel = doc.status === 'aprovado' && !authorActive ? OFF_BOARD_LABEL : OWNER_STATUS_LABELS[doc.status]
   return {
     id: doc.id,
+    apelido: doc.apelido ?? '',
     euSou: euSouLabel,
     cidade: doc.cidade || null,
     texto: doc.texto,
@@ -132,7 +139,7 @@ export function toOwnerAdDTO(
     motivo: doc.status === 'recusado' || doc.status === 'despublicado' ? doc.motivo || null : null,
     updatedLabel: formatShortDate(doc.updatedAt),
     fotos: fotos.length,
-    video: media.some((m) => m.kind === 'video'),
+    videos: media.filter((m) => m.kind === 'video').length,
     capa: fotos[0] ? thumbOf(fotos[0]) : null,
   }
 }
@@ -157,13 +164,14 @@ export type MemberVideoDTO = { id: number; src: string; durationLabel: string }
 
 export type MemberAdDTO = {
   id: number
+  apelido: string
   euSou: string
   cidade: string | null
   texto: string
   publishedLabel: string
-  contato: { whatsapp: ContactLinkDTO | null; telegram: ContactLinkDTO | null; email: ContactLinkDTO | null }
+  contato: { whatsapp: ContactLinkDTO | null; telegram: ContactLinkDTO | null }
   fotos: MemberPhotoDTO[]
-  video: MemberVideoDTO | null
+  videos: MemberVideoDTO[]
 }
 
 export const WHATSAPP_GREETING = 'Olá! Vi seu anúncio no ClassiSex do Paraíso.'
@@ -185,10 +193,10 @@ export function toMemberAdDTO(
       thumbWidth: m.sizes?.card?.width ?? null,
       thumbHeight: m.sizes?.card?.height ?? null,
     }))
-  const v = media.find((m) => m.kind === 'video')
-  const video: MemberVideoDTO | null = v ? { id: v.id, src: mediaUrl(v.id, 'video'), durationLabel: durationLabel(v.durationSeconds) } : null
+  const videos: MemberVideoDTO[] = media.filter((m) => m.kind === 'video').sort(byOrder).map(videoOf)
   return {
     id: doc.id,
+    apelido: doc.apelido ?? '',
     euSou: euSouLabel,
     cidade: doc.cidade || null,
     texto: doc.texto,
@@ -196,10 +204,9 @@ export function toMemberAdDTO(
     contato: {
       whatsapp: c.whatsapp ? { label: c.whatsapp, href: whatsappUrl(c.whatsapp, WHATSAPP_GREETING) } : null,
       telegram: c.telegram ? { label: `@${c.telegram}`, href: `https://t.me/${encodeURIComponent(c.telegram)}` } : null,
-      email: c.email ? { label: c.email, href: `mailto:${c.email}` } : null,
     },
     fotos,
-    video,
+    videos,
   }
 }
 
@@ -211,31 +218,30 @@ export function toMemberAdDTO(
 
 export type PublicAdDTO = {
   id: number
+  apelido: string
   euSou: string
-  cidade: string | null
-  texto: string
-  publishedLabel: string
-  fotos: { previewUrl: string }[]
-  hasVideo: boolean
+  /** One blurred photo (the cover) or null; the open area shows no text, city, contact or video. */
+  foto: { previewUrl: string } | null
 }
 
 export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
 
+/**
+ * Revisão 2026-10-20: the open preview carries only apelido, tipo and the blurred cover. The ad
+ * text and city stay in the members area. The apelido is validated like the text on save, and
+ * redacted again here as a safety net (staff edits in the admin, old data).
+ */
 export function toPublicAdDTO(
   doc: AdDocLike,
   { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
 ): PublicAdDTO {
-  const cidade = doc.cidade ? redactContacts(doc.cidade).text.trim() : ''
+  const cover = media
+    .filter((m) => m.kind === 'foto' && m.previa)
+    .sort(byOrder)[0]
   return {
     id: doc.id,
+    apelido: redactContacts(doc.apelido ?? '').text,
     euSou: euSouLabel,
-    cidade: cidade || null,
-    texto: redactContacts(doc.texto).text,
-    publishedLabel: doc.publishedAt ? formatShortDate(doc.publishedAt) : '',
-    fotos: media
-      .filter((m) => m.kind === 'foto' && m.previa)
-      .sort(byOrder)
-      .map((m) => ({ previewUrl: previewUrl(m.id) })),
-    hasVideo: media.some((m) => m.kind === 'video'),
+    foto: cover ? { previewUrl: previewUrl(cover.id) } : null,
   }
 }

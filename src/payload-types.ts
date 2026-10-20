@@ -410,18 +410,22 @@ export interface Ad {
    * Assinante que escreveu o anúncio. Não aparece no site.
    */
   author: number | Assinante;
+  /**
+   * Aparece na área aberta. Sem telefone, e-mail, @ ou link.
+   */
+  apelido: string;
   euSou: number | AdCategory;
   /**
-   * Opcional. Só letras.
+   * Opcional. Só letras. Só assinantes veem.
    */
   cidade?: string | null;
   cidadeBusca?: string | null;
   /**
-   * Até 600 caracteres. Na área aberta, telefones, e-mails, links e @ são removidos automaticamente.
+   * Até 600 caracteres. Só assinantes veem o texto.
    */
   texto: string;
   /**
-   * Pelo menos um. Nunca aparece na área aberta.
+   * WhatsApp ou Telegram, pelo menos um. Nunca aparece na área aberta.
    */
   contato?: {
     /**
@@ -432,7 +436,6 @@ export interface Ad {
      * Usuário sem o @.
      */
     telegram?: string | null;
-    email?: string | null;
   };
   midias?: {
     docs?: (number | AdMedia)[];
@@ -1102,6 +1105,7 @@ export interface AdCategoriesSelect<T extends boolean = true> {
 export interface AdsSelect<T extends boolean = true> {
   resumo?: T;
   author?: T;
+  apelido?: T;
   euSou?: T;
   cidade?: T;
   cidadeBusca?: T;
@@ -1111,7 +1115,6 @@ export interface AdsSelect<T extends boolean = true> {
     | {
         whatsapp?: T;
         telegram?: T;
-        email?: T;
       };
   midias?: T;
   denuncias?: T;

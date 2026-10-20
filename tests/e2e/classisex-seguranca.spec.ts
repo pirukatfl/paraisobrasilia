@@ -291,7 +291,8 @@ test.describe('owner and staff', () => {
 test.describe('pages and RSC payload', () => {
   test('/classisex shows no contact, author, hidden ad text or private URL to visitors', async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({ baseURL })
-    const hiddenTexts = [TEXTS.pendente, TEXTS.recusado, TEXTS.despublicado, TEXTS.expiredAuthor, TEXTS.viewerPendente]
+    // Revisão 2026-10-20: the open area never shows ad text, not even of the visible ad
+    const hiddenTexts = [TEXTS.aprovado, 'zebra-azul', TEXTS.pendente, TEXTS.recusado, TEXTS.despublicado, TEXTS.expiredAuthor, TEXTS.viewerPendente]
     for (const path of ['/classisex', '/classisex?eu-sou=1&cidade=Bras%C3%ADlia&pagina=2', '/classisex?pagina=1']) {
       for (const headers of [undefined, { RSC: '1' }]) {
         const res = await anon.get(path, { headers })
@@ -302,10 +303,10 @@ test.describe('pages and RSC payload', () => {
         }
       }
     }
-    // control: the visible ad does appear, redacted
+    // control: the visible ad does appear, as apelido and tipo only
     const home = await (await anon.get('/classisex')).text()
-    expect(home).toContain('zebra-azul')
-    expect(home).toContain('[contato só para assinantes]')
+    expect(home).toContain('Anúncio Teste')
+    expect(home).toContain('Assine para ver')
     await anon.dispose()
   })
 
@@ -364,14 +365,14 @@ test.describe('pages and RSC payload', () => {
     const api = await staffApi(request)
     const zeca = await api.createAssinante({ email: 'zeca.some@teste.local', password: 'senha-zeca-12345', name: 'Zeca Some' })
     await api.liberar(zeca.id, { durationDays: 30, method: 'cortesia', amount: 0 })
-    const ad = await api.createAd({ author: zeca.id, texto: 'Texto temporario raposa-dourada some logo.', status: 'aprovado' })
+    const ad = await api.createAd({ author: zeca.id, apelido: 'Raposa Dourada', texto: 'Texto temporario some logo.', status: 'aprovado' })
     const photo = await api.uploadAdMedia(ad.id, 'flyer-square.jpg')
     const anon = await playwright.request.newContext({ baseURL })
-    expect(await (await anon.get('/classisex')).text()).toContain('raposa-dourada')
+    expect(await (await anon.get('/classisex')).text()).toContain('Raposa Dourada')
     expect((await anon.get(`/classisex/previa/${photo.id}`)).status()).toBe(200)
 
     await api.encerrar(zeca.id, 'teste de vencimento')
-    expect(await (await anon.get('/classisex')).text()).not.toContain('raposa-dourada')
+    expect(await (await anon.get('/classisex')).text()).not.toContain('Raposa Dourada')
     expect((await anon.get(`/classisex/previa/${photo.id}`)).status()).toBe(404)
     await anon.dispose()
     await api.dispose()

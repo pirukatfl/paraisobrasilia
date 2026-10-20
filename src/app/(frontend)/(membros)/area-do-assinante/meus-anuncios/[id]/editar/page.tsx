@@ -77,12 +77,12 @@ export default async function EditarAnuncioPage({
         categories={categories}
         adId={ad.id}
         initial={{
+          apelido: ad.apelido,
           euSou: ad.euSou === null ? '' : String(ad.euSou),
           cidade: ad.cidade,
           texto: ad.texto,
           whatsapp: ad.whatsapp,
           telegram: ad.telegram,
-          email: ad.email,
         }}
       />
       <OwnerMediaManager adId={ad.id} media={ad.media} />

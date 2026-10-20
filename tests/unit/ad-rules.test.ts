@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   ACTIVE_LIMIT,
   ACTIVE_STATUSES,
+  APELIDO_MAX,
   CIDADE_MAX,
   TEXT_MAX,
   normaliseCidade,
@@ -12,12 +13,12 @@ import {
 } from '../../src/lib/classisex/rules'
 
 const valid: AdInput = {
+  apelido: 'Casal BSB',
   euSou: 1,
   cidade: 'Brasília',
   texto: 'Casal liberal procura amigos para a próxima festa.',
   whatsapp: '+55 (61) 99988-9772',
   telegram: '@casal_bsb',
-  email: 'Casal@Exemplo.com',
   consent: true,
 }
 
@@ -31,6 +32,7 @@ describe('ClassiSex ad rules (D-01, D-02)', () => {
   it('exposes the limits', () => {
     expect(TEXT_MAX).toBe(600)
     expect(CIDADE_MAX).toBe(60)
+    expect(APELIDO_MAX).toBe(40)
     expect(ACTIVE_LIMIT).toBe(3)
     expect(ACTIVE_STATUSES).toEqual(['pendente', 'aprovado'])
   })
@@ -42,33 +44,56 @@ describe('ClassiSex ad rules (D-01, D-02)', () => {
     expect(result.value.contato).toEqual({
       whatsapp: '5561999889772',
       telegram: 'casal_bsb',
-      email: 'casal@exemplo.com',
     })
+    expect(result.value.apelido).toBe('Casal BSB')
     expect(result.value.cidade).toBe('Brasília')
     expect(result.value.cidadeBusca).toBe('brasilia')
     expect(result.value.euSou).toBe(1)
   })
 
   it('accepts a single contact and an empty cidade', () => {
-    const result = validateAdInput({ ...valid, whatsapp: '', telegram: '', cidade: '  ' })
+    const result = validateAdInput({ ...valid, whatsapp: '', cidade: '  ' })
     expect(result.ok).toBe(true)
     if (!result.ok) return
-    expect(result.value.contato).toEqual({ whatsapp: null, telegram: null, email: 'casal@exemplo.com' })
+    expect(result.value.contato).toEqual({ whatsapp: null, telegram: 'casal_bsb' })
     expect(result.value.cidade).toBeNull()
   })
 
   it.each([
-    [{ whatsapp: '', telegram: '', email: '' }, 'contato', 'Informe pelo menos um contato: WhatsApp, Telegram ou e-mail.'],
+    [{ whatsapp: '', telegram: '' }, 'contato', 'Informe pelo menos um contato: WhatsApp ou Telegram.'],
+    [{ apelido: '  ' }, 'apelido', 'Escolha um apelido para o anúncio.'],
+    [{ apelido: 'a'.repeat(41) }, 'apelido', 'O apelido pode ter até 40 caracteres.'],
     [{ texto: '   ' }, 'texto', 'Escreva o texto do anúncio.'],
     [{ texto: 'a'.repeat(601) }, 'texto', 'O texto pode ter até 600 caracteres.'],
     [{ whatsapp: '61999889772' }, 'whatsapp', 'WhatsApp: só números, com 55 e DDD (ex.: 5561999889772).'],
     [{ telegram: '@ab' }, 'telegram', 'Telegram: use o @ do seu usuário (5 a 32 letras, números ou _).'],
-    [{ email: 'x@' }, 'email', 'E-mail inválido.'],
     [{ cidade: 'Brasília 61 9999' }, 'cidade', 'Cidade: use só letras.'],
     [{ euSou: null }, 'euSou', 'Escolha uma opção em "Eu sou".'],
     [{ consent: false }, 'consent', 'Confirme a declaração para enviar.'],
   ] as const)('refuses %o', (input, key, message) => {
     expect(errorsOf(input as Partial<AdInput>)[key]).toBe(message)
+  })
+
+  it.each([
+    'chama 61 99988-9772',
+    'casal@gmail.com',
+    '@casalbsb',
+    'casalbsb.com.br',
+    'https://wa.me/5561999889772',
+    'zap 61999889772',
+    'insta: casalbsb',
+  ])('refuses an apelido with a contact: %s', (apelido) => {
+    expect(errorsOf({ apelido }).apelido).toBe('O apelido não pode ter telefone, e-mail, @ ou link. Use só um nome ou apelido.')
+  })
+
+  it('accepts a plain apelido of exactly 40 characters', () => {
+    expect(validateAdInput({ ...valid, apelido: 'Casal Fogo 40' }).ok).toBe(true)
+    expect(validateAdInput({ ...valid, apelido: 'a'.repeat(40) }).ok).toBe(true)
+  })
+
+  it('has no e-mail contact', () => {
+    const result = validateAdInput({ ...valid, whatsapp: '', telegram: '', email: 'a@b.com' } as AdInput)
+    expect(result.ok).toBe(false)
   })
 
   it('accepts exactly 600 characters', () => {

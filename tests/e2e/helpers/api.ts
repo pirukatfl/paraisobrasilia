@@ -174,10 +174,11 @@ export async function staffApi(request: APIRequestContext) {
     /** ClassiSex ad written by staff (REST is staff-only); euSou defaults to the first option. */
     async createAd(data: {
       author: number
+      apelido?: string
       euSou?: number
       cidade?: string
       texto?: string
-      contato?: { whatsapp?: string; telegram?: string; email?: string }
+      contato?: { whatsapp?: string; telegram?: string }
       status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
       publishedAt?: string
     }) {
@@ -190,6 +191,7 @@ export async function staffApi(request: APIRequestContext) {
       const res = await request.post('/api/ads', {
         headers,
         data: {
+          apelido: 'Anúncio Teste',
           cidade: 'Brasília',
           texto: 'Anúncio de teste criado pela equipe.',
           contato: { whatsapp: '5561999990000' },
