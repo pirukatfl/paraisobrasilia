@@ -45,6 +45,9 @@ export async function getTestPayload(): Promise<Payload> {
 }
 
 const RESET_ORDER = [
+  // Messages (Phase 5): before the accounts that take part
+  'messages',
+  'conversations',
   // Recados (Phase 5): before the accounts that own them
   'recados',
   // Contos (Phase 5)
@@ -522,4 +525,47 @@ export async function seedAdMedia(
     depth: 0,
     overrideAccess: true,
   }) as Promise<{ id: number; kind: 'foto' | 'video'; filename: string; previa?: string | null }>
+}
+
+type SeedConversationInput = { a: number; b: number; apelidoA?: string; apelidoB?: string; assunto?: string }
+
+/** Conversation between two accounts (participantA = lower id). Local API, no checks. */
+export async function seedConversation(payload: Payload, input: SeedConversationInput) {
+  const [low, high] = input.a < input.b ? [input.a, input.b] : [input.b, input.a]
+  const swapped = low !== input.a
+  return payload.create({
+    collection: 'conversations' as never,
+    data: {
+      participantA: low,
+      participantB: high,
+      pairKey: `${low}-${high}`,
+      apelidoA: (swapped ? input.apelidoB : input.apelidoA) ?? 'Pessoa A',
+      apelidoB: (swapped ? input.apelidoA : input.apelidoB) ?? 'Pessoa B',
+      assunto: input.assunto ?? 'Anúncio: teste',
+    } as never,
+    overrideAccess: true,
+  }) as Promise<{ id: number }>
+}
+
+export async function seedMessage(
+  payload: Payload,
+  input: { conversation: number; sender: number; texto?: string; createdAt?: string },
+) {
+  const created = (await payload.create({
+    collection: 'messages' as never,
+    data: {
+      conversation: input.conversation,
+      sender: input.sender,
+      texto: input.texto ?? 'Mensagem de teste',
+      ...(input.createdAt ? { createdAt: input.createdAt } : {}),
+    } as never,
+    overrideAccess: true,
+  })) as unknown as { id: number; createdAt: string }
+  await payload.update({
+    collection: 'conversations' as never,
+    id: input.conversation,
+    data: { lastMessageAt: created.createdAt, lastSender: input.sender } as never,
+    overrideAccess: true,
+  })
+  return created
 }

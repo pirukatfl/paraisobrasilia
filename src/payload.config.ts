@@ -18,6 +18,8 @@ import { Contos } from './collections/Contos'
 import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
+import { Conversations } from './collections/Conversations'
+import { Messages } from './collections/Messages'
 import { Recados } from './collections/Recados'
 import { SpaceItems } from './collections/SpaceItems'
 import { Subscriptions } from './collections/Subscriptions'
@@ -85,6 +87,8 @@ export default buildConfig({
     { ...AdMedia, upload: { ...(typeof AdMedia.upload === 'object' ? AdMedia.upload : {}), staticDir: privateDir } },
     AdReports,
     Recados,
+    Conversations,
+    Messages,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

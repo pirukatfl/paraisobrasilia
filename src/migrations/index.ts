@@ -19,6 +19,7 @@ import * as migration_20261020_131108_contos from './20261020_131108_contos';
 import * as migration_20261020_132231_contos_wp_bundle from './20261020_132231_contos_wp_bundle';
 import * as migration_20261020_132752_recados from './20261020_132752_recados';
 import * as migration_20261020_133947_recados_moderation from './20261020_133947_recados_moderation';
+import * as migration_20261020_135558_mensagens from './20261020_135558_mensagens';
 
 export const migrations = [
   {
@@ -124,6 +125,11 @@ export const migrations = [
   {
     up: migration_20261020_133947_recados_moderation.up,
     down: migration_20261020_133947_recados_moderation.down,
-    name: '20261020_133947_recados_moderation'
+    name: '20261020_133947_recados_moderation',
+  },
+  {
+    up: migration_20261020_135558_mensagens.up,
+    down: migration_20261020_135558_mensagens.down,
+    name: '20261020_135558_mensagens'
   },
 ];

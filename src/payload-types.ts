@@ -78,6 +78,8 @@ export interface Config {
     'ad-media': AdMedia;
     'ad-reports': AdReport;
     recados: Recado;
+    conversations: Conversation;
+    messages: Message;
     media: Media;
     videos: Video;
     parties: Party;
@@ -111,6 +113,8 @@ export interface Config {
     'ad-media': AdMediaSelect<false> | AdMediaSelect<true>;
     'ad-reports': AdReportsSelect<false> | AdReportsSelect<true>;
     recados: RecadosSelect<false> | RecadosSelect<true>;
+    conversations: ConversationsSelect<false> | ConversationsSelect<true>;
+    messages: MessagesSelect<false> | MessagesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -600,6 +604,38 @@ export interface Recado {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conversations".
+ */
+export interface Conversation {
+  id: number;
+  participantA: number | Assinante;
+  participantB: number | Assinante;
+  pairKey: string;
+  apelidoA?: string | null;
+  apelidoB?: string | null;
+  assunto?: string | null;
+  lastMessageAt?: string | null;
+  lastSender?: (number | null) | Assinante;
+  startedBy?: (number | null) | Assinante;
+  lastReadA?: string | null;
+  lastReadB?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages".
+ */
+export interface Message {
+  id: number;
+  conversation: number | Conversation;
+  sender: number | Assinante;
+  texto: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -1011,6 +1047,14 @@ export interface PayloadLockedDocument {
         value: number | Recado;
       } | null)
     | ({
+        relationTo: 'conversations';
+        value: number | Conversation;
+      } | null)
+    | ({
+        relationTo: 'messages';
+        value: number | Message;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1312,6 +1356,36 @@ export interface RecadosSelect<T extends boolean = true> {
   publishedAt?: T;
   moderatedAt?: T;
   moderatedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "conversations_select".
+ */
+export interface ConversationsSelect<T extends boolean = true> {
+  participantA?: T;
+  participantB?: T;
+  pairKey?: T;
+  apelidoA?: T;
+  apelidoB?: T;
+  assunto?: T;
+  lastMessageAt?: T;
+  lastSender?: T;
+  startedBy?: T;
+  lastReadA?: T;
+  lastReadB?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages_select".
+ */
+export interface MessagesSelect<T extends boolean = true> {
+  conversation?: T;
+  sender?: T;
+  texto?: T;
   updatedAt?: T;
   createdAt?: T;
 }

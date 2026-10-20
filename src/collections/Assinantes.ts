@@ -83,6 +83,38 @@ const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
       req,
     }),
   )
+  // Phase 5 (T-05-12, LGPD): conversations the account takes part in go with all their messages
+  const convs = await withRequestState(req, () =>
+    req.payload.find({
+      collection: 'conversations',
+      where: { or: [{ participantA: { equals: id } }, { participantB: { equals: id } }] },
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+      req,
+    }),
+  )
+  if (convs.docs.length > 0) {
+    const ids = convs.docs.map((c) => c.id)
+    await withRequestState(req, () =>
+      req.payload.delete({
+        collection: 'messages',
+        where: { conversation: { in: ids } },
+        overrideAccess: true,
+        context: { skipAudit: true, assinanteBeingDeleted: true },
+        req,
+      }),
+    )
+    await withRequestState(req, () =>
+      req.payload.delete({
+        collection: 'conversations',
+        where: { id: { in: ids } },
+        overrideAccess: true,
+        context: { skipAudit: true, assinanteBeingDeleted: true },
+        req,
+      }),
+    )
+  }
   // Phase 5 (T-05-12, LGPD): the account's recados go too (recados.author is required)
   await withRequestState(req, () =>
     req.payload.delete({
