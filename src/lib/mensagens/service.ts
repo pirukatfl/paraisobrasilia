@@ -736,3 +736,14 @@ export async function getMessageReportCounts(payload: Payload): Promise<{ aberta
   ])
   return { abertas: abertas.totalDocs, urgentes: urgentes.totalDocs }
 }
+
+/** What the thread page needs to know about the other person: only my own block is ever shown. */
+export async function threadSafetyState(
+  payload: Payload,
+  me: number,
+  conversationId: number | string,
+): Promise<{ euBloqueei: boolean } | null> {
+  const found = await otherParticipant(payload, me, conversationId)
+  if (!found) return null
+  return { euBloqueei: (await blockState(payload, me, found.otherId)).euBloqueei }
+}

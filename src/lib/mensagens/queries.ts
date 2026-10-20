@@ -10,6 +10,7 @@ import {
   listInbox,
   markRead,
   resolveTarget,
+  threadSafetyState,
 } from './service'
 
 // Subscriber-specific reads: never cached; callers run the DAL guard first (T-05-06).
@@ -55,4 +56,9 @@ export async function getComposeTarget(
     assunto: target.assunto,
     apelido: ownApelido ?? '',
   }
+}
+
+export async function getThreadSafety(me: number, id: string): Promise<{ euBloqueei: boolean }> {
+  const payload = await getPayload({ config })
+  return (await threadSafetyState(payload, me, id)) ?? { euBloqueei: false }
 }

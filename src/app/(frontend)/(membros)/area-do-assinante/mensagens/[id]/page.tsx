@@ -4,11 +4,13 @@ import { notFound } from 'next/navigation'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
+import { BlockReportPanel } from '@/components/mensagens/BlockReportPanel'
 import { MessageForm } from '@/components/mensagens/MessageForm'
 import { ThreadView } from '@/components/mensagens/ThreadView'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { responderMensagem } from '@/lib/mensagens/actions'
-import { getThreadFor } from '@/lib/mensagens/queries'
+import { MENSAGEM_MESSAGES } from '@/lib/mensagens/rules'
+import { getThreadFor, getThreadSafety } from '@/lib/mensagens/queries'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,6 +45,7 @@ export default async function ConversaPage({
   }
   const thread = await getThreadFor(check.assinante.id, id, antes)
   if (!thread) notFound()
+  const { euBloqueei } = await getThreadSafety(check.assinante.id, id)
   return (
     <section aria-labelledby="titulo-conversa">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
@@ -52,12 +55,17 @@ export default async function ConversaPage({
       </h1>
       <p className="type-label mt-2 text-muted">{thread.assunto}</p>
       <ThreadView thread={thread} />
-      <section aria-labelledby="titulo-responder" className="mt-8">
-        <h2 id="titulo-responder" className="type-heading">
-          Responder
-        </h2>
-        <MessageForm action={responderMensagem} hidden={{ conversa: String(thread.id) }} submitLabel="Enviar" rows={3} />
-      </section>
+      {euBloqueei ? (
+        <p className="mt-8 max-w-[560px] text-body text-muted">{MENSAGEM_MESSAGES.voceBloqueou}</p>
+      ) : (
+        <section aria-labelledby="titulo-responder" className="mt-8">
+          <h2 id="titulo-responder" className="type-heading">
+            Responder
+          </h2>
+          <MessageForm action={responderMensagem} hidden={{ conversa: String(thread.id) }} submitLabel="Enviar" rows={3} />
+        </section>
+      )}
+      <BlockReportPanel conversaId={thread.id} euBloqueei={euBloqueei} />
       <p className="mt-8">
         <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
           Voltar para Mensagens

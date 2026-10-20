@@ -7,8 +7,8 @@ import { getPayload } from 'payload'
 
 import { requireActiveSubscription } from '../assinantes/session'
 import { ServiceError } from '../classisex/service'
-import { MENSAGEM_MESSAGES } from './rules'
-import { sendMessage, startConversation } from './service'
+import { MENSAGEM_MESSAGES, REPORT_MESSAGES_PT } from './rules'
+import { blockUser, reportConversation, sendMessage, startConversation, unblockUser } from './service'
 
 const BASE = '/area-do-assinante/mensagens'
 
@@ -72,4 +72,60 @@ export async function responderMensagem(_prev: MessageFormState, formData: FormD
   // redirect would be treated as in-page navigation and keep the stale thread)
   revalidatePath(`${BASE}/${Number(conversa)}`)
   redirect(`${BASE}/${Number(conversa)}`)
+}
+
+export type ReportState = { ok: boolean; message: string } | null
+
+/** Block: only `conversa` is read; the other person comes from the conversation (T-05-05). */
+export async function bloquear(formData: FormData): Promise<void> {
+  const conversa = field(formData, 'conversa')
+  const check = await requireActiveSubscription(`${BASE}/${encodeURIComponent(conversa)}`)
+  if (check.inactive) redirect(BASE)
+  const payload = await getPayload({ config })
+  try {
+    await blockUser(payload, { me: check.assinante.id, conversationId: conversa })
+  } catch (err) {
+    if (!(err instanceof ServiceError)) throw err
+    redirect(BASE)
+  }
+  revalidatePath(`${BASE}/${Number(conversa)}`)
+  redirect(`${BASE}/${Number(conversa)}?ok=bloqueado`)
+}
+
+export async function desbloquear(formData: FormData): Promise<void> {
+  const conversa = field(formData, 'conversa')
+  const check = await requireActiveSubscription(`${BASE}/${encodeURIComponent(conversa)}`)
+  if (check.inactive) redirect(BASE)
+  const payload = await getPayload({ config })
+  try {
+    await unblockUser(payload, { me: check.assinante.id, conversationId: conversa })
+  } catch (err) {
+    if (!(err instanceof ServiceError)) throw err
+    redirect(BASE)
+  }
+  revalidatePath(`${BASE}/${Number(conversa)}`)
+  redirect(`${BASE}/${Number(conversa)}?ok=desbloqueado`)
+}
+
+/** Report: reads only conversa, motivo, detalhes and bloquear; the reporter is the session (T-05-28). */
+export async function denunciarConversa(_prev: ReportState, formData: FormData): Promise<ReportState> {
+  const conversa = field(formData, 'conversa')
+  const check = await requireActiveSubscription(`${BASE}/${encodeURIComponent(conversa)}`)
+  if (check.inactive) return { ok: false, message: MENSAGEM_MESSAGES.remetenteInativo }
+  const payload = await getPayload({ config })
+  try {
+    await reportConversation(payload, {
+      me: check.assinante.id,
+      conversationId: conversa,
+      motivo: field(formData, 'motivo'),
+      detalhes: field(formData, 'detalhes'),
+      bloquear: formData.get('bloquear') === 'on',
+      now: new Date(),
+    })
+  } catch (err) {
+    if (err instanceof ServiceError) return { ok: false, message: err.message }
+    throw err
+  }
+  revalidatePath(`${BASE}/${Number(conversa)}`)
+  return { ok: true, message: REPORT_MESSAGES_PT.enviada }
 }

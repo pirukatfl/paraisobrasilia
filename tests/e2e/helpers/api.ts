@@ -357,6 +357,15 @@ export async function staffApi(request: APIRequestContext) {
       const res = await request.post(`/api/recados/${id}/despublicar`, { headers, data: { motivo } })
       if (!res.ok()) throw new Error(`despublicar recado failed: ${res.status()}`)
     },
+    async resolverDenunciaMensagem(id: number, acao: 'descartar' | 'resolver' | 'suspender', nota?: string) {
+      const res = await request.post(`/api/message-reports/${id}/resolver`, { headers, data: { acao, nota } })
+      if (!res.ok()) throw new Error(`resolver denuncia mensagem failed: ${res.status()}`)
+    },
+    async findMessageReports() {
+      const res = await request.get('/api/message-reports?limit=100&depth=0&sort=-createdAt', { headers })
+      if (!res.ok()) throw new Error(`find message-reports failed: ${res.status()}`)
+      return ((await res.json()) as { docs: { id: number; status: string; motivo: string; urgente?: boolean }[] }).docs
+    },
     async findRecados(where = '') {
       const res = await request.get(`/api/recados?limit=100&depth=0&sort=-createdAt${where ? `&${where}` : ''}`, { headers })
       if (!res.ok()) throw new Error(`find recados failed: ${res.status()}`)

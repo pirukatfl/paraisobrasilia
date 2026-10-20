@@ -1,6 +1,7 @@
 import type { ServerProps } from 'payload'
 
 import { getModerationCounts } from '../../../lib/classisex/service'
+import { getMessageReportCounts } from '../../../lib/mensagens/service'
 import { countPendingRecados } from '../../../lib/recados/service'
 
 /**
@@ -10,7 +11,8 @@ import { countPendingRecados } from '../../../lib/recados/service'
 export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payload' | 'user'>) {
   if (!user || (user as { collection?: string }).collection !== 'users') return null
   const { pendentes, denunciasAbertas, urgentes } = await getModerationCounts(payload)
-  const recadosPendentes = await countPendingRecados(payload)
+  const [recadosPendentes, msgReports] = await Promise.all([countPendingRecados(payload), getMessageReportCounts(payload)])
+  const msgQueue = `${payload.config.routes.admin}/collections/message-reports?where[status][equals]=aberta`
   const adminRoute = payload.config.routes.admin
   const reportsLink = `${adminRoute}/collections/ad-reports?where[status][equals]=aberta`
   const recadosQueue = `${adminRoute}/collections/recados?where[status][equals]=pendente&sort=submittedAt`
@@ -50,6 +52,19 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
         ) : (
           <a href={recadosQueue}>
             {recadosPendentes === 1 ? 'Recados: 1 para aprovar' : `Recados: ${recadosPendentes} para aprovar`}
+          </a>
+        )}
+      </p>
+      <p style={{ margin: 'calc(var(--base) * 0.5) 0 0' }}>
+        {msgReports.abertas === 0 ? (
+          'Nenhuma denúncia de mensagem.'
+        ) : (
+          <a href={msgQueue}>
+            {`Mensagens: ${msgReports.abertas} ${msgReports.abertas === 1 ? 'denúncia aberta' : 'denúncias abertas'}${
+              msgReports.urgentes > 0
+                ? ` · ${msgReports.urgentes} ${msgReports.urgentes === 1 ? 'urgente' : 'urgentes'}`
+                : ''
+            }`}
           </a>
         )}
       </p>
