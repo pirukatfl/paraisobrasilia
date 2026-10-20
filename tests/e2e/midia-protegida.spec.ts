@@ -16,6 +16,7 @@ const KAI = { email: 'kai@teste.local', name: 'Kai Vencido', password: PASSWORD 
 let ivoId = 0
 let photoA = 0
 let videoA = 0
+let photoA2 = 0
 let photoP = 0
 
 test.beforeAll(async ({ request }) => {
@@ -27,6 +28,7 @@ test.beforeAll(async ({ request }) => {
   const adA = (await api.createAd({ author: ivoId, texto: 'Anúncio com mídia.', status: 'aprovado' })).id
   photoA = (await api.uploadAdMedia(adA, 'flyer-square.jpg')).id
   videoA = (await api.uploadAdMedia(adA, 'espaco.mp4')).id
+  photoA2 = (await api.uploadAdMedia(adA, 'flyer-portrait.jpg')).id
   const adP = (await api.createAd({ author: ivoId, texto: 'Anúncio em análise com foto.' })).id
   photoP = (await api.uploadAdMedia(adP, 'flyer-portrait.jpg')).id
   const jadeId = (await api.createAssinante(JADE)).id
@@ -160,11 +162,41 @@ test('the owner and staff open media of a pending ad', async ({ browser, baseURL
   await api.dispose()
 })
 
-test("ending the author's access hides the media from other subscribers", async ({ browser, baseURL, request }) => {
+test("ending the author's access leaves other subscribers only the cover photo (G-05)", async ({ browser, baseURL, request }) => {
   const api = await staffApi(request)
   await api.encerrar(ivoId, 'Teste de mídia')
   await api.dispose()
   const { page, context } = await asSubscriber(browser, baseURL!, JADE)
-  expect((await fetchIn(page, url(photoA, 'foto'))).status).toBe(404)
+  // Cover stays; the video and the second photo are kept but answer 404 (no leak of their existence)
+  expect((await fetchIn(page, url(photoA, 'foto'))).status).toBe(200)
+  expect((await fetchIn(page, url(photoA, 'miniatura'))).status).toBe(200)
+  for (const [id, v] of [
+    [photoA2, 'foto'],
+    [photoA2, 'miniatura'],
+    [videoA, 'video'],
+  ] as const) {
+    expect((await fetchIn(page, url(id, v))).status, `${id}/${v}`).toBe(404)
+  }
+  expect((await fetchIn(page, url(videoA, 'video'), 'bytes=0-')).status).toBe(404)
+  expect((await fetchIn(page, url(videoA, 'video'), 'bytes=0-99')).status).toBe(404)
+  await context.close()
+
+  // The author still sees everything; an expired viewer still gets nothing
+  const owner = await asSubscriber(browser, baseURL!, IVO)
+  expect((await fetchIn(owner.page, url(videoA, 'video'))).status).toBe(200)
+  expect((await fetchIn(owner.page, url(photoA2, 'foto'))).status).toBe(200)
+  await owner.context.close()
+  const kai = await asSubscriber(browser, baseURL!, KAI)
+  expect((await fetchIn(kai.page, url(photoA, 'foto'))).status).toBe(403)
+  await kai.context.close()
+})
+
+test('renewing the author brings the video and the other photos back', async ({ browser, baseURL, request }) => {
+  const api = await staffApi(request)
+  await api.liberar(ivoId, { durationDays: 30, method: 'cortesia', amount: 0 })
+  await api.dispose()
+  const { page, context } = await asSubscriber(browser, baseURL!, JADE)
+  expect((await fetchIn(page, url(videoA, 'video'))).status).toBe(200)
+  expect((await fetchIn(page, url(photoA2, 'foto'))).status).toBe(200)
   await context.close()
 })

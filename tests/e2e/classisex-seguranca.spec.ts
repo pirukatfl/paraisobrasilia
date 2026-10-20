@@ -112,7 +112,8 @@ test.describe('anonymous visitor: files and API', () => {
     const anon = await playwright.request.newContext({ baseURL })
     expect((await anon.get(`/classisex/previa/${s.media.video.id}`)).status()).toBe(404)
     expect((await anon.get(`/classisex/previa/${s.media.fotoPendente.id}`)).status()).toBe(404)
-    expect((await anon.get(`/classisex/previa/${s.media.fotoExpired.id}`)).status()).toBe(404)
+    // G-05: an expired author's approved ad stays in the open preview with its blurred cover
+    expect((await anon.get(`/classisex/previa/${s.media.fotoExpired.id}`)).status()).toBe(200)
     expect((await anon.get(`/classisex/previa/${s.media.foto.id}`)).status()).toBe(200)
     await anon.dispose()
   })
@@ -164,7 +165,8 @@ test.describe('expired subscriber', () => {
       file: { field: 'arquivo', name: 'x.jpg', type: 'image/jpeg', text: 'nao-e-uma-imagem' },
     })
     expect(up.url).toContain('midia=erro')
-    expect(up.url).toContain('inativo')
+    // G-05: an expired author is a free account now: the single photo slot is taken
+    expect(up.url).toContain('limite-fotos-gratis')
     expect((await api.findAdMedia(s.ads.expiredAuthor)).length).toBe(before)
     await api.dispose()
     await context.close()
@@ -195,7 +197,8 @@ test.describe('active subscriber who is not the owner', () => {
     const ok = await fetchAs(page, 'GET', mediaUrl(s.media.foto.id, 'foto'))
     expect(ok.status).toBe(200)
     expect(ok.headers['content-type']).toMatch(/^image\//)
-    expect((await fetchAs(page, 'GET', mediaUrl(s.media.fotoExpired.id, 'foto'))).status).toBe(404)
+    // G-05: the expired author's ad is still visible, so its cover opens for an active viewer
+    expect((await fetchAs(page, 'GET', mediaUrl(s.media.fotoExpired.id, 'foto'))).status).toBe(200)
     expect((await fetchAs(page, 'GET', `/api/ad-media/file/${encodeURIComponent(s.files.fotoFilename)}`)).status).toBe(403)
     const optimizer = await fetchAs(page, 'GET', `/_next/image?url=${encodeURIComponent(mediaUrl(s.media.foto.id, 'foto'))}&w=640&q=75`)
     expect(optimizer.status === 200 && isBinaryType(optimizer.headers['content-type'])).toBe(false)
@@ -253,7 +256,7 @@ test.describe('active subscriber who is not the owner', () => {
   test('hidden ads and other people’s editors are 404 pages', async ({ browser, baseURL }) => {
     test.setTimeout(150_000)
     const { page, context } = await asSubscriber(browser, baseURL!, VIEWER)
-    for (const id of [s.ads.pendente, s.ads.recusado, s.ads.despublicado, s.ads.expiredAuthor]) {
+    for (const id of [s.ads.pendente, s.ads.recusado, s.ads.despublicado]) {
       const res = await page.goto(`/area-do-assinante/classisex/${id}`)
       expect(res?.status(), `ad ${id}`).toBe(404)
     }
@@ -360,20 +363,28 @@ test.describe('pages and RSC payload', () => {
     await anon.dispose()
   })
 
-  test('an ad disappears from the open preview as soon as its author’s access ends', async ({ playwright, baseURL, request }) => {
+  test('an ad stays in the open preview with the same blurred cover after its author’s access ends (G-05)', async ({ playwright, baseURL, request }) => {
     test.setTimeout(150_000)
     const api = await staffApi(request)
     const zeca = await api.createAssinante({ email: 'zeca.some@teste.local', password: 'senha-zeca-12345', name: 'Zeca Some' })
     await api.liberar(zeca.id, { durationDays: 30, method: 'cortesia', amount: 0 })
-    const ad = await api.createAd({ author: zeca.id, apelido: 'Raposa Dourada', texto: 'Texto temporario some logo.', status: 'aprovado' })
+    const ad = await api.createAd({ author: zeca.id, apelido: 'Raposa Dourada', texto: 'Texto que fica no ar.', status: 'aprovado' })
     const photo = await api.uploadAdMedia(ad.id, 'flyer-square.jpg')
+    const second = await api.uploadAdMedia(ad.id, 'flyer-portrait.jpg')
     const anon = await playwright.request.newContext({ baseURL })
     expect(await (await anon.get('/classisex')).text()).toContain('Raposa Dourada')
-    expect((await anon.get(`/classisex/previa/${photo.id}`)).status()).toBe(200)
+    const coverBefore = await anon.get(`/classisex/previa/${photo.id}`)
+    expect(coverBefore.status()).toBe(200)
+    const bytesBefore = (await coverBefore.body()).byteLength
+    // the blurred preview shows the cover only, even while the author pays
+    expect((await anon.get(`/classisex/previa/${second.id}`)).status()).toBe(404)
 
     await api.encerrar(zeca.id, 'teste de vencimento')
-    expect(await (await anon.get('/classisex')).text()).not.toContain('Raposa Dourada')
-    expect((await anon.get(`/classisex/previa/${photo.id}`)).status()).toBe(404)
+    expect(await (await anon.get('/classisex')).text()).toContain('Raposa Dourada')
+    const coverAfter = await anon.get(`/classisex/previa/${photo.id}`)
+    expect(coverAfter.status()).toBe(200)
+    expect((await coverAfter.body()).byteLength).toBe(bytesBefore)
+    expect((await anon.get(`/classisex/previa/${second.id}`)).status()).toBe(404)
     await anon.dispose()
     await api.dispose()
   })
