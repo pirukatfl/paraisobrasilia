@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
+import { EnviarMensagemLink } from '@/components/mensagens/EnviarMensagemLink'
 import { ContactLinks } from '@/components/classisex/ContactLinks'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { MediaGallery } from '@/components/classisex/MediaGallery'
@@ -53,6 +54,7 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
           Contato
         </h2>
         <ContactLinks contato={ad.contato} />
+        {canReport && <EnviarMensagemLink origem="anuncio" id={ad.id} />}
       </section>
       {canReport && <ReportForm adId={ad.id} />}
       <p className="mt-10">

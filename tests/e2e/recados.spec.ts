@@ -58,6 +58,7 @@ test('the form, the sub-nav and the redaction notice', async ({ browser, baseURL
     'Minha assinatura',
     'ClassiSex',
     'Recados',
+    'Mensagens',
     'Contos',
     'Meus anúncios',
     'Trocar senha',

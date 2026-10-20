@@ -1,0 +1,29 @@
+import Link from 'next/link'
+
+import type { InboxItemDTO } from '@/lib/mensagens/dto'
+
+/** Conversations of the viewer, newest first. */
+export function InboxList({ items }: { items: InboxItemDTO[] }) {
+  return (
+    <ul className="mt-6 flex max-w-[720px] flex-col gap-3">
+      {items.map((c) => (
+        <li key={c.id}>
+          <Link
+            href={`/area-do-assinante/mensagens/${c.id}`}
+            className="flex flex-col gap-1 rounded-xl border border-line bg-surface p-4 hover:border-accent"
+          >
+            <span className="flex flex-wrap items-center justify-between gap-2">
+              <span className="type-heading">{c.outroApelido}</span>
+              <span className="type-label text-muted">{c.quando}</span>
+            </span>
+            <span className="type-label text-muted">{c.assunto}</span>
+            <span className="flex items-center gap-2 text-body">
+              {c.naoLida && <span className="type-eyebrow text-accent">Nova</span>}
+              <span className={c.naoLida ? 'font-semibold' : undefined}>{c.ultimo}</span>
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  )
+}

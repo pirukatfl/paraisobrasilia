@@ -1,15 +1,17 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { UnreadBadge } from '@/components/mensagens/UnreadBadge'
 import { sair } from '@/lib/assinantes/actions'
 
 // Members area: always rendered per request (private, no-store).
 export const dynamic = 'force-dynamic'
 
-const LINKS = [
+const LINKS: { href: string; label: string; badge?: boolean }[] = [
   { href: '/area-do-assinante', label: 'Minha assinatura' },
   { href: '/area-do-assinante/classisex', label: 'ClassiSex' },
   { href: '/area-do-assinante/recados', label: 'Recados' },
+  { href: '/area-do-assinante/mensagens', label: 'Mensagens', badge: true },
   { href: '/area-do-assinante/contos', label: 'Contos' },
   { href: '/area-do-assinante/meus-anuncios', label: 'Meus anúncios' },
   { href: '/area-do-assinante/senha', label: 'Trocar senha' },
@@ -32,6 +34,7 @@ export default function MembrosLayout({ children }: { children: ReactNode }) {
                 className="type-eyebrow -mb-px inline-flex min-h-11 items-center border-b-2 border-transparent text-muted hover:text-accent"
               >
                 {l.label}
+                {l.badge && <UnreadBadge />}
               </Link>
             </li>
           ))}
