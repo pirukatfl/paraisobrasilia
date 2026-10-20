@@ -7,7 +7,15 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { attachMedia, removeMedia, ServiceError, setCover } from '../../src/lib/classisex/service'
 import { privateMediaDir } from '../../src/lib/classisex/storage'
 import { buildMp4 } from '../helpers/mp4-fixtures'
-import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante } from '../helpers/seed'
+import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante, seedStaffUser, seedSubscription } from '../helpers/seed'
+
+const DAY = 86_400_000
+const pay = (payload: Payload, assinanteId: number, { start = -DAY, end = 30 * DAY } = {}) =>
+  seedSubscription(payload, {
+    assinanteId,
+    startsAt: new Date(Date.now() + start).toISOString(),
+    endsAt: new Date(Date.now() + end).toISOString(),
+  })
 
 type MediaDoc = {
   id: number
@@ -52,6 +60,7 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     await resetDatabase(payload)
     await seedAdCategories(payload)
     owner = await seedAssinante(payload, { email: 'midia@teste.local', password: 'senha-midia-1234', name: 'Dono Mídia' })
+    await pay(payload, owner.id)
     adId = (await seedAd(payload, { author: owner.id })).id
   })
 
@@ -201,6 +210,7 @@ describe('owner media service (CLAS-03, D-01, D-03, T-04-04)', () => {
     await resetDatabase(payload)
     await seedAdCategories(payload)
     owner = await seedAssinante(payload, { email: 'dono@teste.local', password: 'senha-dono-1234', name: 'Dono' })
+    await pay(payload, owner.id)
     other = await seedAssinante(payload, { email: 'outro@teste.local', password: 'senha-outro-1234', name: 'Outro' })
     adId = (await seedAd(payload, { author: owner.id, status: 'aprovado' })).id
   })
@@ -260,5 +270,97 @@ describe('owner media service (CLAS-03, D-01, D-03, T-04-04)', () => {
     expect((await mediaOf()).map((m) => m.id)).toEqual([c.id, b.id])
     expect(fs.existsSync(path.join(dir, removed.filename))).toBe(false)
     expect(await adStatus()).toBe('pendente')
+  })
+})
+
+describe('limits by the ad author tier (G-02, G-03, G-05, I-1, I-3)', () => {
+  let payload: Payload
+  const now = new Date()
+
+  const photoFile = async (name = 'foto.jpg') => {
+    const data = await jpegWithExif(300, 200)
+    return { data, mimetype: 'image/jpeg', name, size: data.length }
+  }
+  const videoFile = (name = 'v.mp4') => {
+    const data = buildMp4({ durationSeconds: 10 })
+    return { data, mimetype: 'video/mp4', name, size: data.length }
+  }
+  const count = async (adId: number, kind: 'foto' | 'video') =>
+    (
+      await payload.count({
+        collection: 'ad-media',
+        where: { and: [{ ad: { equals: adId } }, { kind: { equals: kind } }] },
+        overrideAccess: true,
+      })
+    ).totalDocs
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    await seedAdCategories(payload)
+  })
+
+  it('free author: first photo ok, second photo and any video refused with the free messages', async () => {
+    const free = await seedAssinante(payload, { email: 'livre@teste.local', password: 'senha-livre-123', name: 'Livre' })
+    const ad = await seedAd(payload, { author: free.id })
+    await attachMedia(payload, { assinanteId: free.id, adId: ad.id, file: await photoFile('a.jpg'), now })
+    const second = await attachMedia(payload, { assinanteId: free.id, adId: ad.id, file: await photoFile('b.jpg'), now }).catch((e) => e)
+    expect(second).toBeInstanceOf(ServiceError)
+    expect(second.code).toBe('limite-fotos-gratis')
+    expect(second.message).toBe('Conta gratuita: 1 foto por anúncio. Assine para enviar até 10 fotos e 2 vídeos.')
+    const video = await attachMedia(payload, { assinanteId: free.id, adId: ad.id, file: videoFile(), now }).catch((e) => e)
+    expect(video.code).toBe('video-gratis')
+    expect(video.message).toBe('Conta gratuita não envia vídeos. Assine para enviar até 2 vídeos.')
+    expect(await count(ad.id, 'foto')).toBe(1)
+    expect(await count(ad.id, 'video')).toBe(0)
+  })
+
+  it('paying author: 10 photos + 2 videos ok, 11th photo and 3rd video refused', async () => {
+    const payer = await seedAssinante(payload, { email: 'pago@teste.local', password: 'senha-pago-1234', name: 'Pago' })
+    await pay(payload, payer.id)
+    const ad = await seedAd(payload, { author: payer.id })
+    for (let i = 0; i < 10; i++) await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: await photoFile(`f${i}.jpg`), now })
+    for (let i = 0; i < 2; i++) await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: videoFile(`v${i}.mp4`), now })
+    expect((await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: await photoFile('x.jpg'), now }).catch((e) => e)).code).toBe('limite-fotos')
+    expect((await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: videoFile('x.mp4'), now }).catch((e) => e)).code).toBe('limite-video')
+  }, 120_000)
+
+  it('expired payer with 3 stored photos: cannot add a new photo; may Remover all and then add one', async () => {
+    const payer = await seedAssinante(payload, { email: 'venceu@teste.local', password: 'senha-venceu-12', name: 'Venceu' })
+    const sub = await pay(payload, payer.id)
+    const ad = await seedAd(payload, { author: payer.id, status: 'aprovado' })
+    const ids: number[] = []
+    for (let i = 0; i < 3; i++) ids.push((await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: await photoFile(`e${i}.jpg`), now })).id)
+    await payload.update({
+      collection: 'subscriptions',
+      id: (sub as { id: number }).id,
+      data: { startsAt: new Date(Date.now() - 90 * DAY).toISOString(), endsAt: new Date(Date.now() - DAY).toISOString() },
+      overrideAccess: true,
+      context: { skipAudit: true },
+    })
+    const refused = await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: await photoFile('n.jpg'), now }).catch((e) => e)
+    expect(refused.code).toBe('limite-fotos-gratis')
+    expect(await count(ad.id, 'foto')).toBe(3)
+    for (const id of ids) await removeMedia(payload, { assinanteId: payer.id, mediaId: id, now })
+    expect(await count(ad.id, 'foto')).toBe(0)
+    await attachMedia(payload, { assinanteId: payer.id, adId: ad.id, file: await photoFile('n.jpg'), now })
+    expect(await count(ad.id, 'foto')).toBe(1)
+  }, 120_000)
+
+  it('staff upload to a free author ad is refused on the 2nd photo and on a video (I-3)', async () => {
+    const free = await seedAssinante(payload, { email: 'livre2@teste.local', password: 'senha-livre-123', name: 'Livre 2' })
+    const ad = await seedAd(payload, { author: free.id })
+    await seedStaffUser(payload, { email: 'staff-midia@teste.local', password: 'senha-equipe-123' })
+    const staff = (await payload.find({ collection: 'users', where: { email: { equals: 'staff-midia@teste.local' } }, overrideAccess: true })).docs[0]
+    const asStaff = { overrideAccess: false, user: { ...staff, collection: 'users' } as never }
+    const up = (file: { data: Buffer; mimetype: string; name: string; size: number }) =>
+      payload.create({ collection: 'ad-media', data: { ad: ad.id } as never, file, depth: 0, ...asStaff })
+    await up(await photoFile('s1.jpg'))
+    await expect(up(await photoFile('s2.jpg'))).rejects.toThrow('Conta gratuita: 1 foto por anúncio.')
+    await expect(up(videoFile('sv.mp4'))).rejects.toThrow('Conta gratuita não envia vídeos.')
+    expect(await count(ad.id, 'foto')).toBe(1)
   })
 })

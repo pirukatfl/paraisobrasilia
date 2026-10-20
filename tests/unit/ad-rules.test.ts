@@ -111,3 +111,22 @@ describe('ClassiSex ad rules (D-01, D-02)', () => {
     expect(resumoOf('Casal', 'Brasília', long)).toBe(`Casal · Brasília — ${'x'.repeat(60)}…`)
   })
 })
+
+describe('upload codes for the free-account limits (G-02)', () => {
+  it('maps the hook messages to the codes and the codes to messages with the Assine Já pointer', async () => {
+    const { AD_MEDIA_MESSAGES, UPLOAD_ERROR_MESSAGES, uploadCodeFor, uploadErrorMessage } = await import(
+      '../../src/lib/classisex/media-messages'
+    )
+    expect(uploadCodeFor(AD_MEDIA_MESSAGES.fotosGratis, 'foto')).toBe('limite-fotos-gratis')
+    expect(uploadCodeFor(AD_MEDIA_MESSAGES.videoGratis, 'video')).toBe('video-gratis')
+    expect(uploadCodeFor(AD_MEDIA_MESSAGES.fotos, 'foto')).toBe('limite-fotos')
+    expect(UPLOAD_ERROR_MESSAGES['limite-fotos-gratis']).toMatch(/Veja os planos em Assine Já\.$/)
+    expect(uploadErrorMessage('video-gratis')).toMatch(/Veja os planos em Assine Já\.$/)
+  })
+
+  it('keeps 3 active ads for both tiers', async () => {
+    const { TIER_LIMITS } = await import('../../src/lib/assinantes/tier')
+    expect(TIER_LIMITS.gratis.anunciosAtivos).toBe(ACTIVE_LIMIT)
+    expect(TIER_LIMITS.assinante.anunciosAtivos).toBe(ACTIVE_LIMIT)
+  })
+})

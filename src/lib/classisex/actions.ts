@@ -63,15 +63,15 @@ async function save(
   write: (assinanteId: number, input: AdInput) => Promise<unknown>,
   stayWithId = false,
 ): Promise<AdFormState> {
-  // DAL guard first (T-04-05): only subscribers with active access create or edit
-  const check = await requireActiveSubscription(path)
+  // DAL guard first (T-04-05): a logged-in account creates or edits (free accounts too, G-02);
+  // the media limits follow the account's tier and are enforced by the collection hooks
+  const assinante = await requireAssinante(path)
   const { input, values } = readInput(formData)
-  if (check.inactive) return { errors: { form: INACTIVE }, values }
   const result = validateAdInput(input)
   if (!result.ok) return { errors: result.errors as Record<string, string>, values }
   let created: unknown
   try {
-    created = await write(check.assinante.id, input)
+    created = await write(assinante.id, input)
   } catch (err) {
     if (err instanceof ServiceError) {
       if (err.code === 'nao-encontrado') notFound()
@@ -120,7 +120,7 @@ export async function apagarAnuncio(formData: FormData): Promise<void> {
   redirect(`${MEUS_ANUNCIOS}?${failed ? 'erro=nao-encontrado' : 'ok=apagado'}`)
 }
 
-/** Remover / Usar como capa on "Fotos e vídeos" (CLAS-03, D-03): active access, owner only. */
+/** Remover / Usar como capa on "Fotos e vídeos" (CLAS-03, D-03, G-05): logged-in owner only. */
 async function changeMedia(
   formData: FormData,
   change: (assinanteId: number, mediaId: string) => Promise<{ adId: number }>,
@@ -128,11 +128,10 @@ async function changeMedia(
 ): Promise<void> {
   const adId = field(formData, 'anuncio')
   const editar = `${MEUS_ANUNCIOS}/${encodeURIComponent(adId)}/editar`
-  const check = await requireActiveSubscription(editar)
-  if (check.inactive) redirect(`${editar}?midia=erro&codigo=inativo`)
+  const assinante = await requireAssinante(editar)
   let target = ''
   try {
-    const { adId: owned } = await change(check.assinante.id, field(formData, 'id'))
+    const { adId: owned } = await change(assinante.id, field(formData, 'id'))
     target = `${MEUS_ANUNCIOS}/${owned}/editar?midia=${ok}`
   } catch (err) {
     if (err instanceof ServiceError && err.code === 'nao-encontrado') notFound()

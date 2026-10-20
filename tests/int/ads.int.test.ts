@@ -7,11 +7,13 @@ import {
   resetDatabase,
   seedAd,
   seedAdCategories,
+  seedAdMedia,
   seedAssinante,
   seedStaffUser,
   seedSubscription,
 } from '../helpers/seed'
 
+const DAY = 86_400_000
 const CONTATO_MSG = 'Informe pelo menos um contato: WhatsApp ou Telegram.'
 
 describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () => {
@@ -251,5 +253,66 @@ describe('owner service (CLAS-03, CLAS-04, D-02, D-03, T-04-04)', () => {
     })
     const active = await listOwnAds(payload, owner.id, NOW)
     expect(active.find((a) => a.status === 'aprovado')?.statusLabel).toBe('Publicado')
+  })
+})
+
+describe('free accounts create and edit ads (G-02, G-05)', () => {
+  let payload: Payload
+  const now = new Date()
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    await seedAdCategories(payload)
+  })
+
+  const input = (over: Record<string, unknown> = {}) => ({
+    apelido: 'Casal Livre',
+    euSou: 0,
+    cidade: 'Brasília',
+    texto: 'Casal simpático procura amigos.',
+    whatsapp: '5561999990000',
+    telegram: '',
+    consent: true,
+    ...over,
+  })
+
+  it('a free account (no periods) creates and edits ads; the 4th active ad is refused for free too', async () => {
+    const { createAd, updateAd } = await import('../../src/lib/classisex/service')
+    const free = await seedAssinante(payload, { email: 'gratis@teste.local', password: 'senha-gratis-12', name: 'Gratis' })
+    const cat = (await payload.find({ collection: 'ad-categories', sort: 'order', overrideAccess: true })).docs[0].id as number
+    const ids: number[] = []
+    for (let i = 0; i < 3; i++) ids.push((await createAd(payload, { assinanteId: free.id, input: input({ euSou: cat }), now })).id)
+    await expect(createAd(payload, { assinanteId: free.id, input: input({ euSou: cat }), now })).rejects.toMatchObject({ code: 'limite' })
+    await updateAd(payload, { assinanteId: free.id, id: ids[0], input: input({ euSou: cat, texto: 'Texto novo do anúncio.' }), now })
+    const ad = (await payload.findByID({ collection: 'ads', id: ids[0], overrideAccess: true })) as { texto: string; status: string }
+    expect(ad.texto).toBe('Texto novo do anúncio.')
+    expect(ad.status).toBe('pendente')
+  })
+
+  it('a text edit by an expired payer keeps every stored media file', async () => {
+    const { updateAd } = await import('../../src/lib/classisex/service')
+    const payer = await seedAssinante(payload, { email: 'exp@teste.local', password: 'senha-exp-12345', name: 'Exp' })
+    const sub = await seedSubscription(payload, {
+      assinanteId: payer.id,
+      startsAt: new Date(now.getTime() - DAY).toISOString(),
+      endsAt: new Date(now.getTime() + 30 * DAY).toISOString(),
+    })
+    const cat = (await payload.find({ collection: 'ad-categories', sort: 'order', overrideAccess: true })).docs[0].id as number
+    const ad = await seedAd(payload, { author: payer.id, status: 'aprovado' })
+    for (let i = 0; i < 3; i++) await seedAdMedia(payload, { ad: ad.id, order: i })
+    await payload.update({
+      collection: 'subscriptions',
+      id: (sub as { id: number }).id,
+      data: { startsAt: new Date(now.getTime() - 90 * DAY).toISOString(), endsAt: new Date(now.getTime() - DAY).toISOString() },
+      overrideAccess: true,
+      context: { skipAudit: true },
+    })
+    await updateAd(payload, { assinanteId: payer.id, id: ad.id, input: input({ euSou: cat }), now })
+    const media = await payload.count({ collection: 'ad-media', where: { ad: { equals: ad.id } }, overrideAccess: true })
+    expect(media.totalDocs).toBe(3)
   })
 })

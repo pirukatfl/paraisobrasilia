@@ -2,6 +2,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { accessStatusFor } from '@/lib/assinantes/status'
+import { TIER_LIMITS, tierOf } from '@/lib/assinantes/tier'
 import {
   MAX_AD_PHOTO_BYTES,
   MAX_AD_VIDEO_BYTES,
@@ -21,8 +22,9 @@ export const dynamic = 'force-dynamic'
  * Order of checks (cheap first, body last):
  * 1. session: src/proxy.ts rejects (403) a POST whose Origin is foreign before it gets here, and the
  *    SameSite=Lax cookie is not sent cross-site anyway; no session → /entrar (T-04-15)
- * 2. active access now (T-04-05)
- * 3. ad exists and belongs to this subscriber, else 404 (T-04-04)
+ * 2. ad exists and belongs to this account, else 404 (T-04-04)
+ * 3. tier limits before the body is decoded (G-02/G-03): a free account never sends a video, and
+ *    never a second photo (the collection hook is the last line and counts again)
  * 4. Content-Length cap before reading the body (T-04-09; Caddy also caps at 110 MB)
  * 5. per-kind type and size, then the collection hooks (duration, decoding, limits, scrub)
  * Not a server action: the server-action body limit stays at its default.
@@ -65,11 +67,29 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (user?.collection !== 'assinantes') return seeOther(`/entrar?next=${encodeURIComponent(editar)}`)
   const assinanteId = Number(user.id)
 
-  if ((await accessStatusFor(payload, assinanteId, new Date())).state !== 'ativa') return fail('inativo')
-
   const ad = await payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true, disableErrors: true })
   const authorId = typeof ad?.author === 'object' ? ad?.author?.id : ad?.author
   if (!ad || Number(authorId) !== assinanteId) return notFound()
+
+  // G-02: cheap tier pre-check from the query string (?tipo=foto|video, sent by both upload clients)
+  // and again from the form field once parsed (a client that omits the query still gets refused
+  // before sharp/MP4 parsing; the collection hook is the last line)
+  const tier = tierOf(await accessStatusFor(payload, assinanteId, new Date()))
+  const tierRefusal = async (kind: string | null): Promise<UploadErrorCode | null> => {
+    if (tier !== 'gratis') return null
+    if (kind === 'video') return 'video-gratis'
+    if (kind === 'foto') {
+      const { totalDocs } = await payload.count({
+        collection: 'ad-media',
+        where: { and: [{ ad: { equals: adId } }, { kind: { equals: 'foto' } }] },
+        overrideAccess: true,
+      })
+      if (totalDocs >= TIER_LIMITS.gratis.fotos) return 'limite-fotos-gratis'
+    }
+    return null
+  }
+  const early = await tierRefusal(new URL(request.url).searchParams.get('tipo'))
+  if (early) return fail(early)
 
   const declared = Number(request.headers.get('content-length') ?? 0)
   if (declared > MAX_BODY_BYTES) return fail('grande')
@@ -81,6 +101,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return fail('tipo')
   }
   const tipo = form.get('tipo') === 'video' ? 'video' : 'foto'
+  const late = await tierRefusal(tipo)
+  if (late) return fail(late)
   const arquivo = form.get('arquivo')
   if (!(arquivo instanceof File) || arquivo.size === 0) return fail('tipo')
   const mimetype = mimeOf(arquivo)

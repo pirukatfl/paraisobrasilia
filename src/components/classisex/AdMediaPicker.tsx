@@ -2,11 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 
+import { TIER_LIMITS } from '@/lib/assinantes/tier'
 import {
   CLIENT_MESSAGES,
-  MAX_AD_PHOTOS,
   MAX_AD_PHOTO_BYTES,
-  MAX_AD_VIDEOS,
   MAX_AD_VIDEO_BYTES,
   PHOTO_MIME_TYPES,
   VIDEO_MIME_TYPES,
@@ -87,13 +86,18 @@ export function AdMediaPicker({
   onPhotos,
   onVideos,
   disabled,
+  limits = TIER_LIMITS.assinante,
 }: {
   photos: File[]
   videos: File[]
   onPhotos: (files: File[]) => void
   onVideos: (files: File[]) => void
   disabled: boolean
+  /** Limits of the account's tier (server decides again): photos and videos per ad */
+  limits?: { fotos: number; videos: number }
 }) {
+  const MAX_AD_PHOTOS = limits.fotos
+  const MAX_AD_VIDEOS = limits.videos
   const [photoNotes, setPhotoNotes] = useState<string[]>([])
   const [videoNotes, setVideoNotes] = useState<string[]>([])
   const notes = [...photoNotes, ...videoNotes]
@@ -105,7 +109,7 @@ export function AdMediaPicker({
       if (!PHOTO_MIME_TYPES.includes(mimeOf(file))) notes2.push(CLIENT_MESSAGES.fotoTipo(file.name))
       else if (file.size > MAX_AD_PHOTO_BYTES) notes2.push(CLIENT_MESSAGES.fotoGrande(file.name))
       else if (next.length >= MAX_AD_PHOTOS) {
-        if (!notes2.includes(CLIENT_MESSAGES.fotosMax)) notes2.push(CLIENT_MESSAGES.fotosMax)
+        if (!notes2.includes(CLIENT_MESSAGES.fotosMax(MAX_AD_PHOTOS))) notes2.push(CLIENT_MESSAGES.fotosMax(MAX_AD_PHOTOS))
       } else next.push(file)
     }
     onPhotos(next)
@@ -119,7 +123,7 @@ export function AdMediaPicker({
       if (!VIDEO_MIME_TYPES.includes(mimeOf(file))) notes2.push(CLIENT_MESSAGES.videoTipo(file.name))
       else if (file.size > MAX_AD_VIDEO_BYTES) notes2.push(CLIENT_MESSAGES.videoGrande(file.name))
       else if (next.length >= MAX_AD_VIDEOS) {
-        if (!notes2.includes(CLIENT_MESSAGES.videosMax)) notes2.push(CLIENT_MESSAGES.videosMax)
+        if (!notes2.includes(CLIENT_MESSAGES.videosMax(MAX_AD_VIDEOS))) notes2.push(CLIENT_MESSAGES.videosMax(MAX_AD_VIDEOS))
       } else if (((await readDuration(file)) ?? 0) > MAX_VIDEO_SECONDS) notes2.push(CLIENT_MESSAGES.videoLongo(file.name))
       else next.push(file)
     }

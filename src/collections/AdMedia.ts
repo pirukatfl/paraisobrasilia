@@ -12,6 +12,8 @@ import sharp from 'sharp'
 
 import { isStaff } from '../access/roles'
 import { withRequestState } from '../lib/assinantes/context'
+import { accessStatusFor } from '../lib/assinantes/status'
+import { TIER_LIMITS, tierOf } from '../lib/assinantes/tier'
 import { expire } from '../lib/cache/expire'
 import { makeBlurredPreview } from '../lib/classisex/blur'
 import {
@@ -50,7 +52,7 @@ const relId = (value: unknown): number | null => {
  * - kind and owner are decided here, never taken from the client
  * - photos: size cap, decodable by sharp (Payload then re-encodes to webp: EXIF/GPS gone, T-04-06)
  * - videos: size cap, duration ≤ 60 s, location boxes zero-filled (T-04-06)
- * - per-ad limits (D-01)
+ * - per-ad limits by the author's tier (D-01, G-02, G-03; TIER_LIMITS)
  */
 const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation, req }) => {
   if (operation !== 'create' && operation !== 'update') return args
@@ -119,8 +121,18 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
         req,
       }),
     )
-    if (kind === 'foto' && totalDocs >= MAX_AD_PHOTOS) throw fail(AD_MEDIA_MESSAGES.fotos)
-    if (kind === 'video' && totalDocs >= MAX_AD_VIDEOS) throw fail(AD_MEDIA_MESSAGES.videos)
+    // I-3: limits follow the AD AUTHOR's tier, whoever uploads (owner, staff in /admin, scripts).
+    // I-1: for a free author every stored photo counts, so an expired payer cannot add or replace.
+    const authorId = relId(ad.author)
+    const tier = authorId
+      ? tierOf(await withRequestState(req, () => accessStatusFor(req.payload, authorId, new Date(), req)))
+      : 'gratis'
+    const limits = TIER_LIMITS[tier]
+    if (kind === 'video' && limits.videos === 0) throw fail(AD_MEDIA_MESSAGES.videoGratis)
+    if (kind === 'foto' && totalDocs >= limits.fotos) {
+      throw fail(tier === 'gratis' ? AD_MEDIA_MESSAGES.fotosGratis : AD_MEDIA_MESSAGES.fotos)
+    }
+    if (kind === 'video' && totalDocs >= limits.videos) throw fail(AD_MEDIA_MESSAGES.videos)
   }
   return args
 }

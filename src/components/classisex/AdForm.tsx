@@ -30,7 +30,7 @@ type Item = { file: File; tipo: 'foto' | 'video' }
 function uploadOne(adId: number, item: Item, onProgress: (fraction: number) => void): Promise<string> {
   return new Promise((resolve) => {
     const xhr = new XMLHttpRequest()
-    xhr.open('POST', `/area-do-assinante/meus-anuncios/${adId}/midia`)
+    xhr.open('POST', `/area-do-assinante/meus-anuncios/${adId}/midia?tipo=${item.tipo}`)
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total)
     xhr.onerror = () => resolve('erro')
     xhr.onload = () => {

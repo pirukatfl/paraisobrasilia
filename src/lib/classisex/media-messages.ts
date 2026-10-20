@@ -23,6 +23,8 @@ export const AD_MEDIA_MESSAGES = {
   videoLongo: `O vídeo pode ter até ${MAX_VIDEO_SECONDS} segundos.`,
   fotos: 'Cada anúncio pode ter até 10 fotos.',
   videos: 'Cada anúncio pode ter até 2 vídeos.',
+  fotosGratis: 'Conta gratuita: 1 foto por anúncio. Assine para enviar até 10 fotos e 2 vídeos.',
+  videoGratis: 'Conta gratuita não envia vídeos. Assine para enviar até 2 vídeos.',
   semAnuncio: 'Anúncio não encontrado.',
 } as const
 
@@ -32,6 +34,8 @@ export type UploadErrorCode =
   | 'tipo'
   | 'limite-fotos'
   | 'limite-video'
+  | 'limite-fotos-gratis'
+  | 'video-gratis'
   | 'inativo'
   | 'foto-ilegivel'
   | 'video-ilegivel'
@@ -45,6 +49,8 @@ export const UPLOAD_ERROR_MESSAGES: Record<UploadErrorCode, string> = {
   tipo: 'Envie fotos em JPG, PNG ou WebP e vídeos em MP4 ou MOV.',
   'limite-fotos': AD_MEDIA_MESSAGES.fotos,
   'limite-video': AD_MEDIA_MESSAGES.videos,
+  'limite-fotos-gratis': `${AD_MEDIA_MESSAGES.fotosGratis} Veja os planos em Assine Já.`,
+  'video-gratis': `${AD_MEDIA_MESSAGES.videoGratis} Veja os planos em Assine Já.`,
   inativo: 'Sua assinatura não está ativa.',
   'foto-ilegivel': AD_MEDIA_MESSAGES.fotoIlegivel,
   'video-ilegivel': AD_MEDIA_MESSAGES.videoIlegivel,
@@ -73,6 +79,10 @@ export function uploadCodeFor(message: string, kind: 'foto' | 'video'): UploadEr
       return 'limite-fotos'
     case AD_MEDIA_MESSAGES.videos:
       return 'limite-video'
+    case AD_MEDIA_MESSAGES.fotosGratis:
+      return 'limite-fotos-gratis'
+    case AD_MEDIA_MESSAGES.videoGratis:
+      return 'video-gratis'
     case AD_MEDIA_MESSAGES.indisponivel:
       return 'indisponivel'
     default:
@@ -86,8 +96,14 @@ export function uploadErrorMessage(code: string | undefined): string {
 
 /** Limits shown by the create form (client side); the server enforces the same ones. */
 export const CLIENT_MESSAGES = {
-  fotosMax: `Você pode escolher até ${MAX_AD_PHOTOS} fotos. As que passaram do limite não foram adicionadas.`,
-  videosMax: `Você pode escolher até ${MAX_AD_VIDEOS} vídeos. Os que passaram do limite não foram adicionados.`,
+  fotosMax: (max: number) =>
+    max === 1
+      ? 'Conta gratuita: 1 foto por anúncio. As outras não foram adicionadas.'
+      : `Você pode escolher até ${max} fotos. As que passaram do limite não foram adicionadas.`,
+  videosMax: (max: number) =>
+    max === 0
+      ? 'Conta gratuita não envia vídeos. Assine para enviar até 2 vídeos.'
+      : `Você pode escolher até ${max} vídeos. Os que passaram do limite não foram adicionados.`,
   fotoTipo: (name: string) => `"${name}" não é uma foto JPG, PNG ou WebP.`,
   videoTipo: (name: string) => `"${name}" não é um vídeo MP4 ou MOV.`,
   fotoGrande: (name: string) => `A foto "${name}" passa de 15 MB.`,
