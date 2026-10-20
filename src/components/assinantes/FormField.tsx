@@ -7,6 +7,10 @@ export function FormField({
   autoComplete,
   required = true,
   minLength,
+  maxLength,
+  defaultValue,
+  error,
+  hint,
 }: {
   id: string
   label: string
@@ -15,6 +19,11 @@ export function FormField({
   autoComplete: string
   required?: boolean
   minLength?: number
+  maxLength?: number
+  defaultValue?: string
+  /** Field-level message (rendered under the input, linked with aria-describedby) */
+  error?: string
+  hint?: string
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -28,8 +37,22 @@ export function FormField({
         autoComplete={autoComplete}
         required={required}
         minLength={minLength}
+        maxLength={maxLength}
+        defaultValue={defaultValue}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-erro` : hint ? `${id}-dica` : undefined}
         className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
       />
+      {hint && !error && (
+        <p id={`${id}-dica`} className="type-label text-muted">
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={`${id}-erro`} role="alert" className="type-label text-danger">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

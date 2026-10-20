@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { FormField } from '@/components/assinantes/FormField'
+import { ResendForm } from '@/components/assinantes/ResendForm'
 import { ExternalLink } from '@/components/ExternalLink'
 import { emailEnabled } from '@/lib/email/config'
 import { entrar } from '@/lib/assinantes/actions'
@@ -23,18 +24,21 @@ export const metadata: Metadata = {
 const ERRORS: Record<string, string> = {
   credenciais: 'E-mail ou senha incorretos.',
   bloqueado: 'Muitas tentativas. Aguarde 10 minutos ou fale com a equipe pelo WhatsApp.',
+  'nao-confirmado': 'Confirme seu e-mail antes de entrar. Enviamos o link quando você criou a conta.',
 }
 
 export default async function EntrarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[]; erro?: string | string[] }>
+  searchParams: Promise<{ next?: string | string[]; erro?: string | string[]; confirmado?: string | string[] }>
 }) {
   const params = await searchParams
   const next = safeNext(typeof params.next === 'string' ? params.next : undefined)
   if (await getAssinante()) redirect(next)
 
   const erro = typeof params.erro === 'string' ? ERRORS[params.erro] : undefined
+  const naoConfirmado = params.erro === 'nao-confirmado' && emailEnabled()
+  const confirmado = params.confirmado === '1'
   const contact = await getContact()
 
   return (
@@ -43,11 +47,17 @@ export default async function EntrarPage({
       <h1 id="titulo-entrar" className="type-display mt-2">
         Entrar
       </h1>
+      {confirmado && (
+        <p role="status" className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 text-body text-text">
+          E-mail confirmado. Entre com seu e-mail e senha.
+        </p>
+      )}
       {erro && (
         <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">
           {erro}
         </p>
       )}
+      {naoConfirmado && <ResendForm id="entrar-reenviar" />}
       {/* Plain form + server action: works without client JS */}
       <form action={entrar} className="mt-6 flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />
@@ -81,7 +91,14 @@ export default async function EntrarPage({
           </ExternalLink>
         )}
       </p>
-      <p className="mt-4">
+      {emailEnabled() && (
+        <p className="mt-4">
+          <Link href="/cadastro" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
+            Criar conta grátis
+          </Link>
+        </p>
+      )}
+      <p className="mt-2">
         <Link href="/assine-ja" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
           Ainda não é assinante? Assine Já
         </Link>

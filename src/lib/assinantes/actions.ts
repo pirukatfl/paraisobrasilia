@@ -4,7 +4,7 @@ import config from '@payload-config'
 import { logout } from '@payloadcms/next/auth'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { AuthenticationError, createLocalReq, getPayload, LockedAuth, ValidationError } from 'payload'
+import { AuthenticationError, createLocalReq, getPayload, LockedAuth, UnverifiedEmail, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
 
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
@@ -12,8 +12,9 @@ import { writeAudit } from './audit'
 import { safeNext } from './redirect'
 import { requestPasswordEmail } from './reset-email'
 import { requireAssinante } from './session'
+import { confirmEmail, resendVerification, signUp } from './signup'
 
-type LoginError = 'credenciais' | 'bloqueado'
+type LoginError = 'credenciais' | 'bloqueado' | 'nao-confirmado'
 
 const field = (formData: FormData, name: string) => {
   const value = formData.get(name)
@@ -62,6 +63,8 @@ export async function entrar(formData: FormData): Promise<void> {
     await setAuthCookie(result.token)
   } catch (err) {
     if (err instanceof LockedAuth) error = 'bloqueado'
+    // Payload checks the confirmation only after the password matched, so this does not reveal accounts
+    else if (err instanceof UnverifiedEmail) error = 'nao-confirmado'
     else if (err instanceof AuthenticationError || err instanceof ValidationError) error = 'credenciais'
     else throw err
   }
@@ -171,4 +174,56 @@ export async function pedirNovaSenha(formData: FormData): Promise<void> {
   const payload = await getPayload({ config })
   const result = await requestPasswordEmail(payload, { email, ip })
   redirect(result === 'enviado' ? '/esqueci-senha?enviado=1' : `/esqueci-senha?erro=${result}`)
+}
+
+const clientIp = async () => {
+  const h = await headers()
+  return (h.get('x-forwarded-for')?.split(',')[0] ?? h.get('x-real-ip') ?? 'desconhecido').trim()
+}
+
+export type CadastroState = {
+  errors: Record<string, string>
+  values: { email: string; apelido: string; maior18: boolean; termos: boolean }
+} | null
+
+/**
+ * /cadastro form (G-01): creates a free account. Answers the same ('enviado') for new, unconfirmed
+ * and confirmed e-mails; field errors come back with the typed values (never the password).
+ * With e-mail off nothing is created and the page shows the closed message.
+ */
+export async function cadastrar(_prev: CadastroState, formData: FormData): Promise<CadastroState> {
+  const values = {
+    email: field(formData, 'email'),
+    apelido: field(formData, 'apelido'),
+    maior18: field(formData, 'maior18') === 'sim',
+    termos: field(formData, 'termos') === 'sim',
+  }
+  const payload = await getPayload({ config })
+  const result = await signUp(
+    payload,
+    { ...values, password: field(formData, 'password'), website: field(formData, 'website') },
+    { ip: await clientIp() },
+  )
+  if (typeof result === 'object') return { errors: result.errors, values }
+  if (result === 'fechado') redirect('/cadastro')
+  if (result === 'limite') redirect('/cadastro?erro=limite')
+  redirect('/cadastro?enviado=1')
+}
+
+/** "Reenviar link" (from /cadastro, /cadastro/confirmar and /entrar): neutral answer. */
+export async function reenviarConfirmacao(formData: FormData): Promise<void> {
+  const payload = await getPayload({ config })
+  const result = await resendVerification(payload, { email: field(formData, 'email') }, { ip: await clientIp() })
+  if (result === 'fechado') redirect('/cadastro')
+  redirect(result === 'limite' ? '/cadastro?erro=limite' : '/cadastro?enviado=1')
+}
+
+/**
+ * Button on /cadastro/confirmar (a POST, so link scanners that only GET the e-mail link do not use
+ * up the token). Single use.
+ */
+export async function confirmarEmail(formData: FormData): Promise<void> {
+  const payload = await getPayload({ config })
+  const result = await confirmEmail(payload, field(formData, 'token'))
+  redirect(result === 'ok' ? '/entrar?confirmado=1' : '/cadastro/confirmar?erro=invalido')
 }

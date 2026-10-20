@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 /** Members and auth pages: personal, never indexed (T-03-05). */
-const MEMBERS_PATHS = ['/area-do-assinante', '/entrar', '/nova-senha', '/esqueci-senha']
+const MEMBERS_PATHS = ['/area-do-assinante', '/entrar', '/nova-senha', '/esqueci-senha', '/cadastro']
 
 /** Staging/development: block everything. Production: public pages only (INST-05, T-01-21). */
 export default function robots(): MetadataRoute.Robots {
