@@ -180,8 +180,8 @@ export async function deleteAd(
 // ---------------------------------------------------------------------------------------------
 // Owner photos and video (CLAS-03, D-01, D-03). Called by the upload route handler and the
 // remover/capa server actions after the session + active-access checks.
-// T-04-15: route handlers have no server-action origin check; payload.auth ignores a cookie whose
-// Origin is not in the csrf list, so a cross-site POST arrives here as nobody.
+// T-04-15: route handlers have no server-action origin check; src/proxy.ts rejects a state-changing
+// request with a foreign Origin, and the SameSite=Lax session cookie is not sent cross-site.
 // ---------------------------------------------------------------------------------------------
 
 export type UploadFile = { data: Buffer; mimetype: string; name: string; size: number }

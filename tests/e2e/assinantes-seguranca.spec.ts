@@ -159,8 +159,25 @@ test.describe('logged-in subscriber', () => {
     const own = JSON.parse((await call('GET', `/api/assinantes/${liaId}?depth=0`)).body) as { accessUntil: string }
     expect(own.accessUntil.startsWith('2099')).toBe(false)
 
-    // The same cookie from a non-browser client (no Origin / Sec-Fetch-Site) is ignored (T-03-12)
-    await expectNoData(await page.context().request.get('/api/assinantes'))
+    // Regression (login loop): the same cookie with neither Origin nor Sec-Fetch-Site (old Safari,
+    // WebViews, header-stripping proxies) is still authenticated: Lia sees only herself
+    const bare = await page.context().request.get('/api/assinantes?depth=0', { headers: { 'Sec-Fetch-Site': '' } })
+    expect(bare.status()).toBe(200)
+    const bareBody = await bare.text()
+    expect((JSON.parse(bareBody) as { docs: { id: number }[] }).docs.map((d) => d.id)).toEqual([liaId])
+    expect(bareBody).not.toContain(RUI.email)
+
+    // T-03-12: a state-changing request from a foreign Origin is rejected
+    const evil = await page.context().request.post(`/api/assinantes/${liaId}/liberar`, {
+      headers: { Origin: 'https://evil.example' },
+      data: { durationDays: 365, method: 'cortesia' },
+    })
+    expect(evil.status()).toBe(403)
+    const evilUpdate = await page.context().request.patch(`/api/assinantes/${liaId}`, {
+      headers: { Origin: 'https://evil.example' },
+      data: { name: 'Hackeada' },
+    })
+    expect(evilUpdate.status()).toBe(403)
 
     // /admin is not available to a subscriber session
     await page.goto('/admin')

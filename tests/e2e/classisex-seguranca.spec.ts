@@ -228,12 +228,26 @@ test.describe('active subscriber who is not the owner', () => {
     await context.close()
   })
 
-  test('the same session cookie from a non-browser client gets nothing', async ({ browser, baseURL }) => {
+  test('a valid cookie without Origin/Sec-Fetch-Site is authenticated; a foreign Origin write is rejected', async ({ browser, baseURL }) => {
     const { context } = await asSubscriber(browser, baseURL!, VIEWER)
     const res = await context.request.get(mediaUrl(s.media.foto.id, 'foto'), { headers: { 'Sec-Fetch-Site': '' } })
-    expect([403, 404]).toContain(res.status())
-    expect(isBinaryType(res.headers()['content-type'])).toBe(false)
+    expect(res.status()).toBe(200)
+    expect(isBinaryType(res.headers()['content-type'])).toBe(true)
+    const evil = await context.request.post(`/area-do-assinante/meus-anuncios/${s.ads.aprovado}/midia`, {
+      headers: { Origin: 'https://evil.example' },
+      multipart: { tipo: 'foto', arquivo: { name: 'x.jpg', mimeType: 'image/jpeg', buffer: Buffer.from('x') } },
+      maxRedirects: 0,
+    })
+    expect(evil.status()).toBe(403)
     await context.close()
+  })
+
+  test('the media URL without any cookie gets nothing', async ({ playwright, baseURL }) => {
+    const anon = await playwright.request.newContext({ baseURL })
+    const res = await anon.get(mediaUrl(s.media.foto.id, 'foto'))
+    expect([401, 403, 404]).toContain(res.status())
+    expect(isBinaryType(res.headers()['content-type'])).toBe(false)
+    await anon.dispose()
   })
 
   test('hidden ads and other people’s editors are 404 pages', async ({ browser, baseURL }) => {

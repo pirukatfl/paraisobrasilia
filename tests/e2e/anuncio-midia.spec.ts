@@ -167,15 +167,14 @@ test('other subscribers, anonymous and cross-site posts cannot upload', async ({
   expect(res.headers()['location']).toContain('/entrar?next=')
   await anon.dispose()
 
-  // Lia's cookie on a cross-site POST is ignored (T-04-15)
+  // Lia's cookie on a cross-site POST is rejected by the Origin guard (T-04-15)
   const lia = await asSubscriber(browser, baseURL!, LIA)
   const evil = await lia.context.request.post(midiaPost(liaAd), {
     headers: { Origin: 'https://evil.example' },
     multipart: { tipo: 'foto', arquivo: { name: 'a.jpg', mimeType: 'image/jpeg', buffer: fs.readFileSync(path.join(FIXTURES, 'flyer-square.jpg')) } },
     maxRedirects: 0,
   })
-  expect(evil.status()).toBe(303)
-  expect(evil.headers()['location']).toContain('/entrar?next=')
+  expect(evil.status()).toBe(403)
   await lia.context.close()
 
   // Expired owner: back to the edit page with the inactive code, nothing stored

@@ -92,8 +92,9 @@ export default buildConfig({
     Models,
   ],
   globals: [Contact],
-  // T-03-12: a cookie sent from another origin is ignored (same-origin admin and server actions keep working)
-  csrf: [process.env.NEXT_PUBLIC_SERVER_URL].filter((url): url is string => Boolean(url)),
+  // T-03-12: no `csrf` allowlist — it made extractJWT drop the cookie whenever Origin and
+  // Sec-Fetch-Site were both absent (logged users out). Cookies are SameSite=Lax and src/proxy.ts
+  // rejects state-changing requests carrying a foreign Origin.
   editor: lexicalEditor(),
   i18n: {
     supportedLanguages: { pt, en },

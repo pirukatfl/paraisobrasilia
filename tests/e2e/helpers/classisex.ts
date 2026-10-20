@@ -115,7 +115,7 @@ export type Fetched = {
 
 /**
  * Same-origin fetch executed inside the logged-in page (the browser adds the session cookie and
- * Sec-Fetch-Site; Payload ignores cookies without them when csrf is set). `cache: no-store` so
+ * Origin on writes; the app no longer depends on Sec-Fetch-Site). `cache: no-store` so
  * private 200s are never answered from the browser cache.
  */
 export function fetchAs(

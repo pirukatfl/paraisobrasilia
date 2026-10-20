@@ -133,9 +133,10 @@ test('an active subscriber opens photos and streams the video with ranges', asyn
     expect((await fetchIn(page, url(id, v))).status, `${id}/${v}`).toBe(404)
   }
 
-  // The same cookie from a client without Origin/Sec-Fetch-Site is anonymous (Payload csrf rule)
+  // Regression (login loop): the same cookie from a client without Origin/Sec-Fetch-Site is authenticated
   const res = await context.request.get(url(photoA, 'foto'))
-  expect(res.status()).toBe(403)
+  expect(res.status()).toBe(200)
+  expect(res.headers()['content-type']).toBe('image/webp')
   await context.close()
 })
 

@@ -19,8 +19,8 @@ export const dynamic = 'force-dynamic'
  * edit page with ?midia=foto-ok|video-ok|erro&codigo=…
  *
  * Order of checks (cheap first, body last):
- * 1. session: payload.auth ignores a cookie sent cross-site (csrf list), so a foreign form
- *    arrives here as nobody → /entrar (T-04-15)
+ * 1. session: src/proxy.ts rejects (403) a POST whose Origin is foreign before it gets here, and the
+ *    SameSite=Lax cookie is not sent cross-site anyway; no session → /entrar (T-04-15)
  * 2. active access now (T-04-05)
  * 3. ad exists and belongs to this subscriber, else 404 (T-04-04)
  * 4. Content-Length cap before reading the body (T-04-09; Caddy also caps at 110 MB)
