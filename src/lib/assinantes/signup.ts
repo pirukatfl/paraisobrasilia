@@ -14,6 +14,7 @@ import type { Payload } from 'payload'
 import { MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT } from '../../collections/Assinantes'
 import { emailEnabled } from '../email/config'
 import { allowAttempt } from '../email/rate-limit'
+import { notifyNewSignup } from '../email/new-signup-notice'
 import { recadoApelidoError } from '../recados/rules'
 import { buildAlreadyHasAccountEmail, buildVerifyEmail, verifyUrl, VERIFY_DAYS } from '../email/verify-account'
 
@@ -183,15 +184,20 @@ export async function signUp(payload: Payload, input: SignUpInput, options: Opti
       overrideAccess: true,
       context: { selfSignup: true },
     })) as unknown as { id: number }
-    const fresh = await payload.findByID({
-      collection: 'assinantes',
-      id: created.id,
-      depth: 0,
-      overrideAccess: true,
-      showHiddenFields: true,
-    })
-    const token = (fresh as unknown as AccountDoc)._verificationToken
-    if (token) await sendVerification(payload, { email, name: apelido }, token)
+    try {
+      const fresh = await payload.findByID({
+        collection: 'assinantes',
+        id: created.id,
+        depth: 0,
+        overrideAccess: true,
+        showHiddenFields: true,
+      })
+      const token = (fresh as unknown as AccountDoc)._verificationToken
+      if (token) await sendVerification(payload, { email, name: apelido }, token)
+    } finally {
+      // Staff notice: never throws (own try/catch), so it cannot fail or delay the sign-up answer
+      await notifyNewSignup(payload, { id: created.id, email, name: apelido, apelido }, siteBase())
+    }
   })
   return 'enviado'
 }

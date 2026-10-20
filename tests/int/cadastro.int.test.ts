@@ -50,8 +50,9 @@ describe('public sign-up with e-mail confirmation (G-01, T-CG-04..11)', () => {
     await resetDatabase(payload)
     process.env.EMAIL_CAPTURE_DIR = '/tmp/ignored-by-int-test'
     sent = []
-    spy = vi.spyOn(payload, 'sendEmail').mockImplementation((async (m: never) => {
-      sent.push(m)
+    spy = vi.spyOn(payload, 'sendEmail').mockImplementation((async (m: Mail) => {
+      // the staff notice has its own spec (aviso-novo-cadastro.int.test.ts); here only the subscriber's mails
+      if (m.subject !== 'Novo cadastro no Paraíso Brasília') sent.push(m)
     }) as never)
   })
 

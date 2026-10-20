@@ -1,6 +1,6 @@
 import type { GlobalAfterChangeHook, GlobalConfig } from 'payload'
 
-import { isStaff } from '../access/roles'
+import { isStaff, staffOnlyField } from '../access/roles'
 import { expire } from '../lib/cache/expire'
 
 
@@ -99,6 +99,17 @@ export const Contact: GlobalConfig = {
       type: 'email',
       required: true,
       label: 'E-mail',
+    },
+    {
+      name: 'avisoNovoCadastroEmail',
+      type: 'email',
+      label: 'E-mail que recebe aviso de novo cadastro',
+      // Contact is public-read: this address must never leave the panel (field-level, staff only)
+      access: staffOnlyField,
+      admin: {
+        description:
+          'A cada conta nova criada pelo site (/cadastro), a equipe recebe um aviso neste e-mail. Se ficar vazio, o aviso vai para o e-mail de envio do site (suporte@swingbrasilia.com.br).',
+      },
     },
     {
       name: 'instagram',

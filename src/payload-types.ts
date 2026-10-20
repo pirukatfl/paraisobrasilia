@@ -966,7 +966,7 @@ export interface Conto {
     [k: string]: unknown;
   };
   /**
-   * Quantos parágrafos do início qualquer visitante lê. O resto é só para assinantes.
+   * Quantos parágrafos do início qualquer visitante lê. O resto é só para assinantes. Mesmo que você aumente, o trecho aberto nunca passa de 150 palavras ou 15% do conto (vale o maior) e a última parte fica sempre para assinantes. Títulos curtos no começo não contam.
    */
   paragrafosAbertos: number;
   /**
@@ -1792,6 +1792,10 @@ export interface Contact {
   phone?: string | null;
   email: string;
   /**
+   * A cada conta nova criada pelo site (/cadastro), a equipe recebe um aviso neste e-mail. Se ficar vazio, o aviso vai para o e-mail de envio do site (suporte@swingbrasilia.com.br).
+   */
+  avisoNovoCadastroEmail?: string | null;
+  /**
    * Opcional. Só o nome do perfil, sem @. Se ficar vazio, o Instagram não aparece no site.
    */
   instagram?: string | null;
@@ -1815,6 +1819,7 @@ export interface ContactSelect<T extends boolean = true> {
   whatsapp?: T;
   phone?: T;
   email?: T;
+  avisoNovoCadastroEmail?: T;
   instagram?: T;
   hours?: T;
   updatedAt?: T;

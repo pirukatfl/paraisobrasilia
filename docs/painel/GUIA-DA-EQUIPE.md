@@ -367,6 +367,15 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
 - Há limite de tentativas por internet e por e-mail (5 cadastros por hora por internet, 3 por e-mail); passou do limite, a
   pessoa vê um aviso para tentar mais tarde. O limite zera se o site for reiniciado.
 
+### Aviso de novo cadastro
+
+A cada conta criada pelo próprio visitante em **/cadastro**, a equipe recebe um e-mail curto, "Novo cadastro no Paraíso
+Brasília", com o apelido, o e-mail da pessoa, a data e a hora (horário de Brasília), o tipo de conta (gratuito) e um link
+para abrir a conta no painel. O e-mail nunca traz senha nem link de confirmação. Contas criadas por vocês no painel não
+geram aviso. Para escolher quem recebe, vá em **Configurações → Contato e endereço** e preencha **"E-mail que recebe aviso
+de novo cadastro"**; se ficar vazio, o aviso vai para o e-mail de envio do site (suporte@swingbrasilia.com.br). Se o e-mail
+do site estiver desligado, nenhum aviso é enviado.
+
 ### E-mail não chegou
 
 1. Peça para olhar a caixa de **spam/lixo eletrônico** e procurar por "suporte@swingbrasilia.com.br".
