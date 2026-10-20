@@ -19,6 +19,8 @@ import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
 import { Conversations } from './collections/Conversations'
+import { Blocks } from './collections/Blocks'
+import { MessageReports } from './collections/MessageReports'
 import { Messages } from './collections/Messages'
 import { Recados } from './collections/Recados'
 import { SpaceItems } from './collections/SpaceItems'
@@ -89,6 +91,8 @@ export default buildConfig({
     Recados,
     Conversations,
     Messages,
+    Blocks,
+    MessageReports,
     { ...Media, upload: { ...(typeof Media.upload === 'object' ? Media.upload : {}), staticDir: mediaDir } },
     {
       ...Videos,

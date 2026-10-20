@@ -22,6 +22,9 @@ export type AuditAction =
   | 'recado-aprovado'
   | 'recado-recusado'
   | 'recado-despublicado'
+  // Message safety (Phase 5)
+  | 'denuncia-mensagem-resolvida'
+  | 'mensagens-suspensas'
 
 export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Conta criada', value: 'conta-criada' },
@@ -41,6 +44,8 @@ export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Recado aprovado', value: 'recado-aprovado' },
   { label: 'Recado recusado', value: 'recado-recusado' },
   { label: 'Recado despublicado', value: 'recado-despublicado' },
+  { label: 'Denúncia de mensagem resolvida', value: 'denuncia-mensagem-resolvida' },
+  { label: 'Mensagens suspensas', value: 'mensagens-suspensas' },
 ]
 
 /** Never copied into the log (T-03-10). */

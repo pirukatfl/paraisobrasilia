@@ -6,18 +6,27 @@
  * from a visible ad/recado (or an existing conversation), never taken from the caller.
  * T-05-06/08: both sides must have access now; daily limits per São Paulo day.
  */
-import type { Payload, Where } from 'payload'
+import { createLocalReq, type Payload, type PayloadRequest, type Where } from 'payload'
 
+import { isStaff } from '../../access/roles'
+import { writeAudit } from '../assinantes/audit'
+import { withRequestState } from '../assinantes/context'
 import { spDate, spMidnight } from '../assinantes/periods'
 import { accessStatusFor } from '../assinantes/status'
 import { findVisibleAdDoc } from '../classisex/board'
 import { apelidoError } from '../classisex/rules'
+import { DETAILS_MAX, NOTE_MAX, DAILY_LIMIT } from '../classisex/report-rules'
 import { categoryLabels, ServiceError } from '../classisex/service'
 import { findVisibleRecadoDoc } from '../recados/board'
-import { formatMessageTime, snippetOf, type InboxItemDTO, type ThreadDTO } from './dto'
+import { formatMessageTime, formatSnapshotTime, snippetOf, type InboxItemDTO, type ThreadDTO } from './dto'
 import {
   INBOX_PAGE,
+  isMessageReportReason,
   MENSAGEM_MESSAGES,
+  MESSAGE_URGENT_REASON,
+  messageReasonLabel,
+  REPORT_MESSAGES_PT,
+  SNAPSHOT_MESSAGES,
   MESSAGES_PER_DAY,
   NEW_CONVERSATIONS_PER_DAY,
   normaliseMessage,
@@ -96,17 +105,52 @@ export async function resolveTarget(
   }
 }
 
-/** Both sides need access now. Block/suspension rules join in 05-10. */
+const blockKey = (blocker: number, blocked: number) => `${blocker}-${blocked}`
+
+async function hasBlock(payload: Payload, blocker: number, blocked: number): Promise<boolean> {
+  const { totalDocs } = await payload.count({
+    collection: 'blocks',
+    where: { pairKey: { equals: blockKey(blocker, blocked) } },
+    overrideAccess: true,
+  })
+  return totalDocs > 0
+}
+
+/** UI state: only `euBloqueei` is ever shown; `fuiBloqueado` just selects the neutral send error. */
+export async function blockState(
+  payload: Payload,
+  me: number,
+  otherId: number,
+): Promise<{ euBloqueei: boolean; fuiBloqueado: boolean }> {
+  const [euBloqueei, fuiBloqueado] = await Promise.all([hasBlock(payload, me, otherId), hasBlock(payload, otherId, me)])
+  return { euBloqueei, fuiBloqueado }
+}
+
+/**
+ * T-05-07: checked on start and on every send. Order: suspended sender, blocks in both
+ * directions, then access of both sides.
+ */
 export async function canSend(
   payload: Payload,
   { senderId, recipientId, now }: { senderId: number; recipientId: number; now: Date },
 ): Promise<SendError | null> {
-  const [sender, recipient] = await Promise.all([
+  const sender = (await payload.findByID({
+    collection: 'assinantes',
+    id: senderId,
+    depth: 0,
+    overrideAccess: true,
+    disableErrors: true,
+  })) as { mensagensSuspensas?: boolean | null } | null
+  if (sender?.mensagensSuspensas) return 'suspenso'
+  const blocks = await blockState(payload, senderId, recipientId)
+  if (blocks.euBloqueei) return 'voceBloqueou'
+  if (blocks.fuiBloqueado) return 'bloqueado'
+  const [senderAccess, recipientAccess] = await Promise.all([
     accessStatusFor(payload, senderId, now),
     accessStatusFor(payload, recipientId, now),
   ])
-  if (sender.state !== 'ativa') return 'remetenteInativo'
-  if (recipient.state !== 'ativa') return 'destinatarioInativo'
+  if (senderAccess.state !== 'ativa') return 'remetenteInativo'
+  if (recipientAccess.state !== 'ativa') return 'destinatarioInativo'
   return null
 }
 
@@ -407,4 +451,288 @@ export async function countUnread(payload: Payload, me: number): Promise<number>
     overrideAccess: true,
   })
   return Math.min(totalDocs, UNREAD_CAP + 1)
+}
+
+// ---------------------------------------------------------------------------------------------
+// Block / unblock (REC-03)
+// ---------------------------------------------------------------------------------------------
+
+/** The other participant of a conversation I take part in, or null (T-05-05). */
+async function otherParticipant(
+  payload: Payload,
+  me: number,
+  conversationId: number | string,
+): Promise<{ conversation: ConversationDoc; otherId: number } | null> {
+  const conversation = await loadParticipantConversation(payload, me, conversationId)
+  if (!conversation) return null
+  const a = relId(conversation.participantA)!
+  const b = relId(conversation.participantB)!
+  return { conversation, otherId: a === Number(me) ? b : a }
+}
+
+export async function blockUser(
+  payload: Payload,
+  { me, conversationId }: { me: number; conversationId: number | string; now?: Date },
+): Promise<void> {
+  const found = await otherParticipant(payload, me, conversationId)
+  if (!found) throw notFound()
+  if (await hasBlock(payload, me, found.otherId)) return // idempotent
+  try {
+    await payload.create({
+      collection: 'blocks',
+      data: { blocker: me, blocked: found.otherId, pairKey: blockKey(me, found.otherId) },
+      overrideAccess: true,
+    })
+  } catch (err) {
+    if (!(await hasBlock(payload, me, found.otherId))) throw err
+  }
+}
+
+export async function unblockUser(
+  payload: Payload,
+  { me, conversationId }: { me: number; conversationId: number | string; now?: Date },
+): Promise<void> {
+  const found = await otherParticipant(payload, me, conversationId)
+  if (!found) throw notFound()
+  await payload.delete({
+    collection: 'blocks',
+    where: { pairKey: { equals: blockKey(me, found.otherId) } },
+    overrideAccess: true,
+  })
+}
+
+// ---------------------------------------------------------------------------------------------
+// Reports (REC-03). The reporter always comes from the session; staff only ever see the snapshot.
+// ---------------------------------------------------------------------------------------------
+
+async function suspendMessaging(payload: Payload, assinanteId: number): Promise<void> {
+  await payload.update({
+    collection: 'assinantes',
+    id: assinanteId,
+    data: { mensagensSuspensas: true },
+    overrideAccess: true,
+    context: { skipAudit: true },
+  })
+}
+
+export async function reportConversation(
+  payload: Payload,
+  input: {
+    me: number
+    conversationId: number | string
+    motivo: unknown
+    detalhes?: unknown
+    bloquear?: boolean
+    now: Date
+  },
+): Promise<{ id: number; suspended: boolean }> {
+  const { me, now } = input
+  if (!isMessageReportReason(input.motivo)) {
+    throw new ServiceError('invalido', 'Escolha o motivo da denúncia.', 400)
+  }
+  const detalhes = typeof input.detalhes === 'string' ? input.detalhes.replace(/\r\n/g, '\n').trim() : ''
+  if (detalhes.length > DETAILS_MAX) throw new ServiceError('invalido', `Escreva até ${DETAILS_MAX} caracteres.`, 400)
+  const found = await otherParticipant(payload, me, input.conversationId)
+  if (!found) throw notFound()
+  const { conversation, otherId } = found
+
+  const open = await payload.count({
+    collection: 'message-reports',
+    where: {
+      and: [
+        { conversationId: { equals: conversation.id } },
+        { reporter: { equals: me } },
+        { status: { equals: 'aberta' } },
+      ],
+    },
+    overrideAccess: true,
+  })
+  if (open.totalDocs > 0) throw new ServiceError('duplicada', REPORT_MESSAGES_PT.jaDenunciou, 409)
+  const today = await payload.count({
+    collection: 'message-reports',
+    where: { and: [{ reporter: { equals: me } }, { createdAt: { greater_than_equal: dayStart(now) } }] },
+    overrideAccess: true,
+  })
+  if (today.totalDocs >= DAILY_LIMIT) throw new ServiceError('limite', REPORT_MESSAGES_PT.limite, 429)
+
+  const recent = await payload.find({
+    collection: 'messages',
+    where: { conversation: { equals: conversation.id } },
+    sort: '-id',
+    depth: 0,
+    limit: SNAPSHOT_MESSAGES,
+    pagination: false,
+    overrideAccess: true,
+  })
+  const apelidoOf = (senderId: number | null) =>
+    (relId(conversation.participantA) === senderId ? conversation.apelidoA : conversation.apelidoB) ?? 'Assinante'
+  const mensagens = recent.docs
+    .slice()
+    .reverse()
+    .map((m) => `${apelidoOf(relId(m.sender))} · ${formatSnapshotTime(m.createdAt)}: ${m.texto}`)
+    .join('\n')
+  const reportedApelido = apelidoOf(otherId)
+
+  const created = await payload.create({
+    collection: 'message-reports',
+    data: {
+      conversationId: conversation.id,
+      reporter: me,
+      reported: otherId,
+      reportedApelido,
+      motivo: input.motivo,
+      detalhes: detalhes || null,
+      mensagens,
+      status: 'aberta',
+      createdAt: now.toISOString(),
+    },
+    overrideAccess: true,
+  })
+  if (input.bloquear) await blockUser(payload, { me, conversationId: conversation.id })
+
+  // Orchestrator default: a report of a minor suspends the reported person's messaging at once
+  let suspended = false
+  if (input.motivo === MESSAGE_URGENT_REASON) {
+    await suspendMessaging(payload, otherId)
+    suspended = true
+    const req = await createLocalReq({}, payload)
+    const account = (await payload.findByID({
+      collection: 'assinantes',
+      id: otherId,
+      depth: 0,
+      overrideAccess: true,
+      disableErrors: true,
+    })) as { id: number; name?: string | null; email?: string | null } | null
+    await writeAudit(req, {
+      action: 'mensagens-suspensas',
+      assinante: account ? { id: account.id, name: account.name, email: account.email } : null,
+      summary: `Mensagens de ${reportedApelido} suspensas automaticamente: denúncia de pessoa menor de idade (#${created.id})`,
+      details: { denuncia: created.id, automatico: true },
+    })
+  }
+  return { id: created.id, suspended }
+}
+
+export type MessageResolveAction = 'descartar' | 'resolver' | 'suspender'
+
+type MessageReportDoc = {
+  id: number
+  status: 'aberta' | 'resolvida' | 'descartada'
+  motivo: string
+  reported?: unknown
+  reporter?: unknown
+  reportedApelido?: string | null
+}
+
+/** Staff closes a report; `suspender` also blocks the reported person's messaging (T-05-11). */
+export async function resolveMessageReport(
+  req: PayloadRequest,
+  reportId: number | string,
+  { acao, nota }: { acao: MessageResolveAction; nota?: unknown },
+  now: Date = new Date(),
+): Promise<{ status: 'resolvida' | 'descartada'; closed: number; suspended: boolean }> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  if (acao !== 'descartar' && acao !== 'resolver' && acao !== 'suspender') {
+    throw new ServiceError('invalido', 'Escolha uma ação.', 400)
+  }
+  const text = typeof nota === 'string' ? nota.replace(/\s+/g, ' ').trim() : ''
+  if (text.length > NOTE_MAX) throw new ServiceError('nota', `Escreva até ${NOTE_MAX} caracteres.`, 400)
+
+  const numericId = Number(reportId)
+  const report =
+    Number.isInteger(numericId) && numericId > 0
+      ? ((await withRequestState(req, () =>
+          req.payload.findByID({
+            collection: 'message-reports',
+            id: numericId,
+            depth: 0,
+            overrideAccess: true,
+            disableErrors: true,
+            req,
+          }),
+        )) as unknown as MessageReportDoc | null)
+      : null
+  if (!report) throw new ServiceError('nao-encontrado', 'Denúncia não encontrada.', 404)
+  if (report.status !== 'aberta') throw new ServiceError('transicao', 'Esta denúncia já foi resolvida.', 409)
+  const reportedId = relId(report.reported)
+  if (acao === 'suspender' && reportedId === null) {
+    throw new ServiceError('sem-conta', 'A conta da pessoa denunciada não existe mais.', 409)
+  }
+
+  const staffId = (req.user as { id?: number } | null)?.id ?? null
+  let ids = [report.id]
+  if (acao === 'suspender' && reportedId !== null) {
+    const { docs } = await withRequestState(req, () =>
+      req.payload.find({
+        collection: 'message-reports',
+        where: { and: [{ reported: { equals: reportedId } }, { status: { equals: 'aberta' } }] },
+        depth: 0,
+        limit: 200,
+        pagination: false,
+        overrideAccess: true,
+        req,
+      }),
+    )
+    ids = Array.from(new Set([report.id, ...docs.map((d) => d.id)]))
+    await withRequestState(req, () =>
+      req.payload.update({
+        collection: 'assinantes',
+        id: reportedId,
+        data: { mensagensSuspensas: true },
+        overrideAccess: true,
+        context: { skipAudit: true },
+        req,
+      }),
+    )
+  }
+  const finalStatus = acao === 'descartar' ? 'descartada' : 'resolvida'
+  for (const id of ids) {
+    await withRequestState(req, () =>
+      req.payload.update({
+        collection: 'message-reports',
+        id,
+        data: { status: finalStatus, resolvidaPor: staffId, resolvidaEm: now.toISOString(), nota: text || null },
+        overrideAccess: true,
+        req,
+      }),
+    )
+  }
+
+  const account =
+    reportedId === null
+      ? null
+      : await withRequestState(req, () =>
+          req.payload.findByID({ collection: 'assinantes', id: reportedId, depth: 0, overrideAccess: true, disableErrors: true, req }),
+        )
+  const who = account ? { id: account.id, name: account.name, email: account.email } : null
+  const label = report.reportedApelido ?? 'pessoa denunciada'
+  await writeAudit(req, {
+    action: 'denuncia-mensagem-resolvida',
+    assinante: who,
+    summary: `Denúncia de mensagem #${report.id} (${messageReasonLabel(report.motivo)}) sobre ${label}: ${
+      acao === 'descartar' ? 'descartada' : acao === 'suspender' ? 'mensagens suspensas' : 'resolvida'
+    }${text ? ` — ${text}` : ''}`,
+    details: { denuncia: report.id, acao, motivo: report.motivo, nota: text || null, fechadas: ids.length },
+  })
+  if (acao === 'suspender') {
+    await writeAudit(req, {
+      action: 'mensagens-suspensas',
+      assinante: who,
+      summary: `Mensagens de ${label} suspensas pela equipe (denúncia #${report.id})`,
+      details: { denuncia: report.id, nota: text || null },
+    })
+  }
+  return { status: finalStatus, closed: ids.length, suspended: acao === 'suspender' }
+}
+
+export async function getMessageReportCounts(payload: Payload): Promise<{ abertas: number; urgentes: number }> {
+  const [abertas, urgentes] = await Promise.all([
+    payload.count({ collection: 'message-reports', where: { status: { equals: 'aberta' } }, overrideAccess: true }),
+    payload.count({
+      collection: 'message-reports',
+      where: { and: [{ status: { equals: 'aberta' } }, { urgente: { equals: true } }] },
+      overrideAccess: true,
+    }),
+  ])
+  return { abertas: abertas.totalDocs, urgentes: urgentes.totalDocs }
 }

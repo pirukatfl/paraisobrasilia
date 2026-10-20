@@ -83,6 +83,27 @@ const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
       req,
     }),
   )
+  // Phase 5 (T-05-12, LGPD): blocks involving the account go; message reports stay for the record
+  await withRequestState(req, () =>
+    req.payload.delete({
+      collection: 'blocks',
+      where: { or: [{ blocker: { equals: id } }, { blocked: { equals: id } }] },
+      overrideAccess: true,
+      context: { skipAudit: true, assinanteBeingDeleted: true },
+      req,
+    }),
+  )
+  for (const side of ['reporter', 'reported'] as const) {
+    await withRequestState(req, () =>
+      req.payload.update({
+        collection: 'message-reports',
+        where: { [side]: { equals: id } },
+        data: { [side]: null },
+        overrideAccess: true,
+        req,
+      }),
+    )
+  }
   // Phase 5 (T-05-12, LGPD): conversations the account takes part in go with all their messages
   const convs = await withRequestState(req, () =>
     req.payload.find({
@@ -155,6 +176,7 @@ const FIELD_LABELS: Record<string, string> = {
   mustChangePassword: 'senha provisória',
   accessUntil: 'acesso até',
   apelido: 'apelido',
+  mensagensSuspensas: 'mensagens suspensas',
 }
 
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
@@ -309,6 +331,17 @@ export const Assinantes: CollectionConfig = {
       label: 'Observações da equipe',
       admin: { description: 'Só a equipe vê. Não anote dados bancários nem comprovantes.' },
       access: staffOnlyField,
+    },
+    {
+      name: 'mensagensSuspensas',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Mensagens suspensas',
+      access: staffOnlyField,
+      admin: {
+        position: 'sidebar',
+        description: 'Marcado pela equipe após denúncia. Desmarque para liberar de novo.',
+      },
     },
     {
       name: 'accessUntil',

@@ -47,3 +47,33 @@ export function messageError(texto: string): 'vazio' | 'longa' | null {
   if (clean.length > MESSAGE_MAX) return 'longa'
   return null
 }
+
+// ---------------------------------------------------------------------------------------------
+// Block and report (REC-03)
+// ---------------------------------------------------------------------------------------------
+
+export const MESSAGE_REPORT_REASONS = [
+  { value: 'assedio', label: 'Assédio ou insistência' },
+  { value: 'golpe-ou-cobranca', label: 'Golpe ou cobrança' },
+  { value: 'ofensivo', label: 'Ofensa ou ameaça' },
+  { value: 'menor-de-idade', label: 'Pessoa menor de idade' },
+  { value: 'spam', label: 'Propaganda ou spam' },
+  { value: 'outro', label: 'Outro' },
+] as const
+
+export type MessageReportReason = (typeof MESSAGE_REPORT_REASONS)[number]['value']
+
+export const MESSAGE_URGENT_REASON: MessageReportReason = 'menor-de-idade'
+export const SNAPSHOT_MESSAGES = 20
+
+export const REPORT_MESSAGES_PT = {
+  jaDenunciou: 'Você já denunciou esta conversa. A equipe vai analisar.',
+  limite: 'Você fez muitas denúncias hoje. Tente amanhã.',
+  enviada: 'Denúncia enviada. A equipe vai analisar.',
+} as const
+
+export const isMessageReportReason = (value: unknown): value is MessageReportReason =>
+  MESSAGE_REPORT_REASONS.some((r) => r.value === value)
+
+export const messageReasonLabel = (value: string): string =>
+  MESSAGE_REPORT_REASONS.find((r) => r.value === value)?.label ?? value

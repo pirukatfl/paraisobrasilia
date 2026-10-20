@@ -80,6 +80,8 @@ export interface Config {
     recados: Recado;
     conversations: Conversation;
     messages: Message;
+    blocks: Block;
+    'message-reports': MessageReport;
     media: Media;
     videos: Video;
     parties: Party;
@@ -115,6 +117,8 @@ export interface Config {
     recados: RecadosSelect<false> | RecadosSelect<true>;
     conversations: ConversationsSelect<false> | ConversationsSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
+    blocks: BlocksSelect<false> | BlocksSelect<true>;
+    'message-reports': MessageReportsSelect<false> | MessageReportsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     videos: VideosSelect<false> | VideosSelect<true>;
     parties: PartiesSelect<false> | PartiesSelect<true>;
@@ -234,6 +238,10 @@ export interface Assinante {
    * Só a equipe vê. Não anote dados bancários nem comprovantes.
    */
   staffNotes?: string | null;
+  /**
+   * Marcado pela equipe após denúncia. Desmarque para liberar de novo.
+   */
+  mensagensSuspensas?: boolean | null;
   /**
    * Calculado pelos períodos de assinatura. O acesso termina às 00h deste dia (Brasília).
    */
@@ -370,7 +378,9 @@ export interface AuditLog {
     | 'denuncia-resolvida'
     | 'recado-aprovado'
     | 'recado-recusado'
-    | 'recado-despublicado';
+    | 'recado-despublicado'
+    | 'denuncia-mensagem-resolvida'
+    | 'mensagens-suspensas';
   actorType: 'equipe' | 'assinante' | 'sistema';
   actor?: (number | null) | User;
   actorLabel?: string | null;
@@ -631,6 +641,56 @@ export interface Message {
   conversation: number | Conversation;
   sender: number | Assinante;
   texto: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blocks".
+ */
+export interface Block {
+  id: number;
+  blocker: number | Assinante;
+  blocked: number | Assinante;
+  pairKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Denúncias de conversas privadas. As urgentes (pessoa menor de idade) aparecem primeiro.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "message-reports".
+ */
+export interface MessageReport {
+  id: number;
+  /**
+   * Só para referência. A equipe não abre conversas, só lê o que a denúncia guardou.
+   */
+  conversationId?: number | null;
+  reportedApelido?: string | null;
+  /**
+   * Fica vazio se a conta foi apagada.
+   */
+  reported?: (number | null) | Assinante;
+  /**
+   * Só a equipe vê. Nunca é mostrado à pessoa denunciada.
+   */
+  reporter?: (number | null) | Assinante;
+  motivo: 'assedio' | 'golpe-ou-cobranca' | 'ofensivo' | 'menor-de-idade' | 'spam' | 'outro';
+  detalhes?: string | null;
+  mensagens?: string | null;
+  /**
+   * Marcada sozinha quando o motivo é pessoa menor de idade.
+   */
+  urgente?: boolean | null;
+  /**
+   * Use os botões do quadro Denúncia.
+   */
+  status: 'aberta' | 'resolvida' | 'descartada';
+  resolvidaPor?: (number | null) | User;
+  resolvidaEm?: string | null;
+  nota?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1055,6 +1115,14 @@ export interface PayloadLockedDocument {
         value: number | Message;
       } | null)
     | ({
+        relationTo: 'blocks';
+        value: number | Block;
+      } | null)
+    | ({
+        relationTo: 'message-reports';
+        value: number | MessageReport;
+      } | null)
+    | ({
         relationTo: 'media';
         value: number | Media;
       } | null)
@@ -1167,6 +1235,7 @@ export interface AssinantesSelect<T extends boolean = true> {
   whatsapp?: T;
   apelido?: T;
   staffNotes?: T;
+  mensagensSuspensas?: T;
   accessUntil?: T;
   periodos?: T;
   historico?: T;
@@ -1386,6 +1455,37 @@ export interface MessagesSelect<T extends boolean = true> {
   conversation?: T;
   sender?: T;
   texto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blocks_select".
+ */
+export interface BlocksSelect<T extends boolean = true> {
+  blocker?: T;
+  blocked?: T;
+  pairKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "message-reports_select".
+ */
+export interface MessageReportsSelect<T extends boolean = true> {
+  conversationId?: T;
+  reportedApelido?: T;
+  reported?: T;
+  reporter?: T;
+  motivo?: T;
+  detalhes?: T;
+  mensagens?: T;
+  urgente?: T;
+  status?: T;
+  resolvidaPor?: T;
+  resolvidaEm?: T;
+  nota?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -46,6 +46,8 @@ export async function getTestPayload(): Promise<Payload> {
 
 const RESET_ORDER = [
   // Messages (Phase 5): before the accounts that take part
+  'message-reports',
+  'blocks',
   'messages',
   'conversations',
   // Recados (Phase 5): before the accounts that own them
@@ -568,4 +570,12 @@ export async function seedMessage(
     overrideAccess: true,
   })
   return created
+}
+
+export async function seedBlock(payload: Payload, input: { blocker: number; blocked: number }) {
+  return payload.create({
+    collection: 'blocks' as never,
+    data: { blocker: input.blocker, blocked: input.blocked, pairKey: `${input.blocker}-${input.blocked}` } as never,
+    overrideAccess: true,
+  }) as Promise<{ id: number }>
 }

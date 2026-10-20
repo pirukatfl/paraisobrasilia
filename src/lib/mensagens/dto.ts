@@ -42,3 +42,16 @@ export function snippetOf(texto: string): string {
   const flat = texto.replace(/\s+/g, ' ').trim()
   return flat.length <= INBOX_SNIPPET_MAX ? flat : `${flat.slice(0, INBOX_SNIPPET_MAX - 1).trimEnd()}…`
 }
+
+const short = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: 'America/Sao_Paulo',
+  day: '2-digit',
+  month: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+})
+
+/** "20/10 15:04", used in the report snapshot lines. */
+export function formatSnapshotTime(iso: string): string {
+  return short.format(new Date(iso)).replace(', ', ' ')
+}
