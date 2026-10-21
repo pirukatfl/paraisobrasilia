@@ -10,7 +10,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 - [x] **Phase 2: Site aberto completo e mídia** - Espaço, modelos, Quem Somos, mapa, contato e páginas legais, com galerias rápidas (completed 2026-10-19)
 - [x] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe (completed 2026-10-19)
 - [x] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato (completed 2026-10-20)
-- [ ] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais
+- [x] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais (completed 2026-10-21)
 - [ ] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
 - [ ] **Phase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
 
@@ -187,7 +187,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 05-09-PLAN.md — Mensagens na tela: Enviar mensagem, caixa de entrada, conversa, contador no menu (wave 8)
 - [x] 05-10-PLAN.md — Bloquear e denunciar mensagens; equipe resolve e suspende envio (wave 9)
 - [x] 05-11-PLAN.md — Matriz de vazamento da Fase 5: recados, mensagens, bloqueio e contos (wave 10)
-- [ ] 05-12-PLAN.md — Guia, runbook, smoke, deploy e conferência do cliente (wave 11)
+- [x] 05-12-PLAN.md — Guia, runbook, smoke, deploy e conferência do cliente (wave 11)
 **UI hint**: yes
 
 ### Phase 6: Migração do WordPress
@@ -225,6 +225,6 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 2. Site aberto completo e mídia | 6/6 | Complete    | 2026-10-19 |
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
 | 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
-| 5. Recados, mensagens e contos | 11/12 | In Progress|  |
+| 5. Recados, mensagens e contos | 12/12 | Complete    | 2026-10-21 |
 | 6. Migração do WordPress | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |

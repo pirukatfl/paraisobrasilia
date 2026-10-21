@@ -1,6 +1,6 @@
 # Recados privados: SUMMARY
 
-Status: A, B, C, D1 done. D2 (client checkpoint) pending on staging. Client chose "Unir" (2026-10-20).
+Status: complete. D2 approved by the client on 2026-10-21. Client chose "Unir" (2026-10-20).
 
 | Task | Commit | What |
 |---|---|---|

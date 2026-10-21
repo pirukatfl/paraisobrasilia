@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-07-PLAN.md
-last_updated: "2026-10-20T20:02:24.582Z"
+status: ready_to_plan
+stopped_at: Phase 5 complete (12/12) — ready to discuss Phase 6
+last_updated: 2026-10-21T01:18:19.316Z
 last_activity: 2026-10-20
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 45
-  completed_plans: 44
+  completed_plans: 45
   percent: 57
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-19)
 
 **Core value:** Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas e consegue chegar até ela; quem é assinante encontra perfis e consegue fazer contato.
-**Current focus:** Phase 5 — recados, mensagens e contos
+**Current focus:** Phase 6 — migração do wordpress
 
 ## Current Position
 
-Phase: 5 of 7 (recados, mensagens e contos)
-Plan: 05-01..05-11 done (code gate green 2026-10-20); 05-12 (deploy + client check) pending
-Status: In progress; quick task 2026-10-20-conta-gratuita code complete (gate green); client checkpoint F3 and deploy 05-12 pending
-Last activity: 2026-10-20
+Phase: 6 of 7 (migração do wordpress)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-10-21
 
 Progress: [█████████░] 98% (44/45 plans); Phase 5: 11/12
 
@@ -36,7 +36,7 @@ Progress: [█████████░] 98% (44/45 plans); Phase 5: 11/12
 
 **Velocity:**
 
-- Total plans completed: 39
+- Total plans completed: 51
 - Average duration: 6 min
 - Total execution time: 0.1 hours
 
@@ -48,6 +48,7 @@ Progress: [█████████░] 98% (44/45 plans); Phase 5: 11/12
 | 2 | 6 | - | - |
 | 3 | 7 | - | - |
 | 4 | 10 | - | - |
+| 5 | 12 | - | - |
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|

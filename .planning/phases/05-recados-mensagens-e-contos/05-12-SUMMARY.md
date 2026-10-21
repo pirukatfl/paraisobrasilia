@@ -4,7 +4,7 @@ plan: 12
 subsystem: docs
 tags: [docs, runbook, staff-guide]
 requirements-partial: [REC-01, REC-02, REC-03, REC-04, PREV-02, PREV-03, PREV-04, PAINEL-03]
-completed: PARTIAL (docs done 2026-10-20; staging smoke and client checkpoint handled by the orchestrator)
+completed: COMPLETE (docs done 2026-10-20; staging smoke and client checkpoint handled by the orchestrator)
 ---
 
 # Phase 5 Plan 12: Staff guide and runbook Summary
@@ -22,3 +22,7 @@ Staff guide sections for Contos and Mensagens entre assinantes, a one-line place
 ## Deviations
 - Runbook had 7.5 but no 7.4; 7.4 inserted before it.
 - Recados content deliberately a placeholder (coordinator instruction).
+
+## Checkpoint do cliente
+
+Aprovado por Furlan em 2026-10-21 ("tudo ok"), incluindo os recados privados e a conta gratuita no staging.
