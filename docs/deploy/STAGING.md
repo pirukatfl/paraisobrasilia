@@ -327,6 +327,12 @@ Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do Word
    mkdir -p /opt/paraiso-site/importacao && chmod 700 /opt/paraiso-site/importacao
    ```
 
+   Depois de copiar o dump (e a pasta de fotos), entregue a pasta ao usuário do contêiner (`node`, uid 1000), senão a importação falha com `EACCES: permission denied`:
+
+   ```bash
+   chown -R 1000:1000 /opt/paraiso-site/importacao
+   ```
+
 4. **Rodar** (três passos, nesta ordem; o comando é o mesmo, só mudam as opções). Troque `ARQUIVO` pelo nome do dump:
 
    ```bash
