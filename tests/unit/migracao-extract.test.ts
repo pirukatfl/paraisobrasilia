@@ -9,7 +9,10 @@ import {
   migracaoFixturePath,
   MIGRACAO_PREFIX,
   readMigracaoFixture,
+  SENTINELS,
 } from '../helpers/wp-migracao-fixture'
+import { buildMigrationReport, formatInspect, formatMigrationReport } from '@/lib/migracao/report'
+import { CLASSISEX_POST_ID, extractLegacyAds, inspectDump, resolveFieldKeys } from '@/lib/migracao/wp-classisex'
 import { readWpTables } from '@/lib/contos/wp-dump'
 import { serializedFieldLabels, serializedIntegers, serializedKeys } from '@/lib/migracao/php-serialized'
 import {
@@ -146,5 +149,116 @@ describe('extractAccounts on the synthetic fixture', () => {
     })
     expect(gz).toEqual(plain)
     expect(chunked).toEqual(plain)
+  })
+})
+
+describe('old ClassiSex ads', () => {
+  const POST = CLASSISEX_POST_ID
+  const KEYS = { euSou: 'custom_field_61a0e5b2c9f01', cidade: 'custom_field_61a0e5b2c9f02' }
+
+  it('discovers the wpDiscuz keys, or takes them from flags', async () => {
+    const t = await readMigracaoFixture()
+    expect(resolveFieldKeys(t, { postId: POST })).toEqual(KEYS)
+    expect(resolveFieldKeys(t, { postId: POST, euSou: 'a', cidade: 'b' })).toEqual({ euSou: 'a', cidade: 'b' })
+    const noForm = { ...t, postmeta: t.postmeta!.filter((m) => !String(m.meta_key).startsWith('wpdiscuz')) }
+    expect(resolveFieldKeys(noForm, { postId: POST })).toEqual({ euSou: KEYS.euSou, cidade: null })
+    const polluted = {
+      ...t,
+      commentmeta: t.commentmeta!.map((m) => (m.meta_key === KEYS.euSou ? { ...m, meta_value: 'qualquer coisa' } : m)),
+    }
+    expect(() => resolveFieldKeys(polluted, { postId: POST })).toThrow(/--inspect/)
+  })
+
+  it('extracts the ads that must come in and counts the rest', async () => {
+    const t = await readMigracaoFixture()
+    const { ads, skipped } = extractLegacyAds(t, { postId: POST, keys: KEYS })
+    expect(ads.map((a) => a.wpCommentId)).toEqual([101, 102, 103, 104, 108])
+    expect(skipped).toEqual({
+      resposta: 1,
+      'nao-aprovado': 1,
+      visitante: 1,
+      'eu-sou-desconhecido': 1,
+      'texto-vazio': 0,
+      'outro-tipo': 1,
+    })
+    const by = (id: number) => ads.find((a) => a.wpCommentId === id)!
+    expect(by(101).texto).toBe('Casal Sentinela procura & conversa 61 98888-7777')
+    expect(by(101).euSou).toBe('Casal')
+    expect(by(101).cidade).toBe('Brasília')
+    expect(by(101).createdAt).toBe('2025-05-01T13:00:00.000Z')
+    expect(by(102).euSou).toBe('Homem')
+    expect(by(102).texto).toBe('Solteiro Sentinela\nprocura amizade')
+    expect(by(102).photos).toEqual([
+      { attachmentId: 501, relPath: '2025/05/foto-sentinela.jpg' },
+      { attachmentId: 502, relPath: null },
+    ])
+    expect(by(102).flags).toContain('foto-sem-arquivo')
+    expect(by(103).euSou).toBe('Mulher')
+    expect(by(103).cidade).toBeNull()
+    expect(by(103).flags).toContain('cidade-descartada')
+    expect(by(104).flags).toContain('texto-longo')
+    expect(by(104).texto.length).toBeGreaterThan(600)
+  })
+
+  it('inspect reports counts, key names and labels only', async () => {
+    const t = await readMigracaoFixture()
+    const r = inspectDump(t, { prefix: MIGRACAO_PREFIX, postId: POST })
+    expect(r.tabelas.users).toBe(13)
+    expect(r.prefixosHash['$wp$']).toBe(8)
+    expect(r.prefixosHash['$P$B']).toBe(4)
+    expect(r.prefixosHash['(outro)']).toBe(1)
+    expect(r.papeis.subscriber).toBe(9)
+    expect(r.rotulosFormulario).toEqual({
+      custom_field_61a0e5b2c9f01: 'Eu Sou',
+      custom_field_61a0e5b2c9f02: 'Cidade',
+    })
+    const eu = r.metaAnuncios.find((m) => m.chave === KEYS.euSou)!
+    expect(eu.fracaoEuSou).toBeGreaterThanOrEqual(0.9)
+    for (const m of r.metaAnuncios.filter((x) => x.chave !== KEYS.euSou)) expect(m.fracaoEuSou).toBeLessThan(0.9)
+    expect(r.metaAnuncios.map((m) => m.chave)).toEqual(
+      ['akismet_result', KEYS.euSou, KEYS.cidade, 'wmu_attachments'].sort(),
+    )
+  })
+})
+
+describe('aggregate reports', () => {
+  it('prints the expected counts and leaks nothing', async () => {
+    const t = await readMigracaoFixture()
+    const decisions = extractAccounts(t, opts)
+    const ads = extractLegacyAds(t, { postId: CLASSISEX_POST_ID, keys: resolveFieldKeys(t, { postId: CLASSISEX_POST_ID }) })
+    const text = formatMigrationReport(buildMigrationReport(decisions, ads))
+    for (const line of [
+      'Contas lidas: 13',
+      'Ignoradas: administrador 1 · teste 1 · e-mail inválido 1 · e-mail duplicado 1 · excluídas pela equipe 0',
+      'A importar: 9',
+      'Senhas: formato novo do WP 4 · formato antigo do WP 4 · desconhecido 1 (só por link de nova senha)',
+      'Pagantes (data futura): 4',
+      'Vencimentos por mês: 2026-11: 1 · 2026-12: 2 · 2027-03: 1',
+      'Revisar (assinante antigo sem data): 2',
+      'Vencidas: 2 · sem data: 1',
+      'Alertas: expirado=Y com data futura 1 · não assinante com data futura 1 · apelido descartado 1 · outro papel 1',
+      'Anúncios antigos: 5 · respostas 1 · não aprovados 1 · visitantes 1 · Eu sou desconhecido 1 · outro tipo 1',
+      'Eu sou: Casal 3 · Homem 1 · Mulher 1',
+      'Cidade descartada: 1 · texto acima de 600: 1',
+      'Fotos: 2 referências · sem arquivo no dump 1',
+    ]) {
+      expect(text).toContain(line)
+    }
+    const withImported = formatMigrationReport(
+      buildMigrationReport(decisions, ads, new Set([2, 3, 12, 4])),
+      ['Criadas: 0'],
+    )
+    expect(withImported).toContain('Anúncios de contas importadas: 4')
+    expect(withImported).toContain('Criadas: 0')
+
+    const inspect = inspectDump(t, { prefix: MIGRACAO_PREFIX, postId: CLASSISEX_POST_ID })
+    const outputs = [text, withImported, formatInspect(inspect), JSON.stringify(inspect)]
+    for (const out of outputs) {
+      for (const s of SENTINELS) expect(out).not.toContain(s)
+      expect(out).not.toContain('@')
+      expect(out).not.toContain('$wp$2y$10$')
+      expect(out).not.toContain('$P$BM')
+    }
+    for (const id of ['101', '501', '2894']) expect(text).not.toContain(id)
   })
 })
