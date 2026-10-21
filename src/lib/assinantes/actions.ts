@@ -4,11 +4,12 @@ import config from '@payload-config'
 import { logout } from '@payloadcms/next/auth'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { AuthenticationError, createLocalReq, getPayload, LockedAuth, UnverifiedEmail, ValidationError } from 'payload'
+import { AuthenticationError, createLocalReq, getPayload, LockedAuth, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
 
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
 import { writeAudit } from './audit'
+import { loginWithLegacy } from './legacy-login'
 import { safeNext } from './redirect'
 import { requestPasswordEmail } from './reset-email'
 import { requireAssinante } from './session'
@@ -54,21 +55,16 @@ export async function entrar(formData: FormData): Promise<void> {
   if (!email || !password) redirect(loginErrorUrl('credenciais', next))
 
   let error: LoginError | null = null
-  try {
-    const payload = await getPayload({ config })
-    // Phase 6: when this throws AuthenticationError, try the legacy WordPress hash
-    // (legacyPasswordHash) here, rehash with payload.update({ password }) and log in again.
-    const result = await payload.login({ collection: 'assinantes', data: { email, password } })
-    if (!result.token) throw new AuthenticationError()
-    await setAuthCookie(result.token)
-  } catch (err) {
-    if (err instanceof LockedAuth) error = 'bloqueado'
-    // Payload checks the confirmation only after the password matched, so this does not reveal accounts
-    else if (err instanceof UnverifiedEmail) error = 'nao-confirmado'
-    else if (err instanceof AuthenticationError || err instanceof ValidationError) error = 'credenciais'
-    else throw err
-  }
-  // redirect() throws: keep it outside the try block
+  let novaSenhaToken: string | null = null
+  const payload = await getPayload({ config })
+  // M-03: old WordPress passwords are checked first, only for accounts that still hold the old hash;
+  // everything else (and every failure) goes through Payload's own login inside loginWithLegacy.
+  const outcome = await loginWithLegacy(payload, { email, password })
+  if (outcome.ok) await setAuthCookie(outcome.token)
+  else if ('novaSenhaToken' in outcome) novaSenhaToken = outcome.novaSenhaToken
+  else error = outcome.error
+  // redirect() throws: keep it out of any try block
+  if (novaSenhaToken) redirect(`/nova-senha?token=${encodeURIComponent(novaSenhaToken)}&aviso=senha-curta`)
   if (error) redirect(loginErrorUrl(error, next))
   redirect(safeNext(next))
 }
@@ -150,7 +146,8 @@ export async function definirNovaSenha(formData: FormData): Promise<void> {
   await payload.update({
     collection: 'assinantes',
     id: user.id,
-    data: { mustChangePassword: false },
+    // resetPassword writes through the adapter without hooks, so the old WordPress hash is erased here (T-06-12)
+    data: { mustChangePassword: false, legacyPasswordHash: null },
     overrideAccess: true,
     context: { skipAudit: true },
   })

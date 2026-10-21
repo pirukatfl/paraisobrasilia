@@ -25,11 +25,12 @@ const ERRORS: Record<string, string> = {
 export default async function NovaSenhaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string | string[]; erro?: string | string[] }>
+  searchParams: Promise<{ token?: string | string[]; erro?: string | string[]; aviso?: string | string[] }>
 }) {
   const params = await searchParams
   const token = typeof params.token === 'string' ? params.token : ''
   const erro = typeof params.erro === 'string' ? params.erro : ''
+  const aviso = typeof params.aviso === 'string' ? params.aviso : ''
   const payload = await getPayload({ config })
   const valid = Boolean(token) && erro !== 'expirado' && (await passwordLinkIsValid(payload, token))
 
@@ -60,6 +61,11 @@ export default async function NovaSenhaPage({
       <h1 id="titulo-nova-senha" className="type-display mt-2">
         Criar nova senha
       </h1>
+      {aviso === 'senha-curta' && (
+        <p role="status" className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 text-body text-text">
+          Sua senha do site antigo tem menos de 8 caracteres. Crie uma nova para continuar.
+        </p>
+      )}
       {message && (
         <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">
           {message}
