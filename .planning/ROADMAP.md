@@ -203,15 +203,15 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
   3. Links antigos importantes redirecionam para as páginas novas, sem 404 para o Google
 
 **Plans**: 10 plans
-- [ ] 06-01-PLAN.md — Verificador das senhas do WordPress ($wp$ bcrypt+HMAC-SHA384 e $P$ phpass), com vetores do PHP (wave 1)
-- [ ] 06-02-PLAN.md — Leitura do dump (só dados sintéticos): contas, assinatura, anúncios antigos, --inspect e relatório só com contagens (wave 1)
-- [ ] 06-03-PLAN.md — Mapa de links antigos (301) gerado e versionado, ligado ao next.config, com e2e (wave 1)
-- [ ] 06-04-PLAN.md — Campos de conta da migração, hash antigo invisível, marcador "Assinante antigo sem data de vencimento" (lista, ficha, filtro, painel) (wave 2)
-- [ ] 06-05-PLAN.md — Login com a senha antiga em /entrar, conversão no 1º acesso, senha curta → nova senha (wave 3)
-- [ ] 06-06-PLAN.md — Anúncios antigos como rascunho do autor: status, aviso, revisar e enviar para análise (wave 4)
-- [ ] 06-07-PLAN.md — Carga idempotente: contas, períodos "Migrado do site antigo", rascunhos e fotos (wave 5)
-- [ ] 06-08-PLAN.md — CLI import:wordpress (--inspect, --dry-run, gravação, --uploads), saída só com contagens (wave 6)
-- [ ] 06-09-PLAN.md — Guia da equipe, runbook 7.6 (importação na VPS) e smoke de staging (wave 7)
+- [x] 06-01-PLAN.md — Verificador das senhas do WordPress ($wp$ bcrypt+HMAC-SHA384 e $P$ phpass), com vetores do PHP (wave 1)
+- [x] 06-02-PLAN.md — Leitura do dump (só dados sintéticos): contas, assinatura, anúncios antigos, --inspect e relatório só com contagens (wave 1)
+- [x] 06-03-PLAN.md — Mapa de links antigos (301) gerado e versionado, ligado ao next.config, com e2e (wave 1)
+- [x] 06-04-PLAN.md — Campos de conta da migração, hash antigo invisível, marcador "Assinante antigo sem data de vencimento" (lista, ficha, filtro, painel) (wave 2)
+- [x] 06-05-PLAN.md — Login com a senha antiga em /entrar, conversão no 1º acesso, senha curta → nova senha (wave 3)
+- [x] 06-06-PLAN.md — Anúncios antigos como rascunho do autor: status, aviso, revisar e enviar para análise (wave 4)
+- [x] 06-07-PLAN.md — Carga idempotente: contas, períodos "Migrado do site antigo", rascunhos e fotos (wave 5)
+- [x] 06-08-PLAN.md — CLI import:wordpress (--inspect, --dry-run, gravação, --uploads), saída só com contagens (wave 6)
+- [x] 06-09-PLAN.md — Guia da equipe, runbook 7.6 (importação na VPS) e smoke de staging (wave 7)
 - [ ] 06-10-PLAN.md — Orquestrador no dump real, ensaio no staging pelo cliente e conferência do cliente (wave 8)
 
 ### Phase 7: Lançamento e desempenho
@@ -236,5 +236,5 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
 | 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
 | 5. Recados, mensagens e contos | 12/12 | Complete    | 2026-10-21 |
-| 6. Migração do WordPress | 0/? | Not started | - |
+| 6. Migração do WordPress | 9/10 | In Progress|  |
 | 7. Lançamento e desempenho | 0/? | Not started | - |

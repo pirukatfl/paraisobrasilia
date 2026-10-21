@@ -80,9 +80,9 @@ Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisõ
 
 ### Migração e lançamento (MIG)
 
-- [ ] **MIG-01**: Assinantes atuais entram no site novo sem perder o tempo de assinatura que já pagaram
-- [ ] **MIG-02**: Perfis atuais do ClassiSex aparecem no site novo com suas fotos
-- [ ] **MIG-03**: Links antigos importantes redirecionam para as páginas novas (sem 404 no Google)
+- [x] **MIG-01**: Assinantes atuais entram no site novo sem perder o tempo de assinatura que já pagaram
+- [x] **MIG-02**: Perfis atuais do ClassiSex aparecem no site novo com suas fotos
+- [x] **MIG-03**: Links antigos importantes redirecionam para as páginas novas (sem 404 no Google)
 - [ ] **MIG-04**: Site abre em menos de 2,5 s no celular em 4G nas páginas abertas
 
 ## v2 Requirements
@@ -151,9 +151,9 @@ Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisõ
 | REC-02 | Fase 5 | Complete |
 | REC-03 | Fase 5 | Complete |
 | REC-04 | Fase 5; substituído em Quick 2026-10-20-recados-privados | Complete |
-| MIG-01 | Fase 6 | Pending |
-| MIG-02 | Fase 6 | Pending |
-| MIG-03 | Fase 6 | Pending |
+| MIG-01 | Fase 6 | Complete |
+| MIG-02 | Fase 6 | Complete |
+| MIG-03 | Fase 6 | Complete |
 | MIG-04 | Fase 7 | Pending |
 | CONTA-01 | Quick 2026-10-20-conta-gratuita | Complete |
 | CONTA-02 | Quick 2026-10-20-conta-gratuita; texto revisado em Quick 2026-10-20-recados-privados | Complete |
