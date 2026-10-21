@@ -297,8 +297,12 @@ describe('public sign-up with e-mail confirmation (G-01, T-CG-04..11)', () => {
       await contaGratuita.down({ db, payload, req: {} as never })
       try {
         await contaGratuita.up({ db, payload, req: {} as never })
-      } catch (err) {
-        throw err
+      } finally {
+        // up() recreates enum_assinantes_origem with its original two values; the later migration
+        // migracao_contas (06-04) added 'site-antigo' to the shared test database: put it back
+        await (payload.db as unknown as { pool: { query: (q: string) => Promise<unknown> } }).pool.query(
+          `ALTER TYPE "public"."enum_assinantes_origem" ADD VALUE IF NOT EXISTS 'site-antigo'`,
+        )
       }
       const after = (await account('antiga@teste.local'))!
       expect(after._verified).toBe(true)
