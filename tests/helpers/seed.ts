@@ -558,3 +558,43 @@ export async function seedBlock(payload: Payload, input: { blocker: number; bloc
     overrideAccess: true,
   }) as Promise<{ id: number }>
 }
+
+/**
+ * Creates an account as the WordPress import does (M-03): random unknown password, the old
+ * WordPress hash pending in `legacyPasswordHash`, origem 'site-antigo'. Local API with overrideAccess.
+ */
+export async function seedLegacyAssinante(
+  payload: Payload,
+  {
+    email,
+    name,
+    hash,
+    wpUserId,
+    verified = true,
+    revisar = false,
+  }: { email: string; name: string; hash: string; wpUserId?: number; verified?: boolean; revisar?: boolean },
+) {
+  const { randomBytes } = await import('node:crypto')
+  const created = (await payload.create({
+    collection: 'assinantes' as never,
+    data: {
+      email,
+      name,
+      password: randomBytes(32).toString('base64url'),
+      ...(wpUserId !== undefined ? { wpUserId } : {}),
+      origem: 'site-antigo',
+      importadoEm: new Date().toISOString(),
+      revisarAssinaturaAntiga: revisar,
+    } as never,
+    overrideAccess: true,
+    context: { trustedCreate: true, skipAudit: true },
+  })) as unknown as { id: number; email: string; name: string }
+  await payload.update({
+    collection: 'assinantes' as never,
+    id: created.id,
+    data: { legacyPasswordHash: hash, ...(verified ? {} : { _verified: false }) } as never,
+    overrideAccess: true,
+    context: { skipAudit: true },
+  })
+  return created
+}

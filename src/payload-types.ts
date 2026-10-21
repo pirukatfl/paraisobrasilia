@@ -237,9 +237,16 @@ export interface Assinante {
   /**
    * Quem criou a conta: a equipe ou a própria pessoa pelo site.
    */
-  origem?: ('equipe' | 'cadastro') | null;
+  origem?: ('equipe' | 'cadastro' | 'site-antigo') | null;
   declaracao18Em?: string | null;
   termosAceitosEm?: string | null;
+  wpUserId?: number | null;
+  importadoEm?: string | null;
+  legacyPasswordHash?: string | null;
+  /**
+   * Marcado pela importação: no site antigo era assinante, mas sem data de vencimento. Some sozinho quando a equipe libera uma assinatura; para dispensar sem liberar, desmarque e salve.
+   */
+  revisarAssinaturaAntiga?: boolean | null;
   contaTipo?: string | null;
   emailStatus?: string | null;
   /**
@@ -382,6 +389,8 @@ export interface AuditLog {
     | 'senha-definida-pela-equipe'
     | 'link-de-senha-gerado'
     | 'senha-trocada-pelo-assinante'
+    | 'conta-importada'
+    | 'senha-migrada'
     | 'anuncio-aprovado'
     | 'anuncio-recusado'
     | 'anuncio-despublicado'
@@ -1247,6 +1256,10 @@ export interface AssinantesSelect<T extends boolean = true> {
   origem?: T;
   declaracao18Em?: T;
   termosAceitosEm?: T;
+  wpUserId?: T;
+  importadoEm?: T;
+  legacyPasswordHash?: T;
+  revisarAssinaturaAntiga?: T;
   contaTipo?: T;
   emailStatus?: T;
   staffNotes?: T;

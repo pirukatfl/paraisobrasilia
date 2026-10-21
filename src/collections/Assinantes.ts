@@ -12,6 +12,7 @@ import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
 import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
+import { SEM_DATA_LABEL } from '../lib/assinantes/site-antigo-label'
 import { expire } from '../lib/cache/expire'
 import { emailEnabled } from '../lib/email/config'
 import { buildVerifyEmail, VERIFY_SUBJECT, verifyUrl } from '../lib/email/verify-account'
@@ -57,9 +58,13 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
         mensagensSuspensas: _m,
         mustChangePassword: _p,
         _verificationToken: _t,
+        wpUserId: _w,
+        legacyPasswordHash: _l,
+        importadoEm: _i,
+        revisarAssinaturaAntiga: _r,
         ...rest
       } = input
-      void [_a, _s, _m, _p, _t]
+      void [_a, _s, _m, _p, _t, _w, _l, _i, _r]
       createArgs.data = {
         ...rest,
         _verified: false,
@@ -83,13 +88,17 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
     if (data.password.length < MIN_PASSWORD_LENGTH) {
       throw new APIError(PASSWORD_TOO_SHORT, 400, null, true)
     }
+    // M-03: a new password always erases the old WordPress hash (T-06-12). Whatever the caller sent in
+    // that field is overwritten; the flag lets this server-made write through the field access.
+    writeArgs.data = { ...data, legacyPasswordHash: null }
+    req.context = { ...req.context, legacyHashClear: true }
     // D-04: a password typed by staff is temporary; the subscriber's own change clears the flag.
     // passwordSetBy tells the audit hook which row to write (T-03-11).
     if (staff) {
-      writeArgs.data = { ...data, mustChangePassword: true }
+      writeArgs.data = { ...writeArgs.data, mustChangePassword: true }
       req.context = { ...req.context, passwordSetBy: 'equipe' }
     } else if (isAssinante({ req })) {
-      writeArgs.data = { ...data, mustChangePassword: false }
+      writeArgs.data = { ...writeArgs.data, mustChangePassword: false }
       req.context = { ...req.context, passwordSetBy: 'assinante' }
     }
   }
@@ -212,6 +221,9 @@ const FIELD_LABELS: Record<string, string> = {
   origem: 'origem da conta',
   declaracao18Em: 'declaração de 18+',
   termosAceitosEm: 'aceite dos Termos',
+  wpUserId: 'ID no site antigo',
+  importadoEm: 'importada do site antigo em',
+  revisarAssinaturaAntiga: SEM_DATA_LABEL,
 }
 
 /** PAINEL-08: account created / edited (skipped for bookkeeping writes with context.skipAudit). */
@@ -347,6 +359,12 @@ export const Assinantes: CollectionConfig = {
       admin: { description: 'Como o assinante é chamado no site ("Olá, …").' },
     },
     {
+      // M-02 (client adjustment 2026-10-21): warning on the record of an old subscriber without an expiry date
+      name: 'avisoSemData',
+      type: 'ui',
+      admin: { components: { Field: '/components/admin/assinantes/AvisoSemData#AvisoSemData' } },
+    },
+    {
       // Liberar / renovar / encerrar with the payment record (PAINEL-05); hidden on create
       name: 'assinaturaPainel',
       type: 'ui',
@@ -383,6 +401,7 @@ export const Assinantes: CollectionConfig = {
       options: [
         { label: 'Equipe', value: 'equipe' },
         { label: 'Cadastro no site', value: 'cadastro' },
+        { label: 'Site antigo', value: 'site-antigo' },
       ],
       // Set by the server only (guardOperations); staff read it, nobody edits it
       access: { create: () => false, update: () => false },
@@ -403,6 +422,49 @@ export const Assinantes: CollectionConfig = {
       admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' } },
     },
     {
+      name: 'wpUserId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'ID no site antigo',
+      // Written only by the importer (Local API with overrideAccess); never by REST (T-06-14)
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
+      name: 'importadoEm',
+      type: 'date',
+      label: 'Importada do site antigo em',
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: { readOnly: true, position: 'sidebar', date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' } },
+    },
+    {
+      // M-03: pending WordPress password hash. Invisible to every API and to the admin (T-06-13).
+      // Written by the importer / the legacy login (overrideAccess) and erased by guardOperations on any
+      // password write (the one server-made write that passes the field access, via context.legacyHashClear).
+      name: 'legacyPasswordHash',
+      type: 'text',
+      hidden: true,
+      access: {
+        read: () => false,
+        create: ({ req }) => req.context?.legacyHashClear === true,
+        update: ({ req }) => req.context?.legacyHashClear === true,
+      },
+    },
+    {
+      name: 'revisarAssinaturaAntiga',
+      type: 'checkbox',
+      defaultValue: false,
+      index: true,
+      label: SEM_DATA_LABEL,
+      access: staffOnlyField,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Marcado pela importação: no site antigo era assinante, mas sem data de vencimento. Some sozinho quando a equipe libera uma assinatura; para dispensar sem liberar, desmarque e salve.',
+      },
+    },
+    {
       // Read-only summary for the list (G-01/G-02): derived on read, never stored, staff only
       name: 'contaTipo',
       type: 'text',
@@ -413,11 +475,13 @@ export const Assinantes: CollectionConfig = {
       hooks: {
         afterRead: [
           ({ siblingData }) => {
-            const until = (siblingData as { accessUntil?: string | null }).accessUntil
+            const data = siblingData as { accessUntil?: string | null; revisarAssinaturaAntiga?: boolean | null }
+            const until = data.accessUntil
             const time = until ? new Date(until).getTime() : NaN
-            return Number.isFinite(time) && time > Date.now()
-              ? `Assinante até ${formatShortDate(new Date(time - 1).toISOString())}`
-              : 'Gratuita'
+            if (Number.isFinite(time) && time > Date.now()) {
+              return `Assinante até ${formatShortDate(new Date(time - 1).toISOString())}`
+            }
+            return data.revisarAssinaturaAntiga === true ? `Gratuita · ${SEM_DATA_LABEL.toLowerCase()}` : 'Gratuita'
           },
         ],
       },

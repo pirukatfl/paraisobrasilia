@@ -24,6 +24,7 @@ import * as migration_20261020_141021_mensagens_seguranca from './20261020_14102
 import * as migration_20261020_172550_conta_gratuita from './20261020_172550_conta_gratuita';
 import * as migration_20261020_173000_contos_wp_bundle_carga from './20261020_173000_contos_wp_bundle_carga';
 import * as migration_20261020_212353_aviso_novo_cadastro from './20261020_212353_aviso_novo_cadastro';
+import * as migration_20261021_121622_migracao_contas from './20261021_121622_migracao_contas';
 
 export const migrations = [
   {
@@ -154,6 +155,11 @@ export const migrations = [
   {
     up: migration_20261020_212353_aviso_novo_cadastro.up,
     down: migration_20261020_212353_aviso_novo_cadastro.down,
-    name: '20261020_212353_aviso_novo_cadastro'
+    name: '20261020_212353_aviso_novo_cadastro',
+  },
+  {
+    up: migration_20261021_121622_migracao_contas.up,
+    down: migration_20261021_121622_migracao_contas.down,
+    name: '20261021_121622_migracao_contas'
   },
 ];

@@ -13,6 +13,9 @@ export type AuditAction =
   | 'senha-definida-pela-equipe'
   | 'link-de-senha-gerado'
   | 'senha-trocada-pelo-assinante'
+  // WordPress migration (Phase 6)
+  | 'conta-importada'
+  | 'senha-migrada'
   // ClassiSex moderation (Phase 4)
   | 'anuncio-aprovado'
   | 'anuncio-recusado'
@@ -37,6 +40,8 @@ export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Senha definida pela equipe', value: 'senha-definida-pela-equipe' },
   { label: 'Link de nova senha gerado', value: 'link-de-senha-gerado' },
   { label: 'Senha trocada pelo assinante', value: 'senha-trocada-pelo-assinante' },
+  { label: 'Conta importada do site antigo', value: 'conta-importada' },
+  { label: 'Senha do site antigo convertida', value: 'senha-migrada' },
   { label: 'Anúncio aprovado', value: 'anuncio-aprovado' },
   { label: 'Anúncio recusado', value: 'anuncio-recusado' },
   { label: 'Anúncio despublicado', value: 'anuncio-despublicado' },
@@ -57,6 +62,7 @@ export const SECRET_FIELDS = [
   'resetPasswordToken',
   'resetPasswordExpiration',
   'loginAttempts',
+  'legacyPasswordHash',
   'lockUntil',
   'updatedAt',
   'createdAt',
