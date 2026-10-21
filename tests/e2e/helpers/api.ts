@@ -203,7 +203,7 @@ export async function staffApi(request: APIRequestContext) {
       cidade?: string
       texto?: string
       contato?: { whatsapp?: string; telegram?: string }
-      status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+      status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
       publishedAt?: string
     }) {
       let euSou = data.euSou

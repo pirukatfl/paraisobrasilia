@@ -9,6 +9,7 @@ const mediaSummary = (fotos: number, videos: number) =>
 /** One ad in Meus anúncios (owner view): status, refusal reason, text, contacts, edit/delete. */
 export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean }) {
   const published = ad.status === 'aprovado'
+  const draft = ad.status === 'rascunho'
   return (
     <article className="rounded-xl border border-line bg-surface p-5" aria-label={`Anúncio: ${ad.statusLabel}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -17,6 +18,7 @@ export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean 
         </p>
         <p className="type-label text-muted">Atualizado em {ad.updatedLabel}</p>
       </div>
+      {draft && <p className="mt-3 text-body text-muted">Trazido do site antigo. Revise antes de enviar.</p>}
       {ad.motivo && (
         <p className="mt-3 text-body text-muted">Corrija o que a equipe pediu e salve de novo para nova análise.</p>
       )}
@@ -48,8 +50,8 @@ export function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean 
       </ul>
       <div className="mt-4 flex flex-wrap items-start gap-4">
         {canEdit && (
-          <Link href={`/area-do-assinante/meus-anuncios/${ad.id}/editar`} className="btn-secondary">
-            Editar
+          <Link href={`/area-do-assinante/meus-anuncios/${ad.id}/editar`} className={draft ? 'btn-primary' : 'btn-secondary'}>
+            {draft ? 'Revisar e enviar' : 'Editar'}
           </Link>
         )}
         <details className="group">

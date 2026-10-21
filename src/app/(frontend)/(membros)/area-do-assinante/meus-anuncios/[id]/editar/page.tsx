@@ -58,6 +58,12 @@ export default async function EditarAnuncioPage({
   return (
     <section aria-labelledby="titulo-editar-anuncio">
       {header}
+      {ad.status === 'rascunho' && (
+        <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
+          Este anúncio veio do site antigo. Os contatos que estavam no texto não aparecem para ninguém enquanto for
+          rascunho; coloque WhatsApp ou Telegram nos campos e tire-os do texto.
+        </p>
+      )}
       {ad.status === 'aprovado' ? (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
           Ao salvar, o anúncio sai do ar até a equipe aprovar de novo.

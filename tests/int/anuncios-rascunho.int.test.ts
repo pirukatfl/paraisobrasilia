@@ -237,8 +237,7 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
       // REST cannot set req.context: whatever the body says, the limit still holds
       const fs = await import('node:fs')
       const form = new FormData()
-      form.append('ad', String(d.id))
-      form.append('legacyImport', 'true')
+      form.append('_payload', JSON.stringify({ ad: d.id, order: 1, legacyImport: true }))
       form.append('file', new Blob([fs.readFileSync(new URL('../fixtures/flyer-square.jpg', import.meta.url))], { type: 'image/jpeg' }), 'b.jpg')
       const { config } = await import('../../src/payload.config').then((m) => ({ config: m.default }))
       const routes = await import('@payloadcms/next/routes')
@@ -247,6 +246,7 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
         { params: Promise.resolve({ slug: ['ad-media'] }) },
       )
       expect(res.status).toBeGreaterThanOrEqual(400)
+      expect(await res.text()).toContain('Conta gratuita: 1 foto por anúncio')
       const { totalDocs } = await payload.count({ collection: 'ad-media', where: { ad: { equals: d.id } }, overrideAccess: true })
       expect(totalDocs).toBe(1)
     })
