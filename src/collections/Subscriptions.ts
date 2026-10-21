@@ -11,6 +11,7 @@ import {
 import { isStaff } from '../access/roles'
 import { diffForAudit, writeAudit, type AuditAction } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
+import { clearSemDataAvisoAfterPeriod } from '../lib/assinantes/site-antigo'
 import { expire } from '../lib/cache/expire'
 import { accessUntilOf, addDaysToDate, type PeriodLike, spDate, spMidnight } from '../lib/assinantes/periods'
 import { formatShortDate } from '../lib/format/date'
@@ -122,6 +123,14 @@ const syncAccessUntil: CollectionAfterChangeHook = async ({ doc, previousDoc, re
   for (const id of ids) await recomputeAccessUntil(req, id as number | string)
   // D-06: the author's ads appear/disappear with the access period (public preview cache)
   expire(['ads'])
+  return doc
+}
+
+/** M-02: setting a subscription removes the "assinante antigo sem data de vencimento" marker. */
+const clearSemDataAviso: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
+  if (operation !== 'create') return doc
+  const id = relId(doc.assinante)
+  if (id !== null) await clearSemDataAvisoAfterPeriod(req, id, req.context?.skipAudit !== true)
   return doc
 }
 
@@ -259,7 +268,7 @@ export const Subscriptions: CollectionConfig = {
   hooks: {
     beforeValidate: [fillAndValidateDates],
     beforeChange: [fillSummaryAndClosedAt],
-    afterChange: [syncAccessUntil, auditPeriod],
+    afterChange: [syncAccessUntil, clearSemDataAviso, auditPeriod],
     afterDelete: [syncAccessUntilAfterDelete],
   },
   fields: [

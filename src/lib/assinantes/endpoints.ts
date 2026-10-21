@@ -2,6 +2,7 @@ import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
 import { whatsappUrl } from '../site/contact'
+import { dismissSemDataAviso } from './site-antigo'
 import { createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError, setEmailConfirmed } from './service'
 
 /**
@@ -11,6 +12,7 @@ import { createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError,
  *   POST /api/assinantes/:id/encerrar  { reason }
  *   POST /api/assinantes/:id/email-confirmado { confirmado }
  *   POST /api/assinantes/:id/link-senha (single-use 48 h link to send by WhatsApp, D-04)
+ *   POST /api/assinantes/:id/dispensar-aviso-site-antigo (M-02: dismiss the "sem data de vencimento" marker)
  * Period dates are never read from the request: the service computes them (T-03-15).
  */
 const forbidden = () => Response.json({ message: 'Sem permissão.' }, { status: 403 })
@@ -96,6 +98,17 @@ export const assinanteEndpoints: Endpoint[] = [
         const { url, expiresAt, assinante } = await createPasswordLink(req.payload, { assinanteId: idOf(req), req })
         const message = `Olá, ${assinante.name}! Este é o link para criar sua nova senha no site do Paraíso (vale por 48 horas): ${url}`
         return { url, expiresAt, whatsappUrl: assinante.whatsapp ? whatsappUrl(assinante.whatsapp, message) : null }
+      })
+    },
+  },
+  {
+    path: '/:id/dispensar-aviso-site-antigo',
+    method: 'post',
+    handler: async (req) => {
+      if (!isStaff({ req })) return forbidden()
+      return run(async () => {
+        await dismissSemDataAviso(req, idOf(req))
+        return { ok: true }
       })
     },
   },

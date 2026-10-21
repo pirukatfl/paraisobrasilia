@@ -1,3 +1,4 @@
+import { AvisoSemData as AvisoSemData_7808e47397cf1993e43a254dee8e0608 } from '../../../components/admin/assinantes/AvisoSemData'
 import { AssinaturaPanel as AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24 } from '../../../components/admin/assinantes/AssinaturaPanel'
 import { EmailConfirmado as EmailConfirmado_44d794be48c9769b8d6c2b3ca9391713 } from '../../../components/admin/assinantes/EmailConfirmado'
 import { ModeracaoPanel as ModeracaoPanel_ec761e6491e5a1911a27084fe817e462 } from '../../../components/admin/classisex/ModeracaoPanel'
@@ -24,11 +25,13 @@ import { TrechoAbertoPanel as TrechoAbertoPanel_d1407765f506ff1813efd7276a9239fb
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { Vencimentos as Vencimentos_1f1ae1b3e16b6364b3c888af76c92816 } from '../../../components/admin/assinantes/Vencimentos'
+import { RevisarSiteAntigo as RevisarSiteAntigo_695020af97f38537beffe66d553edc6e } from '../../../components/admin/assinantes/RevisarSiteAntigo'
 import { FilaClassisex as FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2 } from '../../../components/admin/classisex/FilaClassisex'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/admin/assinantes/AvisoSemData#AvisoSemData": AvisoSemData_7808e47397cf1993e43a254dee8e0608,
   "/components/admin/assinantes/AssinaturaPanel#AssinaturaPanel": AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24,
   "/components/admin/assinantes/EmailConfirmado#EmailConfirmado": EmailConfirmado_44d794be48c9769b8d6c2b3ca9391713,
   "/components/admin/classisex/ModeracaoPanel#ModeracaoPanel": ModeracaoPanel_ec761e6491e5a1911a27084fe817e462,
@@ -55,6 +58,7 @@ export const importMap = {
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/assinantes/Vencimentos#Vencimentos": Vencimentos_1f1ae1b3e16b6364b3c888af76c92816,
+  "/components/admin/assinantes/RevisarSiteAntigo#RevisarSiteAntigo": RevisarSiteAntigo_695020af97f38537beffe66d553edc6e,
   "/components/admin/classisex/FilaClassisex#FilaClassisex": FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

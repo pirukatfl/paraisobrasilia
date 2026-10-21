@@ -68,6 +68,7 @@ export default buildConfig({
       // PAINEL-07: ClassiSex moderation queue
       beforeDashboard: [
         '/components/admin/assinantes/Vencimentos#Vencimentos',
+        '/components/admin/assinantes/RevisarSiteAntigo#RevisarSiteAntigo',
         '/components/admin/classisex/FilaClassisex#FilaClassisex',
       ],
       graphics: {
