@@ -301,7 +301,7 @@ describe('conta migrada: campos, hash antigo e marcador (06-04)', () => {
           startsAt: new Date().toISOString(),
           endsAt: new Date(Date.now() + 30 * 86_400_000).toISOString(),
           payment: { method: 'cortesia', amount: 0 },
-        },
+        } as never,
         user: staffUser as never,
         overrideAccess: false,
       })
