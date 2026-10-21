@@ -14,6 +14,14 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
   const msgQueue = `${payload.config.routes.admin}/collections/message-reports?where[status][equals]=aberta`
   const adminRoute = payload.config.routes.admin
   const reportsLink = `${adminRoute}/collections/ad-reports?where[status][equals]=aberta`
+  const equipe = (
+    await payload.count({
+      collection: 'ads',
+      where: { and: [{ origemLegado: { equals: 'equipe' } }, { status: { equals: 'rascunho' } }] },
+      overrideAccess: true,
+    })
+  ).totalDocs
+  const equipeLink = `${adminRoute}/collections/ads?where[origemLegado][equals]=equipe&where[status][equals]=rascunho`
   const queue = `${adminRoute}/collections/ads?where[status][equals]=pendente&sort=submittedAt`
 
   return (
@@ -58,6 +66,12 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
         )}
       </p>
       <p style={{ margin: 'calc(var(--base) * 0.75) 0 0' }}>
+        {equipe === 0 ? null : (
+          <>
+            <a href={equipeLink}>{`${equipe} ${equipe === 1 ? 'anúncio antigo da equipe' : 'anúncios antigos da equipe'} para revisar`}</a>
+            {' · '}
+          </>
+        )}
         <a href={queue}>Ver fila</a> · <a href={reportsLink}>Ver denúncias</a> · <a href={`${adminRoute}/collections/ads`}>Todos os anúncios</a>
       </p>
     </section>

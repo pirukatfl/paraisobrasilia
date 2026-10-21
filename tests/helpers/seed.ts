@@ -415,6 +415,8 @@ export interface SeedAdInput {
   motivo?: string
   /** Old WordPress comment id, importer-only field (06-06) */
   wpCommentId?: number
+  /** Importer-only marker: draft written by the team on the old site (placeholder owner) */
+  origemLegado?: 'equipe'
 }
 
 /** Creates a ClassiSex ad through the Local API (default: first Eu sou option, pendente). */
@@ -438,6 +440,7 @@ export async function seedAd(payload: Payload, input: SeedAdInput) {
       submittedAt: new Date().toISOString(),
       ...(status === 'aprovado' ? { publishedAt: input.publishedAt ?? new Date().toISOString() } : {}),
       ...(input.motivo ? { motivo: input.motivo } : {}),
+      ...(input.origemLegado ? { origemLegado: input.origemLegado } : {}),
       ...(input.wpCommentId !== undefined
         ? {
             wpCommentId: input.wpCommentId,

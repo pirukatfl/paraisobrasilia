@@ -73,8 +73,28 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
   return data
 }
 
+/** Only a team draft from the old site can change owner (staff reassign it to the right member). */
+const guardAuthorChange: CollectionBeforeValidateHook = ({ data, operation, originalDoc, req }) => {
+  if (operation !== 'update' || !data || !originalDoc || data.author === undefined) return data
+  if (relId(data.author) !== relId(originalDoc.author) && originalDoc.origemLegado !== 'equipe') {
+    throw new ValidationError(
+      {
+        collection: 'ads',
+        errors: [{ path: 'author', message: 'Só dá para trocar o anunciante de um anúncio antigo da equipe.' }],
+        req,
+      },
+      req.t,
+    )
+  }
+  return data
+}
+
 /** cidadeBusca (filter target) and resumo (admin title) follow the current values. */
 const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
+  // Handed to a real owner: it leaves the team filter and becomes that member's own draft
+  if (originalDoc?.origemLegado === 'equipe' && data.author !== undefined && relId(data.author) !== relId(originalDoc.author)) {
+    data.origemLegado = null
+  }
   const merged = { ...(originalDoc ?? {}), ...data } as Record<string, unknown>
   const cidade = (merged.cidade as string | null | undefined) ?? null
   data.cidadeBusca = cidade ? normaliseCidade(cidade) : null
@@ -155,7 +175,7 @@ export const Ads: CollectionConfig = {
   // Staff-only moderation actions for the Moderação panel (src/lib/classisex/endpoints.ts)
   endpoints: adEndpoints,
   hooks: {
-    beforeValidate: [normaliseAndCheckContacts],
+    beforeValidate: [guardAuthorChange, normaliseAndCheckContacts],
     beforeChange: [computeDerived],
     // Media files (04-05) and report detaching (04-08)
     beforeDelete: [removeMedia],
@@ -193,7 +213,10 @@ export const Ads: CollectionConfig = {
       required: true,
       index: true,
       label: 'Anunciante',
-      admin: { readOnly: true, description: 'Assinante que escreveu o anúncio. Não aparece no site.' },
+      admin: {
+        description:
+          'Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).',
+      },
     },
     {
       name: 'apelido',
@@ -326,6 +349,20 @@ export const Ads: CollectionConfig = {
       label: 'ID do comentário no site antigo',
       access: { create: () => false, update: () => false, read: isStaff },
       admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
+      // M-04: set only by the importer for ads whose old author was not imported (team, deleted user)
+      name: 'origemLegado',
+      type: 'select',
+      index: true,
+      label: 'Anúncio antigo da equipe',
+      options: [{ label: 'Anúncio antigo da equipe (revisar)', value: 'equipe' }],
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Rascunho trazido do site antigo, só a equipe vê. Troque o anunciante, edite e aprove, ou apague.',
+      },
     },
     {
       name: 'importadoEm',

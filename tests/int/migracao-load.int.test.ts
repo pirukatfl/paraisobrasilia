@@ -286,13 +286,13 @@ describe('carga da migração do WordPress (06-07)', () => {
       ).docs as unknown as { kind: string; order: number }[]
     const withPhotos = () => ads.find((a) => a.photos.some((p) => p.relPath))!
 
-    it('creates four private drafts and counts the administrator ad as missing author', async () => {
+    it('creates five private drafts; the administrator ad goes to the team placeholder', async () => {
       await importAccounts(payload, decisions, { now: FIXTURE_NOW })
       const result = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
-      expect(result).toMatchObject({ criados: 4, jaExistiam: 0, autorAusente: 1 })
+      expect(result).toMatchObject({ criados: 5, jaExistiam: 0, daEquipe: 1 })
       const rows = await drafts()
-      expect(rows).toHaveLength(4)
-      for (const row of rows) {
+      expect(rows).toHaveLength(5)
+      for (const row of rows.filter((r) => r.wpCommentId !== 108)) {
         const src = ads.find((a) => a.wpCommentId === row.wpCommentId)!
         const author = await account(src.wpUserId)
         expect(row).toMatchObject({
@@ -318,7 +318,7 @@ describe('carga da migração do WordPress (06-07)', () => {
       expect(await mediaOf(mid.id as number)).toHaveLength(0)
 
       const topUp = await importLegacyAds(payload, ads, { now: FIXTURE_NOW, uploadsDir: uploads })
-      expect(topUp).toMatchObject({ criados: 0, jaExistiam: 4 })
+      expect(topUp).toMatchObject({ criados: 0, jaExistiam: 5 })
       expect(topUp.fotosGravadas).toBeGreaterThanOrEqual(1)
       const media = await mediaOf(mid.id as number)
       expect(media[0]).toMatchObject({ kind: 'foto', order: 0 })
@@ -340,7 +340,7 @@ describe('carga da migração do WordPress (06-07)', () => {
         [extra(9001, '../../etc/passwd'), extra(9002, '2025/05/fora.jpg'), extra(9003, '2025/05/a.gif'), extra(9004, '2025/05/b.mp4')],
         { now: FIXTURE_NOW, uploadsDir: uploads },
       )
-      expect(r).toMatchObject({ criados: 4, fotosGravadas: 0, fotosRecusadas: 2 })
+      expect(r).toMatchObject({ criados: 4, daEquipe: 0, fotosGravadas: 0, fotosRecusadas: 2 })
       expect(r.fotosForaDaPasta).toBe(2)
     })
 
@@ -381,7 +381,9 @@ describe('carga da migração do WordPress (06-07)', () => {
       const r = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
       const text = formatLoadLines((await importAccounts(payload, decisions, { now: FIXTURE_NOW })).result, r).join('\n')
       for (const s of SENTINELS) expect(text).not.toContain(s)
-      expect(text).toMatch(/rascunhos criados 4/)
+      expect(text).toMatch(/rascunhos criados 5/)
+      expect(text).toContain('da equipe (rascunho para revisar) 1')
+      expect(text).not.toContain('autor não importado')
     })
   })
 })

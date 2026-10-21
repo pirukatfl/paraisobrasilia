@@ -26,6 +26,7 @@ import * as migration_20261020_173000_contos_wp_bundle_carga from './20261020_17
 import * as migration_20261020_212353_aviso_novo_cadastro from './20261020_212353_aviso_novo_cadastro';
 import * as migration_20261021_121622_migracao_contas from './20261021_121622_migracao_contas';
 import * as migration_20261021_123416_migracao_anuncios from './20261021_123416_migracao_anuncios';
+import * as migration_20261021_203534_anuncios_equipe from './20261021_203534_anuncios_equipe';
 
 export const migrations = [
   {
@@ -166,6 +167,11 @@ export const migrations = [
   {
     up: migration_20261021_123416_migracao_anuncios.up,
     down: migration_20261021_123416_migracao_anuncios.down,
-    name: '20261021_123416_migracao_anuncios'
+    name: '20261021_123416_migracao_anuncios',
+  },
+  {
+    up: migration_20261021_203534_anuncios_equipe.up,
+    down: migration_20261021_203534_anuncios_equipe.down,
+    name: '20261021_203534_anuncios_equipe'
   },
 ];

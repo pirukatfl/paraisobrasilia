@@ -270,10 +270,72 @@ export async function importAccounts(
 // Old ads as drafts (M-04)
 // ---------------------------------------------------------------------------------------------
 
+/**
+ * The single placeholder owner of the old ads whose author was not imported (WordPress administrators,
+ * deleted users). Stable marker: this fixed e-mail on a reserved non-routable domain (RFC 6761 style, no
+ * mail ever leaves for it). Nobody can sign in as it: random unknown password, e-mail never confirmed
+ * (`_verified: false` makes login and JWT sessions fail), no subscription period.
+ */
+export const EQUIPE_LEGADO_EMAIL = 'equipe-legado@invalid.paraiso.local'
+export const EQUIPE_LEGADO_NAME = 'Equipe (anúncios do site antigo)'
+
+export async function ensureEquipeLegadoAccount(payload: Payload, now: Date): Promise<number> {
+  const find = async () => {
+    const { docs } = await payload.find({
+      collection: 'assinantes',
+      where: { email: { equals: EQUIPE_LEGADO_EMAIL } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+      select: { email: true } as never,
+    })
+    return (docs[0] as { id: number } | undefined)?.id
+  }
+  const existing = await find()
+  if (existing) return existing
+  try {
+    const created = await payload.create({
+      collection: 'assinantes',
+      data: {
+        email: EQUIPE_LEGADO_EMAIL,
+        password: randomBytes(32).toString('base64url'),
+        name: EQUIPE_LEGADO_NAME,
+        origem: 'site-antigo',
+        importadoEm: now.toISOString(),
+        staffNotes:
+          'Conta técnica: dona dos anúncios antigos feitos pela equipe no site antigo. Ninguém entra com ela. Reatribua o anúncio ao dono certo ou publique-o.',
+      } as never,
+      overrideAccess: true,
+      context: { trustedCreate: true, skipAudit: true },
+    })
+    // trusted creates are born confirmed; this one never is, so it can neither log in nor hold a session
+    await payload.update({
+      collection: 'assinantes',
+      id: created.id,
+      data: { _verified: false } as never,
+      overrideAccess: true,
+      context: { skipAudit: true },
+    })
+    const req = await createLocalReq({}, payload)
+    await writeAudit(req, {
+      action: 'conta-importada',
+      assinante: { id: created.id, name: EQUIPE_LEGADO_NAME, email: EQUIPE_LEGADO_EMAIL },
+      summary: 'Conta técnica criada para os anúncios antigos da equipe',
+      details: {},
+    })
+    return created.id
+  } catch (err) {
+    const raced = await find() // a parallel run created it first
+    if (raced) return raced
+    throw err
+  }
+}
+
 export type AdsLoad = {
   criados: number
   jaExistiam: number
-  autorAusente: number
+  /** Drafts created this run for ads whose WordPress author was not imported (owned by the team placeholder) */
+  daEquipe: number
   fotosGravadas: number
   fotosAusentes: number
   fotosRecusadas: number
@@ -349,7 +411,7 @@ export async function importLegacyAds(
   const result: AdsLoad = {
     criados: 0,
     jaExistiam: 0,
-    autorAusente: 0,
+    daEquipe: 0,
     fotosGravadas: 0,
     fotosAusentes: 0,
     fotosRecusadas: 0,
@@ -402,12 +464,8 @@ export async function importLegacyAds(
     existingAds.map((d) => [Number((d as unknown as { wpCommentId: number }).wpCommentId), d as unknown as { id: number; status: string }]),
   )
 
+  let equipeId: number | null = null
   for (const ad of ads) {
-    const author = authorByWp.get(ad.wpUserId)
-    if (!author) {
-      result.autorAusente++
-      continue
-    }
     const existing = existingByComment.get(ad.wpCommentId)
     if (existing) {
       result.jaExistiam++
@@ -422,12 +480,17 @@ export async function importLegacyAds(
       }
       continue
     }
+    const author = authorByWp.get(ad.wpUserId)
     try {
+      // No imported author (administrator posting for a client, deleted user): the draft belongs to the
+      // team placeholder and shows up in the admin filter "Anúncios antigos da equipe"
+      if (!author && equipeId === null) equipeId = await ensureEquipeLegadoAccount(payload, opts.now)
       const created = await payload.create({
         collection: 'ads',
         data: {
-          author: author.id,
-          apelido: author.apelido || 'Anônimo',
+          author: author ? author.id : equipeId,
+          ...(author ? {} : { origemLegado: 'equipe' }),
+          apelido: author?.apelido || 'Anônimo',
           euSou: categoryId.get(ad.euSou),
           cidade: ad.cidade,
           texto: ad.texto,
@@ -440,6 +503,7 @@ export async function importLegacyAds(
         context: { legacyImport: true },
       })
       result.criados++
+      if (!author) result.daEquipe++
       if (uploadsReal && ad.photos.length > 0) await addPhotos(payload, created.id, ad.photos, uploadsReal, result)
     } catch {
       // generic on purpose (T-06-26): the ad text and author are never printed
@@ -456,7 +520,7 @@ export function formatLoadLines(accounts: AccountsLoad, ads?: AdsLoad): string[]
   ]
   if (ads) {
     lines.push(
-      `Anúncios: rascunhos criados ${ads.criados} · já existiam ${ads.jaExistiam} · autor não importado ${ads.autorAusente}`,
+      `Anúncios: rascunhos criados ${ads.criados} · já existiam ${ads.jaExistiam} · da equipe (rascunho para revisar) ${ads.daEquipe}`,
       `Fotos: gravadas ${ads.fotosGravadas} · ausentes ${ads.fotosAusentes} · recusadas ${ads.fotosRecusadas} · fora da pasta ${ads.fotosForaDaPasta}`,
     )
   }

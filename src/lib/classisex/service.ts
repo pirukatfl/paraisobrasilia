@@ -63,7 +63,7 @@ export class ServiceError extends Error {
 
 const notFound = () => new ServiceError('nao-encontrado', 'Anúncio não encontrado.', 404)
 
-type AdDoc = AdDocLike & { author: unknown }
+type AdDoc = AdDocLike & { author: unknown; origemLegado?: string | null }
 
 async function loadOwnedAd(payload: Payload, assinanteId: number, id: number | string): Promise<AdDoc> {
   const numericId = Number(id)
@@ -470,7 +470,9 @@ export async function moderateAd(
   if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
   const t = TRANSITIONS[kind]
   const ad = await loadAdForStaff(req, id)
-  if (!t.from.includes(ad.status)) {
+  // M-04: a draft the old site's team wrote for a client has no member to send it, so staff publish it
+  const teamDraft = ad.status === DRAFT_STATUS && ad.origemLegado === 'equipe'
+  if (!t.from.includes(ad.status) && !(kind === 'aprovar' && teamDraft)) {
     throw new ServiceError('transicao', `Este anúncio já está ${STATE_WORDS[ad.status]}.`, 409)
   }
   const reason = kind === 'aprovar' ? null : cleanMotivo(motivo)
@@ -485,6 +487,7 @@ export async function moderateAd(
         moderatedAt: now.toISOString(),
         moderatedBy: staffId,
         ...(kind === 'aprovar' ? { publishedAt: now.toISOString() } : {}),
+        ...(teamDraft ? { submittedAt: now.toISOString() } : {}),
       },
       overrideAccess: true,
       context: { moderation: kind },
@@ -727,6 +730,8 @@ export type ModerationView = {
   statusLabel: string
   /** Tier of the ad author right now (Conta gratuita shows only the cover on the board) */
   contaAutor: 'Conta gratuita' | 'Assinante'
+  /** Old-site draft written by the team (placeholder owner): staff can approve it directly */
+  rascunhoDaEquipe: boolean
   motivo: string | null
   /** Exactly what the open area shows (T-04-01): apelido (contacts removed on the server) and tipo */
   publicApelido: string
@@ -761,6 +766,7 @@ export async function getModerationView(req: PayloadRequest, id: number | string
     status: ad.status,
     statusLabel: STAFF_STATUS_LABELS[ad.status],
     contaAutor,
+    rascunhoDaEquipe: ad.status === DRAFT_STATUS && ad.origemLegado === 'equipe',
     motivo: ad.motivo ?? null,
     publicApelido: apelido.text,
     euSouLabel: labels.get(relId(ad.euSou) ?? -1) ?? '',

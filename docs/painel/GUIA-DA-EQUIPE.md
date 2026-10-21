@@ -542,9 +542,13 @@ Algumas contas do site antigo eram de assinante, mas **sem data de vencimento** 
 
 - Os anúncios do ClassiSex antigo viraram **rascunhos**: só o autor (e a equipe, no painel) vê. Nada foi publicado sozinho.
 - O autor entra em **Meus anúncios**, vê o aviso de que o anúncio veio do site antigo e usa **Revisar e enviar**. Depois de enviado, o anúncio entra na fila de moderação como qualquer outro.
-- A equipe **não aprova rascunho**: o botão só aparece depois que o autor envia.
+- A equipe **não aprova rascunho de um autor**: o botão só aparece depois que o autor envia (a exceção são os anúncios da equipe, logo abaixo).
 - Telefones e contatos que estavam no texto antigo não aparecem para ninguém enquanto o anúncio for rascunho; o autor informa o contato ao revisar.
 - As fotos só vêm se o backup da pasta de fotos do site antigo for entregue.
+
+### Anúncios antigos feitos pela equipe
+
+Os anúncios que a própria equipe (contas de administrador do site antigo) e usuários já apagados publicavam vieram como **rascunhos** de uma conta técnica chamada **Equipe (anúncios do site antigo)**, que ninguém usa para entrar. Só a equipe vê. Na caixa **ClassiSex** do painel inicial, clique em **N anúncios antigos da equipe para revisar** (ou filtre **Anúncios** por "Anúncio antigo da equipe"). Para cada um, decida: **trocar o Anunciante** pelo dono certo (ele passa a ver o rascunho em Meus anúncios e envia pelo site), **editar** texto e contato e usar **Aprovar e publicar** no quadro Moderação (o apelido vem como "Anônimo": ajuste antes), ou **excluir** o anúncio.
 
 ### Links antigos
 

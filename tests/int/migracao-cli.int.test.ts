@@ -110,16 +110,18 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
     const first = run(['--uploads', uploads])
     expect(first.code).toBe(0)
     expect(first.out).toMatch(/Contas: criadas 9 /)
-    expect(first.out).toMatch(/Anúncios: rascunhos criados 4 /)
+    expect(first.out).toMatch(/Anúncios: rascunhos criados 5 /)
+    expect(first.out).toContain('da equipe (rascunho para revisar) 1')
     expect(first.out).toMatch(/Fotos: gravadas [1-9]/)
-    expect(await assinantes()).toBe(9)
-    expect(await ads()).toBe(4)
+    expect(await assinantes()).toBe(10) // 9 imported + the team placeholder
+    expect(await ads()).toBe(5)
 
     const second = run(['--uploads', uploads])
     expect(second.code).toBe(0)
     expect(second.out).toMatch(/Contas: criadas 0 /)
-    expect(second.out).toMatch(/rascunhos criados 0 /)
-    expect(await assinantes()).toBe(9)
+    expect(second.out).toMatch(/rascunhos criados 0 · já existiam 5 · da equipe \(rascunho para revisar\) 0/)
+    expect(await assinantes()).toBe(10)
+    expect(await ads()).toBe(5)
   })
 
   it('refuses a missing uploads folder without echoing the path', () => {

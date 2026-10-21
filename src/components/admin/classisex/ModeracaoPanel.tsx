@@ -20,6 +20,7 @@ type View = {
   publicApelido: string
   euSouLabel: string
   contaAutor: 'Conta gratuita' | 'Assinante'
+  rascunhoDaEquipe: boolean
   removed: number
   contato: { whatsapp: string | null; telegram: string | null }
   fields: Record<string, unknown>
@@ -181,7 +182,20 @@ export function ModeracaoPanel() {
             </ul>
           </div>
 
-          {s === 'rascunho' ? (
+          {s === 'rascunho' && view.rascunhoDaEquipe ? (
+            <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
+              <p style={{ margin: 0, fontWeight: 600 }}>
+                Rascunho do site antigo, escrito pela equipe. Só a equipe vê. Troque o anunciante pelo dono certo
+                (ele envia pelo site), ou confira o texto, os contatos e as fotos e aprove para publicar. Para
+                descartar, apague o anúncio.
+              </p>
+              <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
+                <button type="button" onClick={() => act('aprovar')} disabled={busy} style={buttonStyle('primary', busy)}>
+                  Aprovar e publicar
+                </button>
+              </div>
+            </div>
+          ) : s === 'rascunho' ? (
             <p style={{ margin: 'calc(var(--base) * 0.75) 0 0', fontWeight: 600 }}>
               Rascunho do anunciante, trazido do site antigo. Só o anunciante pode enviar para análise.
             </p>

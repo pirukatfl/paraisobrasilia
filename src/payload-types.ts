@@ -451,7 +451,7 @@ export interface Ad {
    */
   resumo?: string | null;
   /**
-   * Assinante que escreveu o anúncio. Não aparece no site.
+   * Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).
    */
   author: number | Assinante;
   /**
@@ -507,6 +507,10 @@ export interface Ad {
   moderatedAt?: string | null;
   moderatedBy?: (number | null) | User;
   wpCommentId?: number | null;
+  /**
+   * Rascunho trazido do site antigo, só a equipe vê. Troque o anunciante, edite e aprove, ou apague.
+   */
+  origemLegado?: 'equipe' | null;
   importadoEm?: string | null;
   criadoNoSiteAntigoEm?: string | null;
   /**
@@ -1384,6 +1388,7 @@ export interface AdsSelect<T extends boolean = true> {
   moderatedAt?: T;
   moderatedBy?: T;
   wpCommentId?: T;
+  origemLegado?: T;
   importadoEm?: T;
   criadoNoSiteAntigoEm?: T;
   consentAt?: T;

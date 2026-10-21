@@ -308,7 +308,7 @@ Vídeo ocupa muito mais espaço que foto, então:
 
 Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do WordPress nunca vai para o git nem para o chat.** Mande para a gente só os números que o comando imprime.
 
-1. **Confira as migrações** do deploy (`migracao_contas` e `migracao_anuncios`):
+1. **Confira as migrações** do deploy (`migracao_contas`, `migracao_anuncios` e `anuncios_equipe`):
 
    ```bash
    journalctl -u paraiso-update -n 80 | grep -i migracao     # "Migrated: ..._migracao_contas" e "..._migracao_anuncios"
@@ -343,6 +343,8 @@ Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do Word
    $IMPORTAR                # grava contas, períodos e anúncios (rascunhos)
    $IMPORTAR --uploads /importacao/uploads    # depois, quando a pasta de fotos chegar
    ```
+
+   **Anúncios de quem não foi importado** (administradores do site antigo e usuários apagados) entram como rascunhos da conta técnica "Equipe (anúncios do site antigo)" (e-mail fixo `equipe-legado@invalid.paraiso.local`, sem login possível), visíveis só para a equipe. No relatório aparecem como `da equipe (rascunho para revisar) N`. Repetir o comando é seguro: quem já existe vira `já existiam`, e só os novos são criados. Na primeira rodada depois desta mudança, esperamos `rascunhos criados 96 · já existiam 108 · da equipe (rascunho para revisar) 96` e `Contas: criadas 0` (a conta técnica não entra na contagem de contas).
 
    Outras opções: `--excluir-ids arquivo.txt` (um número de usuário por linha, `#` para comentários), `--chave-eu-sou` e `--chave-cidade` (só se o `--inspect` mostrar chaves diferentes) e `--post` (número do post do ClassiSex).
 
