@@ -494,7 +494,7 @@ export interface Ad {
   /**
    * Use os botões do quadro Moderação.
    */
-  status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado';
+  status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho';
   /**
    * Preenchido pelos botões Recusar e Despublicar.
    */
@@ -506,6 +506,9 @@ export interface Ad {
   publishedAt?: string | null;
   moderatedAt?: string | null;
   moderatedBy?: (number | null) | User;
+  wpCommentId?: number | null;
+  importadoEm?: string | null;
+  criadoNoSiteAntigoEm?: string | null;
   /**
    * O anunciante declarou ter 18 anos ou mais e autorização de todas as pessoas das fotos e do vídeo.
    */
@@ -1380,6 +1383,9 @@ export interface AdsSelect<T extends boolean = true> {
   publishedAt?: T;
   moderatedAt?: T;
   moderatedBy?: T;
+  wpCommentId?: T;
+  importadoEm?: T;
+  criadoNoSiteAntigoEm?: T;
   consentAt?: T;
   updatedAt?: T;
   createdAt?: T;

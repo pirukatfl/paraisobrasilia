@@ -128,8 +128,12 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
       ? tierOf(await withRequestState(req, () => accessStatusFor(req.payload, authorId, new Date(), req)))
       : 'gratis'
     const limits = TIER_LIMITS[tier]
+    // T-06-23: server-only flag for the WordPress import (Local API + overrideAccess; REST cannot set
+    // req.context). Skips only the per-tier photo count; size, decoding, EXIF strip and blur still apply.
+    const legacyImport =
+      req.context?.legacyImport === true && (args as { overrideAccess?: boolean }).overrideAccess === true
     if (kind === 'video' && limits.videos === 0) throw fail(AD_MEDIA_MESSAGES.videoGratis)
-    if (kind === 'foto' && totalDocs >= limits.fotos) {
+    if (kind === 'foto' && !legacyImport && totalDocs >= limits.fotos) {
       throw fail(tier === 'gratis' ? AD_MEDIA_MESSAGES.fotosGratis : AD_MEDIA_MESSAGES.fotos)
     }
     if (kind === 'video' && totalDocs >= limits.videos) throw fail(AD_MEDIA_MESSAGES.videos)

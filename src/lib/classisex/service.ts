@@ -41,6 +41,7 @@ import {
   ACTIVE_LIMIT,
   ACTIVE_STATUSES,
   AD_MESSAGES,
+  DRAFT_STATUS,
   validateAdInput,
   type AdErrors,
   type AdInput,
@@ -197,6 +198,8 @@ type MediaRow = { id: number; ad: unknown; owner: unknown; kind: 'foto' | 'video
  * (recusado/despublicado) and the limit is reached, it simply stays where it is.
  */
 async function backToModeration(payload: Payload, assinanteId: number, ad: AdDoc, now: Date, strict: boolean) {
+  // M-04: a media change never submits a draft (the author sends it through the validated form)
+  if (ad.status === DRAFT_STATUS) return
   if (!ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
     if (strict) throw limitError()
     return
@@ -231,7 +234,11 @@ export async function attachMedia(
   { assinanteId, adId, file, now }: { assinanteId: number; adId: number | string; file: UploadFile; now: Date },
 ): Promise<{ id: number }> {
   const ad = await loadOwnedAd(payload, assinanteId, adId)
-  if (!ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
+  if (
+    ad.status !== DRAFT_STATUS &&
+    !ACTIVE_STATUSES.includes(ad.status) &&
+    (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT
+  ) {
     throw limitError()
   }
   const kind = VIDEO_MIME_TYPES.includes(file.mimetype) ? 'video' : 'foto'
@@ -413,6 +420,7 @@ export const STAFF_STATUS_LABELS: Record<AdStatus, string> = {
   aprovado: 'Publicado',
   recusado: 'Recusado',
   despublicado: 'Despublicado',
+  rascunho: 'Rascunho do anunciante (site antigo)',
 }
 
 const STATE_WORDS: Record<AdStatus, string> = {
@@ -420,6 +428,7 @@ const STATE_WORDS: Record<AdStatus, string> = {
   aprovado: 'publicado',
   recusado: 'recusado',
   despublicado: 'despublicado',
+  rascunho: 'em rascunho (só o anunciante pode enviar)',
 }
 
 export const MOTIVO_MAX = 300
@@ -427,6 +436,7 @@ export const MOTIVO_MESSAGE = 'Escreva o motivo (até 300 caracteres).'
 
 type Moderation = 'aprovar' | 'recusar' | 'despublicar'
 
+// M-04: no transition starts from 'rascunho'; only the author submits it (updateAd -> 'pendente')
 const TRANSITIONS: Record<Moderation, { from: AdStatus[]; to: AdStatus; action: AuditAction; verb: string }> = {
   aprovar: { from: ['pendente', 'recusado', 'despublicado'], to: 'aprovado', action: 'anuncio-aprovado', verb: 'aprovado' },
   recusar: { from: ['pendente'], to: 'recusado', action: 'anuncio-recusado', verb: 'recusado' },

@@ -4,7 +4,10 @@
  */
 import { redactContacts } from './redact'
 
-export type AdStatus = 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+export type AdStatus = 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
+
+/** M-04: an ad brought from the old site; private to its author and staff until the author sends it. */
+export const DRAFT_STATUS = 'rascunho' as const
 
 export const TEXT_MAX = 600
 /** Revisão 2026-10-20: public nickname shown in the open preview. */

@@ -45,7 +45,12 @@ export const OWNER_STATUS_LABELS: Record<AdStatus, string> = {
   aprovado: 'Publicado',
   recusado: 'Recusado',
   despublicado: 'Despublicado pela equipe',
+  rascunho: 'Rascunho do site antigo (só você vê)',
 }
+
+/** M-04: shown on the members home and in Meus anúncios while any draft exists. */
+export const SITE_ANTIGO_AVISO =
+  'Você tinha anúncios no site antigo. Eles estão guardados como rascunho e só você vê. Revise o texto, preencha WhatsApp ou Telegram e envie para análise.'
 
 /** G-05: an approved ad of a free (or expired) author stays up showing only its cover. */
 export const FREE_PUBLISHED_LABEL = 'Publicado como conta gratuita (só a capa aparece)'

@@ -14,6 +14,7 @@ import {
   AD_MESSAGES,
   APELIDO_MAX,
   CIDADE_MAX,
+  DRAFT_STATUS,
   TEXT_MAX,
   apelidoError,
   cidadeError,
@@ -31,6 +32,7 @@ export const AD_STATUS_OPTIONS = [
   { label: 'Publicado', value: 'aprovado' },
   { label: 'Recusado', value: 'recusado' },
   { label: 'Despublicado', value: 'despublicado' },
+  { label: 'Rascunho (site antigo)', value: 'rascunho' },
 ] as const
 
 const relId = (value: unknown): number | string | null => {
@@ -60,7 +62,9 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
   if (typeof data.texto === 'string') data.texto = data.texto.replace(/\r\n/g, '\n').trim()
 
   const merged = { ...((originalDoc?.contato as Contato | undefined) ?? {}), ...((data.contato as Contato) ?? {}) }
-  if (!merged.whatsapp && !merged.telegram) {
+  // M-04: a draft brought from the old site may have no contact yet; the owner adds it before sending
+  const status = (data.status ?? originalDoc?.status) as string | undefined
+  if (!merged.whatsapp && !merged.telegram && status !== DRAFT_STATUS) {
     throw new ValidationError(
       { collection: 'ads', errors: [{ path: 'contato.whatsapp', message: AD_MESSAGES.contato }], req },
       req.t,
@@ -230,7 +234,13 @@ export const Ads: CollectionConfig = {
       admin: {
         description: `Até ${TEXT_MAX} caracteres. Só assinantes veem o texto.`,
       },
-      validate: (value: unknown) => textoError(String(value ?? '')) ?? true,
+      // M-04: old texts may exceed the limit while the ad is a draft; the owner shortens it before sending
+      validate: (value: unknown, { siblingData }: { siblingData?: Record<string, unknown> }) =>
+        siblingData?.status === DRAFT_STATUS
+          ? String(value ?? '').trim()
+            ? true
+            : AD_MESSAGES.textoVazio
+          : (textoError(String(value ?? '')) ?? true),
     },
     {
       name: 'contato',
@@ -306,6 +316,30 @@ export const Ads: CollectionConfig = {
       relationTo: 'users',
       label: 'Moderado por',
       admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
+      // M-04: set only by the WordPress importer (Local API); never by REST or the owner
+      name: 'wpCommentId',
+      type: 'number',
+      unique: true,
+      index: true,
+      label: 'ID do comentário no site antigo',
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: { readOnly: true, position: 'sidebar' },
+    },
+    {
+      name: 'importadoEm',
+      type: 'date',
+      label: 'Importado do site antigo em',
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: dateAdmin(),
+    },
+    {
+      name: 'criadoNoSiteAntigoEm',
+      type: 'date',
+      label: 'Publicado no site antigo em',
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: dateAdmin(),
     },
     {
       name: 'consentAt',

@@ -410,9 +410,11 @@ export interface SeedAdInput {
   cidade?: string
   texto?: string
   contato?: { whatsapp?: string; telegram?: string }
-  status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+  status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
   publishedAt?: string
   motivo?: string
+  /** Old WordPress comment id, importer-only field (06-06) */
+  wpCommentId?: number
 }
 
 /** Creates a ClassiSex ad through the Local API (default: first Eu sou option, pendente). */
@@ -436,6 +438,13 @@ export async function seedAd(payload: Payload, input: SeedAdInput) {
       submittedAt: new Date().toISOString(),
       ...(status === 'aprovado' ? { publishedAt: input.publishedAt ?? new Date().toISOString() } : {}),
       ...(input.motivo ? { motivo: input.motivo } : {}),
+      ...(input.wpCommentId !== undefined
+        ? {
+            wpCommentId: input.wpCommentId,
+            importadoEm: new Date().toISOString(),
+            criadoNoSiteAntigoEm: '2025-05-01T13:00:00.000Z',
+          }
+        : {}),
     } as never,
     overrideAccess: true,
   }) as Promise<{ id: number; status: string; resumo?: string | null }>

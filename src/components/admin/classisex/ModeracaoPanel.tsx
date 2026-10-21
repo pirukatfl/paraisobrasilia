@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
  * server (redactContacts), so staff see exactly what visitors will see (T-04-01).
  */
 
-type Status = 'pendente' | 'aprovado' | 'recusado' | 'despublicado'
+type Status = 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
 
 type View = {
   id: number
@@ -181,6 +181,12 @@ export function ModeracaoPanel() {
             </ul>
           </div>
 
+          {s === 'rascunho' ? (
+            <p style={{ margin: 'calc(var(--base) * 0.75) 0 0', fontWeight: 600 }}>
+              Rascunho do anunciante, trazido do site antigo. Só o anunciante pode enviar para análise.
+            </p>
+          ) : (
+            <>
           <label
             htmlFor="moderacao-motivo"
             style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 'calc(var(--base) * 0.75)' }}
@@ -222,6 +228,8 @@ export function ModeracaoPanel() {
               Despublicar
             </button>
           </div>
+            </>
+          )}
           {status && (
             <p role="status" style={{ margin: 'calc(var(--base) * 0.75) 0 0' }}>
               {status}
