@@ -229,3 +229,54 @@ test('anonymous sign-up through the REST API is refused', async ({ playwright })
   expect(res.ok()).toBe(false)
   await anon.dispose()
 })
+
+// Fase 6: old WordPress links and migration leak checks (read-only: GET only)
+test.describe('Fase 6: links antigos e vazamentos', () => {
+  /** Follows redirects by hand (max 4 hops) and returns the final path and status. */
+  async function chain(request: import('@playwright/test').APIRequestContext, from: string) {
+    let url = from
+    const hops: number[] = []
+    for (let i = 0; i < 4; i++) {
+      const res = await request.get(url, { maxRedirects: 0 })
+      const status = res.status()
+      hops.push(status)
+      if (![301, 302, 307, 308].includes(status)) return { path: url, status, hops }
+      const location = res.headers()['location'] ?? ''
+      url = new URL(location, BASE!).pathname
+    }
+    return { path: url, status: 0, hops }
+  }
+
+  const cases: [string, string][] = [
+    ['/classisex1/', '/classisex'],
+    ['/quemsomos/', '/quem-somos'],
+    ['/wp-login.php', '/entrar'],
+    ['/feed/', '/entrar'],
+    ['/membros/x/', '/classisex'],
+  ]
+  for (const [from, to] of cases) {
+    test(`${from} ends at ${to} through permanent redirects`, async ({ request }) => {
+      const r = await chain(request, from)
+      expect(r.path).toBe(to)
+      expect(r.hops[0]).toBeGreaterThanOrEqual(301)
+      expect([301, 308]).toContain(r.hops[0])
+    })
+  }
+
+  test('/4384-2/ reaches the migrated conto (200 once the contos bundle is deployed)', async ({ request }) => {
+    const r = await chain(request, '/4384-2/')
+    expect(r.path).toBe('/contos/engole-minha-pica-sua-puta-safada')
+    test.skip(r.status === 404, 'contos bundle not deployed on this host yet')
+    expect(r.status).toBe(200)
+  })
+
+  test('anonymous visitors get no account data and no draft ads', async ({ playwright }) => {
+    const anon = await playwright.request.newContext({ baseURL: BASE, extraHTTPHeaders: { Cookie: 'pb_age_ok=1' } })
+    const api = await anon.get('/api/assinantes')
+    expect([401, 403]).toContain(api.status())
+    expect(await api.text()).not.toContain('legacyPasswordHash')
+    const board = await anon.get('/classisex')
+    expect(await board.text()).not.toContain('Rascunho')
+    await anon.dispose()
+  })
+})
