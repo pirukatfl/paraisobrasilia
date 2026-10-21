@@ -508,6 +508,51 @@ Esse texto **ainda não está** nas páginas Termos e Privacidade do site: cole 
 
 ---
 
+## Site antigo (migração)
+
+Quando o site novo entrou no ar, as contas do site antigo (WordPress) vieram junto. Esta parte explica o que a equipe vai ver e o que dizer para as pessoas.
+
+### Contas que vieram do site antigo
+
+- No painel, em **Assinantes**, essas contas aparecem com origem **Site antigo**. Entram como **conta gratuita já confirmada**: ninguém precisa confirmar e-mail de novo.
+- Administradores do site antigo e contas de teste **ficaram de fora**.
+- Se a pessoa já tinha criado conta no site novo com o mesmo e-mail (e confirmado), a conta do site antigo foi **ligada a ela**: vale a senha nova e o tempo pago foi somado.
+- Conta criada no site novo e **não confirmada** com o mesmo e-mail não recebe nada do site antigo. Se a pessoa reclamar, peça para confirmar o e-mail e avise o desenvolvedor.
+
+### Senha antiga
+
+- A pessoa entra em **Entrar** com o **e-mail e a senha de antes**. No primeiro acesso a senha é convertida e, no histórico da conta, aparece **Senha do site antigo convertida**.
+- Se a senha antiga tem **menos de 8 caracteres**, o site pede uma senha nova na hora (a antiga foi confirmada, só falta criar a nova).
+- Quem esqueceu a senha usa **Esqueci minha senha** na tela de entrada, ou a equipe gera o link de nova senha na ficha da conta, como já é feito.
+
+### Assinante antigo sem data de vencimento
+
+Algumas contas do site antigo eram de assinante, mas **sem data de vencimento** registrada. Elas entram como gratuitas e ficam marcadas com **Assinante antigo sem data de vencimento**.
+
+- Onde aparece: na coluna **Conta** da lista, num quadro de aviso na ficha da conta, no filtro da lista e num quadro no painel inicial.
+- O que fazer: **decida com a casa**. Se a pessoa deve ter acesso, use **Assinatura** → **Liberar acesso** com a data combinada: o aviso some sozinho. Se ela deve continuar gratuita, clique em **Dispensar aviso** no quadro da ficha.
+- Tudo fica registrado no histórico da conta.
+
+### Tempo de assinatura que veio do site antigo
+
+- Quem tinha assinatura com data futura recebeu um período do plano **Migrado do site antigo**, até a mesma data (termina à meia-noite do dia seguinte ao último dia pago).
+- Esse plano **não aparece no Assine Já**. Para renovar, a pessoa assina normalmente e vocês liberam como sempre.
+
+### Anúncios antigos (rascunhos)
+
+- Os anúncios do ClassiSex antigo viraram **rascunhos**: só o autor (e a equipe, no painel) vê. Nada foi publicado sozinho.
+- O autor entra em **Meus anúncios**, vê o aviso de que o anúncio veio do site antigo e usa **Revisar e enviar**. Depois de enviado, o anúncio entra na fila de moderação como qualquer outro.
+- A equipe **não aprova rascunho**: o botão só aparece depois que o autor envia.
+- Telefones e contatos que estavam no texto antigo não aparecem para ninguém enquanto o anúncio for rascunho; o autor informa o contato ao revisar.
+- As fotos só vêm se o backup da pasta de fotos do site antigo for entregue.
+
+### Links antigos
+
+- Endereços do site antigo (contos, páginas, login, ClassiSex) levam às páginas novas.
+- As **Dicas Hot** antigas não têm página nova.
+
+---
+
 ## Dúvidas e problemas
 
 - O painel mostra o erro em vermelho ao lado do campo (ex.: "A imagem passa de 15 MB. Reduza o tamanho e envie de novo.").

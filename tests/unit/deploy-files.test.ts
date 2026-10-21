@@ -361,3 +361,43 @@ describe('Phase 5 staff guide and runbook 7.4 (plan 05-12)', () => {
     }
   })
 })
+
+describe('migração do WordPress: guia da equipe e runbook (06-09)', () => {
+  it('the staff guide explains the migrated accounts, the marker, the periods and the drafts', () => {
+    const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+    for (const h of [
+      '## Site antigo (migração)',
+      '### Contas que vieram do site antigo',
+      '### Senha antiga',
+      '### Assinante antigo sem data de vencimento',
+      '### Tempo de assinatura que veio do site antigo',
+      '### Anúncios antigos (rascunhos)',
+      '### Links antigos',
+    ]) {
+      expect(guide).toContain(h)
+    }
+    for (const s of ['Dispensar aviso', 'Migrado do site antigo', 'Esqueci minha senha', 'Revisar e enviar']) {
+      expect(guide).toContain(s)
+    }
+  })
+
+  it('the runbook 7.6 has backup, the rehearsal commands, dump deletion and the cutover rules', () => {
+    const runbook = read('docs/deploy/STAGING.md')
+    for (const s of [
+      '### 7.6 Migração do WordPress',
+      'pg_dump',
+      '/opt/paraiso-site/importacao',
+      'paraiso-staging_private_media',
+      'scripts/import/wordpress.ts',
+      '--inspect',
+      '--dry-run',
+      '--uploads',
+      'migracao_contas',
+      'migracao_anuncios',
+      'shred -u',
+      'Fase 7',
+    ]) {
+      expect(runbook).toContain(s)
+    }
+  })
+})

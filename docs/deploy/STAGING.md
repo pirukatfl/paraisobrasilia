@@ -304,6 +304,62 @@ Vídeo ocupa muito mais espaço que foto, então:
   Depois exclua a conta de teste no painel.
 
 
+### 7.6 Migração do WordPress
+
+Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do WordPress nunca vai para o git nem para o chat.** Mande para a gente só os números que o comando imprime.
+
+1. **Confira as migrações** do deploy (`migracao_contas` e `migracao_anuncios`):
+
+   ```bash
+   journalctl -u paraiso-update -n 80 | grep -i migracao     # "Migrated: ..._migracao_contas" e "..._migracao_anuncios"
+   ```
+
+2. **Backup antes de gravar** (obrigatório):
+
+   ```bash
+   cd /opt/paraiso-site
+   docker compose --env-file .env.staging exec -T db pg_dump -U paraiso paraiso | gzip > /opt/paraiso-site/antes-da-importacao.sql.gz
+   ```
+
+3. **Pasta da importação** (só o dono acessa) e cópia do dump (pelo gerenciador de arquivos do hPanel ou `scp`). A pasta de fotos, quando chegar, vai em `/opt/paraiso-site/importacao/uploads`:
+
+   ```bash
+   mkdir -p /opt/paraiso-site/importacao && chmod 700 /opt/paraiso-site/importacao
+   ```
+
+4. **Rodar** (três passos, nesta ordem; o comando é o mesmo, só mudam as opções). Troque `ARQUIVO` pelo nome do dump:
+
+   ```bash
+   cd /opt/paraiso-site
+   IMPORTAR="docker compose --env-file .env.staging run --rm -v /opt/paraiso-site/importacao:/importacao:ro -v paraiso-staging_private_media:/app/private-media -e PRIVATE_MEDIA_DIR=/app/private-media -e WP_DUMP_PATH=/importacao/ARQUIVO.sql.gz migrate node_modules/.bin/payload run scripts/import/wordpress.ts --"
+   $IMPORTAR --inspect      # só mostra a estrutura (contagens); não grava
+   $IMPORTAR --dry-run      # relatório da importação; não grava
+   $IMPORTAR                # grava contas, períodos e anúncios (rascunhos)
+   $IMPORTAR --uploads /importacao/uploads    # depois, quando a pasta de fotos chegar
+   ```
+
+   Outras opções: `--excluir-ids arquivo.txt` (um número de usuário por linha, `#` para comentários), `--chave-eu-sou` e `--chave-cidade` (só se o `--inspect` mostrar chaves diferentes) e `--post` (número do post do ClassiSex).
+
+5. **Conferir no painel:** em **Assinantes**, filtre por origem **Site antigo**; veja o quadro de contas a revisar no painel inicial; peça para uma pessoa conhecida entrar com a senha de antes.
+
+6. **Apagar o dump** do servidor assim que terminar:
+
+   ```bash
+   shred -u /opt/paraiso-site/importacao/*.sql.gz || rm -f /opt/paraiso-site/importacao/*.sql.gz
+   ```
+
+7. **Se algo der errado (voltar atrás):** pare o site, restaure o backup do passo 2 e suba de novo:
+
+   ```bash
+   cd /opt/paraiso-site
+   docker compose --env-file .env.staging stop app
+   docker compose --env-file .env.staging exec -T db psql -U paraiso -d postgres -c "DROP DATABASE paraiso WITH (FORCE)" -c "CREATE DATABASE paraiso OWNER paraiso"
+   gunzip -c /opt/paraiso-site/antes-da-importacao.sql.gz | docker compose --env-file .env.staging exec -T db psql -U paraiso paraiso
+   docker compose --env-file .env.staging start app
+   ```
+
+8. **Fase 7 (virada do site):** faça um backup novo e rode o mesmo comando com o dump atualizado. Ele traz só o que mudou: **nunca duplica** contas ou anúncios, **nunca encurta** um período pago, **nunca sobrescreve** senha já convertida, nome, apelido ou edição da equipe, e não mexe em rascunho que o autor já enviou.
+
 ## 8. Jeito B — publicar por SSH (alternativa)
 
 Para quem tem acesso SSH ao servidor (chave pública cadastrada em hPanel → VPS → servidor → **Chaves SSH**).
