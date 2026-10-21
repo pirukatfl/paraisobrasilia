@@ -159,7 +159,8 @@ describe('old ClassiSex ads', () => {
   it('discovers the wpDiscuz keys, or takes them from flags', async () => {
     const t = await readMigracaoFixture()
     expect(resolveFieldKeys(t, { postId: POST })).toEqual(KEYS)
-    expect(resolveFieldKeys(t, { postId: POST, euSou: 'a', cidade: 'b' })).toEqual({ euSou: 'a', cidade: 'b' })
+    expect(resolveFieldKeys(t, { postId: POST, euSou: KEYS.euSou, cidade: 'b' })).toEqual({ euSou: KEYS.euSou, cidade: 'b' })
+    expect(() => resolveFieldKeys(t, { postId: POST, euSou: 'a' })).toThrow(/--chave-eu-sou/)
     const noForm = { ...t, postmeta: t.postmeta!.filter((m) => !String(m.meta_key).startsWith('wpdiscuz')) }
     expect(resolveFieldKeys(noForm, { postId: POST })).toEqual({ euSou: KEYS.euSou, cidade: null })
     const polluted = {

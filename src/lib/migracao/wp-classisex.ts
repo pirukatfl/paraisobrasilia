@@ -80,6 +80,9 @@ export function resolveFieldKeys(
 ): FieldKeys {
   const meta = adMeta(tables, opts.postId)
   let euSou = opts.euSou
+  if (euSou && !meta.has(euSou)) {
+    throw new Error('A chave informada em --chave-eu-sou não existe nos anúncios. Rode com --inspect para ver as chaves.')
+  }
   if (!euSou) {
     let best: { key: string; share: number; rows: number } | null = null
     for (const [key, rows] of meta) {
