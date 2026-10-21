@@ -38,6 +38,8 @@ test('home card: a landscape flyer keeps its own aspect ratio (no 4:5 crop)', as
   expect(b.width / b.height).toBeGreaterThan(1.7) // 16:9 = 1.78, a 4:5 box would be 0.8
   expect(b.width / b.height).toBeLessThan(1.85)
   await expect(img).toHaveCSS('object-fit', 'contain')
+  // Lazy image: wait until it has decoded before reading its natural size.
+  await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0)
   const nat = await img.evaluate((el: HTMLImageElement) => ({ w: el.naturalWidth, h: el.naturalHeight }))
   expect(nat.w / nat.h).toBeCloseTo(16 / 9, 1)
 })
