@@ -3,6 +3,8 @@ import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
+import { LEGACY_REDIRECTS } from './src/lib/redirects/legacy-redirects'
+
 const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
@@ -16,6 +18,8 @@ const nextConfig: NextConfig = {
     return [
       { source: '/recados', destination: '/assine-ja', permanent: true },
       { source: '/area-do-assinante/recados', destination: '/area-do-assinante/mensagens', permanent: true },
+      // M-05: links do site antigo; mapa gerado, ver src/lib/redirects/build.ts
+      ...LEGACY_REDIRECTS,
     ]
   },
   async headers() {
