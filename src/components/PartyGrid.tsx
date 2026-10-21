@@ -1,20 +1,27 @@
 import type { PartyCardDTO } from '@/lib/parties/types'
 
 import { PartyCard } from './PartyCard'
+import { PartyFeatured } from './PartyFeatured'
 
 export function PartyGrid({ parties }: { parties: PartyCardDTO[] }) {
-  // Focal point: with 3+ parties the soonest one spans 2 columns x 2 rows from 1024px.
-  const featureFirst = parties.length >= 3
+  // The soonest party is the large, whole flyer; the others follow as a tidy card grid.
+  const [next, ...others] = parties
+  if (!next) return null
   return (
-    <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3" role="list">
-      {parties.map((party, index) => (
-        <li
-          key={party.id}
-          className={index === 0 && featureFirst ? 'lg:col-span-2 lg:row-span-2' : undefined}
+    <div className="mt-6">
+      <PartyFeatured party={next} />
+      {others.length > 0 && (
+        <ul
+          className="mt-8 grid grid-cols-1 items-start gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+          role="list"
         >
-          <PartyCard party={party} priority={index === 0} featured={index === 0 && featureFirst} />
-        </li>
-      ))}
-    </ul>
+          {others.map((party) => (
+            <li key={party.id}>
+              <PartyCard party={party} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }

@@ -9,7 +9,6 @@ const party: PartyDetailDTO = {
   title: 'Festa do Branco',
   startsAt: '2026-10-25T02:00:00.000Z',
   endsAt: '2026-10-25T12:00:00.000Z',
-  flyerFormat: 'portrait',
   flyer: { url: '/api/media/file/x.webp', width: 1080, height: 1350, alt: 'Flyer' },
   summary: null,
   details: null,

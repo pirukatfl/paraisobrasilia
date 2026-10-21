@@ -10,14 +10,14 @@ import { fileURLToPath } from 'url'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const rootDir = path.resolve(dirname, '../..')
 
-const TEST_DB_SUFFIX = '/paraiso_test'
+const TEST_DB_PATTERN = /\/paraiso_test(_[a-z0-9]+)?$/ // paraiso_test or a per-worktree copy (paraiso_test_xyz)
 
 function assertTestDatabase(): void {
   const uri = process.env.DATABASE_URI ?? ''
   // T-01-36: never reset anything but the dedicated test database.
-  if (!uri.replace(/\?.*$/, '').endsWith(TEST_DB_SUFFIX)) {
+  if (!TEST_DB_PATTERN.test(uri.replace(/\?.*$/, ''))) {
     throw new Error(
-      `Refusing to touch database "${uri.replace(/\/\/[^@]*@/, '//***@')}": tests only run against ${TEST_DB_SUFFIX}`,
+      `Refusing to touch database "${uri.replace(/\/\/[^@]*@/, '//***@')}": tests only run against paraiso_test[_suffix]`,
     )
   }
 }
@@ -181,7 +181,8 @@ export interface SeedPartyInput {
   title: string
   startsAt?: string
   endsAt?: string
-  flyerFormat?: 'square' | 'portrait'
+  /** Which fixture image is uploaded (the site reads the real proportions from the file) */
+  flyerFormat?: 'square' | 'portrait' | 'landscape' | 'stories'
   summary?: string
   prices?: { label: string; value: string }[]
   dressCode?: string
@@ -278,7 +279,7 @@ export async function seedParty(payload: Payload, partial: SeedPartyInput) {
   const flyer = await payload.create({
     collection: 'media',
     data: { alt: `Flyer da ${partial.title}` },
-    filePath: path.join(FIXTURES, flyerFormat === 'square' ? 'flyer-square.jpg' : 'flyer-portrait.jpg'),
+    filePath: path.join(FIXTURES, `flyer-${flyerFormat}.jpg`),
     overrideAccess: true,
   })
   const status = partial.status ?? 'published'
@@ -291,7 +292,6 @@ export async function seedParty(payload: Payload, partial: SeedPartyInput) {
       startsAt: partial.startsAt ?? new Date(Date.now() + 3 * 86_400_000).toISOString(),
       ...(partial.endsAt ? { endsAt: partial.endsAt } : {}),
       flyer: flyer.id,
-      flyerFormat,
       ...(partial.summary !== undefined ? { summary: partial.summary } : {}),
       ...(partial.prices !== undefined ? { prices: partial.prices } : {}),
       ...(partial.dressCode !== undefined ? { dressCode: partial.dressCode } : {}),
