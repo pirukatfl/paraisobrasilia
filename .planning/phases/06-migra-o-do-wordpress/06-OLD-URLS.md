@@ -1,0 +1,136 @@
+# URLs públicas do WordPress antigo (do backup 2026-10-19)
+
+Permalink: `/%postname%/`; front page = página "home". Só slugs públicos, sem dados pessoais.
+
+## Páginas publicadas
+
+- /assine-ja/
+- /checkout/
+- /contos/
+- /dicas-hot/
+- /envie-seu-conto/
+- /esqueci-minha-senha/
+- /faq/
+- /galeria/
+- /galeria-hot/
+- /home/
+- /hot-ia-videos-members/
+- /ia-hot-previa/
+- /login-ou-cadastro/
+- /minha-conta/
+- /obrigado/
+- /politica-de-privacidade/
+- /quemsomos/
+- /rede-social/
+- /regras-da-casa/
+- /sobreacasa/
+
+## Posts publicados (slug · categorias)
+
+- /23-centimetros-ii-suada-fodida-e-satisfeita/ · contos
+- /3-exercicios-rapidos-para-melhorar-a-qualidade-da-erecao/ · dicas-hot, postdev
+- /3753-2/ · postdev
+- /4384-2/ · contos
+- /4464-2/ · contos
+- /4716-2/ · contos, postdev
+- /4720-2/ · contos
+- /6-dicas-de-como-propor-e-curtir-o-sexo-a-tres/ · dicas-hot
+- /6925-2/ · contos, postdev
+- /7013-2/ · dicas-hot
+- /a-amante-da-minha-mulher/ · contos
+- /a-la-50-tons/ · dicas-hot, postdev
+- /a-primeira-vez-que-leticia-mamou/ · contos
+- /abusando-do-cunhado/ · contos
+- /apostei-e-perdi/ · postdev
+- /arregacando-a-buceta-da-mulher-do-meu-socio/ · contos, postdev
+- /asfixia-erotica/ · dicas-hot
+- /avisos/ · postdev
+- /ballbusting-o-que-e/ · dicas-hot
+- /barraca-armada/ · postdev
+- /beijo-grego/ · dicas-hot
+- /beijo-grego-2/ · dicas-hot, postdev
+- /beijo-triplo/ · dicas-hot
+- /carnaval-e-gang-bang/ · postdev
+- /carona-com-meu-professor/ · postdev
+- /casada-liberada/ · contos
+- /classisex1/ · postdev
+- /com-o-coroa-no-estacionamento-do-bar/ · contos
+- /comi-minha-sogra/ · contos, postdev
+- /como-funciona-o-swing/ · dicas-hot
+- /como-me-tornei-garota-de-programa/ · postdev
+- /como-ser-convidado-para-uma-festa-liberal/ · dicas-hot
+- /coroa-no-estacionamento-do-extra/ · contos
+- /crente-gostosa-e-virgem/ · contos
+- /crente-virgem-e-gostosa/ · contos
+- /cuckolding/ · dicas-hot
+- /dando-para-o-casal-de-amigos-na-viagem/ · contos
+- /dando-pro-chefe/ · contos
+- /dei-para-o-pai-da-minha-amiga/ · contos, postdev
+- /dei-para-o-tarado-do-carro-que-descobri-ser-amigo-do-marido/ · postdev
+- /dia-do-corno/ · dicas-hot, postdev
+- /dica/ · dicas-hot
+- /duplamente-deflorada/ · contos
+- /eu-e-julie/ · contos
+- /faculdade-dos-desejos/ · contos
+- /ferias-na-fazenda/ · contos
+- /foda-rapida-e-forte-no-paraiso/ · contos
+- /fui-de-traidor-a-corno-lambedor-da-buceta-cheia-de-porra-de-outro/ · contos, postdev
+- /inicio-no-mundo-liberal/ · postdev
+- /irmao-do-meu-amigo/ · contos
+- /massigista-completa/ · contos
+- /menage-a-trois-masculino/ · dicas-hot
+- /menage-de-surpresa/ · contos
+- /meu-chefe-me-comeu-o-rabo/ · contos
+- /meu-chefe-me-comeu-o-rabo-copy/ · contos
+- /meu-chefe-me-comeu-o-rabo-copy-3/ · contos
+- /meu-marido-e-um-corno-bicha/ · contos
+- /minha-cunhada-faz-o-que-minha-mulher-nao-faz/ · contos
+- /minha-mulher-e-meu-amigo/ · postdev
+- /mulher-madura/ · dicas-hot
+- /mulheres-mais-velhas/ · dicas-hot
+- /mural/ · postdev
+- /no-caminhao/ · postdev
+- /no-cinema/ · contos
+- /o-casal-mais-excitante-que-conheci/ · contos
+- /o-entregador-de-gas/ · postdev
+- /o-que-e-a-salirofilia/ · dicas-hot
+- /o-que-e-dogging/ · postdev
+- /o-que-sente-uma-hotwife/ · dicas-hot, postdev
+- /orgasmo-sem-penetracao/ · dicas-hot
+- /orgia-na-cobertura/ · contos
+- /os-beneficios-de-fazer-amor-pela-manha/ · dicas-hot
+- /pare-de-transar-uma-vez-por-semana/ · dicas-hot, postdev
+- /periculofilia-o-que-e/ · dicas-hot, postdev
+- /primeira-vez-no-swing/ · contos
+- /primeiro-swing/ · contos
+- /programacao/ · postdev
+- /quando-dei-um-vibrador-de-presente-pra-minha-esposa/ · contos
+- /quem-ama-assume-quem-nao-ama-da-desculpas/ · postdev
+- /rapidinha-pode-ser-uma-boa/ · postdev
+- /realizei-meu-fetiche-gang-bang/ · contos
+- /requisitos-basicos-para-ser-um-homem-bom-de-cama/ · dicas-hot
+- /rose-e-os-camioneiros/ · contos
+- /sendo-a-puta-do-novinho-2/ · contos
+- /sendo-a-puta-do-novinho-3/ · contos
+- /sexo-a-tres/ · contos
+- /sexo-a-tres-2/ · postdev
+- /sexo-anal-com-a-esposa/ · contos, postdev
+- /sexo-anal-o-grande-mito/ · contos
+- /sexo-em-grupo/ · contos
+- /sexo-no-chuveiro/ · dicas-hot
+- /sexo-no-mundo/ · dicas-hot
+- /signos-e-o-sexo/ · dicas-hot
+- /suruba-de-casais-quentes/ · postdev
+- /tem-a-certeza-que-sabe-tudo-sobre-sexo/ · dicas-hot
+- /terapia-de-casal/ · contos
+- /troca-de-casais/ · dicas-hot
+- /uma-verdadeira-dama-na-sociedade-e-uma-puta-depravada/ · contos, postdev
+- /vamos-trocar-os-maridos/ · contos
+- /viagra/ · dicas-hot, postdev
+
+## Categorias
+
+- /category/postdev/ (ou /postdev/ com category_base vazio)
+- /category/contos/ (ou /contos/ com category_base vazio)
+- /category/youzify_media/ (ou /youzify_media/ com category_base vazio)
+- /category/dicas-hot/ (ou /dicas-hot/ com category_base vazio)
