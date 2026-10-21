@@ -47,6 +47,9 @@ export default async function globalSetup(): Promise<void> {
       attractions: [{ kind: 'dj', name: 'DJ Teste' }],
       details: 'Abertura da casa às 23h. Traje elegante.',
     })
+    // Flyers in other social formats: shown whole at their own proportions (no 4:5 crop)
+    await seedParty(payload, { title: 'Festa Paisagem', flyerFormat: 'landscape', startsAt: brasiliaAt(5, 23) })
+    await seedParty(payload, { title: 'Festa Stories', flyerFormat: 'stories', startsAt: brasiliaAt(6, 23) })
     // Ended yesterday morning: reachable by direct link, absent from the home page
     await seedParty(payload, {
       title: 'Festa Passada',

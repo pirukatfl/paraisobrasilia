@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { FlyerFrame } from '@/components/party/FlyerFrame'
 import { PartyDetails } from '@/components/party/PartyDetails'
 import { formatPartyDate, formatPartyTime } from '@/lib/format/date'
 import { getPartyBySlug } from '@/lib/parties/queries'
@@ -34,22 +34,17 @@ export default async function PartyPage({ params }: Props) {
   const party = await getPartyBySlug(slug)
   if (!party) notFound()
 
-  const ratio = party.flyerFormat === 'square' ? 'aspect-square' : 'aspect-[4/5]'
-
   return (
     <article className="grid grid-cols-1 gap-8 lg:grid-cols-12">
       <div className="lg:col-span-5">
-        <div className={`relative ${ratio} w-full overflow-hidden rounded-lg lg:sticky lg:top-8`}>
-          <Image
-            src={party.flyer.url}
-            alt={party.flyer.alt}
-            width={party.flyer.width}
-            height={party.flyer.height}
-            sizes="(max-width: 1024px) 100vw, 40vw"
-            priority
-            className="h-full w-full object-cover"
-          />
-        </div>
+        <FlyerFrame
+          flyer={party.flyer}
+          sizes="(max-width: 1024px) 100vw, 40vw"
+          priority
+          minRatio={0}
+          maxHeightClass="max-h-[85vh]"
+          className="rounded-lg lg:sticky lg:top-8"
+        />
       </div>
 
       <div className="max-w-[680px] lg:col-span-7">

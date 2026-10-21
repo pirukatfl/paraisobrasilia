@@ -833,11 +833,11 @@ export interface Party {
    */
   endsAt?: string | null;
   /**
-   * Envie o flyer no formato das redes: 1080×1080 (quadrado) ou 1080×1350 (vertical). JPG, PNG ou WebP até 15 MB.
+   * Envie no formato que usa nas redes (quadrado, vertical, stories ou horizontal); o site mostra inteiro. JPG, PNG ou WebP até 15 MB.
    */
   flyer: number | Media;
   /**
-   * Escolha o mesmo formato do flyer enviado.
+   * Não usado: o site detecta o formato do flyer enviado.
    */
   flyerFormat: 'square' | 'portrait';
   /**

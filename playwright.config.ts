@@ -9,7 +9,9 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 loadEnv({ path: path.resolve(dirname, '.env.test') })
 
 const remoteBaseURL = process.env.E2E_BASE_URL
-const baseURL = remoteBaseURL ?? 'http://localhost:3000'
+// E2E_PORT lets parallel worktrees run their own dev server (default 3000).
+const port = process.env.E2E_PORT ?? '3000'
+const baseURL = remoteBaseURL ?? `http://localhost:${port}`
 
 // Optional preinstalled Chromium (for environments where `playwright install` is not possible).
 const executablePath = process.env.PW_CHROMIUM_PATH || undefined
@@ -47,7 +49,7 @@ export default defineConfig({
   webServer: remoteBaseURL
     ? undefined
     : {
-        command: 'pnpm dev',
+        command: `pnpm dev -p ${port}`,
         url: baseURL,
         reuseExistingServer: true,
         timeout: 180_000,

@@ -56,8 +56,9 @@ test('staff creates, publishes, edits and unpublishes a party', async ({ page, c
   await drawer.getByRole('button', { name: 'Salvar' }).click()
   await expect(drawer).toBeHidden()
 
-  await page.locator('#field-flyerFormat').click()
-  await page.getByRole('option', { name: 'Quadrado (1:1)' }).click()
+  // The flyer format is automatic now: no selector, and the upload says any social format works
+  await expect(page.locator('#field-flyerFormat')).not.toBeVisible()
+  await expect(page.getByText('o site mostra inteiro')).toBeVisible()
 
   // Publicar
   await page.getByRole('button', { name: 'Publicar alterações' }).click()

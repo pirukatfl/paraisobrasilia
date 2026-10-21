@@ -31,7 +31,6 @@ describe('getUpcomingParties (FEST-01, FEST-04)', () => {
 
     const [a, b] = parties
     expect(a.slug).toBe('festa-futura-a')
-    expect(a.flyerFormat).toBe('portrait')
     expect(a.endsAt).toBe('2026-10-25T12:00:00.000Z') // default +10 h
     expect(a.flyer.url).toMatch(/^\/api\/media\/file\/.+/)
     expect(a.flyer.width).toBe(1080)

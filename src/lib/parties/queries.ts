@@ -5,14 +5,18 @@ import { getPayload } from 'payload'
 
 import type { Media, Party } from '../../payload-types'
 import { cached } from '../cache/cached'
-import type { FlyerFormat, FlyerImage, PartyCardDTO, PartyDetailDTO, RichTextState } from './types'
+import type { FlyerImage, PartyCardDTO, PartyDetailDTO, RichTextState } from './types'
 import { isUpcoming } from './visibility'
 
 const UPCOMING_LIMIT = 50 // T-01-11: bounded list
 
-function toFlyerImage(flyer: Party['flyer'], format: FlyerFormat, title: string): FlyerImage {
+/**
+ * The flyer is shown whole, at its own proportions (square, 4:5, 9:16, 16:9...): use the
+ * non-cropping `gallery` derivative (long side up to 1600 px) and fall back to the original.
+ */
+function toFlyerImage(flyer: Party['flyer'], title: string): FlyerImage {
   const media = (typeof flyer === 'object' && flyer ? flyer : null) as Media | null
-  const size = media?.sizes?.[format]
+  const size = media?.sizes?.gallery
   const alt = media?.alt?.trim() || `Flyer da festa ${title}`
   if (size?.url && size.width && size.height) {
     return { url: size.url, width: size.width, height: size.height, alt }
@@ -20,21 +24,19 @@ function toFlyerImage(flyer: Party['flyer'], format: FlyerFormat, title: string)
   return {
     url: media?.url ?? '',
     width: media?.width ?? 1080,
-    height: media?.height ?? (format === 'square' ? 1080 : 1350),
+    height: media?.height ?? 1350,
     alt,
   }
 }
 
 export function toPartyCard(doc: Party): PartyCardDTO {
-  const flyerFormat = (doc.flyerFormat ?? 'portrait') as FlyerFormat
   return {
     id: String(doc.id),
     slug: doc.slug,
     title: doc.title,
     startsAt: doc.startsAt,
     endsAt: doc.endsAt ?? doc.startsAt,
-    flyerFormat,
-    flyer: toFlyerImage(doc.flyer, flyerFormat, doc.title),
+    flyer: toFlyerImage(doc.flyer, doc.title),
     updatedAt: doc.updatedAt,
   }
 }

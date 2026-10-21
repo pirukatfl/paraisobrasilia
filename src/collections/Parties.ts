@@ -111,16 +111,18 @@ export const Parties: CollectionConfig = {
       label: 'Flyer',
       admin: {
         description:
-          'Envie o flyer no formato das redes: 1080×1080 (quadrado) ou 1080×1350 (vertical). JPG, PNG ou WebP até 15 MB.',
+          'Envie no formato que usa nas redes (quadrado, vertical, stories ou horizontal); o site mostra inteiro. JPG, PNG ou WebP até 15 MB.',
       },
     },
     {
+      // Legacy: the site now reads the real width/height of the uploaded flyer. Kept (hidden,
+      // with its default) so the column stays and no destructive migration is needed.
       name: 'flyerFormat',
       type: 'select',
       required: true,
       defaultValue: 'portrait',
-      label: 'Formato do flyer',
-      admin: { description: 'Escolha o mesmo formato do flyer enviado.' },
+      label: 'Formato do flyer (automático)',
+      admin: { hidden: true, description: 'Não usado: o site detecta o formato do flyer enviado.' },
       options: [
         { label: 'Quadrado (1:1)', value: 'square' },
         { label: 'Vertical (4:5)', value: 'portrait' },
