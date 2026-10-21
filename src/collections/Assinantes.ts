@@ -80,7 +80,10 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
     // Staff link (no e-mail), or the "Esqueci minha senha" action — only while e-mail is configured
     const staffLink = req.context?.staffPasswordLink === true
     const emailed = req.context?.emailedPasswordLink === true && emailEnabled()
-    if (!staffLink && !emailed) throw new Forbidden(req.t)
+    // Server-only: set by legacy-login after the old WordPress password was verified (T-06-17).
+    // `context` cannot be set over HTTP, so the public REST endpoint stays closed.
+    const legacyUpgrade = req.context?.legacyPasswordUpgrade === true
+    if (!staffLink && !emailed && !legacyUpgrade) throw new Forbidden(req.t)
   }
   const writeArgs = args as { data?: Record<string, unknown> }
   const data = operation === 'create' || operation === 'update' ? writeArgs.data : undefined
