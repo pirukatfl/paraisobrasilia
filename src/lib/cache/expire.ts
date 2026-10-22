@@ -7,6 +7,7 @@ import { revalidateTag } from 'next/cache.js'
  * 'plans' — Assine Já plans (03-02); 'ads' — ClassiSex public preview (04-07), expired by ads,
  * Eu sou options, ad media and subscription changes.
  * 'contos' (lists, sitemap) and 'conto:{slug}' (one conto) — 05-02/05-03.
+ * 'dicas' (lists, home, sitemap) and 'dica:{slug}' (quick dicas-hot).
  * `{ expire: 0 }` expires immediately, so the next visitor gets fresh HTML instead of a
  * stale-while-revalidate copy.
  */

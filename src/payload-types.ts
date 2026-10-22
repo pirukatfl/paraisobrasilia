@@ -87,6 +87,7 @@ export interface Config {
     parties: Party;
     pages: Page;
     contos: Conto;
+    dicas: Dica;
     'space-items': SpaceItem;
     models: Model;
     'payload-kv': PayloadKv;
@@ -124,6 +125,7 @@ export interface Config {
     parties: PartiesSelect<false> | PartiesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     contos: ContosSelect<false> | ContosSelect<true>;
+    dicas: DicasSelect<false> | DicasSelect<true>;
     'space-items': SpaceItemsSelect<false> | SpaceItemsSelect<true>;
     models: ModelsSelect<false> | ModelsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -1005,6 +1007,71 @@ export interface Conto {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Dicas Hot do site: textos abertos a qualquer visitante e ao Google. Salve como rascunho para revisar; Publicar coloca no ar.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dicas".
+ */
+export interface Dica {
+  id: number;
+  title: string;
+  /**
+   * Endereço: /dicas-hot/…  Se ficar vazio, é criado a partir do título. Mudar o endereço quebra links já compartilhados e o Google.
+   */
+  slug: string;
+  /**
+   * Ordena a lista: mais recentes primeiro.
+   */
+  publishedAt: string;
+  /**
+   * Aparece na lista e como descrição no Google e nas prévias do WhatsApp (o Google mostra uns 155 caracteres). Se ficar vazio, usamos o começo do texto.
+   */
+  resumo?: string | null;
+  /**
+   * Sem nudez explícita: esta parte do site é aberta.
+   */
+  capa?: (number | null) | Media;
+  /**
+   * A capa só aparece no site e nas prévias de compartilhamento com esta caixa marcada. Capas trazidas do site antigo chegam desmarcadas: olhe a imagem e marque.
+   */
+  capaConferida?: boolean | null;
+  texto: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Marcado pela importação quando o post antigo era montado no Elementor, perdeu imagens, shortcodes ou contatos, ou era curto. Confira o texto e desmarque.
+   */
+  revisar?: boolean | null;
+  /**
+   * Preenchido pela importação. Não mexa.
+   */
+  wpId?: number | null;
+  /**
+   * Usado para redirecionar o link antigo.
+   */
+  wpSlug?: string | null;
+  importadoEm?: string | null;
+  /**
+   * Preenchido quando a importação trouxe a capa. A importação nunca troca uma capa de novo.
+   */
+  capaImportadaEm?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Fotos e vídeos dos ambientes. Sem nudez explícita: esta galeria é aberta ao público.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1172,6 +1239,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'contos';
         value: number | Conto;
+      } | null)
+    | ({
+        relationTo: 'dicas';
+        value: number | Dica;
       } | null)
     | ({
         relationTo: 'space-items';
@@ -1700,6 +1771,27 @@ export interface ContosSelect<T extends boolean = true> {
   wpSlug?: T;
   wpRestrito?: T;
   importadoEm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dicas_select".
+ */
+export interface DicasSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  publishedAt?: T;
+  resumo?: T;
+  capa?: T;
+  capaConferida?: T;
+  texto?: T;
+  revisar?: T;
+  wpId?: T;
+  wpSlug?: T;
+  importadoEm?: T;
+  capaImportadaEm?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

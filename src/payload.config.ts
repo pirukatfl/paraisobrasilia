@@ -15,6 +15,7 @@ import { Ads } from './collections/Ads'
 import { Assinantes } from './collections/Assinantes'
 import { AuditLog } from './collections/AuditLog'
 import { Contos } from './collections/Contos'
+import { Dicas } from './collections/Dicas'
 import { Media } from './collections/Media'
 import { Models } from './collections/Models'
 import { Pages } from './collections/Pages'
@@ -102,6 +103,7 @@ export default buildConfig({
     Parties,
     Pages,
     Contos,
+    Dicas,
     SpaceItems,
     Models,
   ],

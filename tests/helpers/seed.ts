@@ -54,6 +54,8 @@ const RESET_ORDER = [
   'recados',
   // Contos (Phase 5)
   'contos',
+  // Dicas Hot (quick dicas-hot): before media (capa references it)
+  'dicas',
   // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
   'ad-reports',
   'ad-media',
@@ -263,6 +265,46 @@ export async function seedConto(payload: Payload, input: SeedContoInput) {
       ...(input.wpId !== undefined ? { wpId: input.wpId } : {}),
       ...(input.wpSlug !== undefined ? { wpSlug: input.wpSlug } : {}),
       ...(input.wpRestrito !== undefined ? { wpRestrito: input.wpRestrito } : {}),
+    } as never,
+    overrideAccess: true,
+  }) as unknown as Promise<{ id: number; slug: string; title: string; _status?: string }>
+}
+
+export interface SeedDicaInput {
+  title: string
+  slug?: string
+  /** One paragraph per entry (default: 3 generic paragraphs) */
+  paragrafos?: string[]
+  status?: 'published' | 'draft'
+  publishedAt?: string
+  resumo?: string
+  capa?: number
+  capaConferida?: boolean
+  revisar?: boolean
+  wpId?: number
+  wpSlug?: string
+}
+
+/** Creates a dica through the Local API (published by default). */
+export async function seedDica(payload: Payload, input: SeedDicaInput) {
+  const status = input.status ?? 'published'
+  return payload.create({
+    collection: 'dicas' as never,
+    draft: status === 'draft',
+    data: {
+      _status: status,
+      title: input.title,
+      ...(input.slug ? { slug: input.slug } : {}),
+      publishedAt: input.publishedAt ?? '2025-06-01T12:00:00.000Z',
+      texto: lexicalParagraphs(
+        input.paragrafos ?? [1, 2, 3].map((i) => `Parágrafo ${i} da dica ${input.title}.`),
+      ),
+      ...(input.resumo !== undefined ? { resumo: input.resumo } : {}),
+      ...(input.capa !== undefined ? { capa: input.capa } : {}),
+      ...(input.capaConferida !== undefined ? { capaConferida: input.capaConferida } : {}),
+      ...(input.revisar !== undefined ? { revisar: input.revisar } : {}),
+      ...(input.wpId !== undefined ? { wpId: input.wpId } : {}),
+      ...(input.wpSlug !== undefined ? { wpSlug: input.wpSlug } : {}),
     } as never,
     overrideAccess: true,
   }) as unknown as Promise<{ id: number; slug: string; title: string; _status?: string }>

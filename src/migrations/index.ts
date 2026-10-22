@@ -28,6 +28,7 @@ import * as migration_20261021_121622_migracao_contas from './20261021_121622_mi
 import * as migration_20261021_123416_migracao_anuncios from './20261021_123416_migracao_anuncios';
 import * as migration_20261021_203534_anuncios_equipe from './20261021_203534_anuncios_equipe';
 import * as migration_20261022_022156_mural_publicado from './20261022_022156_mural_publicado';
+import * as migration_20261022_102706_dicas from './20261022_102706_dicas';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20261022_022156_mural_publicado.up,
     down: migration_20261022_022156_mural_publicado.down,
-    name: '20261022_022156_mural_publicado'
+    name: '20261022_022156_mural_publicado',
+  },
+  {
+    up: migration_20261022_102706_dicas.up,
+    down: migration_20261022_102706_dicas.down,
+    name: '20261022_102706_dicas'
   },
 ];
