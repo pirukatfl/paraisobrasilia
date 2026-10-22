@@ -79,7 +79,7 @@ const OPEN_TOO_MUCH = 0.4
 const OPEN_TOO_SHORT_WORDS = 60
 
 /** Applies redactContacts to every text node, returns how many contacts were replaced. */
-function redactTextNodes(node: LexicalNode): number {
+export function redactTextNodes(node: LexicalNode): number {
   let removed = 0
   if (node.type === 'text' && typeof node.text === 'string') {
     const result = redactContacts(node.text)
@@ -95,7 +95,7 @@ function redactTextNodes(node: LexicalNode): number {
 }
 
 /** Removes leftover shortcodes ([x a b], [/x]) from the text nodes; the redaction label is kept. */
-function stripShortcodes(node: LexicalNode): number {
+export function stripShortcodes(node: LexicalNode): number {
   let removed = 0
   if (node.type === 'text' && typeof node.text === 'string') {
     const parts = node.text.split(REDACTED_LABEL)
@@ -115,7 +115,7 @@ function stripShortcodes(node: LexicalNode): number {
 }
 
 /** Normalized text used to spot exact duplicates. */
-function dedupeKey(plain: string): string {
+export function dedupeKey(plain: string): string {
   return plain
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -124,7 +124,7 @@ function dedupeKey(plain: string): string {
     .trim()
 }
 
-function firstWords(plain: string, n: number): string {
+export function firstWords(plain: string, n: number): string {
   return plain
     .replace(/\[[^\]]*\]/g, ' ')
     .split(/\s+/)
@@ -133,7 +133,7 @@ function firstWords(plain: string, n: number): string {
     .join(' ')
 }
 
-function baseSlugOf(conto: WpConto): string {
+export function baseSlugOf(conto: WpConto): string {
   let decoded = conto.wpSlug
   try {
     decoded = decodeURIComponent(conto.wpSlug)
@@ -143,7 +143,7 @@ function baseSlugOf(conto: WpConto): string {
   return slugify(decoded) || slugify(conto.wpSlug) || slugify(conto.title) || 'conto'
 }
 
-function withSuffix(base: string, n: number): string {
+export function withSuffix(base: string, n: number): string {
   const suffix = `-${n}`
   return `${base.slice(0, SLUG_MAX - suffix.length).replace(/-+$/, '')}${suffix}`
 }
