@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { expectFieldError } from '../helpers/errors'
+import { findLatestDicas, findPublishedDica, findPublishedDicaSlugs, findPublishedDicas } from '../../src/lib/dicas/reads'
 import { getTestPayload, lexicalParagraphs, resetDatabase, seedAssinante, seedDica, seedStaffUser } from '../helpers/seed'
 
 const DENIED = /permiss|forbidden|not allowed/i
@@ -94,5 +95,56 @@ describe('dicas collection (quick dicas-hot, DH-05, T-DH-01)', () => {
     await payload.delete({ collection: 'dicas', id: doc.id, overrideAccess: true })
     expect(spy).toHaveBeenCalledWith(expect.arrayContaining(['dicas', 'dica:cache-dois']))
     spy.mockRestore()
+  })
+
+  describe('public reads (A2)', () => {
+    beforeAll(async () => {
+      await resetDatabase(payload)
+      for (let i = 1; i <= 13; i++) {
+        await seedDica(payload, {
+          title: `Dica ${i}`,
+          slug: `dica-${i}`,
+          publishedAt: `2025-06-${String(i).padStart(2, '0')}T12:00:00.000Z`,
+        })
+      }
+      await seedDica(payload, { title: 'Rascunho', slug: 'rascunho', status: 'draft', publishedAt: '2025-07-01T12:00:00.000Z' })
+    })
+
+    it('never returns drafts and orders newest first, 12 per page', async () => {
+      const p1 = await findPublishedDicas(payload, { page: 1 })
+      expect(p1.totalDocs).toBe(13)
+      expect(p1.totalPages).toBe(2)
+      expect(p1.items).toHaveLength(12)
+      expect(p1.items[0]!.slug).toBe('dica-13')
+      const p2 = await findPublishedDicas(payload, { page: 2 })
+      expect(p2.items.map((d) => d.slug)).toEqual(['dica-1'])
+      const all = [...p1.items, ...p2.items].map((d) => d.slug)
+      expect(all).not.toContain('rascunho')
+    })
+
+    it('findPublishedDica: draft slug and unknown slug are null', async () => {
+      expect((await findPublishedDica(payload, 'dica-3'))?.title).toBe('Dica 3')
+      expect(await findPublishedDica(payload, 'rascunho')).toBeNull()
+      expect(await findPublishedDica(payload, 'nao-existe')).toBeNull()
+    })
+
+    it('slugs are published only; latest(3) are the three newest', async () => {
+      const slugs = (await findPublishedDicaSlugs(payload)).map((d) => d.slug)
+      expect(slugs).toHaveLength(13)
+      expect(slugs).not.toContain('rascunho')
+      expect((await findLatestDicas(payload, 3)).map((d) => d.slug)).toEqual(['dica-13', 'dica-12', 'dica-11'])
+    })
+
+    it('a published dica that has an unpublished draft edit still reads the published version', async () => {
+      const doc = await findPublishedDica(payload, 'dica-5')
+      await payload.update({
+        collection: 'dicas',
+        id: doc!.id,
+        draft: true,
+        overrideAccess: true,
+        data: { title: 'Dica 5 EDITADA (rascunho)', _status: 'draft' } as never,
+      })
+      expect((await findPublishedDica(payload, 'dica-5'))?.title).toBe('Dica 5')
+    })
   })
 })
