@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export const NEUTRAL_MESSAGE =
+const NEUTRAL_MESSAGE =
   'Se o e-mail existir, enviamos um link para criar uma nova senha. Olhe também a caixa de spam.'
 
 export default async function EsqueciSenhaPage({
