@@ -1,4 +1,13 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import { expect, test, type APIRequestContext } from '@playwright/test'
+
+import { LEGACY_REDIRECTS } from '../../src/lib/redirects/legacy-redirects'
+
+const dicasBundle = JSON.parse(
+  fs.readFileSync(path.resolve(process.cwd(), 'src/migrations/seed/dicas-wp.json'), 'utf8'),
+) as { legado: { wpSlug: string; slug: string | null }[] }
 
 // M-05 / MIG-03: links of the old WordPress site end in the right new page with permanent redirects.
 test.skip(({ isMobile }) => !isMobile, 'HTTP only: one project is enough')
@@ -32,6 +41,9 @@ const CASES: [string, string][] = [
   ['/membros/fulano/', '/classisex'],
   ['/atividades/', '/entrar'],
   ['/category/contos/', '/contos'],
+  ['/dicas-hot/', '/dicas-hot'],
+  ['/category/dicas-hot/', '/dicas-hot'],
+  ['/dicas-hot/page/2/', '/dicas-hot'],
   ['/sitemap_index.xml', '/sitemap.xml'],
   ['/login-ou-cadastro/', '/entrar'],
 ]
@@ -52,8 +64,17 @@ test('/assine-ja/ termina em /assine-ja com 200', async ({ request }) => {
   expect(status).toBe(200)
 })
 
-test('/beijo-grego/ termina em 404', async ({ request }) => {
-  const { status, hops } = await follow(request, '/beijo-grego/')
+for (const { wpSlug } of dicasBundle.legado) {
+  test(`dica antiga /${wpSlug}/ termina no destino do mapa`, async ({ request }) => {
+    const destination = LEGACY_REDIRECTS.find((r) => r.source === `/${wpSlug}`)!.destination
+    const { hops, final } = await follow(request, `/${wpSlug}/`)
+    for (const h of hops.filter((x) => x.status >= 300 && x.status < 400)) expect([301, 308]).toContain(h.status)
+    expect(final).toBe(destination)
+  })
+}
+
+test('/o-que-e-dogging/ termina em 404', async ({ request }) => {
+  const { status, hops } = await follow(request, '/o-que-e-dogging/')
   expect(status).toBe(404)
   for (const h of hops.slice(0, -1)) expect([301, 308]).toContain(h.status)
 })

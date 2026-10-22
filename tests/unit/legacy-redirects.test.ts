@@ -12,6 +12,12 @@ const bundle = (JSON.parse(fs.readFileSync(path.join(root, 'src/migrations/seed/
   contos: { wpSlug: string; slug: string }[]
 }).contos.map((c) => ({ wpSlug: c.wpSlug, slug: c.slug }))
 const slugs = new Set(bundle.map((c) => c.slug))
+const dicasBundle = JSON.parse(fs.readFileSync(path.join(root, 'src/migrations/seed/dicas-wp.json'), 'utf8')) as {
+  dicas: { slug: string; publicar: boolean }[]
+  legado: { wpSlug: string; slug: string | null }[]
+}
+const dicasLegado = dicasBundle.legado.map((d) => ({ wpSlug: d.wpSlug, slug: d.slug }))
+const dicaSlugs = new Set(dicasBundle.dicas.filter((d) => d.publicar).map((d) => d.slug))
 
 function listPages(dir: string, out: string[] = []): string[] {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -36,10 +42,12 @@ const validDestination = (d: string) => {
   if (d === '/sitemap.xml') return true
   const m = /^\/contos\/([^/]+)$/.exec(d)
   if (m) return slugs.has(m[1]!)
+  const dm = /^\/dicas-hot\/([^/]+)$/.exec(d)
+  if (dm) return dicaSlugs.has(dm[1]!)
   return isRoute(d)
 }
 
-const result = buildLegacyRedirects(markdown, bundle)
+const result = buildLegacyRedirects(markdown, bundle, dicasLegado)
 const get = (source: string) => result.redirects.find((r) => r.source === source)?.destination
 
 describe('parseOldUrls', () => {
@@ -59,8 +67,17 @@ describe('buildLegacyRedirects', () => {
     expect(get('/a-amante-da-minha-mulher')).toBe('/contos/a-amante-da-minha-mulher')
     expect(get('/regras-da-casa')).toBe('/quem-somos/regras')
     expect(get('/dicas-hot')).toBeUndefined()
-    expect(get('/beijo-grego')).toBeUndefined()
-    expect(result.semDestino).toContain('/beijo-grego')
+    const beijo = dicasLegado.find((d) => d.wpSlug === 'beijo-grego')!
+    expect(get('/beijo-grego')).toBe(beijo.slug ? `/dicas-hot/${beijo.slug}` : '/dicas-hot')
+    expect(get('/category/dicas-hot')).toBe('/dicas-hot')
+    expect(get('/category/dicas-hot/:path*')).toBe('/dicas-hot')
+    expect(get('/dicas-hot/page/:n')).toBe('/dicas-hot')
+    const idx = (s: string) => result.redirects.findIndex((r) => r.source === s)
+    expect(idx('/category/dicas-hot')).toBeLessThan(idx('/category/:slug'))
+    expect(idx('/category/dicas-hot/:path*')).toBeLessThan(idx('/category/:slug/:path*'))
+    for (const d of dicasLegado) {
+      expect(get(`/${d.wpSlug}`)).toBe(d.slug ? `/dicas-hot/${d.slug}` : '/dicas-hot')
+    }
     expect(get('/barraca-armada')).toBe('/contos')
     expect(get('/assine-ja')).toBeUndefined()
     expect(get('/mural')).toBe('/classisex')
@@ -100,6 +117,8 @@ describe('buildLegacyRedirects', () => {
       '/area-do-assinante',
       '/area-do-assinante/mensagens',
       '/contos/engole-minha-pica-sua-puta-safada',
+      '/dicas-hot',
+      '/dicas-hot/x',
     ]
     for (const r of result.redirects) {
       const re = toRegex(r.source)
@@ -117,10 +136,7 @@ describe('buildLegacyRedirects', () => {
       const ok = get(p) !== undefined || result.semDestino.includes(p) || isRoute(p)
       expect(ok, p).toBe(true)
     }
-    for (const s of result.semDestino) {
-      const u = parseOldUrls(markdown).find((x) => '/' + x.path.replace(/^\/+|\/+$/g, '') === s)!
-      expect(u.categorias.includes('dicas-hot') || s === '/o-que-e-dogging').toBe(true)
-    }
+    expect(result.semDestino).toEqual(['/o-que-e-dogging'])
   })
 
   it('the committed map is up to date', () => {

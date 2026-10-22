@@ -1,7 +1,7 @@
 /**
  * Generator of the old-WordPress-links redirect map (M-05). Pure: no Next, no Payload, no fs.
- * Input: the URL inventory markdown (06-OLD-URLS.md) and the contos bundle pairs (wpSlug -> slug).
- * T-06-08: only wpSlug/slug of the bundle are used; nothing else of the bundle is read.
+ * Input: the URL inventory markdown (06-OLD-URLS.md), the contos bundle pairs and the dicas bundle
+ * pairs (wpSlug -> slug | null). T-06-08: only wpSlug/slug of the bundles are used; nothing else is read.
  */
 
 export type RedirectEntry = { source: string; destination: string; statusCode: 301 }
@@ -120,8 +120,10 @@ export function parseOldUrls(markdown: string): OldUrl[] {
 export function buildLegacyRedirects(
   markdown: string,
   contos: { wpSlug: string; slug: string }[],
+  dicas: { wpSlug: string; slug: string | null }[] = [],
 ): { redirects: RedirectEntry[]; semDestino: string[] } {
   const bundle = new Map(contos.map((c) => [c.wpSlug, c.slug]))
+  const dicasBundle = new Map(dicas.map((d) => [d.wpSlug, d.slug]))
   const exact: RedirectEntry[] = []
   const semDestino: string[] = []
   const categoryRules: RedirectEntry[] = []
@@ -141,7 +143,8 @@ export function buildLegacyRedirects(
         const novo = bundle.get(slug)
         exact.push(redirect(`/${slug}`, novo ? `/contos/${novo}` : '/contos'))
       } else if (url.categorias.includes('dicas-hot')) {
-        semDestino.push(`/${slug}`)
+        const novo = dicasBundle.get(slug)
+        exact.push(redirect(`/${slug}`, novo ? `/dicas-hot/${novo}` : '/dicas-hot'))
       } else {
         exact.push(redirect(`/${slug}`, '/contos'))
       }
@@ -159,6 +162,9 @@ export function buildLegacyRedirects(
     ...exact,
     redirect('/category/contos', '/contos'),
     redirect('/category/contos/:path*', '/contos'),
+    redirect('/category/dicas-hot', '/dicas-hot'),
+    redirect('/category/dicas-hot/:path*', '/dicas-hot'),
+    redirect('/dicas-hot/page/:n', '/dicas-hot'),
     redirect('/category/:slug', '/'),
     redirect('/category/:slug/:path*', '/'),
     ...categoryRules,
@@ -170,7 +176,7 @@ export function buildLegacyRedirects(
 export function renderLegacyModule(result: { redirects: RedirectEntry[]; semDestino: string[] }): string {
   const lines = [
     '// Gerado por tests/unit/legacy-redirects.test.ts (UPDATE_REDIRECTS=1). Não edite à mão.',
-    '// M-05: links do site antigo -> páginas novas. Fonte: 06-OLD-URLS.md + contos-wp.json (src/lib/redirects/build.ts).',
+    '// M-05: links do site antigo -> páginas novas. Fonte: 06-OLD-URLS.md + contos-wp.json + dicas-wp.json (src/lib/redirects/build.ts).',
     '',
     'export const LEGACY_REDIRECTS: { source: string; destination: string; statusCode: 301 }[] = [',
     ...result.redirects.map(
