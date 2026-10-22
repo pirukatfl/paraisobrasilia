@@ -383,6 +383,41 @@ Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do Word
 
 8. **Fase 7 (virada do site):** faça um backup novo e rode o mesmo comando com o dump atualizado. Ele traz só o que mudou: **nunca duplica** contas ou anúncios, **nunca encurta** um período pago, **nunca sobrescreve** senha já convertida, nome, apelido ou edição da equipe, e não mexe em rascunho que o autor já enviou.
 
+### 7.7 Dicas Hot (22/10/2026)
+
+As 30 Dicas Hot do site antigo viajam no repositório (`src/migrations/seed/dicas-wp.json`, já revisado e sem contatos). Nada de dump neste passo.
+
+1. **Deploy normal.** Ele roda as migrações `dicas` (tabelas) e `dicas_wp_bundle` (carga das dicas). Conferir no log:
+
+   ```bash
+   cd /opt/paraiso-site
+   docker compose --env-file .env.staging logs migrate | grep -i dicas
+   ```
+
+   Saída esperada na primeira vez: `dicas_wp_bundle: 30 criadas, 0 já existiam.` (nenhuma ignorada ou duplicada no dump real; 20 chegam marcadas "Conferir texto importado"). Nas próximas vezes: `0 criadas, 30 já existiam.` Rodar de novo é seguro e nunca sobrescreve edição da equipe.
+
+2. **Capas (opcional, 15 imagens).** Elas não vão no repositório. Liste os arquivos usados (sai só a lista de caminhos, sem dump):
+
+   ```bash
+   docker compose --env-file .env.staging run --rm migrate node_modules/.bin/payload run scripts/import/dicas.ts -- --from-bundle src/migrations/seed/dicas-wp.json --listar-capas
+   ```
+
+   O cliente extrai **somente esses arquivos** do backup de uploads para `/opt/paraiso-site/importacao/uploads` (mesma estrutura `AAAA/MM/arquivo`) e ajusta o dono:
+
+   ```bash
+   chown -R 1000:1000 /opt/paraiso-site/importacao/uploads
+   ```
+
+   Faça o backup do banco antes (como no passo 2 da seção 7.6) e confirme o nome do volume com `docker volume ls | grep media`. Então:
+
+   ```bash
+   docker compose --env-file .env.staging run --rm -v /opt/paraiso-site/importacao:/importacao:ro -v paraiso-staging_media:/app/media -e MEDIA_DIR=/app/media migrate node_modules/.bin/payload run scripts/import/dicas.ts -- --from-bundle src/migrations/seed/dicas-wp.json --uploads /importacao/uploads
+   ```
+
+   O comando imprime só contagens; mande para a equipe técnica apenas a linha `Capas: gravadas N · ausentes N · recusadas N · fora da pasta N · já tinham N · sem dica N · sem capa no site antigo N`. Cada capa entra **uma vez** e **desmarcada** ("Capa conferida"): a equipe olha a imagem no painel e marca. Repetir o comando é seguro (`já tinham`).
+
+3. **Conferir:** abrir `/dicas-hot` (30 dicas, 12 por página), uma dica qualquer, e um link antigo (ex.: `/asfixia-erotica/` deve terminar em `/dicas-hot/asfixia-erotica`). Lembrete: `/o-que-e-dogging` continua sem página.
+
 ## 8. Jeito B — publicar por SSH (alternativa)
 
 Para quem tem acesso SSH ao servidor (chave pública cadastrada em hPanel → VPS → servidor → **Chaves SSH**).

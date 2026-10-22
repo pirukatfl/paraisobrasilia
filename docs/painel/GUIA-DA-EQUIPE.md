@@ -376,6 +376,34 @@ Se o trecho ficou curto ou longo demais, mude o número e olhe o quadro de novo.
 Autor e contatos que estavam nos textos antigos foram retirados na importação. Se ainda achar algum telefone ou e-mail dentro
 de um conto, apague e salve.
 
+## Dicas Hot
+
+As **Dicas Hot** são textos abertos: qualquer visitante lê a dica inteira, sem assinar, e o Google mostra esses textos nas buscas. Ficam em **/dicas-hot**, com link no **rodapé** do site e uma seção na **página inicial** (as 3 mais recentes). Não aparecem no menu principal. Não confunda com **Dicas**, dentro de Quem somos: aquela é um texto institucional da casa e continua em **Textos**.
+
+### Criar, editar e publicar
+
+1. No painel, abra **Dicas Hot** e clique em **Criar novo**.
+2. Preencha o **Título**, o **Texto** e a **Data de publicação** (a lista mostra as mais recentes primeiro).
+3. Clique em **Salvar rascunho** para guardar sem mostrar no site, ou em **Publicar** para colocar no ar na hora. **Despublicar** tira do ar sem apagar.
+4. Confira no site numa **janela anônima**.
+
+### Endereço, resumo e capa
+
+- **Endereço:** se ficar vazio, é criado a partir do título. **Não mude depois de publicada**: quem já compartilhou o link e o Google deixam de encontrar a dica.
+- **Resumo:** é a descrição que aparece no Google e na prévia do WhatsApp (até uns **155 caracteres**). Se ficar vazio, usamos o começo do texto.
+- **Imagem de capa:** como esta parte do site é aberta, use só imagem **sem nudez explícita**. A capa só aparece no site e nas prévias de compartilhamento com a caixa **Capa conferida (sem nudez explícita)** marcada. Capas trazidas do site antigo chegam **desmarcadas**: abra a dica, olhe a imagem e, estando tudo certo, marque a caixa e salve.
+
+### Dicas do site antigo
+
+**30 dicas** vieram do site antigo. Os links antigos (inclusive /dicas-hot/ e a categoria) levam às dicas novas. Na lista de **Dicas Hot**, filtre por **Conferir texto importado**: são as dicas que a importação marcou (cerca de 20) porque o post antigo era montado no Elementor, ou tinha trechos soltos, ou era muito curto. Em cada uma:
+
+- leia o texto e apague trechos soltos que não fazem sentido;
+- veja se alguma imagem do texto sumiu (as imagens dentro do texto não vêm; só a capa);
+- contatos (telefone, e-mail, WhatsApp) foram apagados na importação; se achar algum que sobrou, apague;
+- depois de conferir, **desmarque** "Conferir texto importado" e salve.
+
+Os campos da lateral ("Código no site antigo", "Endereço no site antigo", "Importado em", "Capa importada em") são só para consulta; não mexa neles.
+
 ## Recados (conversas privadas entre assinantes)
 
 **Desde 20/10/2026 não existe mais mural de recados.** O que antes se chamava "Mensagens" passou a se chamar **Recados**:
@@ -574,7 +602,7 @@ Os anúncios que a própria equipe (contas de administrador do site antigo) e us
 ### Links antigos
 
 - Endereços do site antigo (contos, páginas, login, ClassiSex) levam às páginas novas.
-- As **Dicas Hot** antigas não têm página nova.
+- Os links das **Dicas Hot** antigas levam às dicas novas (/dicas-hot).
 
 ---
 

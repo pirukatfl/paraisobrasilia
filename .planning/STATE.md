@@ -154,6 +154,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-20 | email-hostinger | Transactional e-mail through the Hostinger SMTP; /esqueci-senha (see .planning/quick/2026-10-20-email-hostinger/) |
 | 2026-10-20 | recados-privados | R-01 UNIFICAR: mural and recados moderation removed; Recados = private conversations between paying members, started by Enviar recado on a paying member's ad; locked button on the open ClassiSex; /recados -> /assine-ja (308); legacy recados table hidden, no migration (R-01..R-08; see .planning/quick/2026-10-20-recados-privados/). The 05-12 client checklist uses step D2 for recados |
 | 2026-10-20 | conta-gratuita | Open sign-up with e-mail confirmation, free vs paying tiers on the ClassiSex, ads stay online as free (cover only) after expiry, Grátis x Assinante table (G-01..G-06); migration 20261020_172550_conta_gratuita; gate: Vitest 539, Playwright 391 passed / 0 failed, build ok (see .planning/quick/2026-10-20-conta-gratuita/) |
+| 2026-10-22 | dicas-hot | Dicas Hot (M-08): public SEO section /dicas-hot + /dicas-hot/<slug>, staff-only `dicas` collection with draft/publish, cover gate `capaConferida`, footer link + home teaser + sitemap, importer `pnpm import:dicas`, 30 dicas bundle + loader, 30 old slugs + /dicas-hot/ + /category/dicas-hot/ redirected (DH-01..DH-10); migrations 20261022_102706_dicas and 20261022_120000_dicas_wp_bundle (see .planning/quick/2026-10-22-dicas-hot/) |
 
 ## Deferred Items
 
