@@ -12,7 +12,7 @@ export const PAGE_DESTINATIONS: Record<string, string | null> = {
   'assine-ja': null,
   checkout: '/assine-ja',
   contos: null,
-  'dicas-hot': '/quem-somos/dicas',
+  'dicas-hot': null, // quick dicas-hot: /dicas-hot is a real page now
   'envie-seu-conto': '/contato',
   'esqueci-minha-senha': '/esqueci-senha',
   faq: '/quem-somos',

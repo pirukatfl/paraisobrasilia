@@ -58,6 +58,7 @@ describe('buildLegacyRedirects', () => {
     expect(get('/4384-2')).toBe('/contos/engole-minha-pica-sua-puta-safada')
     expect(get('/a-amante-da-minha-mulher')).toBe('/contos/a-amante-da-minha-mulher')
     expect(get('/regras-da-casa')).toBe('/quem-somos/regras')
+    expect(get('/dicas-hot')).toBeUndefined()
     expect(get('/beijo-grego')).toBeUndefined()
     expect(result.semDestino).toContain('/beijo-grego')
     expect(get('/barraca-armada')).toBe('/contos')

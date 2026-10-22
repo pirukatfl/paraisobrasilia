@@ -31,7 +31,6 @@ export const LEGACY_REDIRECTS: { source: string; destination: string; statusCode
   { source: "/dando-pro-chefe", destination: "/contos", statusCode: 301 },
   { source: "/dei-para-o-pai-da-minha-amiga", destination: "/contos/dei-para-o-pai-da-minha-amiga", statusCode: 301 },
   { source: "/dei-para-o-tarado-do-carro-que-descobri-ser-amigo-do-marido", destination: "/contos", statusCode: 301 },
-  { source: "/dicas-hot", destination: "/quem-somos/dicas", statusCode: 301 },
   { source: "/duplamente-deflorada", destination: "/contos/duplamente-deflorada", statusCode: 301 },
   { source: "/envie-seu-conto", destination: "/contato", statusCode: 301 },
   { source: "/esqueci-minha-senha", destination: "/esqueci-senha", statusCode: 301 },
