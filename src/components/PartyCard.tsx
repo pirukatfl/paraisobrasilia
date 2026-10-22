@@ -19,11 +19,11 @@ export function PartyCard({ party, priority = false }: Props) {
     >
       <FlyerFrame
         flyer={party.flyer}
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 560px"
         priority={priority}
         imageClassName="transition-transform duration-200 group-hover:scale-[1.02] group-focus-visible:scale-[1.02]"
       />
-      <div className="flex flex-col gap-2 p-4">
+      <div className="flex flex-col gap-2 p-5">
         <p className="type-label flex items-center gap-1 text-gold">
           <CalendarIcon />
           <time dateTime={party.startsAt}>{formatCardDate(party.startsAt)}</time>
