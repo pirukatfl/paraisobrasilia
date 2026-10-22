@@ -19,6 +19,18 @@ export const SENTINELS = {
 }
 export const PHONE_DIGITS = '97766-5544'
 
+/** Ana's approved ad: readable text (shown to visitors and free accounts) with contacts planted in it and in the fields. */
+export const AD_PLANT = {
+  apelido: 'AnaBSB',
+  visible: 'Casal da Ana aberto ao diálogo',
+  texto:
+    'Casal da Ana aberto ao diálogo. Zap 61 95544-3322, ana.plantada@exemplo.com, insta @ana_plantada, ' +
+    'https://wa.me/5561955443322 e www.ana-plantada.com.br',
+  contato: { whatsapp: '5561955443322', telegram: 'ana_tg_plantado' },
+  /** None of these may reach a visitor or a free account, in HTML, RSC or REST. */
+  secrets: ['95544-3322', '5561955443322', 'ana.plantada@exemplo.com', '@ana_plantada', 'ana_plantada', 'ana-plantada.com', 'ana_tg_plantado'],
+}
+
 export const ANA = { email: 'ana.fase5@teste.local', name: 'Ana Fase5', password: PASSWORD }
 export const BETO = { email: 'beto.fase5@teste.local', name: 'Beto Fase5', password: PASSWORD }
 export const CAIO = { email: 'caio.fase5@teste.local', name: 'Caio Fase5', password: PASSWORD }
@@ -74,7 +86,7 @@ export async function buildFase5Scenario(request: APIRequestContext, browser: Br
     ids[key] = (await api.createAssinante(who)).id
     await api.liberar(ids[key]!, { durationDays: 30, method: 'cortesia', amount: 0 })
   }
-  const adId = (await api.createAd({ author: ids.ana!, apelido: 'AnaBSB', status: 'aprovado' })).id
+  const adId = (await api.createAd({ author: ids.ana!, apelido: AD_PLANT.apelido, texto: AD_PLANT.texto, contato: AD_PLANT.contato, status: 'aprovado' })).id
   const recadoId = (
     await api.createRecado({ author: ids.ana!, apelido: SENTINELS.recadoApelido, texto: RECADO_TEXTO, status: 'aprovado' })
   ).id

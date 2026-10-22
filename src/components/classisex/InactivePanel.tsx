@@ -21,8 +21,8 @@ export async function InactivePanel({ access }: { access: AccessStatus }) {
         <div className="max-w-[560px] rounded-xl border border-line bg-surface p-6">
           <h2 className="type-heading mb-4">Disponível para assinantes</h2>
           <p className="text-body">
-            Com a conta gratuita você publica seus anúncios em Meus anúncios. Assine para ver todos os anúncios com
-            contatos e mandar e receber recados.
+            Com a conta gratuita você publica seus anúncios em Meus anúncios e lê os anúncios dos outros (sem os contatos e
+            com as fotos desfocadas). Assine para ver o contato e as fotos e para mandar e receber recados.
           </p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link href="/assine-ja" className="btn-primary">

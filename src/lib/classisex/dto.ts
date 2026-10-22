@@ -236,16 +236,22 @@ export type PublicAdDTO = {
   id: number
   apelido: string
   euSou: string
-  /** One blurred photo (the cover) or null; the open area shows no text, city, contact or video. */
+  /** City, contact-redacted (a city field is free text). */
+  cidade: string | null
+  /** The ad text in full, with every contact removed on the server (redactContacts). */
+  texto: string
+  /** One blurred photo (the cover) or null; the open area shows no video, contact or author. */
   foto: { previewUrl: string } | null
 }
 
 export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
 
 /**
- * Revisão 2026-10-20: the open preview carries only apelido, tipo and the blurred cover. The ad
- * text and city stay in the members area. The apelido is validated like the text on save, and
- * redacted again here as a safety net (staff edits in the admin, old data).
+ * Revisão 2026-10-22: the open view (visitors and free accounts) carries the whole ad text, apelido,
+ * tipo and city, exactly as the author wrote it EXCEPT the contacts: phones, e-mails, links, @handles
+ * and WhatsApp/Telegram are removed here on the server (redactContacts) and the structured contact
+ * fields are never read. The only photo is the blurred derivative of the cover; no video, no author.
+ * Staff review the redacted result in the moderation panel (obfuscations cannot be caught by a heuristic).
  */
 export function toPublicAdDTO(
   doc: AdDocLike,
@@ -254,10 +260,13 @@ export function toPublicAdDTO(
   // The same file as the members board and the media route (coverOf); it needs its blurred twin
   const found = coverOf(media)
   const cover = found && found.previa ? found : null
+  const cidade = redactContacts(doc.cidade ?? '').text
   return {
     id: doc.id,
     apelido: redactContacts(doc.apelido ?? '').text,
     euSou: euSouLabel,
+    cidade: cidade || null,
+    texto: redactContacts(doc.texto ?? '').text,
     foto: cover ? { previewUrl: previewUrl(cover.id) } : null,
   }
 }

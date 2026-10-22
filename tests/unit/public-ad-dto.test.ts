@@ -2,8 +2,9 @@ import { describe, expect, it } from 'vitest'
 
 import { toPublicAdDTO } from '../../src/lib/classisex/dto'
 
-// PREV-01 / D-04 / T-04-01 (revisão 2026-10-20): the open-area preview carries only apelido, tipo
-// and one blurred photo. No text, city, contact, video or author data.
+// PREV-01 / D-04 / T-04-01 (revisão 2026-10-22): the open view (visitors and free accounts) carries
+// apelido, tipo, city and the FULL text with every contact removed, plus one blurred photo.
+// No contact fields, video, author data or member URLs.
 const doc = {
   id: 12,
   author: { id: 4, name: 'Nome Real', email: 'real@x.com' },
@@ -26,11 +27,40 @@ const media = [
 ]
 
 describe('toPublicAdDTO (PREV-01, D-04)', () => {
-  it('has exactly id, apelido, tipo and one photo', () => {
+  it('has exactly id, apelido, tipo, city, text and one photo', () => {
     const dto = toPublicAdDTO(doc, { euSouLabel: 'Casal', media })
-    expect(Object.keys(dto).sort()).toEqual(['apelido', 'euSou', 'foto', 'id'])
+    expect(Object.keys(dto).sort()).toEqual(['apelido', 'cidade', 'euSou', 'foto', 'id', 'texto'])
     expect(dto.apelido).toBe('Casal BSB')
     expect(dto.euSou).toBe('Casal')
+    expect(dto.cidade).toBe('Brasília')
+  })
+
+  it('shows the whole text with the contacts removed', () => {
+    const dto = toPublicAdDTO(doc, { euSouLabel: 'Casal', media })
+    expect(dto.texto.startsWith('Casal top, ')).toBe(true)
+    expect(dto.texto).toContain('[contato só para assinantes]')
+    expect(dto.texto).not.toContain('99988')
+    expect(dto.texto).not.toContain('casal@gmail.com')
+  })
+
+  it('keeps a text without contacts exactly as written, line breaks included', () => {
+    const texto = 'Somos um casal simpático.\nGostamos de festas e de conversar.'
+    expect(toPublicAdDTO({ ...doc, texto }, { euSouLabel: 'Casal' }).texto).toBe(texto)
+  })
+
+  it('removes phones, e-mails, links, @handles and keyword handles from text and city', () => {
+    const texto = [
+      'Chama no (61) 99988-1234 ou 61999887766.',
+      'Mail fulano@exemplo.com.br e fulano arroba gmail ponto com.',
+      'Site https://exemplo.com/x, www.exemplo.com, wa.me/5561999887766.',
+      'Insta: casalbsb, @casalbsb, telegram fulano_tg, zap 61 99988-9772.',
+    ].join(' ')
+    const dto = toPublicAdDTO({ ...doc, texto, cidade: 'Brasília, zap 61 99988-1234' }, { euSouLabel: 'Casal' })
+    for (const leak of ['99988', '99887766', 'fulano@', 'gmail', 'exemplo.com', 'wa.me', 'casalbsb', 'fulano_tg', '@']) {
+      expect(dto.texto, leak).not.toContain(leak)
+    }
+    expect(dto.cidade).not.toContain('99988')
+    expect(dto.cidade).toContain('Brasília')
   })
 
   it('points only at the blurred cover (first photo by order) and ignores the video', () => {
@@ -53,19 +83,18 @@ describe('toPublicAdDTO (PREV-01, D-04)', () => {
     expect(dto.apelido).not.toContain('99988')
   })
 
-  it('never serialises text, city, contacts, author, member URLs or filenames', () => {
+  it('never serialises contacts, author, member URLs or filenames', () => {
     const json = JSON.stringify(toPublicAdDTO(doc, { euSouLabel: 'Casal', media }))
     for (const banned of [
       '5561999889772',
       'casalbsb',
       'casal@gmail.com',
-      'Casal top',
-      'Brasília',
       'Nome Real',
       'real@x.com',
+      '99988',
       '"contato"',
-      '"texto"',
-      '"cidade"',
+      '"whatsapp"',
+      '"telegram"',
       '"author"',
       '/area-do-assinante/midia',
       '/api/ad-media',

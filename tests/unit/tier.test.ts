@@ -53,6 +53,11 @@ describe('TIER_LIMITS and labels', () => {
     expect(TIER_COMPARISON[0]).toMatchObject({ gratis: '1', assinante: 'até 10' })
     expect(TIER_COMPARISON[1]).toMatchObject({ gratis: 'não', assinante: 'até 2' })
   })
+  it('free accounts read every ad (no contacts, blurred photos); only subscribers get contacts, photos and videos', () => {
+    const row = TIER_COMPARISON.find((r) => r.item === 'Ver anúncios do ClassiSex')!
+    expect(row.gratis).toBe('todos, sem contato e com fotos desfocadas')
+    expect(row.assinante).toBe('todos, com contato, fotos e vídeos')
+  })
 })
 
 const m = [

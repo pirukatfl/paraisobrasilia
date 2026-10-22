@@ -4,11 +4,13 @@ import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { AdFilters } from '@/components/classisex/AdFilters'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { MemberAdCard } from '@/components/classisex/MemberAdCard'
+import { PublicBoard } from '@/components/classisex/PublicBoard'
 import { Pagination } from '@/components/classisex/Pagination'
 import { EmptyState } from '@/components/EmptyState'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { parseBoardFilters } from '@/lib/classisex/board'
 import { REPORT_MESSAGES } from '@/lib/classisex/report-rules'
+import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { getActiveAdCategories, listMemberAds } from '@/lib/classisex/queries'
 
 export const dynamic = 'force-dynamic'
@@ -36,17 +38,28 @@ export default async function ClassisexPage({
       </h1>
     </>
   )
-  // No restricted markup at all without active access (T-04-05): return before any query
+  const params = await searchParams
+  // No restricted markup at all without active access (T-04-05): return before any members query.
+  // A free account reads the same open board as a visitor (text with contacts removed, blurred
+  // cover): the public read model only, never the members DTOs.
   if (check.inactive) {
+    const publicFilters = { ...parseBoardFilters(params), cidade: undefined }
+    const [publicResult, publicCategories] = await Promise.all([getPublicAds(publicFilters), getPublicAdFilters()])
     return (
       <section aria-labelledby="titulo-classisex">
         {header}
         <InactivePanel access={check.access} />
+        <div className="mt-10" data-open-board>
+          <h2 className="type-heading">Anúncios publicados</h2>
+          <p className="mt-2 max-w-[680px] text-body text-muted">
+            Você lê os recados na íntegra. Os contatos, as fotos sem desfoque e os vídeos aparecem para assinantes.
+          </p>
+          <PublicBoard basePath={PATH} result={publicResult} categories={publicCategories} filters={publicFilters} signedIn />
+        </div>
       </section>
     )
   }
 
-  const params = await searchParams
   const filters = parseBoardFilters(params)
   const reported = params.denuncia === 'enviada'
   const [result, categories] = await Promise.all([listMemberAds(filters), getActiveAdCategories()])

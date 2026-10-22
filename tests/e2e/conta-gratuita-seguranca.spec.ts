@@ -5,6 +5,7 @@ import { loginAsAssinante } from './helpers/assinante'
 import { captureReply } from './helpers/fase5'
 import { fetchAs } from './helpers/classisex'
 import {
+  ALL_PLANTED,
   buildTierScenario,
   CONTACTS,
   EXPIRADO,
@@ -18,7 +19,8 @@ import {
   type TierScenario,
 } from './helpers/conta-gratuita'
 
-// Conta gratuita leak matrix (G-02..G-05, T-CG-*): free viewers see nothing of others, a free (or
+// Conta gratuita leak matrix (G-02..G-05, T-CG-*): free viewers read the open board (text with the
+// contacts removed, blurred covers) and nothing else of others, a free (or
 // expired) author exposes only the cover and no video, unconfirmed accounts cannot log in, and
 // replayed requests create nothing. Denials are paired with controls that prove the data exists.
 test.describe.configure({ mode: 'serial' })
@@ -70,10 +72,19 @@ const othersSentinels = () => [
   EXPIRADO.name,
 ]
 
+/** What the open board shows by design (revisão 2026-10-22): the redacted text, apelido and tipo of approved ads. */
+const openBoardVisible = () => [TEXTS.pago, TEXTS.gratis, TEXTS.expirado, 'Casal Abacate', 'Casal Jabuticaba', 'Casal Pitanga']
+
+/** Everything of other people's that must still never reach a free viewer (contacts, accounts, planted values). */
+const hiddenFromFree = () => {
+  const open = new Set([...openBoardVisible(), 'sentinela-abacate', 'sentinela-jabuticaba', 'sentinela-pitanga', TEXTS.pago2, TEXTS.viewer])
+  return [...othersSentinels().filter((v) => !open.has(v)), ...ALL_PLANTED]
+}
+
 const allOthersMedia = () => [...s.media.pago, ...s.media.pago2, ...s.media.gratis, ...s.media.expirado, ...s.media.viewer]
 
 test.describe('free viewer (never paid)', () => {
-  test('pages hold nothing of other people’s ads, contacts or media', async ({ browser, baseURL }) => {
+  test('pages hold no contact, account or original media of others; the open board shows the redacted texts', async ({ browser, baseURL }) => {
     test.setTimeout(150_000)
     const { page, context } = await asSubscriber(browser, baseURL!, LIVRE)
     const paths = [
@@ -89,10 +100,16 @@ test.describe('free viewer (never paid)', () => {
     ]
     for (const path of paths) {
       const res = await fetchAs(page, 'GET', path)
-      for (const value of othersSentinels()) expect(res.body, `${path} contains ${value}`).not.toContain(value)
+      for (const value of hiddenFromFree()) expect(res.body, `${path} contains ${value}`).not.toContain(value)
       for (const m of allOthersMedia()) expect(mediaIdsIn(res.body), `${path} points at media ${m.id}`).not.toContain(m.id)
     }
-    // control: her own pending ad is on her own page
+    // control: the board shows the approved ads' texts (contacts removed), apelido and the blurred covers
+    const board = await fetchAs(page, 'GET', '/area-do-assinante/classisex')
+    for (const visible of openBoardVisible()) expect(board.body, visible).toContain(visible)
+    expect(board.body).toContain('[contato só para assinantes]')
+    expect(board.body).toContain('Assine para ver o contato e as fotos')
+    expect(board.body).toMatch(/\/classisex\/previa\/\d+/)
+    // her own pending ad is on her own page
     const own = await fetchAs(page, 'GET', '/area-do-assinante/meus-anuncios')
     expect(own.body).toContain('Casal Goiaba')
     await context.close()
@@ -104,7 +121,7 @@ test.describe('free viewer (never paid)', () => {
     for (const path of ['/area-do-assinante', '/area-do-assinante/classisex', `/area-do-assinante/classisex/${s.ads.gratis}`, '/area-do-assinante/meus-anuncios']) {
       const res = await context.request.get(path, { headers: { RSC: '1' } })
       const body = await res.text()
-      for (const value of othersSentinels()) expect(body, `RSC ${path} contains ${value}`).not.toContain(value)
+      for (const value of hiddenFromFree()) expect(body, `RSC ${path} contains ${value}`).not.toContain(value)
       for (const m of allOthersMedia()) expect(mediaIdsIn(body), `RSC ${path} points at media ${m.id}`).not.toContain(m.id)
     }
     await context.close()

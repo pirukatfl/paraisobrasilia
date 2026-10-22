@@ -253,9 +253,13 @@ painel ou vê a área do assinante com o usuário errado.
 No site novo o ClassiSex é um **mural de anúncios** — o roteiro antigo chamava de "perfis". O assinante com acesso ativo
 escreve o anúncio, com **até 10 fotos e até 2 vídeos curtos (cada um com até 60 segundos)** (a conta gratuita tem 1 foto e
 nenhum vídeo: veja **Contas gratuitas**); **nada vai ao ar sem a sua
-aprovação**. Quem não é assinante vê só uma prévia: o **apelido**, o **tipo** (Casal, Mulher, Homem ou Trans) e **uma foto
-desfocada**, com o botão "Assine para ver". O texto, a cidade, todas as fotos, os vídeos e os contatos (**WhatsApp e
-Telegram**, pelo menos um; não há campo de e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
+aprovação**. Quem não é assinante (visitante ou conta gratuita) lê o **anúncio inteiro** — **apelido**, **tipo** (Casal, Mulher, Homem
+ou Trans), **cidade** e o **texto na íntegra** — com **uma foto desfocada** e o botão "Assine para ver o contato e as fotos".
+Só os **meios de contato** ficam de fora: o site apaga sozinho do texto telefones, e-mails, links, @usuários e nomes de
+aplicativo seguidos de contato (aparece "[contato só para assinantes]"), e os campos de WhatsApp e Telegram nunca saem do
+servidor. Por isso confira o texto na **Moderação**: o apagamento automático não pega tudo (números escritos por extenso,
+por exemplo). As fotos sem desfoque, os vídeos e os contatos (**WhatsApp e Telegram**, pelo menos um; não há campo de
+e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
 vence, o anúncio da pessoa **continua no ar como gratuito**: só a capa, sem vídeos, até ela renovar.
 
 O assinante já pode anexar as fotos e os vídeos **na hora de criar o anúncio** (em Meus anúncios → Novo anúncio); os arquivos
@@ -428,16 +432,19 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
 | Fotos por anúncio | 1 | até 10 |
 | Vídeos por anúncio | não | até 2 |
 | Anúncios ativos | até 3 | até 3 |
-| Ver anúncios do ClassiSex | só os seus | todos, com WhatsApp e Telegram |
+| Ver anúncios do ClassiSex | todos, sem contato e com fotos desfocadas | todos, com WhatsApp, Telegram, fotos e vídeos |
 | Recados (conversas privadas) | não | manda e recebe |
 | Contos completos | só o início | sim |
 
 - Esse mesmo quadro aparece para a pessoa em **/cadastro**, **/assine-ja**, **Meus anúncios** e **Novo anúncio**, com o
   botão "Assine Já".
 - O anúncio de uma conta gratuita **passa pela sua aprovação como qualquer outro**. Depois de aprovado ele aparece na
-  lista dos assinantes (com **só a capa**) e na área aberta (apelido, tipo e a foto desfocada).
+  lista dos assinantes (com **só a capa**) e na área aberta (apelido, tipo, cidade, texto sem contatos e a foto desfocada).
 - Na tela de **Moderação** do anúncio há a linha **"Conta do anunciante"**: "Conta gratuita — no ClassiSex aparece só a
   capa, sem vídeos" ou "Assinante". Use para saber o que a pessoa vai mostrar depois de aprovado.
+- A conta gratuita logada, em **ClassiSex** da área do assinante, vê o mesmo mural aberto dos visitantes: os anúncios dos
+  outros com o **texto na íntegra, sem contatos**, e a foto desfocada. Não vê contatos, fotos sem desfoque nem vídeos, não
+  abre o anúncio completo e não manda recados.
 - O assinante que vê o anúncio de uma conta gratuita enxerga o **WhatsApp e o Telegram** do anúncio, mas **não tem o botão
   "Enviar recado"** (conta gratuita não recebe recados). Conta gratuita também não manda recados.
 

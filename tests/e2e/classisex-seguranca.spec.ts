@@ -294,8 +294,9 @@ test.describe('owner and staff', () => {
 test.describe('pages and RSC payload', () => {
   test('/classisex shows no contact, author, hidden ad text or private URL to visitors', async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({ baseURL })
-    // Revisão 2026-10-20: the open area never shows ad text, not even of the visible ad
-    const hiddenTexts = [TEXTS.aprovado, 'zebra-azul', TEXTS.pendente, TEXTS.recusado, TEXTS.despublicado, TEXTS.expiredAuthor, TEXTS.viewerPendente]
+    // Revisão 2026-10-22: approved ads show their text with the contacts removed; ads that are not
+    // approved stay out, and the phone planted in the approved text never appears
+    const hiddenTexts = [TEXTS.aprovado, '98877-1122', '98877', TEXTS.pendente, TEXTS.recusado, TEXTS.despublicado, TEXTS.viewerPendente, 'girafa-verde', 'leao-roxo', 'tigre-cinza', 'coruja-marrom']
     for (const path of ['/classisex', '/classisex?eu-sou=1&cidade=Bras%C3%ADlia&pagina=2', '/classisex?pagina=1']) {
       for (const headers of [undefined, { RSC: '1' }]) {
         const res = await anon.get(path, { headers })
@@ -306,10 +307,15 @@ test.describe('pages and RSC payload', () => {
         }
       }
     }
-    // control: the visible ad does appear, as apelido and tipo only
-    const home = await (await anon.get('/classisex')).text()
-    expect(home).toContain('Anúncio Teste')
-    expect(home).toContain('Assine para ver')
+    // control: the visible ads do appear, with their text minus the contacts
+    for (const headers of [undefined, { RSC: '1' }]) {
+      const home = await (await anon.get('/classisex', { headers })).text()
+      expect(home).toContain('Anúncio Teste')
+      expect(home).toContain('Texto aprovado zebra-azul procura amigos,')
+      expect(home).toContain('panda-rosa')
+      expect(home).toContain('[contato só para assinantes]')
+      if (!headers) expect(home).toContain('Assine para ver o contato e as fotos')
+    }
     await anon.dispose()
   })
 

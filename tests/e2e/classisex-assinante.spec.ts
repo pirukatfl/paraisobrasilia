@@ -167,16 +167,25 @@ test('full ad shows contacts; hidden ads answer 404', async ({ browser, baseURL 
   await context.close()
 })
 
-test('inactive viewer gets the status panel and no ad markup', async ({ browser, baseURL }) => {
+test('inactive viewer gets the status panel and the open board: texts yes, contacts and members markup no', async ({ browser, baseURL }) => {
   const { page, context } = await asSubscriber(browser, baseURL!, HUGO)
-  for (const path of ['/area-do-assinante/classisex', `/area-do-assinante/classisex/${casalAd}`]) {
-    await page.goto(path)
-    await expect(page.locator('main')).toContainText('Sua assinatura não está ativa')
-    const html = await page.content()
-    for (const secret of [TEXTO_CASAL, TEXTO_SOLTEIRA, DUDA_WHATS, '977776666', DUDA_EMAIL, 'duda_bsb']) {
-      expect(html).not.toContain(secret)
-    }
-  }
+  const contacts = [DUDA_WHATS, '977776666', DUDA_EMAIL, 'duda_bsb', '/area-do-assinante/midia/', '/area-do-assinante/classisex/']
+  // detail page: the panel only, no ad markup at all
+  await page.goto(`/area-do-assinante/classisex/${casalAd}`)
+  await expect(page.locator('main')).toContainText('Sua assinatura não está ativa')
+  const detail = await page.content()
+  for (const secret of [TEXTO_CASAL, TEXTO_SOLTEIRA, ...contacts.slice(0, 4)]) expect(detail).not.toContain(secret)
+  // board: the same open board as visitors (texts with contacts removed, blurred covers, "Assine ...")
+  await page.goto('/area-do-assinante/classisex')
+  const main = page.locator('main')
+  await expect(main).toContainText('Sua assinatura não está ativa')
+  await expect(main).toContainText(TEXTO_CASAL)
+  await expect(main).toContainText(TEXTO_SOLTEIRA)
+  await expect(main.getByRole('link', { name: 'Assine para ver o contato e as fotos' }).first()).toHaveAttribute('href', '/assine-ja')
+  await expect(main.getByRole('link', { name: 'Enviar recado: só para assinantes' }).first()).toBeVisible()
+  const board = await page.content()
+  for (const secret of contacts.slice(0, 4)) expect(board).not.toContain(secret)
+  expect(board).not.toContain('/area-do-assinante/midia/')
   await context.close()
 })
 

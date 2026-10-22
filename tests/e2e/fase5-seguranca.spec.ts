@@ -3,6 +3,7 @@ import { expect, test, type APIRequestContext, type APIResponse, type Browser } 
 import { staffApi } from './helpers/api'
 import {
   ANA,
+  AD_PLANT,
   BETO,
   BIA,
   buildFase5Scenario,
@@ -363,9 +364,19 @@ test.describe('contos and public previews', () => {
           PHONE_DIGITS,
           '/area-do-assinante/mensagens',
           'Casal tranquilo procurando amigos',
+          ...AD_PLANT.secrets,
         ])
+        if (path === '/classisex') expect(body, `${path} shows the redacted text`).toContain(AD_PLANT.visible)
         if (!headers.RSC && path !== '/assine-ja') expect(body, path).toMatch(/href="\/assine-ja"[^>]*>\s*Assine Já/)
       }
+    }
+    await anon.dispose()
+  })
+
+  test('REST holds no planted contact for a visitor', async ({ playwright, baseURL }) => {
+    const anon = await playwright.request.newContext({ baseURL })
+    for (const path of ['/api/ads?depth=2&limit=50', `/api/ads/${s.adId}?depth=2`, '/api/ad-media?limit=50']) {
+      await expectNoData(await anon.get(path), AD_PLANT.secrets)
     }
     await anon.dispose()
   })

@@ -61,8 +61,8 @@ export default async function AreaDoAssinantePage({
             Sua conta: {TIER_LABELS[tier]}
           </h2>
           <p className="text-body">
-            Você pode publicar até 3 anúncios com 1 foto cada. Para ver os anúncios dos outros, contatos e recados,
-            assine.
+            Você pode publicar até 3 anúncios com 1 foto cada. Também lê os anúncios dos outros, sem os contatos e com as
+            fotos desfocadas. Para ver o contato e as fotos e para trocar recados, assine.
           </p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <Link href="/area-do-assinante/meus-anuncios" className="btn-primary">

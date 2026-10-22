@@ -33,6 +33,14 @@ export const TEXTS = {
   livre: 'Texto pendente da livre sentinela-goiaba',
 }
 
+/** Contacts planted inside the ad texts: the open board shows the text, never these. */
+export const PLANTED_IN_TEXT = {
+  pago: { tail: ' Zap 61 98111-0001 ou pago.plantado@exemplo.com', secrets: ['98111-0001', 'pago.plantado@exemplo.com'] },
+  gratis: { tail: ' Insta @gratis_plantado ou https://exemplo-gratis.com.br/x', secrets: ['@gratis_plantado', 'gratis_plantado', 'exemplo-gratis.com.br'] },
+  expirado: { tail: ' Chama no 61 97531-8642', secrets: ['97531-8642'] },
+}
+export const ALL_PLANTED = Object.values(PLANTED_IN_TEXT).flatMap((p) => p.secrets)
+
 export const CONTACTS = {
   pago: { whatsapp: '5561982220001', telegram: 'tg_pago_unico' },
   pago2: { whatsapp: '5561982220002', telegram: 'tg_pago2_unico' },
@@ -61,10 +69,10 @@ export async function buildTierScenario(request: APIRequestContext) {
   const mk = (author: number, apelido: string, texto: string, status: 'aprovado' | 'pendente', contato: { whatsapp: string; telegram?: string }) =>
     api.createAd({ author, apelido, texto, cidade: 'Brasília', status, contato }).then((d) => d.id)
   const ads = {
-    pago: await mk(ids.pago!, 'Casal Abacate', TEXTS.pago, 'aprovado', CONTACTS.pago),
+    pago: await mk(ids.pago!, 'Casal Abacate', TEXTS.pago + PLANTED_IN_TEXT.pago.tail, 'aprovado', CONTACTS.pago),
     pago2: await mk(ids.pago2!, 'Casal Framboesa', TEXTS.pago2, 'aprovado', CONTACTS.pago2),
-    gratis: await mk(ids.gratis!, 'Casal Jabuticaba', TEXTS.gratis, 'aprovado', CONTACTS.gratis),
-    expirado: await mk(ids.expirado!, 'Casal Pitanga', TEXTS.expirado, 'aprovado', CONTACTS.expirado),
+    gratis: await mk(ids.gratis!, 'Casal Jabuticaba', TEXTS.gratis + PLANTED_IN_TEXT.gratis.tail, 'aprovado', CONTACTS.gratis),
+    expirado: await mk(ids.expirado!, 'Casal Pitanga', TEXTS.expirado + PLANTED_IN_TEXT.expirado.tail, 'aprovado', CONTACTS.expirado),
     viewer: await mk(ids.viewer!, 'Casal Caju', TEXTS.viewer, 'pendente', { whatsapp: '5561982220005' }),
     livre: await mk(ids.livre!, 'Casal Goiaba', TEXTS.livre, 'pendente', { whatsapp: '5561982220006' }),
   }

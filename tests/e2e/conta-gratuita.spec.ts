@@ -135,7 +135,7 @@ test('free account sees the Assine Já panel on board, detail and Recados, with 
   await context.close()
 })
 
-test('after approval a paying member sees the free ad with 1 photo and contacts, no Enviar recado; the visitor sees it blurred', async ({
+test('after approval a paying member sees the free ad with 1 photo and contacts, no Enviar recado; the visitor reads it with a blurred photo and no contact', async ({
   browser,
   baseURL,
   request,
@@ -161,7 +161,9 @@ test('after approval a paying member sees the free ad with 1 photo and contacts,
   await visitor.page.goto('/classisex')
   await expect(visitor.page.locator('main').getByText('Casal Gratis')).toBeVisible()
   await expect(visitor.page.locator('main img[src^="/classisex/previa/"]')).toHaveCount(1)
-  expect(await visitor.page.content()).not.toContain('dahlia-sentinela')
+  // the open board now shows the text (it has no contact in it) but never the WhatsApp of the account/ad
+  await expect(visitor.page.locator('main').getByRole('article').filter({ hasText: 'dahlia-sentinela' })).toHaveCount(1)
+  expect(await visitor.page.content()).not.toContain('5561999990001')
   await visitor.context.close()
   await context.close()
 })

@@ -3,9 +3,10 @@ import Link from 'next/link'
 import type { PublicAdDTO } from '@/lib/classisex/dto'
 
 /**
- * One ad in the open preview (PREV-01, D-04; revisão 2026-10-20): apelido, tipo and a single
- * blurred photo (/classisex/previa/…, plain <img>), plus the call to subscribe and a locked "Enviar recado" (same on every card). No text, city,
- * contact, video or author.
+ * One ad in the open view (visitors and free accounts; PREV-01, revisão 2026-10-22): apelido, tipo,
+ * city and the whole text with the contacts already removed on the server, a single blurred photo
+ * (/classisex/previa/…, plain <img>), the call to subscribe and a locked "Enviar recado" (same on every
+ * card). No video, contact or author.
  */
 export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
   const titleId = `previa-${ad.id}`
@@ -30,10 +31,14 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
       <h2 id={titleId} className="type-heading mt-4">
         {ad.apelido}
       </h2>
-      <p className="type-label mt-1 text-muted">{ad.euSou}</p>
+      <p className="type-label mt-1 text-muted">
+        {ad.euSou}
+        {ad.cidade ? ` · ${ad.cidade}` : ''}
+      </p>
+      {ad.texto && <p className="mt-3 whitespace-pre-line break-words text-body">{ad.texto}</p>}
       <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
-        <Link href="/assine-ja" className="btn-primary">
-          Assine para ver
+        <Link href="/assine-ja" className="btn-primary text-center">
+          Assine para ver o contato e as fotos
         </Link>
         {/* Locked on EVERY card, whoever pays: nothing here says which advertisers are subscribers (I-1, T-RP-05) */}
         <Link
