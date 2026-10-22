@@ -13,8 +13,8 @@ async function box(locator: ReturnType<import('@playwright/test').Page['locator'
 
 test('home: the next party is a large featured flyer, others stay in the card grid', async ({ page }) => {
   await page.goto('/')
-  const featured = page.locator('[data-featured-party]')
-  await expect(featured).toHaveCount(1)
+  // The carousel holds every upcoming party; the first slide is the next party
+  const featured = page.locator('[data-featured-party]').first()
   await expect(featured).toHaveAttribute('href', '/festas/festa-de-teste')
   const frame = featured.locator('[data-flyer-ratio]')
   const vw = page.viewportSize()!.width
@@ -30,7 +30,7 @@ test('home: the next party is a large featured flyer, others stay in the card gr
 
 test('home card: a landscape flyer keeps its own aspect ratio (no 4:5 crop)', async ({ page }) => {
   await page.goto('/')
-  const card = page.getByRole('link', { name: 'Ver detalhes da festa Festa Paisagem' })
+  const card = page.getByRole('list').getByRole('link', { name: 'Ver detalhes da festa Festa Paisagem' })
   const frame = card.locator('[data-flyer-ratio]')
   const img = card.locator('img').first()
   await img.scrollIntoViewIfNeeded()
@@ -47,6 +47,7 @@ test('home card: a landscape flyer keeps its own aspect ratio (no 4:5 crop)', as
 test('home card: a stories flyer is capped, not dominating the grid', async ({ page }) => {
   await page.goto('/')
   const frame = page
+    .getByRole('list')
     .getByRole('link', { name: 'Ver detalhes da festa Festa Stories' })
     .locator('[data-flyer-ratio]')
   await frame.scrollIntoViewIfNeeded()
