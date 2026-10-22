@@ -312,13 +312,14 @@ describe('public preview read model (PREV-01, D-04, D-07)', () => {
 
     const page = await findPublicAds(payload, {}, NOW_P)
     expect(page.items.map((i) => i.id)).toEqual([recent.id, old.id, stays.id])
-    // Revisão 2026-10-20: the open preview carries no ad text, city or contact at all
-    expect(Object.keys(page.items[0]).sort()).toEqual(['apelido', 'euSou', 'foto', 'id'])
+    // Revisão 2026-10-22: the open view carries the whole text and the city, never a contact
+    expect(Object.keys(page.items[0]).sort()).toEqual(['apelido', 'cidade', 'euSou', 'foto', 'id', 'texto'])
+    expect(page.items[0]!.texto).toBe('Chama no [contato só para assinantes] agora.')
+    expect(page.items[1]).toMatchObject({ cidade: 'Taguatinga', texto: 'Casal simpático procura amigos para a próxima festa.' })
     expect(JSON.stringify(page)).not.toContain('99988')
-    expect(JSON.stringify(page)).not.toContain('Taguatinga')
-    expect(JSON.stringify(page)).not.toContain('Casal simpático')
     expect(JSON.stringify(page)).not.toContain('5561999990000')
-    // the city is not public: the open area ignores a cidade filter
+    expect(JSON.stringify(page)).not.toContain('"contato"')
+    // the city is shown but never a public filter: the open area ignores a cidade filter
     expect((await findPublicAds(payload, { cidade: 'taguatinga' }, NOW_P)).items.map((i) => i.id)).toEqual([recent.id, old.id, stays.id])
 
     // The cached wrapper calls through outside a Next server
