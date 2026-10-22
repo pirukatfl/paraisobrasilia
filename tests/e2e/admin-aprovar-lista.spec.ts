@@ -114,7 +114,9 @@ test('Aprovar selecionados publishes the ticked ads and lists the ones that coul
 
   // audit: one row per approved ad (3 here + the single approval of Lista A)
   const payload = await getTestPayload()
-  const rows = await payload.find({ collection: 'audit-log', where: { action: { equals: 'anuncio-aprovado' } }, depth: 0, overrideAccess: true, limit: 50 })
-  expect(rows.totalDocs).toBe(4)
-  expect(rows.docs.filter((r) => (r.details as { lote?: boolean } | null)?.lote === true)).toHaveLength(3)
+  const rows = await payload.find({ collection: 'audit-log', where: { action: { equals: 'anuncio-aprovado' } }, depth: 0, overrideAccess: true, limit: 500 })
+  // (the audit log is shared with other specs: look only at these ads)
+  const mine = rows.docs.filter((r) => [ids.a, ids.b, ids.c, ids.equipeOk].includes((r.details as { anuncio?: number } | null)?.anuncio ?? -1))
+  expect(mine).toHaveLength(4)
+  expect(mine.filter((r) => (r.details as { lote?: boolean } | null)?.lote === true)).toHaveLength(3)
 })
