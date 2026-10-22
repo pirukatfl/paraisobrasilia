@@ -8,8 +8,6 @@ import Link from 'next/link'
 import { getAccessStatus } from '@/lib/assinantes/access'
 import { requireAssinante } from '@/lib/assinantes/session'
 import { TIER_LABELS, tierOf } from '@/lib/assinantes/tier'
-import { SITE_ANTIGO_AVISO } from '@/lib/classisex/dto'
-import { getOwnAds } from '@/lib/classisex/queries'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 
@@ -26,7 +24,7 @@ export default async function AreaDoAssinantePage({
   searchParams: Promise<{ ok?: string | string[] }>
 }) {
   const assinante = await requireAssinante('/area-do-assinante')
-  const [access, contact, ads] = await Promise.all([getAccessStatus(assinante.id), getContact(), getOwnAds(assinante.id)])
+  const [access, contact] = await Promise.all([getAccessStatus(assinante.id), getContact()])
   const { ok } = await searchParams
   const tier = tierOf(access)
   return (
@@ -37,14 +35,6 @@ export default async function AreaDoAssinantePage({
         </p>
       )}
       <PasswordBanner mustChangePassword={assinante.mustChangePassword} />
-      {ads.some((ad) => ad.status === 'rascunho') && (
-        <div role="note" className="mb-8 max-w-[680px] rounded-lg border border-accent px-4 py-3 text-body">
-          <p>{SITE_ANTIGO_AVISO}</p>
-          <Link href="/area-do-assinante/meus-anuncios" className="btn-primary mt-3">
-            Ver meus anúncios
-          </Link>
-        </div>
-      )}
       <p className="type-eyebrow text-muted">Área do assinante</p>
       <h1 id="titulo-area" className="type-display mt-2">
         Olá, {assinante.name}

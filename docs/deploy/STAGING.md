@@ -340,13 +340,24 @@ Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do Word
    IMPORTAR="docker compose --env-file .env.staging run --rm -v /opt/paraiso-site/importacao:/importacao:ro -v paraiso-staging_private_media:/app/private-media -e PRIVATE_MEDIA_DIR=/app/private-media -e WP_DUMP_PATH=/importacao/ARQUIVO.sql.gz migrate node_modules/.bin/payload run scripts/import/wordpress.ts --"
    $IMPORTAR --inspect      # só mostra a estrutura (contagens); não grava
    $IMPORTAR --dry-run      # relatório da importação; não grava
-   $IMPORTAR                # grava contas, períodos e anúncios (rascunhos)
+   $IMPORTAR                # grava contas, períodos e anúncios (publicados)
    $IMPORTAR --uploads /importacao/uploads    # depois, quando a pasta de fotos chegar
    ```
 
-   **Anúncios de quem não foi importado** (administradores do site antigo e usuários apagados) entram como rascunhos da conta técnica "Equipe (anúncios do site antigo)" (e-mail fixo `equipe-legado@invalid.paraiso.local`, sem login possível), visíveis só para a equipe. No relatório aparecem como `da equipe (rascunho para revisar) N`. Repetir o comando é seguro: quem já existe vira `já existiam`, e só os novos são criados. Na primeira rodada depois desta mudança, esperamos `rascunhos criados 96 · já existiam 108 · da equipe (rascunho para revisar) 96` e `Contas: criadas 0` (a conta técnica não entra na contagem de contas).
+   **Anúncios antigos (decisão do cliente de 22/10/2026):** entram **publicados**, de duas origens: ClassiSex (post 2894) e Mural (post 749). Os de quem não foi importado (administradores do site antigo e usuários apagados) ficam em nome da conta técnica "Equipe (anúncios do site antigo)" (e-mail fixo `equipe-legado@invalid.paraiso.local`, sem login possível). Os anúncios antigos não contam no limite de 3 anúncios, não têm limite de texto nem exigem contato; os novos mantêm todos os limites. O importador só imprime contagens, por origem:
 
-   Outras opções: `--excluir-ids arquivo.txt` (um número de usuário por linha, `#` para comentários), `--chave-eu-sou` e `--chave-cidade` (só se o `--inspect` mostrar chaves diferentes) e `--post` (número do post do ClassiSex).
+   ```
+   Anúncios: publicados N · promovidos de rascunho N · já existiam N · da equipe N
+     ClassiSex: publicados N · promovidos de rascunho N · já existiam N · da equipe N
+     Mural: publicados N · promovidos de rascunho N · já existiam N · da equipe N
+   Fotos: gravadas N · ausentes N · recusadas N · fora da pasta N
+     ClassiSex: gravadas N · ausentes N · recusadas N · fora da pasta N
+     Mural: gravadas N · ausentes N · recusadas N · fora da pasta N
+   ```
+
+   Repetir o comando é seguro. **Saída esperada no staging** (que já tem 108 rascunhos de assinantes e talvez 96 da equipe da rodada anterior): `Contas: criadas 0`; no ClassiSex, `publicados 0 · promovidos de rascunho 108` (ou 204, se os 96 da equipe também já existirem; se não existirem, entram como `publicados 96 · da equipe 96`); no Mural, `publicados` perto de 500 (todos os comentários aprovados, menos respostas e os de quem não escolheu Casal, Solteiro ou Solteira) e `da equipe` com os que não têm autor importado. Uma segunda rodada seguida mostra `publicados 0 · promovidos de rascunho 0 · já existiam` com o total. Só são **promovidos** os rascunhos que ninguém mexeu: anúncio recusado, despublicado, editado pelo autor, passado para outro dono ou apagado (aparece como `apagados antes (não recriados) N`) nunca é alterado. Fotos em GIF não são aceitas e contam como `recusadas`.
+
+   Outras opções: `--excluir-ids arquivo.txt` (um número de usuário por linha, `#` para comentários), `--chave-eu-sou` e `--chave-cidade` (só se o `--inspect` mostrar chaves diferentes) e `--post` (número do post de origem ou lista separada por vírgula; padrão `2894,749`, ClassiSex e Mural).
 
 5. **Conferir no painel:** em **Assinantes**, filtre por origem **Site antigo**; veja o quadro de contas a revisar no painel inicial; peça para uma pessoa conhecida entrar com a senha de antes.
 

@@ -58,6 +58,12 @@ export default async function EditarAnuncioPage({
   return (
     <section aria-labelledby="titulo-editar-anuncio">
       {header}
+      {ad.legacy && (
+        <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
+          Este anúncio veio do site antigo. Não há limite de texto nem é preciso preencher WhatsApp ou Telegram.
+          Quem não é assinante vê o texto sem telefones, links e @.
+        </p>
+      )}
       {ad.status === 'rascunho' && (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
           Este anúncio veio do site antigo. Os contatos que estavam no texto não aparecem para ninguém enquanto for
@@ -77,6 +83,7 @@ export default async function EditarAnuncioPage({
         action={salvarAnuncio}
         categories={categories}
         adId={ad.id}
+        legacy={ad.legacy}
         initial={{
           apelido: ad.apelido,
           euSou: ad.euSou === null ? '' : String(ad.euSou),
@@ -86,7 +93,7 @@ export default async function EditarAnuncioPage({
           telegram: ad.telegram,
         }}
       />
-      <OwnerMediaManager adId={ad.id} media={ad.media} tier={tier} />
+      <OwnerMediaManager adId={ad.id} media={ad.media} tier={tier} legacy={ad.legacy} />
     </section>
   )
 }

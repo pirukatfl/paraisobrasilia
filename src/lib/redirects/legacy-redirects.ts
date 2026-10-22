@@ -58,7 +58,7 @@ export const LEGACY_REDIRECTS: { source: string; destination: string; statusCode
   { source: "/minha-conta", destination: "/area-do-assinante", statusCode: 301 },
   { source: "/minha-cunhada-faz-o-que-minha-mulher-nao-faz", destination: "/contos/minha-cunhada-faz-o-que-minha-mulher-nao-faz", statusCode: 301 },
   { source: "/minha-mulher-e-meu-amigo", destination: "/contos", statusCode: 301 },
-  { source: "/mural", destination: "/assine-ja", statusCode: 301 },
+  { source: "/mural", destination: "/classisex", statusCode: 301 },
   { source: "/no-caminhao", destination: "/contos", statusCode: 301 },
   { source: "/no-cinema", destination: "/contos/no-cinema", statusCode: 301 },
   { source: "/o-casal-mais-excitante-que-conheci", destination: "/contos/o-casal-mais-excitante-que-conheci", statusCode: 301 },

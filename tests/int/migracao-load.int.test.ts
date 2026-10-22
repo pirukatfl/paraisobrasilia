@@ -18,6 +18,7 @@ import { getTestPayload, resetDatabase, seedAdCategories, seedAssinante } from '
 import {
   CLASSISEX_POST,
   FIXTURE_NOW,
+  MURAL_POST,
   MIGRACAO_PREFIX,
   SENTINELS,
   readMigracaoFixture,
@@ -40,8 +41,9 @@ describe('carga da migração do WordPress (06-07)', () => {
     payload = await getTestPayload()
     const tables = await readMigracaoFixture()
     decisions = extractAccounts(tables, { prefix: MIGRACAO_PREFIX, now: FIXTURE_NOW })
-    const keys = resolveFieldKeys(tables, { postId: CLASSISEX_POST })
-    ads = extractLegacyAds(tables, { postId: CLASSISEX_POST, keys }).ads
+    ads = [CLASSISEX_POST, MURAL_POST].flatMap(
+      (postId) => extractLegacyAds(tables, { postId, keys: resolveFieldKeys(tables, { postId }) }).ads,
+    )
     uploads = await fs.mkdtemp(path.join(os.tmpdir(), 'mig-uploads-'))
     outside = await fs.mkdtemp(path.join(os.tmpdir(), 'mig-outside-'))
     const jpeg = await sharp({ create: { width: 64, height: 64, channels: 3, background: '#a33' } }).jpeg().toBuffer()
@@ -269,12 +271,13 @@ describe('carga da migração do WordPress (06-07)', () => {
     })
   })
 
-  describe('anúncios como rascunho', () => {
-    const drafts = async () =>
+  describe('anúncios antigos publicados (ClassiSex + Mural)', () => {
+    const rowsOf = async () =>
       (await payload.find({ collection: 'ads', limit: 50, depth: 0, overrideAccess: true })).docs as unknown as Record<
         string,
         unknown
       >[]
+    const rowOf = async (wpCommentId: number) => (await rowsOf()).find((r) => r.wpCommentId === wpCommentId)!
     const mediaOf = async (ad: number) =>
       (
         await payload.find({
@@ -284,42 +287,67 @@ describe('carga da migração do WordPress (06-07)', () => {
           overrideAccess: true,
         })
       ).docs as unknown as { kind: string; order: number }[]
-    const withPhotos = () => ads.find((a) => a.photos.some((p) => p.relPath))!
+    const touch = (id: number, data: Record<string, unknown>) =>
+      payload.update({
+        collection: 'ads',
+        id,
+        data: data as never,
+        overrideAccess: true,
+        context: { skipAudit: true, legacyImport: true },
+      })
+    const MURAL_PHOTO = 112 // fixture: 3 photos (jpg, gif, missing file)
 
-    it('creates five private drafts; the administrator ad goes to the team placeholder', async () => {
+    it('reads both boards: five ClassiSex ads and three Mural ads, source recorded', () => {
+      expect(ads.filter((a) => a.fonte === 'classisex')).toHaveLength(5)
+      expect(ads.filter((a) => a.fonte === 'mural').map((a) => a.wpCommentId)).toEqual([110, 112, 113])
+    })
+
+    it('publishes eight ads; the administrator ads go to the team placeholder', async () => {
       await importAccounts(payload, decisions, { now: FIXTURE_NOW })
       const result = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
-      expect(result).toMatchObject({ criados: 5, jaExistiam: 0, daEquipe: 1 })
-      const rows = await drafts()
-      expect(rows).toHaveLength(5)
-      for (const row of rows.filter((r) => r.wpCommentId !== 108)) {
+      expect(result).toMatchObject({ criados: 8, promovidos: 0, jaExistiam: 0, daEquipe: 2 })
+      expect(result.porFonte.classisex).toMatchObject({ publicados: 5, daEquipe: 1 })
+      expect(result.porFonte.mural).toMatchObject({ publicados: 3, daEquipe: 1 })
+      const rows = await rowsOf()
+      expect(rows).toHaveLength(8)
+      for (const row of rows.filter((r) => ![108, 113].includes(r.wpCommentId as number))) {
         const src = ads.find((a) => a.wpCommentId === row.wpCommentId)!
         const author = await account(src.wpUserId)
         expect(row).toMatchObject({
-          status: 'rascunho',
+          status: 'aprovado',
           author: author.id,
+          fonteLegado: src.fonte,
           cidade: src.cidade,
           texto: src.texto,
           importadoEm: FIXTURE_NOW.toISOString(),
         })
+        expect(row.publishedAt).toBeTruthy()
+        expect(new Date(row.publishedAt as string).toISOString()).toBe(src.createdAt)
         expect(row.apelido).toBe((author.apelido as string) || 'Anônimo')
-        expect(new Date(row.criadoNoSiteAntigoEm as string).toISOString()).toBe(src.createdAt)
         expect(row.contato).toMatchObject({ whatsapp: null, telegram: null })
         expect(row.consentAt ?? null).toBeNull()
       }
-      expect((rows.find((r) => r.wpCommentId === 104)!.texto as string).length).toBeGreaterThan(600)
+      for (const id of [108, 113]) {
+        expect(await rowOf(id)).toMatchObject({ status: 'aprovado', origemLegado: 'equipe' })
+      }
+      expect((await rowOf(104)).texto as string).toHaveLength(ads.find((a) => a.wpCommentId === 104)!.texto.length)
+      expect(((await rowOf(MURAL_PHOTO)).texto as string).length).toBeGreaterThan(600)
+      expect(((await rowOf(110)).texto as string)).toContain('61 97777-6666') // stored as written; redacted on read
+      expect((await rowOf(110)).fonteLegado).toBe('mural')
     })
 
-    it('stores photos from the uploads folder; none without it', async () => {
+    it('stores photos per source; a GIF is refused, a missing file is absent', async () => {
       await importAccounts(payload, decisions, { now: FIXTURE_NOW })
       const without = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
       expect(without.fotosGravadas).toBe(0)
-      const mid = (await drafts()).find((r) => r.wpCommentId === withPhotos().wpCommentId)!
+      const mid = await rowOf(MURAL_PHOTO)
       expect(await mediaOf(mid.id as number)).toHaveLength(0)
 
       const topUp = await importLegacyAds(payload, ads, { now: FIXTURE_NOW, uploadsDir: uploads })
-      expect(topUp).toMatchObject({ criados: 0, jaExistiam: 5 })
-      expect(topUp.fotosGravadas).toBeGreaterThanOrEqual(1)
+      expect(topUp).toMatchObject({ criados: 0, promovidos: 0, jaExistiam: 8 })
+      expect(topUp.porFonte.classisex).toMatchObject({ fotosGravadas: 1, fotosAusentes: 1, fotosRecusadas: 0 })
+      expect(topUp.porFonte.mural).toMatchObject({ fotosGravadas: 1, fotosAusentes: 1, fotosRecusadas: 1 })
+      expect(topUp.fotosGravadas).toBe(2)
       const media = await mediaOf(mid.id as number)
       expect(media[0]).toMatchObject({ kind: 'foto', order: 0 })
       const again = await importLegacyAds(payload, ads, { now: FIXTURE_NOW, uploadsDir: uploads })
@@ -329,7 +357,7 @@ describe('carga da migração do WordPress (06-07)', () => {
 
     it('refuses paths that escape the folder and unsupported files', async () => {
       await importAccounts(payload, decisions, { now: FIXTURE_NOW })
-      const base = withPhotos()
+      const base = ads.find((a) => a.photos.some((p) => p.relPath))!
       const extra = (id: number, relPath: string): WpLegacyAd => ({
         ...base,
         wpCommentId: id,
@@ -344,19 +372,68 @@ describe('carga da migração do WordPress (06-07)', () => {
       expect(r.fotosForaDaPasta).toBe(2)
     })
 
-    it('never touches a draft the author already submitted', async () => {
+    it('promotes the untouched drafts of an earlier run, once, and counts them apart', async () => {
       await importAccounts(payload, decisions, { now: FIXTURE_NOW })
       await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
-      const row = (await drafts()).find((r) => r.wpCommentId === withPhotos().wpCommentId)!
-      await payload.update({
-        collection: 'ads',
-        id: row.id as number,
-        data: { status: 'pendente', contato: { whatsapp: '5561988887777' } } as never,
-        overrideAccess: true,
-        context: { skipAudit: true, legacyImport: true },
-      })
+      // staging today: everything from the first import is a draft (member and team)
+      for (const r of await rowsOf()) await touch(r.id as number, { status: 'rascunho', publishedAt: null, fonteLegado: null })
+
+      const run = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
+      expect(run).toMatchObject({ criados: 0, promovidos: 8, jaExistiam: 0, daEquipe: 2 })
+      expect(run.porFonte.classisex).toMatchObject({ publicados: 0, promovidos: 5, jaExistiam: 0, daEquipe: 1 })
+      expect(run.porFonte.mural).toMatchObject({ publicados: 0, promovidos: 3, jaExistiam: 0, daEquipe: 1 })
+      for (const r of await rowsOf()) {
+        expect(r.status).toBe('aprovado')
+        expect(r.publishedAt).toBeTruthy()
+        expect(r.fonteLegado).toBe(ads.find((a) => a.wpCommentId === r.wpCommentId)!.fonte)
+      }
+      const again = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
+      expect(again).toMatchObject({ criados: 0, promovidos: 0, jaExistiam: 8, daEquipe: 0 })
+    })
+
+    it('never overrides a staff or author decision, nor brings back a deleted ad', async () => {
+      await importAccounts(payload, decisions, { now: FIXTURE_NOW })
+      await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
+      const stamp = FIXTURE_NOW.toISOString()
+      const d101 = await rowOf(101)
+      const d102 = await rowOf(102)
+      const d103 = await rowOf(103)
+      const d104 = await rowOf(104)
+      const d108 = await rowOf(108)
+      const d110 = await rowOf(110)
+      // every one of them is a draft again, then the people acted on some of them
+      for (const r of await rowsOf()) await touch(r.id as number, { status: 'rascunho', publishedAt: null })
+      await touch(d101.id as number, { status: 'recusado', moderatedAt: stamp, motivo: 'Fora das regras' }) // staff refused
+      await touch(d102.id as number, { status: 'despublicado', moderatedAt: stamp }) // staff unpublished
+      await touch(d103.id as number, { status: 'pendente', submittedAt: stamp, contato: { whatsapp: '5561988887777' } }) // author edited
+      await touch(d104.id as number, { status: 'rascunho', submittedAt: stamp }) // author touched the draft
+      const other = await seedAssinante(payload, { email: 'outro-dono@teste.local', password: 'senha-outro-123', name: 'Outro' })
+      await touch(d108.id as number, { author: other.id }) // staff handed the team draft to a member
+      await payload.delete({ collection: 'ads', id: d110.id as number, overrideAccess: true }) // deleted by someone
+
+      const run = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
+      // left: 112 and 113 (untouched drafts) are promoted; the other five exist and stay as they are
+      expect(run).toMatchObject({ criados: 0, promovidos: 2, jaExistiam: 5, apagadosAntes: 1 })
+      expect(await rowOf(101)).toMatchObject({ status: 'recusado', motivo: 'Fora das regras' })
+      expect(await rowOf(102)).toMatchObject({ status: 'despublicado' })
+      expect(await rowOf(103)).toMatchObject({ status: 'pendente' })
+      expect(await rowOf(104)).toMatchObject({ status: 'rascunho' })
+      expect(await rowOf(108)).toMatchObject({ status: 'rascunho' })
+      expect(await rowOf(112)).toMatchObject({ status: 'aprovado' })
+      expect(await rowOf(113)).toMatchObject({ status: 'aprovado' })
+      expect(await rowOf(110)).toBeUndefined()
+      expect(formatLoadLines((await importAccounts(payload, decisions, { now: FIXTURE_NOW })).result, run).join('\n')).toContain(
+        'apagados antes (não recriados) 1',
+      )
+    })
+
+    it('adds the photos only to an untouched ad that has none', async () => {
+      await importAccounts(payload, decisions, { now: FIXTURE_NOW })
+      await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
+      const row = await rowOf(MURAL_PHOTO)
+      await touch(row.id as number, { status: 'pendente', submittedAt: FIXTURE_NOW.toISOString(), contato: { whatsapp: '5561988887777' } })
       const r = await importLegacyAds(payload, ads, { now: FIXTURE_NOW, uploadsDir: uploads })
-      expect(r.fotosGravadas).toBe(0)
+      expect(r.porFonte.mural.fotosGravadas).toBe(0)
       expect(await mediaOf(row.id as number)).toHaveLength(0)
     })
 
@@ -373,16 +450,18 @@ describe('carga da migração do WordPress (06-07)', () => {
       await expect(importLegacyAds(payload, ads, { now: FIXTURE_NOW })).rejects.toThrow(
         'Opção "Eu sou" não encontrada: Homem. Confira as opções no painel antes de importar.',
       )
-      expect(await drafts()).toHaveLength(0)
+      expect(await rowsOf()).toHaveLength(0)
     })
 
-    it('prints no ad text', async () => {
+    it('prints counts only, per source', async () => {
       await importAccounts(payload, decisions, { now: FIXTURE_NOW })
-      const r = await importLegacyAds(payload, ads, { now: FIXTURE_NOW })
+      const r = await importLegacyAds(payload, ads, { now: FIXTURE_NOW, uploadsDir: uploads })
       const text = formatLoadLines((await importAccounts(payload, decisions, { now: FIXTURE_NOW })).result, r).join('\n')
       for (const s of SENTINELS) expect(text).not.toContain(s)
-      expect(text).toMatch(/rascunhos criados 5/)
-      expect(text).toContain('da equipe (rascunho para revisar) 1')
+      expect(text).toContain('Anúncios: publicados 8 · promovidos de rascunho 0 · já existiam 0 · da equipe 2')
+      expect(text).toContain('ClassiSex: publicados 5 · promovidos de rascunho 0 · já existiam 0 · da equipe 1')
+      expect(text).toContain('Mural: publicados 3 · promovidos de rascunho 0 · já existiam 0 · da equipe 1')
+      expect(text).toContain('Mural: gravadas 1 · ausentes 1 · recusadas 1 · fora da pasta 0')
       expect(text).not.toContain('autor não importado')
     })
   })

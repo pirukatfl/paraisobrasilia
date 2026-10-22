@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { TIER_LIMITS, type Tier } from '@/lib/assinantes/tier'
 import type { OwnerMediaDTO } from '@/lib/classisex/dto'
+import { MAX_AD_PHOTOS } from '@/lib/classisex/media-messages'
 import { definirCapa, removerMidia } from '@/lib/classisex/actions'
 
 export const MEDIA_HINT = 'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 60 segundos.'
@@ -14,12 +15,13 @@ export const GUARDADA = 'Guardada: volta a aparecer quando você assinar'
  * Usar como capa are server actions. Thumbnails are plain <img> through the protected route,
  * never the Next image optimizer (T-04-07).
  */
-export function OwnerMediaManager({ adId, media, tier }: { adId: number; media: OwnerMediaDTO; tier: Tier }) {
+export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId: number; media: OwnerMediaDTO; tier: Tier; legacy?: boolean }) {
   const uploadAction = `/area-do-assinante/meus-anuncios/${adId}/midia`
   const limits = TIER_LIMITS[tier]
   // I-1: a free owner never loses stored media by editing, but cannot add a photo while one exists
   // (paying accounts keep today's forms; the server enforces their limits)
-  const canAddPhoto = tier === 'assinante' || media.fotos.length < limits.fotos
+  // Old-site ads are exempt from the per-tier photo count (2026-10-22); the absolute cap of 10 stays
+  const canAddPhoto = legacy ? media.fotos.length < MAX_AD_PHOTOS : tier === 'assinante' || media.fotos.length < limits.fotos
   const canAddVideo = tier === 'assinante'
   const fileInput = 'mt-2 block w-full text-body file:mr-4 file:cursor-pointer file:rounded-full file:border file:border-line file:bg-surface file:px-4 file:py-2 file:text-text'
   return (

@@ -63,7 +63,16 @@ export class ServiceError extends Error {
 
 const notFound = () => new ServiceError('nao-encontrado', 'Anúncio não encontrado.', 404)
 
-type AdDoc = AdDocLike & { author: unknown; origemLegado?: string | null }
+type AdDoc = AdDocLike & {
+  author: unknown
+  origemLegado?: string | null
+  fonteLegado?: string | null
+  wpCommentId?: number | null
+}
+
+/** Ad brought from the old site (set only by the importer): exempt from the new-ad limits (2026-10-22). */
+export const isLegacyAd = (ad: { wpCommentId?: number | null }): boolean =>
+  ad.wpCommentId !== undefined && ad.wpCommentId !== null
 
 async function loadOwnedAd(payload: Payload, assinanteId: number, id: number | string): Promise<AdDoc> {
   const numericId = Number(id)
@@ -86,6 +95,8 @@ async function countActive(payload: Payload, assinanteId: number, excludeId?: nu
       and: [
         { author: { equals: assinanteId } },
         { status: { in: ACTIVE_STATUSES } },
+        // Old-site ads never count toward the limit of new ads (2026-10-22)
+        { wpCommentId: { exists: false } },
         ...(excludeId ? [{ id: { not_equals: excludeId } }] : []),
       ],
     },
@@ -94,8 +105,8 @@ async function countActive(payload: Payload, assinanteId: number, excludeId?: nu
   return totalDocs
 }
 
-function validated(input: AdInput) {
-  const result = validateAdInput(input)
+function validated(input: AdInput, legacy = false) {
+  const result = validateAdInput(input, { legacy })
   if (!result.ok) throw new ServiceError('invalido', 'Confira os campos destacados.', 400, result.errors)
   return result.value
 }
@@ -148,9 +159,13 @@ export async function updateAd(
   { assinanteId, id, input, now }: { assinanteId: number; id: number | string; input: AdInput; now: Date },
 ): Promise<void> {
   const ad = await loadOwnedAd(payload, assinanteId, id)
-  const value = validated(input)
+  // An old-site ad stays exempt after the author edits it: no contact field, no 600-character cap and no
+  // place in the 3-ad limit. It still goes back to moderation (D-03) and its text is redacted for non-payers
+  // exactly like any other ad (the public/free view never reads the contact fields).
+  const legacy = isLegacyAd(ad)
+  const value = validated(input, legacy)
   await assertActiveCategory(payload, value.euSou)
-  if (!ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
+  if (!legacy && !ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
     throw limitError()
   }
   await payload.update({
@@ -200,7 +215,7 @@ type MediaRow = { id: number; ad: unknown; owner: unknown; kind: 'foto' | 'video
 async function backToModeration(payload: Payload, assinanteId: number, ad: AdDoc, now: Date, strict: boolean) {
   // M-04: a media change never submits a draft (the author sends it through the validated form)
   if (ad.status === DRAFT_STATUS) return
-  if (!ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
+  if (!isLegacyAd(ad) && !ACTIVE_STATUSES.includes(ad.status) && (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT) {
     if (strict) throw limitError()
     return
   }
@@ -236,6 +251,7 @@ export async function attachMedia(
   const ad = await loadOwnedAd(payload, assinanteId, adId)
   if (
     ad.status !== DRAFT_STATUS &&
+    !isLegacyAd(ad) &&
     !ACTIVE_STATUSES.includes(ad.status) &&
     (await countActive(payload, assinanteId, ad.id)) >= ACTIVE_LIMIT
   ) {
@@ -384,6 +400,8 @@ export type OwnAdFormValues = {
   texto: string
   whatsapp: string
   telegram: string
+  /** Came from the old site: no 600-character cap and no required contact in the form. */
+  legacy: boolean
 }
 
 /** Values for the edit form, or null when the ad is not the owner's. */
@@ -403,6 +421,7 @@ export async function getOwnAdFormValues(
       texto: ad.texto,
       whatsapp: ad.contato?.whatsapp ?? '',
       telegram: ad.contato?.telegram ? `@${ad.contato.telegram}` : '',
+      legacy: isLegacyAd(ad),
     }
   } catch (err) {
     if (err instanceof ServiceError && err.code === 'nao-encontrado') return null

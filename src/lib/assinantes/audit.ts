@@ -20,6 +20,7 @@ export type AuditAction =
   | 'anuncio-aprovado'
   | 'anuncio-recusado'
   | 'anuncio-despublicado'
+  | 'anuncio-legado-apagado'
   | 'denuncia-resolvida'
   // Recados moderation (Phase 5)
   | 'recado-aprovado'
@@ -45,6 +46,7 @@ export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Anúncio aprovado', value: 'anuncio-aprovado' },
   { label: 'Anúncio recusado', value: 'anuncio-recusado' },
   { label: 'Anúncio despublicado', value: 'anuncio-despublicado' },
+  { label: 'Anúncio antigo apagado', value: 'anuncio-legado-apagado' },
   { label: 'Denúncia resolvida', value: 'denuncia-resolvida' },
   { label: 'Recado aprovado', value: 'recado-aprovado' },
   { label: 'Recado recusado', value: 'recado-recusado' },

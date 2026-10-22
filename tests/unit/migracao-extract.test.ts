@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { chunkedStream } from '../helpers/wp-dump-fixture'
 import {
   CLASSISEX_POST,
+  MURAL_POST,
   FIXTURE_NOW,
   gzipMigracaoFixtureToTemp,
   migracaoFixturePath,
@@ -85,7 +86,8 @@ describe('extractAccounts on the synthetic fixture', () => {
     const keys = new Set(t.usermeta!.map((r) => r.meta_key))
     expect([...keys].sort()).toEqual(['_expire_user_date', '_expire_user_expired', 'wp26_capabilities'])
     expect(t.usermeta!.some((r) => r.meta_key === 'billing_phone')).toBe(false)
-    expect(t.comments!.every((c) => c.comment_post_ID === CLASSISEX_POST)).toBe(true)
+    expect(t.comments!.every((c) => [CLASSISEX_POST, MURAL_POST].includes(Number(c.comment_post_ID)))).toBe(true)
+    expect(t.comments!.some((c) => Number(c.comment_post_ID) === MURAL_POST)).toBe(true)
     expect(t.posts!.every((p) => p.post_type === 'attachment' || p.post_type === 'wpdiscuz_form')).toBe(true)
   })
 
@@ -145,7 +147,7 @@ describe('extractAccounts on the synthetic fixture', () => {
     const chunked = await readWpTables(chunkedStream(fs.readFileSync(migracaoFixturePath(), 'utf8'), 7), {
       prefix: MIGRACAO_PREFIX,
       tables: [...MIGRACAO_TABLES],
-      rowFilter: migracaoRowFilter(MIGRACAO_PREFIX, CLASSISEX_POST),
+      rowFilter: migracaoRowFilter(MIGRACAO_PREFIX, [CLASSISEX_POST, MURAL_POST]),
     })
     expect(gz).toEqual(plain)
     expect(chunked).toEqual(plain)

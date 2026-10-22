@@ -61,22 +61,9 @@ test('staff review the draft and publish it from the Moderação panel', async (
   const panel = painel(page)
   await expect(panel).toContainText('Situação: Rascunho')
   await expect(panel).toContainText('Rascunho do site antigo, escrito pela equipe')
+  // old ads are exempt from the contact rule (2026-10-22): no contact needed to publish
   await panel.getByRole('button', { name: 'Aprovar e publicar' }).click()
-  // no contact yet: the normal ad rules refuse it and the draft stays a draft
-  await expect(panel.getByRole('alert')).toBeVisible()
-  await expect(panel).toContainText('Situação: Rascunho')
-
-  // staff add the contact (the team knows it), then publish
   const payload = await getTestPayload()
-  await payload.update({
-    collection: 'ads',
-    id: adId,
-    data: { contato: { whatsapp: '5561999990000' } } as never,
-    overrideAccess: true,
-    context: { skipAudit: true },
-  })
-  await page.reload()
-  await painel(page).getByRole('button', { name: 'Aprovar e publicar' }).click()
   await expect(painel(page)).toContainText('Situação: Publicado')
   expect((await payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true })).status).toBe('aprovado')
 })

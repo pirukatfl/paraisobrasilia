@@ -556,17 +556,20 @@ Algumas contas do site antigo eram de assinante, mas **sem data de vencimento** 
 - Quem tinha assinatura com data futura recebeu um período do plano **Migrado do site antigo**, até a mesma data (termina à meia-noite do dia seguinte ao último dia pago).
 - Esse plano **não aparece no Assine Já**. Para renovar, a pessoa assina normalmente e vocês liberam como sempre.
 
-### Anúncios antigos (rascunhos)
+### Anúncios antigos
 
-- Os anúncios do ClassiSex antigo viraram **rascunhos**: só o autor (e a equipe, no painel) vê. Nada foi publicado sozinho.
-- O autor entra em **Meus anúncios**, vê o aviso de que o anúncio veio do site antigo e usa **Revisar e enviar**. Depois de enviado, o anúncio entra na fila de moderação como qualquer outro.
-- A equipe **não aprova rascunho de um autor**: o botão só aparece depois que o autor envia (a exceção são os anúncios da equipe, logo abaixo).
-- Telefones e contatos que estavam no texto antigo não aparecem para ninguém enquanto o anúncio for rascunho; o autor informa o contato ao revisar.
-- As fotos só vêm se o backup da pasta de fotos do site antigo for entregue.
+- Desde 22/10/2026 **todos** os anúncios do ClassiSex antigo e do **Mural** antigo vêm **já publicados**, não mais como rascunho. A origem aparece no campo **Veio do site antigo (origem)** de cada anúncio e serve de filtro na lista de **Anúncios**.
+- As regras de ver são as de sempre: quem não assina vê o texto **sem telefone, e-mail, link ou @** e a foto de capa desfocada; anúncio de quem não paga fica no ar só com a capa; quem assina vê tudo.
+- Anúncios antigos **não têm limites**: não contam nos 3 anúncios ativos, não têm limite de 600 caracteres, não exigem WhatsApp ou Telegram e não têm limite de fotos por plano (no máximo 10 fotos). Os anúncios **novos** continuam com todos os limites.
+- O autor vê e edita cada um em **Meus anúncios**. Quando ele edita um anúncio antigo, o anúncio volta para a fila de moderação, como qualquer anúncio editado, mas continua sem o limite de texto e sem exigir contato.
+- Se o importador rodar de novo, ele **publica os rascunhos antigos que ninguém mexeu** e não mexe em mais nada: anúncio recusado, despublicado, editado pelo autor, passado para outro dono ou **apagado** continua como está (um anúncio apagado não volta).
+- Telefones e contatos que estavam dentro do texto antigo ficam no texto, mas **só assinantes enxergam**; para os demais o site os tira na hora de mostrar.
+- GIFs e outros arquivos que não são JPG, PNG ou WebP não são aceitos como foto (aparecem como "recusadas" no relatório). As fotos só vêm se o backup da pasta de fotos do site antigo for entregue.
+- Quem ainda tiver um rascunho antigo (de uma importação anterior) o vê em **Meus anúncios** e usa **Revisar e enviar**; a equipe não aprova rascunho de um autor.
 
 ### Anúncios antigos feitos pela equipe
 
-Os anúncios que a própria equipe (contas de administrador do site antigo) e usuários já apagados publicavam vieram como **rascunhos** de uma conta técnica chamada **Equipe (anúncios do site antigo)**, que ninguém usa para entrar. Só a equipe vê. Na caixa **ClassiSex** do painel inicial, clique em **N anúncios antigos da equipe para revisar** (ou filtre **Anúncios** por "Anúncio antigo da equipe"). Para cada um, decida: **trocar o Anunciante** pelo dono certo (ele passa a ver o rascunho em Meus anúncios e envia pelo site), **editar** texto e contato e usar **Aprovar e publicar** no quadro Moderação (o apelido vem como "Anônimo": ajuste antes), ou **excluir** o anúncio.
+Os anúncios que a própria equipe (contas de administrador do site antigo) e usuários já apagados publicavam estão **publicados** em nome de uma conta técnica chamada **Equipe (anúncios do site antigo)**, que ninguém usa para entrar. Como essa conta não assina, aparecem só com a capa para os assinantes. No painel, filtre **Anúncios** por "Anúncio antigo da equipe". Para cada um, decida: **trocar o Anunciante** pelo dono certo (o anúncio passa a ser dele em Meus anúncios), **editar**, **despublicar** ou **excluir**. Rascunhos da equipe que sobrarem de uma importação anterior continuam com o botão **Aprovar e publicar** no quadro Moderação.
 
 ### Links antigos
 

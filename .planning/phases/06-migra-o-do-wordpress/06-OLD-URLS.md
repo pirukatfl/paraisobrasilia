@@ -88,7 +88,7 @@ Permalink: `/%postname%/`; front page = página "home". Só slugs públicos, sem
 - /minha-mulher-e-meu-amigo/ · postdev
 - /mulher-madura/ · dicas-hot
 - /mulheres-mais-velhas/ · dicas-hot
-- /mural/ · postdev
+- /mural/ · postdev (redireciona para /classisex desde 2026-10-22: o Mural antigo foi importado para o ClassiSex)
 - /no-caminhao/ · postdev
 - /no-cinema/ · contos
 - /o-casal-mais-excitante-que-conheci/ · contos

@@ -33,7 +33,7 @@ export const PAGE_DESTINATIONS: Record<string, string | null> = {
 
 export const STRUCTURAL_POSTS: Record<string, string> = {
   classisex1: '/classisex',
-  mural: '/assine-ja',
+  mural: '/classisex', // 2026-10-22: o mural antigo virou o ClassiSex
   programacao: '/',
   avisos: '/',
   '3753-2': '/',

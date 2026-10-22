@@ -3,8 +3,11 @@ import { expect, test, type Browser } from '@playwright/test'
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 import { loginAsStaff } from './helpers/staff'
+import { getTestPayload, seedAd, seedAdMedia } from '../helpers/seed'
 
-// M-04: old ClassiSex ads arrive as private drafts; the author reviews and sends them to moderation.
+// M-04 (2026-10-22): old ads now arrive published; a draft an earlier import left untouched is still private to its
+// author, who reviews and sends it. Old ads (wpCommentId, importer-only) are exempt from the 600 characters, the
+// contact field and the 3-ad limit.
 test.skip(({ isMobile }) => !isMobile, 'one project is enough for this flow')
 test.describe.configure({ mode: 'serial' })
 
@@ -14,8 +17,8 @@ const B = { email: 'viewer.pago@teste.local', name: 'Viewer Pago', password: PAS
 const C = { email: 'autor.cheio@teste.local', name: 'Autor Cheio', password: PASSWORD } // paying author with 3 ads
 const SENTINEL = 'sentinela-rascunho-abacaxi'
 const OLD_TEXT = `Casal ${SENTINEL} procura amigos, chama no 61 98888-7777. `.repeat(14) // > 600 characters
-const AVISO =
-  'Você tinha anúncios no site antigo. Eles estão guardados como rascunho e só você vê. Revise o texto, preencha WhatsApp ou Telegram e envie para análise.'
+const AVISO = 'Seus anúncios do site antigo já estão publicados. Você pode editar ou apagar cada um aqui em Meus anúncios.'
+const AVISO_ANTIGO = 'Você tinha anúncios no site antigo. Eles estão guardados como rascunho'
 const DECLARACAO =
   'Declaro que tenho 18 anos ou mais, que as informações são verdadeiras e que todas as pessoas das fotos e do vídeo são maiores de idade e autorizaram a publicação.'
 const LIMITE = 'Você já tem 3 anúncios ativos. Apague um para publicar outro.'
@@ -23,6 +26,7 @@ const LIMITE = 'Você já tem 3 anúncios ativos. Apague um para publicar outro.
 let aId = 0
 let draftId = 0
 let cDraftId = 0
+let bDraftId = 0
 
 test.beforeAll(async ({ request }) => {
   test.setTimeout(180_000)
@@ -37,10 +41,13 @@ test.beforeAll(async ({ request }) => {
   await api.liberar(c.id, { durationDays: 30, method: 'cortesia', amount: 0 })
   await api.createAd({ author: b.id, texto: 'Anúncio aprovado do viewer pago.', status: 'aprovado' })
   for (let i = 0; i < 3; i++) await api.createAd({ author: c.id, texto: `Anúncio ativo ${i + 1} do autor cheio.`, status: i === 0 ? 'aprovado' : 'pendente' })
-  draftId = (await api.createAd({ author: aId, apelido: 'Casal Antigo', texto: OLD_TEXT, status: 'rascunho', contato: {} })).id
-  await api.uploadAdMedia(draftId, 'flyer-square.jpg')
-  cDraftId = (await api.createAd({ author: c.id, apelido: 'Cheio Antigo', texto: 'Texto antigo curto.', status: 'rascunho', contato: {} })).id
   await api.dispose()
+  // old ads carry wpCommentId, which only the importer (Local API) can set
+  const payload = await getTestPayload()
+  draftId = (await seedAd(payload, { author: aId, apelido: 'Casal Antigo', texto: OLD_TEXT, status: 'rascunho', contato: {}, wpCommentId: 8901 })).id
+  await seedAdMedia(payload, { ad: draftId })
+  bDraftId = (await seedAd(payload, { author: b.id, apelido: 'Viewer Antigo', texto: 'Rascunho antigo do viewer.', status: 'rascunho', contato: {}, wpCommentId: 8903 })).id
+  cDraftId = (await seedAd(payload, { author: c.id, apelido: 'Cheio Antigo', texto: 'Texto antigo curto.', status: 'rascunho', contato: {}, wpCommentId: 8902 })).id
 })
 
 test.afterAll(async ({ request }) => {
@@ -58,11 +65,11 @@ async function as(browser: Browser, baseURL: string, acc: { email: string; passw
   return { context, page }
 }
 
-test('the author sees the notice on the home and in Meus anúncios, with the draft card', async ({ browser, baseURL }) => {
+test('the home no longer nags about drafts; Meus anúncios has the short note and the draft card', async ({ browser, baseURL }) => {
   const { context, page } = await as(browser, baseURL!, A)
-  await expect(page.getByText(AVISO)).toBeVisible()
-  await page.getByRole('link', { name: 'Ver meus anúncios' }).click()
-  await expect(page).toHaveURL(/\/meus-anuncios$/)
+  await expect(page.getByText(AVISO_ANTIGO)).toHaveCount(0)
+  await expect(page.getByText(AVISO)).toHaveCount(0)
+  await page.goto('/area-do-assinante/meus-anuncios')
   await expect(page.getByText(AVISO)).toHaveCount(1)
   const card = page.getByRole('article', { name: /Rascunho do site antigo/ })
   await expect(card).toContainText('Rascunho do site antigo (só você vê)')
@@ -87,57 +94,46 @@ test('nobody else sees the draft: paying viewer, anonymous visitor', async ({ br
   await anon.close()
 })
 
-test('the author reviews, fixes and sends the draft; it enters the moderation queue', async ({ browser, baseURL }) => {
+test('the author sends the old draft as it is: no 600-character cap, no contact required; it enters the queue', async ({ browser, baseURL }) => {
   const { context, page } = await as(browser, baseURL!, A)
   await page.goto(`/area-do-assinante/meus-anuncios/${draftId}/editar`)
   const main = page.locator('main')
   await expect(main).toContainText('Este anúncio veio do site antigo.')
   await expect(main.getByLabel('Texto do anúncio')).toHaveValue(OLD_TEXT.trim())
-  // over 600 characters: the existing error on submit
-  await main.getByLabel('WhatsApp').fill('5561988887777')
-  await main.getByLabel(DECLARACAO).check()
-  await main.getByRole('button', { name: 'Enviar para aprovação' }).click()
-  await expect(main.getByText('O texto pode ter até 600 caracteres.')).toBeVisible()
-
-  await main.getByLabel('Texto do anúncio').fill('Casal simpático procura amigos para a próxima festa.')
-  await main.getByLabel('WhatsApp').fill('5561988887777')
   await main.getByLabel(DECLARACAO).check()
   await main.getByRole('button', { name: 'Enviar para aprovação' }).click()
   await expect(page).toHaveURL(/\/meus-anuncios\?ok=enviado/)
   await expect(page.getByRole('article', { name: /Em análise pela equipe/ })).toBeVisible()
-  await expect(page.getByText(AVISO)).toHaveCount(0)
-  await page.goto('/area-do-assinante')
-  await expect(page.getByText(AVISO)).toHaveCount(0)
   await context.close()
 })
 
-test('a paying author at the limit gets the usual message when sending a draft', async ({ browser, baseURL }) => {
+test('a paying author with 3 active ads can still send an old draft (old ads are outside the limit)', async ({ browser, baseURL }) => {
   const { context, page } = await as(browser, baseURL!, C)
   await page.goto(`/area-do-assinante/meus-anuncios/${cDraftId}/editar`)
   const main = page.locator('main')
-  await main.getByLabel('WhatsApp').fill('5561977776666')
   await main.getByLabel(DECLARACAO).check()
   await main.getByRole('button', { name: 'Enviar para aprovação' }).click()
-  await expect(main.getByText(LIMITE)).toBeVisible()
+  await expect(page).toHaveURL(/\/meus-anuncios\?ok=enviado/)
+  await expect(page.getByText(LIMITE)).toHaveCount(0)
   await context.close()
 })
 
 test('staff: drafts have no Aprovar button and are not in the queue count', async ({ page, request }) => {
   const api = await staffApi(request)
-  // C's draft is still a draft; A's ad was sent and is pending
+  // B's draft is still a draft; A's and C's ads were sent and are pending
   const ads = (await api.get('/api/ads?limit=50&depth=0')) as unknown as { docs: { id: number; status: string }[] }
   await api.dispose()
-  expect(ads.docs.find((a) => a.id === cDraftId)?.status).toBe('rascunho')
+  expect(ads.docs.find((a) => a.id === bDraftId)?.status).toBe('rascunho')
   const pendentes = ads.docs.filter((a) => a.status === 'pendente').length
   expect(pendentes).toBeGreaterThan(0)
 
   await loginAsStaff(page)
-  await page.goto(`/admin/collections/ads/${cDraftId}`)
+  await page.goto(`/admin/collections/ads/${bDraftId}`)
   const panel = page.locator('section', { has: page.getByRole('heading', { name: 'Moderação', exact: true }) })
   await expect(panel).toContainText('Rascunho do anunciante (site antigo)')
   await expect(panel.getByRole('button', { name: 'Aprovar' })).toHaveCount(0)
   await page.goto('/admin')
   // the queue panel count follows pending ads only
   const fila = page.locator('section', { has: page.getByRole('heading', { name: /Anúncios em análise|Fila/ }) }).first()
-  if (await fila.count()) await expect(fila).not.toContainText('Cheio Antigo')
+  if (await fila.count()) await expect(fila).not.toContainText('Viewer Antigo')
 })

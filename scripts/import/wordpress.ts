@@ -6,7 +6,8 @@
  *   WP_DUMP_PATH=… pnpm import:wordpress -- --dry-run                          # relatório, sem banco
  *   WP_DUMP_PATH=… pnpm import:wordpress                                       # grava no banco do DATABASE_URI
  *   WP_DUMP_PATH=… pnpm import:wordpress -- --uploads /caminho/wp-content/uploads
- *   opções: --chave-eu-sou <meta_key> --chave-cidade <meta_key> --excluir-ids <arquivo> --post <id>
+ *   opções: --chave-eu-sou <meta_key> --chave-cidade <meta_key> --excluir-ids <arquivo>
+ *           --post <id>[,<id>…]   posts de origem dos anúncios (padrão: 2894 ClassiSex e 749 Mural)
  *
  * // T-06-31: prints counts only
  */
@@ -16,10 +17,13 @@ import { formatLoadLines, importAccounts, importLegacyAds } from '../../src/lib/
 import { buildMigrationReport, formatInspect, formatMigrationReport } from '../../src/lib/migracao/report'
 import { MIGRACAO_TABLES, extractAccounts, migracaoRowFilter } from '../../src/lib/migracao/wp-accounts'
 import {
-  CLASSISEX_POST_ID,
+  DEFAULT_POST_IDS,
+  FONTE_BY_POST,
   extractLegacyAds,
   inspectDump,
   resolveFieldKeys,
+  type AdSkip,
+  type WpLegacyAd,
 } from '../../src/lib/migracao/wp-classisex'
 import { DEFAULT_WP_PREFIX, readWpTables } from '../../src/lib/contos/wp-dump'
 
@@ -35,11 +39,11 @@ type Opts = {
   chaveEuSou?: string
   chaveCidade?: string
   excluirIds?: string
-  post: number
+  posts: number[]
 }
 
 function parseArgs(argv: string[]): Opts {
-  const out: Opts = { inspect: false, dryRun: false, post: CLASSISEX_POST_ID }
+  const out: Opts = { inspect: false, dryRun: false, posts: DEFAULT_POST_IDS }
   const args = argv.filter((a) => a !== '--')
   for (let i = 0; i < args.length; i++) {
     const a = args[i]!
@@ -51,9 +55,15 @@ function parseArgs(argv: string[]): Opts {
     else if (a === '--chave-cidade') out.chaveCidade = value()
     else if (a === '--excluir-ids') out.excluirIds = value()
     else if (a === '--post') {
-      const n = Number(value())
-      if (!Number.isInteger(n) || n <= 0) fail('O valor de --post deve ser um número inteiro.')
-      out.post = n
+      const ids = value()
+        .split(',')
+        .map((t) => Number(t.trim()))
+      if (ids.length === 0 || ids.some((n) => !Number.isInteger(n) || n <= 0)) {
+        fail('O valor de --post deve ser um número inteiro ou uma lista separada por vírgulas (ex.: 2894,749).')
+      }
+      const unknown = ids.filter((n) => !(n in FONTE_BY_POST))
+      if (unknown.length > 0) fail('--post só aceita os posts conhecidos: 2894 (ClassiSex) e 749 (Mural).')
+      out.posts = [...new Set(ids)]
     } else fail(`Opção desconhecida: ${a}`)
   }
   return out
@@ -89,19 +99,32 @@ async function main() {
   const tables = await readWpTables(dumpPath, {
     prefix,
     tables: [...MIGRACAO_TABLES],
-    rowFilter: migracaoRowFilter(prefix, opts.post),
+    rowFilter: migracaoRowFilter(prefix, opts.posts),
   })
 
   if (opts.inspect) {
-    console.log(formatInspect(inspectDump(tables, { prefix, postId: opts.post })))
+    console.log(formatInspect(inspectDump(tables, { prefix, postId: opts.posts })))
     console.log('Nada foi gravado (inspeção).')
     return
   }
 
-  const keys = resolveFieldKeys(tables, { postId: opts.post, euSou: opts.chaveEuSou, cidade: opts.chaveCidade })
   const now = new Date()
   const decisions = extractAccounts(tables, { prefix, now, excluirIds })
-  const adsResult = extractLegacyAds(tables, { postId: opts.post, keys })
+  // One extraction per source post: ClassiSex and Mural share the two custom fields (Eu Sou, Cidade)
+  const adsResult: { ads: WpLegacyAd[]; skipped: Record<AdSkip, number> } = {
+    ads: [],
+    skipped: { resposta: 0, 'nao-aprovado': 0, visitante: 0, 'eu-sou-desconhecido': 0, 'texto-vazio': 0, 'outro-tipo': 0 },
+  }
+  for (const postId of opts.posts) {
+    if (!(tables.comments ?? []).some((c) => Number(c.comment_post_ID) === postId)) {
+      console.log(`Aviso: o dump não tem comentários no post ${postId}; origem ignorada.`)
+      continue
+    }
+    const keys = resolveFieldKeys(tables, { postId, euSou: opts.chaveEuSou, cidade: opts.chaveCidade })
+    const one = extractLegacyAds(tables, { postId, keys })
+    adsResult.ads.push(...one.ads)
+    for (const k of Object.keys(one.skipped) as AdSkip[]) adsResult.skipped[k] += one.skipped[k]
+  }
 
   if (opts.dryRun) {
     console.log(formatMigrationReport(buildMigrationReport(decisions, adsResult)))

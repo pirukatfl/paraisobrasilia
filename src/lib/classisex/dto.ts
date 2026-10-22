@@ -22,6 +22,8 @@ export type AdDocLike = {
   motivo?: string | null
   updatedAt: string
   publishedAt?: string | null
+  /** Set only by the WordPress importer: the ad came from the old site. */
+  wpCommentId?: number | null
 }
 
 export type OwnerAdDTO = {
@@ -38,6 +40,8 @@ export type OwnerAdDTO = {
   fotos: number
   videos: number
   capa: ThumbDTO | null
+  /** Came from the old site (exempt from the new-ad limits). */
+  antigo: boolean
 }
 
 export const OWNER_STATUS_LABELS: Record<AdStatus, string> = {
@@ -48,9 +52,9 @@ export const OWNER_STATUS_LABELS: Record<AdStatus, string> = {
   rascunho: 'Rascunho do site antigo (só você vê)',
 }
 
-/** M-04: shown on the members home and in Meus anúncios while any draft exists. */
+/** Client decision 2026-10-22: old ads are published, not drafts. Short note in Meus anúncios only. */
 export const SITE_ANTIGO_AVISO =
-  'Você tinha anúncios no site antigo. Eles estão guardados como rascunho e só você vê. Revise o texto, preencha WhatsApp ou Telegram e envie para análise.'
+  'Seus anúncios do site antigo já estão publicados. Você pode editar ou apagar cada um aqui em Meus anúncios.'
 
 /** G-05: an approved ad of a free (or expired) author stays up showing only its cover. */
 export const FREE_PUBLISHED_LABEL = 'Publicado como conta gratuita (só a capa aparece)'
@@ -153,6 +157,7 @@ export function toOwnerAdDTO(
     fotos: fotos.length,
     videos: media.filter((m) => m.kind === 'video').length,
     capa: fotos[0] ? thumbOf(fotos[0]) : null,
+    antigo: doc.wpCommentId !== undefined && doc.wpCommentId !== null,
   }
 }
 
