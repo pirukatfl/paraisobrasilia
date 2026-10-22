@@ -1,6 +1,6 @@
 import { AdFilters } from '@/components/classisex/AdFilters'
+import { InfiniteAds } from '@/components/classisex/InfiniteAds'
 import { Pagination } from '@/components/classisex/Pagination'
-import { PublicAdCard } from '@/components/classisex/PublicAdCard'
 import { EmptyState } from '@/components/EmptyState'
 import type { BoardFilters, BoardPage } from '@/lib/classisex/board'
 import type { PublicAdDTO } from '@/lib/classisex/dto'
@@ -25,6 +25,14 @@ export function PublicBoard({
   signedIn?: boolean
 }) {
   const filtered = Boolean(filters.euSou)
+  const paginationEl = (
+    <Pagination
+      basePath={basePath}
+      page={result.page}
+      totalPages={result.totalPages}
+      params={{ 'eu-sou': filters.euSou ? String(filters.euSou) : undefined }}
+    />
+  )
   return (
     <>
       <AdFilters action={basePath} categories={categories} euSou={filters.euSou} showCidade={false} />
@@ -43,18 +51,18 @@ export function PublicBoard({
           />
         )
       ) : (
-        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {result.items.map((ad) => (
-            <PublicAdCard key={ad.id} ad={ad} />
-          ))}
-        </div>
+        <InfiniteAds
+          // New filter = new navigation; the key also resets the list on ?pagina= changes
+          key={`${filters.euSou ?? ''}:${result.page}`}
+          scope="publico"
+          initialItems={result.items}
+          initialPage={result.page}
+          totalPages={result.totalPages}
+          euSou={filters.euSou}
+          gridClassName="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+          noscriptPagination={paginationEl}
+        />
       )}
-      <Pagination
-        basePath={basePath}
-        page={result.page}
-        totalPages={result.totalPages}
-        params={{ 'eu-sou': filters.euSou ? String(filters.euSou) : undefined }}
-      />
     </>
   )
 }

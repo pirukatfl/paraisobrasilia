@@ -255,7 +255,7 @@ escreve o anúncio, com **até 10 fotos e até 2 vídeos curtos (cada um com at�
 nenhum vídeo: veja **Contas gratuitas**); **nada vai ao ar sem a sua
 aprovação**. Quem não é assinante (visitante ou conta gratuita) lê o **anúncio inteiro** — **apelido**, **tipo** (Casal, Mulher, Homem
 ou Trans), **cidade** e o **texto na íntegra** — com **uma foto desfocada** e o botão "Assine para ver o contato e as fotos".
-Só os **meios de contato** ficam de fora: o site apaga sozinho do texto telefones, e-mails, links, @usuários e nomes de
+O mural carrega **sozinho conforme a pessoa rola a página** (rolagem infinita, 20 anúncios por vez), sem botão de "próxima página"; no fim aparece "Você chegou ao fim dos anúncios". Se a internet falhar, o botão **Carregar mais** continua disponível. Só os **meios de contato** ficam de fora: o site apaga sozinho do texto telefones, e-mails, links, @usuários e nomes de
 aplicativo seguidos de contato (aparece "[contato só para assinantes]"), e os campos de WhatsApp e Telegram nunca saem do
 servidor. Por isso confira o texto na **Moderação**: o apagamento automático não pega tudo (números escritos por extenso,
 por exemplo). As fotos sem desfoque, os vídeos e os contatos (**WhatsApp e Telegram**, pelo menos um; não há campo de

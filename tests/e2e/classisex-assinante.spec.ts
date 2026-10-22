@@ -227,7 +227,7 @@ test('ending the author access keeps the ads on the board as free ads; renewing 
   await context.close()
 })
 
-test('pagination keeps the filters', async ({ browser, baseURL, request }) => {
+test('infinite scroll loads the next pages with the filters (members and public)', async ({ browser, baseURL, request }) => {
   test.setTimeout(150_000)
   const api = await staffApi(request)
   for (let i = 0; i < 20; i++) {
@@ -242,16 +242,36 @@ test('pagination keeps the filters', async ({ browser, baseURL, request }) => {
   }
   await api.dispose()
   const { page, context } = await asSubscriber(browser, baseURL!, GIL)
-  await page.goto(`/area-do-assinante/classisex?eu-sou=${solteiraCat}&cidade=taguatinga`)
+  const filtered = `/area-do-assinante/classisex?eu-sou=${solteiraCat}&cidade=taguatinga`
+  await page.goto(filtered)
   const main = page.locator('main')
   await expect(main.getByRole('article')).toHaveCount(20)
-  const nav = main.getByRole('navigation', { name: 'Paginação' })
-  await nav.getByRole('link', { name: 'Próximos' }).click()
-  await expect(page).toHaveURL(/pagina=2/)
-  const url = new URL(page.url())
-  expect(url.searchParams.get('eu-sou')).toBe(String(solteiraCat))
-  expect(url.searchParams.get('cidade')).toBe('taguatinga')
+  // Infinite scroll: the 21st ad (page 2) is appended with the same filters, URL unchanged
+  await page.mouse.wheel(0, 100_000)
+  await page.locator('[data-infinite-status]').scrollIntoViewIfNeeded()
+  await expect(main.getByRole('article')).toHaveCount(21)
+  await expect(main.getByText('Você chegou ao fim dos anúncios.')).toBeVisible()
+  await expect(main.getByRole('button', { name: 'Carregar mais' })).toHaveCount(0)
+  expect(page.url()).toContain(filtered)
+  expect(page.url()).not.toContain('pagina=')
+  // Members items keep their contacts
+  await expect(main.getByRole('article').nth(20)).toContainText('Solteira extra')
+  // Deep link to page 2 still renders server-side (no-JS / crawlers follow the noscript links)
+  await page.goto(`${filtered}&pagina=2`)
   await expect(main.getByRole('article')).toHaveCount(1)
-  await expect(nav.getByRole('link', { name: 'Anteriores' })).toBeVisible()
   await context.close()
+
+  const anon = await browser.newContext({ baseURL: baseURL! })
+  await anon.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const pub = await anon.newPage()
+  await pub.goto(`/classisex?eu-sou=${solteiraCat}`)
+  const pubMain = pub.locator('main')
+  await expect(pubMain.getByRole('article')).toHaveCount(20)
+  // Page 2 comes by itself (or via the button once the sentinel is far below the fold)
+  await pub.locator('[data-infinite-status]').scrollIntoViewIfNeeded()
+  await expect(pubMain.getByRole('article')).toHaveCount(21)
+  expect(pub.url()).not.toContain('pagina=')
+  // Redacted public cards only: no contact links leaked by the fetched page
+  await expect(pubMain.getByRole('link', { name: /^WhatsApp/ })).toHaveCount(0)
+  await anon.close()
 })

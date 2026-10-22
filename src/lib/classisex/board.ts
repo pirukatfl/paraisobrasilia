@@ -23,6 +23,12 @@ import { visibleAdsWhere } from './visibility'
 export const PAGE_SIZE = 20
 const MAX_PAGE = 1000
 
+/** Clamp an untrusted page number to 1..MAX_PAGE (non-numbers become 1). */
+export function clampPage(raw: unknown): number {
+  const n = typeof raw === 'number' ? raw : Number.parseInt(String(raw ?? ''), 10)
+  return Number.isInteger(n) && n >= 1 ? Math.min(n, MAX_PAGE) : 1
+}
+
 export type BoardFilters = { euSou?: number; cidade?: string; page?: number }
 
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)

@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { AdFilters } from '@/components/classisex/AdFilters'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
-import { MemberAdCard } from '@/components/classisex/MemberAdCard'
+import { InfiniteAds } from '@/components/classisex/InfiniteAds'
 import { PublicBoard } from '@/components/classisex/PublicBoard'
 import { Pagination } from '@/components/classisex/Pagination'
 import { EmptyState } from '@/components/EmptyState'
@@ -91,18 +91,25 @@ export default async function ClassisexPage({
           />
         )
       ) : (
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {result.items.map((ad) => (
-            <MemberAdCard key={ad.id} ad={ad} />
-          ))}
-        </div>
+        <InfiniteAds
+          key={`${filters.euSou ?? ''}:${filters.cidade ?? ''}:${result.page}`}
+          scope="membros"
+          initialItems={result.items}
+          initialPage={result.page}
+          totalPages={result.totalPages}
+          euSou={filters.euSou}
+          cidade={filters.cidade}
+          gridClassName="mt-8 grid gap-4 md:grid-cols-2"
+          noscriptPagination={
+            <Pagination
+              basePath={PATH}
+              page={result.page}
+              totalPages={result.totalPages}
+              params={{ 'eu-sou': filters.euSou ? String(filters.euSou) : undefined, cidade: filters.cidade }}
+            />
+          }
+        />
       )}
-      <Pagination
-        basePath={PATH}
-        page={result.page}
-        totalPages={result.totalPages}
-        params={{ 'eu-sou': filters.euSou ? String(filters.euSou) : undefined, cidade: filters.cidade }}
-      />
     </section>
   )
 }
