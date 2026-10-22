@@ -25,7 +25,7 @@
 
 - **M-08 Dicas Hot (cliente, 2026-10-21):** os 30 posts "Dicas Hot" entram como **seção nova** no site (trazem visitas do Google), com os links antigos redirecionando para ela. Planejar como quick task depois das etapas 06-01..06-09.
 - **M-09 Exclusões e e-mail já existente (cliente, 2026-10-21):** sem lista extra de contas a excluir além de administradores e testes óbvios. Conta nova confirmada com o mesmo e-mail é unida à antiga (mantém a senha nova e ganha o tempo pago); cadastro não confirmado não é unido.
-- **Uploads (2026-10-21):** o backup de arquivos do cliente trouxe só uploads/2024 (1.864 arquivos); as pastas 2025 e 2026 (fotos dos anúncios) vieram vazias. Pedido ao cliente baixá-las de novo.
+- **Uploads (2026-10-22):** o backup de arquivos do cliente tem as fotos (a primeira conferência pegou a extração pela metade). As 10 fotos de anúncios aprovados foram separadas no computador do cliente em `fotos-anuncios.tar.gz` (estrutura uploads/AAAA/MM) para `--uploads`. avatars/buddypress/youzify são fotos de perfil da rede antiga: não migram.
 
 ## Deferred
 - Aviso por e-mail aos usuários antigos — Fase 7.
