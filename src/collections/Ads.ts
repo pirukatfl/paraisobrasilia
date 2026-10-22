@@ -160,8 +160,12 @@ export const Ads: CollectionConfig = {
   admin: {
     group: 'ClassiSex',
     useAsTitle: 'resumo',
-    defaultColumns: ['resumo', 'status', 'submittedAt', 'author'],
+    defaultColumns: ['resumo', 'status', 'submittedAt', 'author', 'aprovarNaLista'],
     listSearchableFields: ['resumo', 'apelido', 'texto', 'cidade'],
+    components: {
+      // "Aprovar selecionados" above the list (staff); the per-row button is the `aprovarNaLista` column
+      beforeListTable: ['/components/admin/classisex/AprovarSelecionados#AprovarSelecionados'],
+    },
     description:
       'Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados.',
   },
@@ -193,6 +197,13 @@ export const Ads: CollectionConfig = {
     ],
   },
   fields: [
+    {
+      // Quick "Aprovar" in each row of the list (pending ads and team drafts); nothing on the edit screen
+      name: 'aprovarNaLista',
+      type: 'ui',
+      label: 'Aprovar',
+      admin: { components: { Cell: '/components/admin/classisex/AprovarCelula#AprovarCelula' } },
+    },
     {
       // Aprovar / Recusar / Despublicar with the public preview (PAINEL-07); hidden on create
       name: 'moderacao',

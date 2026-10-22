@@ -18,10 +18,13 @@ type View = {
   statusLabel: string
   motivo: string | null
   publicApelido: string
+  publicCidade: string | null
+  publicTexto: string
   euSouLabel: string
   contaAutor: 'Conta gratuita' | 'Assinante'
   rascunhoDaEquipe: boolean
   removed: number
+  removedApelido: number
   contato: { whatsapp: string | null; telegram: string | null }
   fields: Record<string, unknown>
 }
@@ -165,12 +168,20 @@ export function ModeracaoPanel() {
               Como aparece na área aberta
             </h4>
             <p style={quote}>
-              {view.publicApelido} · {view.euSouLabel} (com uma foto desfocada)
+              <strong>
+                {view.publicApelido} · {view.euSouLabel}
+                {view.publicCidade ? ` · ${view.publicCidade}` : ''}
+              </strong>
+              {'\n'}
+              {view.publicTexto}
+              {'\n'}(com uma foto desfocada)
             </p>
             <p style={{ margin: 'calc(var(--base) * 0.25) 0 0', opacity: 0.8 }}>
-              {view.removed > 0
+              {view.removedApelido > 0
                 ? 'O apelido tem um contato escondido: edite o apelido ou recuse o anúncio.'
-                : 'A área aberta mostra só o apelido, o tipo e uma foto desfocada. Confira o texto e as fotos antes de aprovar.'}
+                : view.removed > 0
+                  ? 'O site escondeu contatos do texto (aparece "[contato só para assinantes]"). Confira se não sobrou nenhum escrito de outro jeito, como número por extenso, antes de aprovar.'
+                  : 'Visitantes e contas gratuitas leem o apelido, o tipo, a cidade e o texto, com uma foto desfocada. Confira se não há contato escrito de outro jeito e veja as fotos antes de aprovar.'}
             </p>
           </div>
 

@@ -1,7 +1,9 @@
 import { AvisoSemData as AvisoSemData_7808e47397cf1993e43a254dee8e0608 } from '../../../components/admin/assinantes/AvisoSemData'
 import { AssinaturaPanel as AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24 } from '../../../components/admin/assinantes/AssinaturaPanel'
 import { EmailConfirmado as EmailConfirmado_44d794be48c9769b8d6c2b3ca9391713 } from '../../../components/admin/assinantes/EmailConfirmado'
+import { AprovarCelula as AprovarCelula_10fb62e0be876840929f6ea26f5d5864 } from '../../../components/admin/classisex/AprovarCelula'
 import { ModeracaoPanel as ModeracaoPanel_ec761e6491e5a1911a27084fe817e462 } from '../../../components/admin/classisex/ModeracaoPanel'
+import { AprovarSelecionados as AprovarSelecionados_42dfd8d279800017a6cbfcc6c08cf494 } from '../../../components/admin/classisex/AprovarSelecionados'
 import { DenunciaPanel as DenunciaPanel_38859cfdaab329474f1feee2c26931b5 } from '../../../components/admin/classisex/DenunciaPanel'
 import { MensagemDenunciaPanel as MensagemDenunciaPanel_708efcad2e179bed32d5d707d9198ce3 } from '../../../components/admin/mensagens/MensagemDenunciaPanel'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -34,7 +36,9 @@ export const importMap = {
   "/components/admin/assinantes/AvisoSemData#AvisoSemData": AvisoSemData_7808e47397cf1993e43a254dee8e0608,
   "/components/admin/assinantes/AssinaturaPanel#AssinaturaPanel": AssinaturaPanel_de2430cf3a33e8aa958fb181a8618e24,
   "/components/admin/assinantes/EmailConfirmado#EmailConfirmado": EmailConfirmado_44d794be48c9769b8d6c2b3ca9391713,
+  "/components/admin/classisex/AprovarCelula#AprovarCelula": AprovarCelula_10fb62e0be876840929f6ea26f5d5864,
   "/components/admin/classisex/ModeracaoPanel#ModeracaoPanel": ModeracaoPanel_ec761e6491e5a1911a27084fe817e462,
+  "/components/admin/classisex/AprovarSelecionados#AprovarSelecionados": AprovarSelecionados_42dfd8d279800017a6cbfcc6c08cf494,
   "/components/admin/classisex/DenunciaPanel#DenunciaPanel": DenunciaPanel_38859cfdaab329474f1feee2c26931b5,
   "/components/admin/mensagens/MensagemDenunciaPanel#MensagemDenunciaPanel": MensagemDenunciaPanel_708efcad2e179bed32d5d707d9198ce3,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,

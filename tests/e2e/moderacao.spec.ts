@@ -57,8 +57,10 @@ test('panel shows the public preview (apelido and tipo) without contacts; refuse
   await expect(panel).toContainText('Situação: Em análise')
   const preview = panel.getByRole('region', { name: 'Como aparece na área aberta' })
   await expect(preview).toContainText('Cris BSB · Casal')
-  await expect(preview).not.toContainText('Casal procura casal')
+  // visitors read the text now: the preview shows it with the contact removed, exactly as they will see it
+  await expect(preview).toContainText('Casal procura casal, chama no [contato só para assinantes]')
   await expect(preview).not.toContainText('99988')
+  await expect(preview).toContainText('O site escondeu contatos do texto')
   await expect(panel).toContainText('Conta do anunciante: Assinante')
   await expect(panel).toContainText('5561999889772')
   await expect(panel).toContainText('@cris_bsb')

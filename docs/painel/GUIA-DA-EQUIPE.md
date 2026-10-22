@@ -269,14 +269,25 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 
 1. No painel inicial, a caixa **ClassiSex** mostra "N anúncios para aprovar" e "N denúncias abertas".
 2. Clique em **Ver fila**: os anúncios em análise aparecem, **os mais antigos primeiro**.
-3. Quando o anunciante edita um anúncio já aprovado, ele **volta para a fila** e sai do ar até você aprovar de novo.
+3. **Aprovar direto na lista** (sem abrir o anúncio): cada linha de anúncio em análise (e de rascunho antigo da equipe) tem
+   o botão **Aprovar**. Ele faz exatamente o mesmo que o botão do quadro Moderação: vale a regra do contato obrigatório,
+   do texto de até 600 caracteres e fica no Registro de ações. Se algo não passar, a mensagem aparece na própria linha e o
+   anúncio continua como estava.
+4. **Aprovar vários de uma vez**: marque os anúncios na lista (a caixa do topo marca a página inteira; "selecionar todos"
+   pega todas as páginas do filtro, até 200 por vez) e clique em **Aprovar selecionados (N)**, acima da tabela. O quadro
+   mostra quantos foram aprovados e, para os que **não** passaram (sem contato, já publicado, rascunho de assinante...), o
+   motivo de cada um com o link do anúncio; esses ficam como estavam. Dica: **leia antes de aprovar em massa**, porque o
+   texto vai ao ar para visitantes.
+5. Quando o anunciante edita um anúncio já aprovado, ele **volta para a fila** e sai do ar até você aprovar de novo.
 
 ### Aprovar, recusar ou despublicar
 
 1. Abra o anúncio. No topo está o quadro **Moderação**.
-2. Confira **Como aparece na área aberta**: é exatamente o que o visitante vai ver (apelido, tipo e uma foto desfocada).
-   O **apelido** não pode ter telefone, e-mail, @ ou link: o site já recusa isso ao salvar, mas confira mesmo assim. Confira
-   também o texto, as fotos e os vídeos em **Fotos e vídeos**.
+2. Confira **Como aparece na área aberta**: é exatamente o que o visitante e a conta gratuita vão ler (apelido, tipo,
+   cidade e o texto inteiro, com uma foto desfocada). O site já troca telefone, e-mail, link e @ por "[contato só para
+   assinantes]", mas **leia o texto procurando contato escrito de outro jeito** (número por extenso, letras separadas) e, se
+   achar, edite o texto ou recuse. O **apelido** não pode ter contato: o site recusa ao salvar, mas confira mesmo assim.
+   Confira também as fotos e os vídeos em **Fotos e vídeos**.
 3. Se estiver tudo certo, clique em **Aprovar**. Você pode corrigir o apelido ou o texto antes de aprovar.
 4. **Recusar** (anúncio em análise) e **Despublicar** (anúncio que já está no ar) pedem sempre um **motivo**, e o
    anunciante lê esse motivo em Meus anúncios. Escreva de forma simples: "Telefone escrito no texto", "Foto de outra pessoa".

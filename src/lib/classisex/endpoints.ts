@@ -1,7 +1,7 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
-import { approveAd, getModerationView, rejectAd, resolveReport, ServiceError, unpublishAd } from './service'
+import { approveAd, approveAds, getModerationView, rejectAd, resolveReport, ServiceError, unpublishAd } from './service'
 
 /**
  * Staff-only moderation actions on an ad, used by the "Moderação" panel in /admin (PAINEL-07):
@@ -9,6 +9,7 @@ import { approveAd, getModerationView, rejectAd, resolveReport, ServiceError, un
  *   POST /api/ads/:id/aprovar
  *   POST /api/ads/:id/recusar     { motivo }
  *   POST /api/ads/:id/despublicar { motivo }
+ *   POST /api/ads/aprovar-lote    { ids: number[] }  (list view "Aprovar selecionados", same rules as /aprovar)
  * T-04-04: 403 unless the principal is staff. Only `motivo` is read from the body.
  */
 const forbidden = () => Response.json({ message: 'Sem permissão.' }, { status: 403 })
@@ -36,6 +37,15 @@ async function run(fn: () => Promise<unknown>): Promise<Response> {
 }
 
 export const adEndpoints: Endpoint[] = [
+  {
+    path: '/aprovar-lote',
+    method: 'post',
+    handler: async (req) => {
+      if (!isStaff({ req })) return forbidden()
+      const body = await readBody(req)
+      return run(() => approveAds(req, body.ids, new Date()))
+    },
+  },
   {
     path: '/:id/moderacao',
     method: 'get',

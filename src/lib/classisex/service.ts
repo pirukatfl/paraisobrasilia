@@ -519,6 +519,60 @@ export const rejectAd = (req: PayloadRequest, id: number | string, motivo: unkno
 export const unpublishAd = (req: PayloadRequest, id: number | string, motivo: unknown, now: Date = new Date()) =>
   moderateAd(req, id, 'despublicar', { motivo, now })
 
+/** Most ads one bulk approval accepts (a list page holds far fewer; the cap stops runaway requests). */
+export const BULK_APPROVE_MAX = 200
+
+export type BulkApproveFailure = { id: number; resumo: string | null; motivo: string }
+export type BulkApproveResult = {
+  /** Ids approved now. */
+  aprovados: number[]
+  /** Ads that stay as they were, each with the reason (validation, state, not found). */
+  falhas: BulkApproveFailure[]
+}
+
+/** Reason in Portuguese for a failed approval: service rules first, then Payload validation messages. */
+function failureReason(err: unknown): string {
+  if (err instanceof ServiceError) return err.message
+  const data = (err as { data?: { errors?: { message?: string }[] } } | null)?.data
+  const messages = (data?.errors ?? []).map((e) => e.message).filter((m): m is string => Boolean(m))
+  if (messages.length) return [...new Set(messages)].join(' ')
+  const message = err instanceof Error ? err.message : ''
+  return message || 'Não foi possível aprovar.'
+}
+
+/**
+ * Staff approve several ads at once (list view "Aprovar selecionados"). Each ad goes through the very
+ * same `moderateAd(..., 'aprovar')` as the single Aprovar button: transition rules (pending, refused,
+ * unpublished, or a team draft), contact / text validation of the ad collection, publishedAt, moderator
+ * and one audit row per ad. A failing ad is reported with its reason and stays as it was; the others
+ * are not affected.
+ */
+export async function approveAds(req: PayloadRequest, rawIds: unknown, now: Date = new Date()): Promise<BulkApproveResult> {
+  if (!isStaff({ req })) throw new ServiceError('proibido', 'Sem permissão.', 403)
+  if (!Array.isArray(rawIds) || rawIds.length === 0) {
+    throw new ServiceError('ids', 'Escolha pelo menos um anúncio.', 400)
+  }
+  const ids = [...new Set(rawIds.map((v) => Number(v)))]
+  if (ids.some((id) => !Number.isInteger(id) || id <= 0)) throw new ServiceError('ids', 'Lista de anúncios inválida.', 400)
+  if (ids.length > BULK_APPROVE_MAX) {
+    throw new ServiceError('limite', `Aprove até ${BULK_APPROVE_MAX} anúncios por vez.`, 400)
+  }
+  const result: BulkApproveResult = { aprovados: [], falhas: [] }
+  for (const id of ids) {
+    try {
+      await moderateAd(req, id, 'aprovar', { now, auditDetails: { lote: true } })
+      result.aprovados.push(id)
+    } catch (err) {
+      const resumo = await loadAdForStaff(req, id).then(
+        (ad) => ad.resumo ?? null,
+        () => null,
+      )
+      result.falhas.push({ id, resumo, motivo: failureReason(err) })
+    }
+  }
+  return result
+}
+
 /** Dashboard queue (FilaClassisex): ads waiting for approval and open reports. */
 export async function getModerationCounts(
   payload: Payload,
@@ -733,10 +787,15 @@ export type ModerationView = {
   /** Old-site draft written by the team (placeholder owner): staff can approve it directly */
   rascunhoDaEquipe: boolean
   motivo: string | null
-  /** Exactly what the open area shows (T-04-01): apelido (contacts removed on the server) and tipo */
+  /** Exactly what the open area shows (T-04-01): apelido, tipo, city and text, contacts removed on the server */
   publicApelido: string
+  publicCidade: string | null
+  publicTexto: string
   euSouLabel: string
+  /** Contacts the server removed from apelido, city and text, in total */
   removed: number
+  /** Contacts removed from the apelido alone (it is a title: better edited than hidden) */
+  removedApelido: number
   contato: AdContatoDTO
   /** Current values of the moderation fields, to refresh the admin form after an action */
   fields: {
@@ -757,6 +816,8 @@ export async function getModerationView(req: PayloadRequest, id: number | string
     moderatedBy?: unknown
   }
   const apelido = redactContacts(ad.apelido ?? '')
+  const cidade = redactContacts(ad.cidade ?? '')
+  const texto = redactContacts(ad.texto ?? '')
   const labels = await categoryLabels(req.payload)
   const authorId = relId(ad.author)
   const contaAutor: ModerationView['contaAutor'] =
@@ -769,8 +830,11 @@ export async function getModerationView(req: PayloadRequest, id: number | string
     rascunhoDaEquipe: ad.status === DRAFT_STATUS && ad.origemLegado === 'equipe',
     motivo: ad.motivo ?? null,
     publicApelido: apelido.text,
+    publicCidade: cidade.text || null,
+    publicTexto: texto.text,
     euSouLabel: labels.get(relId(ad.euSou) ?? -1) ?? '',
-    removed: apelido.removed,
+    removed: apelido.removed + cidade.removed + texto.removed,
+    removedApelido: apelido.removed,
     contato: contatoOf(ad),
     fields: {
       status: ad.status,
