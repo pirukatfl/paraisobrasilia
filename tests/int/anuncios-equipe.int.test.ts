@@ -47,7 +47,8 @@ describe('anúncios antigos da equipe: conta técnica (M-04; publicados desde 20
     const tables = await readMigracaoFixture()
     decisions = extractAccounts(tables, { prefix: MIGRACAO_PREFIX, now: FIXTURE_NOW })
     const keys = resolveFieldKeys(tables, { postId: CLASSISEX_POST })
-    ads = extractLegacyAds(tables, { postId: CLASSISEX_POST, keys }).ads
+    // visitor ads (also owned by the placeholder) are covered in migracao-load; this file is about the administrator ad
+    ads = extractLegacyAds(tables, { postId: CLASSISEX_POST, keys }).ads.filter((a) => !a.visitante)
   })
 
   beforeEach(async () => {

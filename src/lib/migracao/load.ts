@@ -494,7 +494,7 @@ export async function importLegacyAds(
 
   const uploadsReal = opts.uploadsDir ? await fs.realpath(opts.uploadsDir) : null
 
-  const wpUserIds = [...new Set(ads.map((a) => a.wpUserId))]
+  const wpUserIds = [...new Set(ads.filter((a) => !a.visitante).map((a) => a.wpUserId))]
   const { docs: authors } = await payload.find({
     collection: 'assinantes',
     where: { wpUserId: { in: wpUserIds } },
@@ -562,7 +562,8 @@ export async function importLegacyAds(
     const counters = porFonte[ad.fonte]
     const existing = existingByComment.get(ad.wpCommentId)
     const publishedAt = ad.createdAt.startsWith('1970') ? opts.now.toISOString() : ad.createdAt
-    const author = authorByWp.get(ad.wpUserId)
+    // Visitors (user_id 0) never match an account: they belong to the team placeholder
+    const author = ad.visitante ? undefined : authorByWp.get(ad.wpUserId)
     if (existing) {
       const expectedOwner = author ? author.id : (equipeId ??= await findEquipeId())
       const sameOwner = expectedOwner !== null && relIdOf(existing.author) === expectedOwner
@@ -626,7 +627,7 @@ export async function importLegacyAds(
           author: author ? author.id : equipeId,
           ...(author ? {} : { origemLegado: 'equipe' }),
           fonteLegado: ad.fonte,
-          apelido: author?.apelido || 'Anônimo',
+          apelido: author?.apelido || ad.apelidoVisitante || 'Anônimo',
           euSou: categoryId.get(ad.euSou),
           cidade: ad.cidade,
           texto: ad.texto,

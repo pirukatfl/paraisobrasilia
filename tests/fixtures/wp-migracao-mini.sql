@@ -83,7 +83,8 @@ INSERT INTO `wp26_comments` VALUES (101,2894,'Membro Dois Sentinela','membro2.se
 (112,749,'Membro Tres Sentinela','membro3.sentinela@paraiso-sintetico.test','','192.0.2.1','2025-05-12 10:00:00','2025-05-12 13:00:00','Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. Mural longo Sentinela sem contato. ',0,'1','agente-sentinela','',0,3),
 (113,749,'Admin Sentinela','membro1.sentinela@paraiso-sintetico.test','','192.0.2.1','2025-05-13 10:00:00','2025-05-13 13:00:00','Mural da equipe Sentinela, chame no zap 61 96666-5555',0,'1','agente-sentinela','',0,1),
 (114,749,'Membro Dois Sentinela','membro2.sentinela@paraiso-sintetico.test','','192.0.2.1','2025-05-14 10:00:00','2025-05-14 13:00:00','Resposta no mural Sentinela',0,'1','agente-sentinela','',110,2),
-(115,3000,'Membro Dois Sentinela','membro2.sentinela@paraiso-sintetico.test','','192.0.2.1','2025-05-15 10:00:00','2025-05-15 13:00:00','Comentário de outro post Sentinela',0,'1','agente-sentinela','',0,2);
+(115,3000,'Membro Dois Sentinela','membro2.sentinela@paraiso-sintetico.test','','192.0.2.1','2025-05-15 10:00:00','2025-05-15 13:00:00','Comentário de outro post Sentinela',0,'1','agente-sentinela','',0,2),
+(116,749,'Zé Sentinela 61 98888-1234 @zesentinela','visitante.sentinela@paraiso-sintetico.test','','192.0.2.1','2025-05-16 10:00:00','2025-05-16 13:00:00','Visitante do mural Sentinela, procuro conversa',0,'1','agente-sentinela','',0,0);
 UNLOCK TABLES;
 
 --
@@ -107,7 +108,10 @@ INSERT INTO `wp26_commentmeta` VALUES (1,101,'custom_field_61a0e5b2c9f01','Casal
 (22,112,'wmu_attachments','a:1:{s:6:"images";a:3:{i:0;s:3:"503";i:1;i:504;i:2;i:505;}}'),
 (23,113,'custom_field_61a0e5b2c9f01','Solteira'),
 (24,113,'custom_field_61a0e5b2c9f02','Asa Norte'),
-(25,114,'custom_field_61a0e5b2c9f01','Casal');
+(25,114,'custom_field_61a0e5b2c9f01','Casal'),
+(26,116,'custom_field_61a0e5b2c9f01','Solteiro'),
+(27,116,'wmu_attachments','a:1:{s:6:"images";a:1:{i:0;s:3:"506";}}'),
+(28,107,'custom_field_61a0e5b2c9f01','Casal');
 UNLOCK TABLES;
 
 --
@@ -140,6 +144,7 @@ LOCK TABLES `wp26_posts` WRITE;
 INSERT INTO `wp26_posts` VALUES (501,1,'2025-05-01 10:00:00','2025-05-01 13:00:00','','foto-sentinela','','inherit','open','closed','foto-sentinela','2025-05-01 13:00:00','2025-05-01 13:00:00',0,0,'attachment',0),(502,1,'2025-05-01 10:00:00','2025-05-01 13:00:00','','foto-sem-arquivo','','inherit','open','closed','foto-sem-arquivo','2025-05-01 13:00:00','2025-05-01 13:00:00',0,0,'attachment',0),(900,1,'2025-05-01 10:00:00','2025-05-01 13:00:00','','Formulário Sentinela','','publish','open','closed','form-sentinela','2025-05-01 13:00:00','2025-05-01 13:00:00',0,0,'wpdiscuz_form',0),(503,1,'2025-06-01 10:00:00','2025-06-01 13:00:00','','foto-mural-sentinela','','inherit','open','closed','foto-mural-sentinela','2025-06-01 13:00:00','2025-06-01 13:00:00',0,0,'attachment',0),
 (504,1,'2025-06-01 10:00:00','2025-06-01 13:00:00','','gif-mural-sentinela','','inherit','open','closed','gif-mural-sentinela','2025-06-01 13:00:00','2025-06-01 13:00:00',0,0,'attachment',0),
 (505,1,'2025-06-01 10:00:00','2025-06-01 13:00:00','','foto-mural-sem-arquivo','','inherit','open','closed','foto-mural-sem-arquivo','2025-06-01 13:00:00','2025-06-01 13:00:00',0,0,'attachment',0),
+(506,1,'2025-06-01 10:00:00','2025-06-01 13:00:00','','foto-visitante-sentinela','','inherit','open','closed','foto-visitante-sentinela','2025-06-01 13:00:00','2025-06-01 13:00:00',0,0,'attachment',0),
 (749,1,'2025-05-01 10:00:00','2025-05-01 13:00:00','Mural Sentinela','Mural','','publish','open','closed','mural','2025-05-01 13:00:00','2025-05-01 13:00:00',0,0,'page',0),
 (2894,1,'2025-05-01 10:00:00','2025-05-01 13:00:00','Página dos anúncios Sentinela','Classisex','','publish','open','closed','classisex1','2025-05-01 13:00:00','2025-05-01 13:00:00',0,0,'page',0);
 UNLOCK TABLES;
@@ -160,5 +165,5 @@ CREATE TABLE `wp26_postmeta` (
 LOCK TABLES `wp26_postmeta` WRITE;
 INSERT INTO `wp26_postmeta` VALUES (1,501,'_wp_attached_file','2025/05/foto-sentinela.jpg'),
 (5,503,'_wp_attached_file','2025/06/foto-mural-sentinela.jpg'),
-(6,504,'_wp_attached_file','2025/06/gif-mural-sentinela.gif'),(2,900,'wpdiscuz_form_structure','a:2:{s:26:"custom_field_61a0e5b2c9f01";a:3:{s:4:"type";s:6:"wpdFormAttr\\Field\\Select";s:4:"name";s:6:"Eu Sou";s:8:"required";s:1:"1";}s:26:"custom_field_61a0e5b2c9f02";a:2:{s:4:"type";s:4:"text";s:4:"name";s:6:"Cidade";}}'),(3,2894,'_edit_lock','123:1'),(4,2894,'wpdiscuz_something','x');
+(6,504,'_wp_attached_file','2025/06/gif-mural-sentinela.gif'),(7,506,'_wp_attached_file','2025/06/foto-visitante-sentinela.jpg'),(2,900,'wpdiscuz_form_structure','a:2:{s:26:"custom_field_61a0e5b2c9f01";a:3:{s:4:"type";s:6:"wpdFormAttr\\Field\\Select";s:4:"name";s:6:"Eu Sou";s:8:"required";s:1:"1";}s:26:"custom_field_61a0e5b2c9f02";a:2:{s:4:"type";s:4:"text";s:4:"name";s:6:"Cidade";}}'),(3,2894,'_edit_lock','123:1'),(4,2894,'wpdiscuz_something','x');
 UNLOCK TABLES;

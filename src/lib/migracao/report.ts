@@ -27,7 +27,8 @@ export type MigrationReport = {
     fotosSemArquivo: number
     deContasImportadas: number | null
     /** Per old board (ClassiSex, Mural) */
-    porFonte: Record<Fonte, { total: number; textoLongo: number; fotosReferencias: number; fotosSemArquivo: number }>
+    deVisitantes: number
+    porFonte: Record<Fonte, { total: number; deVisitantes: number; textoLongo: number; fotosReferencias: number; fotosSemArquivo: number }>
   }
 }
 
@@ -63,9 +64,10 @@ export function buildMigrationReport(
       fotosReferencias: 0,
       fotosSemArquivo: 0,
       deContasImportadas: accountIdsImported ? 0 : null,
+      deVisitantes: 0,
       porFonte: {
-        classisex: { total: 0, textoLongo: 0, fotosReferencias: 0, fotosSemArquivo: 0 },
-        mural: { total: 0, textoLongo: 0, fotosReferencias: 0, fotosSemArquivo: 0 },
+        classisex: { total: 0, deVisitantes: 0, textoLongo: 0, fotosReferencias: 0, fotosSemArquivo: 0 },
+        mural: { total: 0, deVisitantes: 0, textoLongo: 0, fotosReferencias: 0, fotosSemArquivo: 0 },
       },
     },
   }
@@ -103,6 +105,10 @@ export function buildMigrationReport(
     report.anuncios.fotosSemArquivo += ad.photos.filter((p) => p.relPath === null).length
     const fonte = report.anuncios.porFonte[ad.fonte]
     fonte.total++
+    if (ad.visitante) {
+      fonte.deVisitantes++
+      report.anuncios.deVisitantes++
+    }
     if (ad.flags.includes('texto-longo')) fonte.textoLongo++
     fonte.fotosReferencias += ad.photos.length
     fonte.fotosSemArquivo += ad.photos.filter((p) => p.relPath === null).length
@@ -130,13 +136,13 @@ export function formatMigrationReport(report: MigrationReport, load: string[] = 
     `Revisar (assinante antigo sem data): ${report.revisar}`,
     `Vencidas: ${report.vencidas} · sem data: ${report.semData}`,
     `Alertas: expirado=Y com data futura ${al.expiradoComDataFutura} · não assinante com data futura ${al.naoAssinanteComDataFutura} · apelido descartado ${al.apelidoDescartado} · outro papel ${al.outroPapel}`,
-    `Anúncios antigos: ${an.total} · respostas ${sk.resposta} · não aprovados ${sk['nao-aprovado']} · visitantes ${sk.visitante} · Eu sou desconhecido ${sk['eu-sou-desconhecido']} · outro tipo ${sk['outro-tipo']}${sk['texto-vazio'] ? ` · texto vazio ${sk['texto-vazio']}` : ''}`,
+    `Anúncios antigos: ${an.total} · respostas ${sk.resposta} · não aprovados ${sk['nao-aprovado']} · de visitantes (publicados pela equipe) ${an.deVisitantes} · Eu sou desconhecido ${sk['eu-sou-desconhecido']} · outro tipo ${sk['outro-tipo']}${sk['texto-vazio'] ? ` · texto vazio ${sk['texto-vazio']}` : ''}`,
     `Eu sou: Casal ${an.euSou.Casal} · Homem ${an.euSou.Homem} · Mulher ${an.euSou.Mulher}`,
     `Cidade descartada: ${an.cidadeDescartada} · texto acima de 600: ${an.textoLongo}`,
     `Fotos: ${an.fotosReferencias} referências · sem arquivo no dump ${an.fotosSemArquivo}`,
     ...FONTES.map((f) => {
       const x = an.porFonte[f]
-      return `  ${FONTE_LABELS[f]}: ${x.total} anúncios · texto acima de 600: ${x.textoLongo} · ${x.fotosReferencias} fotos referenciadas · sem arquivo ${x.fotosSemArquivo}`
+      return `  ${FONTE_LABELS[f]}: ${x.total} anúncios · de visitantes (publicados pela equipe) ${x.deVisitantes} · texto acima de 600: ${x.textoLongo} · ${x.fotosReferencias} fotos referenciadas · sem arquivo ${x.fotosSemArquivo}`
     }),
   ]
   if (an.deContasImportadas !== null) lines.push(`Anúncios de contas importadas: ${an.deContasImportadas}`)

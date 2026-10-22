@@ -344,9 +344,13 @@ Quem faz: o cliente, no terminal da VPS (a gente não tem SSH). **O dump do Word
    $IMPORTAR --uploads /importacao/uploads    # depois, quando a pasta de fotos chegar
    ```
 
-   **Anúncios antigos (decisão do cliente de 22/10/2026):** entram **publicados**, de duas origens: ClassiSex (post 2894) e Mural (post 749). Os de quem não foi importado (administradores do site antigo e usuários apagados) ficam em nome da conta técnica "Equipe (anúncios do site antigo)" (e-mail fixo `equipe-legado@invalid.paraiso.local`, sem login possível). Os anúncios antigos não contam no limite de 3 anúncios, não têm limite de texto nem exigem contato; os novos mantêm todos os limites. O importador só imprime contagens, por origem:
+   **Anúncios antigos (decisão do cliente de 22/10/2026):** entram **publicados**, de duas origens: ClassiSex (post 2894) e Mural (post 749). Os de quem não foi importado (administradores do site antigo e usuários apagados) ficam em nome da conta técnica "Equipe (anúncios do site antigo)" (e-mail fixo `equipe-legado@invalid.paraiso.local`, sem login possível). Os comentários **aprovados de visitantes** (sem login, `user_id` 0) também entram publicados, na mesma conta técnica da equipe e com a marca "Anúncio antigo da equipe"; o apelido é o nome que o visitante digitou (sem telefone, link ou @; no máximo 40 caracteres; "Anônimo" se sobrar nada). E-mail e IP do visitante nunca são lidos nem gravados. Os anúncios antigos não contam no limite de 3 anúncios, não têm limite de texto nem exigem contato; os novos mantêm todos os limites. O importador só imprime contagens, por origem:
 
    ```
+   (simulação) Anúncios antigos: N · respostas N · não aprovados N · de visitantes (publicados pela equipe) N · Eu sou desconhecido N · outro tipo N
+     ClassiSex: N anúncios · de visitantes (publicados pela equipe) N · texto acima de 600: N · N fotos referenciadas · sem arquivo N
+     Mural: N anúncios · de visitantes (publicados pela equipe) N · texto acima de 600: N · N fotos referenciadas · sem arquivo N
+   (gravação)
    Anúncios: publicados N · promovidos de rascunho N · já existiam N · da equipe N
      ClassiSex: publicados N · promovidos de rascunho N · já existiam N · da equipe N
      Mural: publicados N · promovidos de rascunho N · já existiam N · da equipe N

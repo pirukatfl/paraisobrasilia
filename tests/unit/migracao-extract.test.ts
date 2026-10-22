@@ -13,7 +13,7 @@ import {
   SENTINELS,
 } from '../helpers/wp-migracao-fixture'
 import { buildMigrationReport, formatInspect, formatMigrationReport } from '@/lib/migracao/report'
-import { CLASSISEX_POST_ID, extractLegacyAds, inspectDump, resolveFieldKeys } from '@/lib/migracao/wp-classisex'
+import { CLASSISEX_POST_ID, apelidoVisitante, extractLegacyAds, inspectDump, resolveFieldKeys } from '@/lib/migracao/wp-classisex'
 import { readWpTables } from '@/lib/contos/wp-dump'
 import { serializedFieldLabels, serializedIntegers, serializedKeys } from '@/lib/migracao/php-serialized'
 import {
@@ -175,11 +175,10 @@ describe('old ClassiSex ads', () => {
   it('extracts the ads that must come in and counts the rest', async () => {
     const t = await readMigracaoFixture()
     const { ads, skipped } = extractLegacyAds(t, { postId: POST, keys: KEYS })
-    expect(ads.map((a) => a.wpCommentId)).toEqual([101, 102, 103, 104, 108])
+    expect(ads.map((a) => a.wpCommentId)).toEqual([101, 102, 103, 104, 107, 108])
     expect(skipped).toEqual({
       resposta: 1,
       'nao-aprovado': 1,
-      visitante: 1,
       'eu-sou-desconhecido': 1,
       'texto-vazio': 0,
       'outro-tipo': 1,
@@ -201,6 +200,36 @@ describe('old ClassiSex ads', () => {
     expect(by(103).flags).toContain('cidade-descartada')
     expect(by(104).flags).toContain('texto-longo')
     expect(by(104).texto.length).toBeGreaterThan(600)
+    // visitor (user_id 0) comes in, with the typed name as nickname
+    expect(by(107).visitante).toBe(true)
+    expect(by(107).apelidoVisitante).toBe('Visitante Sentinela')
+    expect(by(101).visitante).toBe(false)
+    expect(by(101).apelidoVisitante).toBeNull()
+  })
+
+  it('imports approved top-level visitor comments of the Mural with a sanitised nickname and photos', async () => {
+    const t = await readMigracaoFixture()
+    const keys = resolveFieldKeys(t, { postId: MURAL_POST })
+    const { ads, skipped } = extractLegacyAds(t, { postId: MURAL_POST, keys })
+    const v = ads.find((a) => a.wpCommentId === 116)!
+    expect(v.visitante).toBe(true)
+    expect(v.fonte).toBe('mural')
+    expect(v.euSou).toBe('Homem')
+    expect(v.photos).toEqual([{ attachmentId: 506, relPath: '2025/06/foto-visitante-sentinela.jpg' }])
+    // phone, handle and "@" removed from the name; the e-mail column is never read
+    expect(v.apelidoVisitante).toBe('Zé Sentinela')
+    expect(JSON.stringify(v)).not.toMatch(/98888-1234|zesentinela|visitante\.sentinela|192\.0\.2\.1|@/)
+    expect(skipped.resposta).toBe(1)
+    expect(ads.filter((a) => a.visitante).map((a) => a.wpCommentId)).toEqual([116])
+  })
+
+  it('sanitises visitor nicknames', () => {
+    expect(apelidoVisitante('  Casal   Feliz ')).toBe('Casal Feliz')
+    expect(apelidoVisitante('61 99999-8888')).toBe('Anônimo')
+    expect(apelidoVisitante('fulano@gmail.com')).toBe('Anônimo')
+    expect(apelidoVisitante('www.site.com.br')).toBe('Anônimo')
+    expect(apelidoVisitante('')).toBe('Anônimo')
+    expect(apelidoVisitante('a'.repeat(60))).toBe('a'.repeat(40))
   })
 
   it('inspect reports counts, key names and labels only', async () => {
@@ -240,10 +269,11 @@ describe('aggregate reports', () => {
       'Revisar (assinante antigo sem data): 2',
       'Vencidas: 2 · sem data: 1',
       'Alertas: expirado=Y com data futura 1 · não assinante com data futura 1 · apelido descartado 1 · outro papel 1',
-      'Anúncios antigos: 5 · respostas 1 · não aprovados 1 · visitantes 1 · Eu sou desconhecido 1 · outro tipo 1',
-      'Eu sou: Casal 3 · Homem 1 · Mulher 1',
+      'Anúncios antigos: 6 · respostas 1 · não aprovados 1 · de visitantes (publicados pela equipe) 1 · Eu sou desconhecido 1 · outro tipo 1',
+      'Eu sou: Casal 4 · Homem 1 · Mulher 1',
       'Cidade descartada: 1 · texto acima de 600: 1',
       'Fotos: 2 referências · sem arquivo no dump 1',
+      '  ClassiSex: 6 anúncios · de visitantes (publicados pela equipe) 1 · texto acima de 600: 1 · 2 fotos referenciadas · sem arquivo 1',
     ]) {
       expect(text).toContain(line)
     }

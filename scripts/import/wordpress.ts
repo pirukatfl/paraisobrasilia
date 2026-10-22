@@ -113,7 +113,7 @@ async function main() {
   // One extraction per source post: ClassiSex and Mural share the two custom fields (Eu Sou, Cidade)
   const adsResult: { ads: WpLegacyAd[]; skipped: Record<AdSkip, number> } = {
     ads: [],
-    skipped: { resposta: 0, 'nao-aprovado': 0, visitante: 0, 'eu-sou-desconhecido': 0, 'texto-vazio': 0, 'outro-tipo': 0 },
+    skipped: { resposta: 0, 'nao-aprovado': 0, 'eu-sou-desconhecido': 0, 'texto-vazio': 0, 'outro-tipo': 0 },
   }
   for (const postId of opts.posts) {
     if (!(tables.comments ?? []).some((c) => Number(c.comment_post_ID) === postId)) {

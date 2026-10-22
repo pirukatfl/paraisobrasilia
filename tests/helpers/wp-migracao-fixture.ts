@@ -67,4 +67,8 @@ export const SENTINELS: string[] = [
   'mural_sentinela',
   '61 97777-6666',
   '61 96666-5555',
+  '98888-1234',
+  'zesentinela',
+  'foto-visitante-sentinela',
+  '192.0.2.1',
 ]

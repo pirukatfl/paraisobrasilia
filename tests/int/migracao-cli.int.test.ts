@@ -32,7 +32,7 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
     expect(out).not.toContain('@')
     // --inspect legitimately prints the 4-char hash PREFIXES with counts; a full hash never appears
     expect(out).not.toMatch(/\$wp\$2y\$\d+\$\S|\$P\$\S{5}/)
-    expect(out).not.toMatch(/\b(101|102|103|104|108|110|112|113|501|503|504)\b/)
+    expect(out).not.toMatch(/\b(101|102|103|104|108|110|107|112|113|116|501|503|504|506)\b/)
     return { code: res.status, out, stderr: res.stderr ?? '' }
   }
 
@@ -110,13 +110,13 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
 
   it('--dry-run reports both boards, and --post narrows the source posts', () => {
     const both = run(['--dry-run'])
-    expect(both.out).toContain('ClassiSex: 5 anúncios')
-    expect(both.out).toContain('Mural: 3 anúncios')
+    expect(both.out).toContain('ClassiSex: 6 anúncios · de visitantes (publicados pela equipe) 1')
+    expect(both.out).toContain('Mural: 4 anúncios · de visitantes (publicados pela equipe) 1')
     const only = run(['--dry-run', '--post', '749'])
-    expect(only.out).toContain('Mural: 3 anúncios')
+    expect(only.out).toContain('Mural: 4 anúncios · de visitantes (publicados pela equipe) 1')
     expect(only.out).toContain('ClassiSex: 0 anúncios')
     const list = run(['--dry-run', '--post', '2894,749'])
-    expect(list.out).toContain('Mural: 3 anúncios')
+    expect(list.out).toContain('Mural: 4 anúncios · de visitantes (publicados pela equipe) 1')
     const bad = run(['--dry-run', '--post', '12'])
     expect(bad.code).toBe(1)
     expect(bad.out).toContain('--post só aceita os posts conhecidos')
@@ -126,22 +126,40 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
     const first = run(['--uploads', uploads])
     expect(first.code).toBe(0)
     expect(first.out).toMatch(/Contas: criadas 9 /)
-    expect(first.out).toContain('Anúncios: publicados 8 · promovidos de rascunho 0 · já existiam 0 · da equipe 2')
-    expect(first.out).toContain('ClassiSex: publicados 5 · promovidos de rascunho 0 · já existiam 0 · da equipe 1')
-    expect(first.out).toContain('Mural: publicados 3 · promovidos de rascunho 0 · já existiam 0 · da equipe 1')
+    expect(first.out).toContain('Anúncios: publicados 10 · promovidos de rascunho 0 · já existiam 0 · da equipe 4')
+    expect(first.out).toContain('ClassiSex: publicados 6 · promovidos de rascunho 0 · já existiam 0 · da equipe 2')
+    expect(first.out).toContain('Mural: publicados 4 · promovidos de rascunho 0 · já existiam 0 · da equipe 2')
     expect(first.out).toMatch(/Fotos: gravadas [1-9]/)
-    expect(first.out).toContain('Mural: gravadas 1 · ausentes 1 · recusadas 1 · fora da pasta 0')
+    expect(first.out).toContain('Mural: gravadas 2 · ausentes 1 · recusadas 1 · fora da pasta 0')
     expect(await assinantes()).toBe(10) // 9 imported + the team placeholder
-    expect(await ads()).toBe(8)
+    expect(await ads()).toBe(10)
     const published = await payload.count({ collection: 'ads', where: { status: { equals: 'aprovado' } }, overrideAccess: true })
-    expect(published.totalDocs).toBe(8)
+    expect(published.totalDocs).toBe(10)
+
+    // the visitor comment (116) is a published ad of the team placeholder, with the sanitised typed name and its photo
+    const { docs: visitorAds } = await payload.find({
+      collection: 'ads',
+      where: { wpCommentId: { equals: 116 } },
+      depth: 1,
+      overrideAccess: true,
+    })
+    expect(visitorAds).toHaveLength(1)
+    const va = visitorAds[0] as unknown as { status: string; apelido: string; origemLegado: string; fonteLegado: string; id: number; author: { email: string } }
+    expect(va.status).toBe('aprovado')
+    expect(va.apelido).toBe('Zé Sentinela')
+    expect(va.origemLegado).toBe('equipe')
+    expect(va.fonteLegado).toBe('mural')
+    expect(va.author.email).toBe('equipe-legado@invalid.paraiso.local')
+    expect(JSON.stringify(visitorAds)).not.toMatch(/98888-1234|zesentinela|visitante\.sentinela|192\.0\.2\.1/)
+    const photos = await payload.count({ collection: 'ad-media', where: { ad: { equals: va.id } }, overrideAccess: true })
+    expect(photos.totalDocs).toBe(1)
 
     const second = run(['--uploads', uploads])
     expect(second.code).toBe(0)
     expect(second.out).toMatch(/Contas: criadas 0 /)
-    expect(second.out).toContain('Anúncios: publicados 0 · promovidos de rascunho 0 · já existiam 8 · da equipe 0')
+    expect(second.out).toContain('Anúncios: publicados 0 · promovidos de rascunho 0 · já existiam 10 · da equipe 0')
     expect(await assinantes()).toBe(10)
-    expect(await ads()).toBe(8)
+    expect(await ads()).toBe(10)
   })
 
   it('refuses a missing uploads folder without echoing the path', () => {

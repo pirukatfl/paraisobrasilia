@@ -569,7 +569,7 @@ Algumas contas do site antigo eram de assinante, mas **sem data de vencimento** 
 
 ### Anúncios antigos feitos pela equipe
 
-Os anúncios que a própria equipe (contas de administrador do site antigo) e usuários já apagados publicavam estão **publicados** em nome de uma conta técnica chamada **Equipe (anúncios do site antigo)**, que ninguém usa para entrar. Como essa conta não assina, aparecem só com a capa para os assinantes. No painel, filtre **Anúncios** por "Anúncio antigo da equipe". Para cada um, decida: **trocar o Anunciante** pelo dono certo (o anúncio passa a ser dele em Meus anúncios), **editar**, **despublicar** ou **excluir**. Rascunhos da equipe que sobrarem de uma importação anterior continuam com o botão **Aprovar e publicar** no quadro Moderação.
+Os anúncios que a própria equipe (contas de administrador do site antigo) e usuários já apagados publicavam, e também os recados de **visitantes** que não tinham login (o apelido é o nome que eles digitaram), estão **publicados** em nome de uma conta técnica chamada **Equipe (anúncios do site antigo)**, que ninguém usa para entrar. Como essa conta não assina, aparecem só com a capa para os assinantes. No painel, filtre **Anúncios** por "Anúncio antigo da equipe". Para cada um, decida: **trocar o Anunciante** pelo dono certo (o anúncio passa a ser dele em Meus anúncios), **editar**, **despublicar** ou **excluir**. Rascunhos da equipe que sobrarem de uma importação anterior continuam com o botão **Aprovar e publicar** no quadro Moderação.
 
 ### Links antigos
 

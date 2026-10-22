@@ -3,7 +3,8 @@
  * Pure: no database, no Payload, no Next.
  */
 // T-06-04: only comments of the ad post and their meta are used; contacts in the text are NOT extracted (M-04)
-import { cidadeError } from '../classisex/rules'
+import { REDACTED_LABEL, redactContacts } from '../classisex/redact'
+import { APELIDO_MAX, apelidoError, cidadeError } from '../classisex/rules'
 import { decodeEntities } from '../contos/html-to-lexical'
 import type { Row, WpTables } from '../contos/wp-dump'
 import { serializedFieldLabels, serializedIntegers, serializedKeys } from './php-serialized'
@@ -25,7 +26,7 @@ const TEXTO_MAX = 600
 
 export type FieldKeys = { euSou: string; cidade: string | null }
 export type AdFlag = 'cidade-descartada' | 'texto-longo' | 'foto-sem-arquivo'
-export type AdSkip = 'resposta' | 'nao-aprovado' | 'visitante' | 'eu-sou-desconhecido' | 'texto-vazio' | 'outro-tipo'
+export type AdSkip = 'resposta' | 'nao-aprovado' | 'eu-sou-desconhecido' | 'texto-vazio' | 'outro-tipo'
 
 export type WpLegacyAd = {
   wpCommentId: number
@@ -37,6 +38,10 @@ export type WpLegacyAd = {
   cidade: string | null
   photos: { attachmentId: number; relPath: string | null }[]
   flags: AdFlag[]
+  /** Posted by a visitor (not logged in, user_id 0): imported as published, owned by the team placeholder */
+  visitante: boolean
+  /** Visitor only: the name typed on the old site, sanitised (no contacts, max 40, else "Anônimo") */
+  apelidoVisitante: string | null
   /** Which old board the comment came from (reporting, admin filter) */
   fonte: Fonte
 }
@@ -128,6 +133,20 @@ function cleanText(html: string): string {
     .trim()
 }
 
+/** Public nickname of a visitor ad: what they typed, minus any contact, link or "@"; never e-mail or IP. */
+export function apelidoVisitante(raw: string): string {
+  const typed = raw.replace(/\s+/g, ' ').trim()
+  const cleaned = redactContacts(typed)
+    .text.split(REDACTED_LABEL)
+    .join(' ')
+    .replace(/@/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, APELIDO_MAX)
+    .trim()
+  return cleaned && apelidoError(cleaned) === null ? cleaned : 'Anônimo'
+}
+
 function isoUtc(c: Row): string {
   for (const col of ['comment_date_gmt', 'comment_date']) {
     const v = c[col]
@@ -146,7 +165,6 @@ export function extractLegacyAds(
   const skipped: Record<AdSkip, number> = {
     resposta: 0,
     'nao-aprovado': 0,
-    visitante: 0,
     'eu-sou-desconhecido': 0,
     'texto-vazio': 0,
     'outro-tipo': 0,
@@ -185,10 +203,8 @@ export function extractLegacyAds(
       skipped['nao-aprovado']++
       continue
     }
-    if (!(Number(c.user_id) > 0)) {
-      skipped.visitante++
-      continue
-    }
+    // Visitors (user_id 0) come in too (client, 2026-10-22: "traz todas"); the e-mail/IP columns are never read
+    const visitante = !(Number(c.user_id) > 0)
     const id = Number(c.comment_ID)
     const meta = metaOf.get(id) ?? new Map<string, string>()
     const euRaw = (meta.get(opts.keys.euSou) ?? '').trim()
@@ -222,6 +238,8 @@ export function extractLegacyAds(
       cidade,
       photos,
       flags,
+      visitante,
+      apelidoVisitante: visitante ? apelidoVisitante(String(c.comment_author ?? '')) : null,
       fonte,
     })
   }
