@@ -7,7 +7,9 @@
  * // never titles or text.
  */
 import fs from 'node:fs'
+import fsp from 'node:fs/promises'
 import path from 'node:path'
+import sharp from 'sharp'
 import type { Payload, PayloadRequest } from 'payload'
 
 import { REDACTED_LABEL, redactContacts } from '../classisex/redact'
@@ -310,7 +312,10 @@ export function formatDicasLoad(load: DicasLoad): string {
   return `Criados: ${load.criados.length} · já existiam: ${load.existentes.length} · endereços renomeados: ${load.renomeados.length}`
 }
 
-// Loader, covers and bundle are added in the next step (Task C2).
+// ---------------------------------------------------------------------------------------------
+// Covers (--uploads)
+// ---------------------------------------------------------------------------------------------
+
 export type CoverLoad = {
   gravadas: number
   ausentes: number
@@ -321,14 +326,271 @@ export type CoverLoad = {
   semCapa: number
 }
 
+export const emptyCoverLoad = (): CoverLoad => ({
+  gravadas: 0,
+  ausentes: 0,
+  recusadas: 0,
+  foraDaPasta: 0,
+  jaTinham: 0,
+  semDica: 0,
+  semCapa: 0,
+})
+
 export function formatCovers(c: CoverLoad): string {
   return `Capas: gravadas ${c.gravadas} · ausentes ${c.ausentes} · recusadas ${c.recusadas} · fora da pasta ${c.foraDaPasta} · já tinham ${c.jaTinham} · sem dica ${c.semDica} · sem capa no site antigo ${c.semCapa}`
 }
 
-// Silence unused-import lint until the loader lands
-void fs
-void path
-void SLUG_MAX
-void SLUG_RE
-void isSafeRelativePath
-export type { Payload, PayloadRequest }
+const COVER_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp'])
+const MIME_BY_FORMAT: Record<string, string> = { jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }
+const ALT_MAX = 120
+
+/**
+ * Attaches each featured image once, UNCONFIRMED (I-1): the dica gets `capaConferida: false`, so the
+ * cover shows neither on the site nor in share previews until staff look at it and tick the box.
+ * Never re-attaches (a dica that has a cover, or had one imported, is left alone) and never reads
+ * outside the uploads folder (T-DH-04: containment before and after symlink resolution, extension and
+ * image-format allow-lists, Media size cap).
+ */
+export async function attachCovers(
+  payload: Payload,
+  records: DicaRecord[],
+  opts: { uploadsDir: string; now?: Date; req?: Partial<PayloadRequest> },
+): Promise<CoverLoad> {
+  const counters = emptyCoverLoad()
+  const uploadsReal = await fsp.realpath(opts.uploadsDir)
+  const now = opts.now ?? new Date()
+  const reqArg = opts.req ? { req: opts.req as PayloadRequest } : {}
+
+  for (const record of records) {
+    if (!record.capaWp) {
+      counters.semCapa++
+      continue
+    }
+    const found = await payload.find({
+      collection: 'dicas',
+      where: { wpId: { equals: record.wpId } },
+      draft: true,
+      limit: 1,
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+      ...reqArg,
+    })
+    const dica = found.docs[0]
+    if (!dica) {
+      counters.semDica++
+      continue
+    }
+    if (dica.capa || dica.capaImportadaEm) {
+      counters.jaTinham++
+      continue
+    }
+
+    if (!isSafeRelativePath(record.capaWp)) {
+      counters.foraDaPasta++
+      continue
+    }
+    const resolved = path.resolve(uploadsReal, record.capaWp)
+    if (!resolved.startsWith(uploadsReal + path.sep)) {
+      counters.foraDaPasta++
+      continue
+    }
+    if (!COVER_EXTENSIONS.has(path.extname(record.capaWp).toLowerCase())) {
+      counters.recusadas++
+      continue
+    }
+    let real: string
+    try {
+      real = await fsp.realpath(resolved)
+    } catch {
+      counters.ausentes++
+      continue
+    }
+    // A symlink inside the folder pointing outside of it is refused too
+    if (!real.startsWith(uploadsReal + path.sep)) {
+      counters.foraDaPasta++
+      continue
+    }
+
+    let mediaId: number | null = null
+    try {
+      const data = await fsp.readFile(real)
+      const meta = await sharp(data).metadata()
+      const mimetype = MIME_BY_FORMAT[String(meta.format)]
+      if (!mimetype) {
+        counters.recusadas++
+        continue
+      }
+      const media = await payload.create({
+        collection: 'media',
+        data: { alt: dica.title.slice(0, ALT_MAX) } as never,
+        file: { data, mimetype, name: path.basename(record.capaWp), size: data.length },
+        depth: 0,
+        overrideAccess: true,
+        ...reqArg,
+      })
+      mediaId = media.id
+      await payload.update({
+        collection: 'dicas',
+        id: dica.id,
+        data: {
+          capa: media.id,
+          capaConferida: false,
+          capaImportadaEm: now.toISOString(),
+          // keep the status the dica had (a draft stays a draft, a published one stays published)
+          _status: dica._status ?? 'draft',
+        } as never,
+        draft: false,
+        depth: 0,
+        overrideAccess: true,
+        ...reqArg,
+      })
+      counters.gravadas++
+    } catch {
+      if (mediaId !== null) await payload.delete({ collection: 'media', id: mediaId, overrideAccess: true, ...reqArg }).catch(() => undefined)
+      counters.recusadas++
+    }
+  }
+  return counters
+}
+
+// ---------------------------------------------------------------------------------------------
+// Loader
+// ---------------------------------------------------------------------------------------------
+
+async function freeSlug(payload: Payload, wanted: string, req?: Partial<PayloadRequest>): Promise<string> {
+  for (let n = 1; ; n++) {
+    const candidate = n === 1 ? wanted : withSuffix(wanted, n)
+    const clash = await payload.find({
+      collection: 'dicas',
+      where: { slug: { equals: candidate } },
+      draft: true,
+      limit: 1,
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+      ...(req ? { req: req as PayloadRequest } : {}),
+    })
+    if (clash.docs.length === 0) return candidate
+  }
+}
+
+/** Creates the dicas that do not exist yet (by wpId). Existing dicas are never touched (staff edits are safe). */
+export async function importDicas(
+  payload: Payload,
+  records: DicaRecord[],
+  opts: { req?: Partial<PayloadRequest>; now?: Date } = {},
+): Promise<DicasLoad> {
+  const result: DicasLoad = { criados: [], existentes: [], renomeados: [] }
+  const now = opts.now ?? new Date()
+  const reqArg = opts.req ? { req: opts.req as PayloadRequest } : {}
+  for (const record of records) {
+    const found = await payload.find({
+      collection: 'dicas',
+      where: { wpId: { equals: record.wpId } },
+      draft: true,
+      limit: 1,
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+      ...reqArg,
+    })
+    if (found.docs[0]) {
+      result.existentes.push(found.docs[0].slug)
+      continue
+    }
+    const slug = await freeSlug(payload, record.slug, opts.req)
+    if (slug !== record.slug) result.renomeados.push({ de: record.slug, para: slug })
+    await payload.create({
+      collection: 'dicas',
+      data: {
+        title: record.title,
+        slug,
+        publishedAt: record.publishedAt,
+        ...(record.resumo ? { resumo: record.resumo } : {}),
+        texto: record.texto as never,
+        revisar: record.revisar,
+        wpId: record.wpId,
+        wpSlug: record.wpSlug,
+        importadoEm: now.toISOString(),
+        _status: record.publicar ? 'published' : 'draft',
+      },
+      overrideAccess: true,
+      draft: !record.publicar,
+      ...reqArg,
+    })
+    result.criados.push(slug)
+  }
+  return result
+}
+
+// ---------------------------------------------------------------------------------------------
+// Bundle
+// ---------------------------------------------------------------------------------------------
+
+const BUNDLE_ERROR = 'Arquivo de dicas inválido.'
+
+export function writeDicasBundle(file: string, records: DicaRecord[], legado: DicaLegado[], now: Date): void {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(
+    file,
+    `${JSON.stringify({ version: DICAS_BUNDLE_VERSION, generatedAt: now.toISOString(), dicas: records, legado }, null, 1)}\n`,
+    'utf8',
+  )
+}
+
+function isRecord(value: unknown): value is DicaRecord {
+  if (!value || typeof value !== 'object') return false
+  const r = value as Record<string, unknown>
+  const root = (r.texto as { root?: { children?: unknown } } | undefined)?.root
+  return (
+    typeof r.wpId === 'number' &&
+    typeof r.wpSlug === 'string' &&
+    typeof r.slug === 'string' &&
+    r.slug.length <= SLUG_MAX &&
+    SLUG_RE.test(r.slug) &&
+    typeof r.title === 'string' &&
+    r.title.trim().length > 0 &&
+    typeof r.publishedAt === 'string' &&
+    !Number.isNaN(Date.parse(r.publishedAt)) &&
+    typeof r.publicar === 'boolean' &&
+    typeof r.revisar === 'boolean' &&
+    (r.resumo === null || (typeof r.resumo === 'string' && r.resumo.length <= RESUMO_MAX)) &&
+    (r.capaWp === null || isSafeRelativePath(r.capaWp)) &&
+    Array.isArray(root?.children)
+  )
+}
+
+function isLegado(value: unknown): value is DicaLegado {
+  if (!value || typeof value !== 'object') return false
+  const l = value as Record<string, unknown>
+  return (
+    typeof l.wpSlug === 'string' &&
+    (l.slug === null || (typeof l.slug === 'string' && l.slug.length <= SLUG_MAX && SLUG_RE.test(l.slug)))
+  )
+}
+
+export function readDicasBundle(file: string): { records: DicaRecord[]; legado: DicaLegado[] } {
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(fs.readFileSync(file, 'utf8'))
+  } catch {
+    throw new Error(BUNDLE_ERROR)
+  }
+  const bundle = parsed as { version?: unknown; dicas?: unknown; legado?: unknown } | null
+  if (!bundle || bundle.version !== DICAS_BUNDLE_VERSION || !Array.isArray(bundle.dicas) || !Array.isArray(bundle.legado)) {
+    throw new Error(BUNDLE_ERROR)
+  }
+  if (!bundle.dicas.every(isRecord) || !bundle.legado.every(isLegado)) throw new Error(BUNDLE_ERROR)
+  return { records: bundle.dicas as DicaRecord[], legado: bundle.legado as DicaLegado[] }
+}
+
+/** Used by the dicas_wp_bundle migration: a missing file is a no-op. */
+export async function loadDicasBundleIfPresent(
+  payload: Payload,
+  file: string,
+  opts: { req?: Partial<PayloadRequest> } = {},
+): Promise<DicasLoad | { skipped: true }> {
+  if (!fs.existsSync(file)) return { skipped: true }
+  return importDicas(payload, readDicasBundle(file).records, opts)
+}
