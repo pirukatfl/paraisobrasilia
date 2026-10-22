@@ -1,7 +1,9 @@
 import { AboutTeaser } from '@/components/home/AboutTeaser'
+import { DicasTeaser } from '@/components/home/DicasTeaser'
 import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
+import { getLatestDicas } from '@/lib/dicas/public'
 import { getSpacePhotos } from '@/lib/gallery/queries'
 import { getPageIntro } from '@/lib/pages/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
@@ -22,11 +24,12 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
 }
 
 export default async function HomePage() {
-  const [parties, photos, intro, contact] = await Promise.all([
+  const [parties, photos, intro, contact, dicas] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
     optional(() => getSpacePhotos(6)),
     optional(() => getPageIntro('quem-somos')),
     optional(() => getContact()),
+    optional(() => getLatestDicas(3)),
   ])
   const hasParties = parties.length > 0
 
@@ -58,6 +61,7 @@ export default async function HomePage() {
 
       <SpaceTeaser photos={photos ?? []} />
       <AboutTeaser intro={intro} />
+      <DicasTeaser dicas={dicas ?? []} />
       {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
     </>
   )

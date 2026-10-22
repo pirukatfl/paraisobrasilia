@@ -10,6 +10,8 @@ export type SitemapInput = {
   hasModels: boolean
   /** Published contos (05-03) */
   contos?: { slug: string; updatedAt: string }[]
+  /** Published Dicas Hot (quick dicas-hot) */
+  dicas?: { slug: string; updatedAt: string }[]
 }
 
 /**
@@ -17,7 +19,7 @@ export type SitemapInput = {
  * /modelos while a model is published, upcoming published parties, /assine-ja and the ClassiSex
  * preview /classisex (redacted, blurred; listing it is a client decision kept open in 04-RESEARCH Q2).
  */
-export function buildSitemap({ base, parties, pages, hasModels, contos = [] }: SitemapInput): MetadataRoute.Sitemap {
+export function buildSitemap({ base, parties, pages, hasModels, contos = [], dicas = [] }: SitemapInput): MetadataRoute.Sitemap {
   const root = base.replace(/\/$/, '')
   return [
     { url: `${root}/`, changeFrequency: 'daily', priority: 1 },
@@ -33,6 +35,13 @@ export function buildSitemap({ base, parties, pages, hasModels, contos = [] }: S
       lastModified: c.updatedAt,
       changeFrequency: 'monthly' as const,
       priority: 0.5,
+    })),
+    { url: `${root}/dicas-hot`, changeFrequency: 'weekly', priority: 0.6 },
+    ...dicas.map((d) => ({
+      url: `${root}/dicas-hot/${d.slug}`,
+      lastModified: d.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
     })),
     ...pages.map((page) => ({
       url: `${root}${pathForKey(page.key)}`,

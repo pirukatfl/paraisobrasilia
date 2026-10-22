@@ -24,11 +24,12 @@ describe('sitemap (INST-06, T-02-13)', () => {
         '/assine-ja',
         '/classisex',
         '/contos',
+        '/dicas-hot',
       ]),
     )
     expect(urls).not.toContain('/modelos')
     expect(urls).not.toContain('/recados') // mural removed 2026-10-20 (R-08)
-    expect(urls).toHaveLength(12)
+    expect(urls).toHaveLength(13)
   })
 
   it('includes /modelos and upcoming parties when present', () => {
@@ -47,6 +48,15 @@ describe('sitemap (INST-06, T-02-13)', () => {
     expect(urls).toContain('/contos')
     expect(urls).toContain('/contos/conto-um')
     for (const url of urls) expect(url).not.toMatch(/^\/area-do-assinante/)
+  })
+
+  it('lists /dicas-hot and every published dica (quick dicas-hot)', () => {
+    const urls = paths(
+      buildSitemap({ base, parties: [], pages: [], hasModels: false, dicas: [{ slug: 'dica-um', updatedAt: '2026-10-19T12:00:00.000Z' }] }),
+    )
+    expect(urls).toContain('/dicas-hot')
+    expect(urls).toContain('/dicas-hot/dica-um')
+    expect(paths(buildSitemap({ base, parties: [], pages: [], hasModels: false }))).not.toContain('/dicas-hot/dica-um')
   })
 
   it('lists /assine-ja and never the members or auth pages (T-03-05)', () => {

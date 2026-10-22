@@ -317,6 +317,44 @@ export async function staffApi(request: APIRequestContext) {
       })
       return (await check(res, 'create conto')).doc
     },
+    /** Dica Hot written by staff REST (quick dicas-hot): one Lexical paragraph per entry of `paragrafos`. */
+    async createDica(data: {
+      title: string
+      slug?: string
+      paragrafos: string[]
+      publishedAt?: string
+      status?: 'published' | 'draft'
+      resumo?: string
+      capa?: number
+      capaConferida?: boolean
+    }) {
+      const res = await request.post('/api/dicas', {
+        headers,
+        data: {
+          title: data.title,
+          ...(data.slug ? { slug: data.slug } : {}),
+          publishedAt: data.publishedAt ?? '2026-10-01T12:00:00.000Z',
+          texto: lexicalParagraphs(data.paragrafos),
+          ...(data.resumo !== undefined ? { resumo: data.resumo } : {}),
+          ...(data.capa !== undefined ? { capa: data.capa } : {}),
+          ...(data.capaConferida !== undefined ? { capaConferida: data.capaConferida } : {}),
+          _status: data.status ?? 'published',
+        },
+      })
+      return (await check(res, 'create dica')).doc
+    },
+    async updateDica(id: number, data: Record<string, unknown>) {
+      const res = await request.patch(`/api/dicas/${id}`, { headers, data })
+      return (await check(res, 'update dica')).doc
+    },
+    /** Uploads a fixture image to the public media collection. */
+    async createMedia(alt: string, fixture = 'flyer-square.jpg') {
+      return upload('media', fixture, { alt })
+    },
+    async deleteDoc(collection: string, id: number) {
+      const res = await request.delete(`/api/${collection}/${id}`, { headers })
+      if (!res.ok()) throw new Error(`delete ${collection}/${id} failed: ${res.status()}`)
+    },
     async updateConto(id: number, data: Record<string, unknown>) {
       const res = await request.patch(`/api/contos/${id}`, { headers, data })
       return (await check(res, 'update conto')).doc
