@@ -10,6 +10,11 @@ export type AdStatus = 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | '
 export const DRAFT_STATUS = 'rascunho' as const
 
 export const TEXT_MAX = 600
+/**
+ * Client decision 2026-10-22: ads brought from the old site are exempt from the 600-character limit and from
+ * the contact field. When their author edits one, only this generous ceiling (abuse guard) applies.
+ */
+export const LEGACY_TEXT_MAX = 5000
 /** Revisão 2026-10-20: public nickname shown in the open preview. */
 export const APELIDO_MAX = 40
 export const CIDADE_MAX = 60
@@ -92,8 +97,9 @@ export function cidadeError(cidade: string): string | null {
   return CIDADE_RE.test(cidade) ? null : AD_MESSAGES.cidade
 }
 
-export function textoError(texto: string): string | null {
+export function textoError(texto: string, { legacy = false }: { legacy?: boolean } = {}): string | null {
   if (!texto.trim()) return AD_MESSAGES.textoVazio
+  if (legacy) return texto.length > LEGACY_TEXT_MAX ? `O texto pode ter até ${LEGACY_TEXT_MAX} caracteres.` : null
   if (texto.length > TEXT_MAX) return AD_MESSAGES.textoLongo
   return null
 }
@@ -118,6 +124,7 @@ export function resumoOf(euSouLabel: string, cidade: string | null | undefined, 
 /** D-01: validates and normalises what the subscriber typed. */
 export function validateAdInput(
   input: AdInput,
+  { legacy = false }: { legacy?: boolean } = {},
 ): { ok: true; value: NormalisedAd } | { ok: false; errors: AdErrors } {
   const errors: AdErrors = {}
   const texto = input.texto.replace(/\r\n/g, '\n').trim()
@@ -131,11 +138,11 @@ export function validateAdInput(
   if (input.euSou === null || !Number.isInteger(input.euSou)) errors.euSou = AD_MESSAGES.euSou
   const cErr = cidadeError(cidade)
   if (cErr) errors.cidade = cErr
-  const tErr = textoError(texto)
+  const tErr = textoError(texto, { legacy })
   if (tErr) errors.texto = tErr
   if (whatsapp && !isValidWhatsapp(whatsapp)) errors.whatsapp = AD_MESSAGES.whatsapp
   if (telegram && !isValidTelegram(telegram)) errors.telegram = AD_MESSAGES.telegram
-  if (!whatsapp && !telegram) errors.contato = AD_MESSAGES.contato
+  if (!whatsapp && !telegram && !legacy) errors.contato = AD_MESSAGES.contato
   if (!input.consent) errors.consent = AD_MESSAGES.consent
 
   if (Object.keys(errors).length > 0) return { ok: false, errors }

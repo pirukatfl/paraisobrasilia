@@ -132,8 +132,11 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
     // req.context). Skips only the per-tier photo count; size, decoding, EXIF strip and blur still apply.
     const legacyImport =
       req.context?.legacyImport === true && (args as { overrideAccess?: boolean }).overrideAccess === true
+    // Client decision 2026-10-22: old-site ads are exempt from the per-tier photo count (absolute cap stays)
+    const legacyAd = (ad as { wpCommentId?: number | null }).wpCommentId != null
     if (kind === 'video' && limits.videos === 0) throw fail(AD_MEDIA_MESSAGES.videoGratis)
-    if (kind === 'foto' && !legacyImport && totalDocs >= limits.fotos) {
+    if (kind === 'foto' && legacyAd && !legacyImport && totalDocs >= MAX_AD_PHOTOS) throw fail(AD_MEDIA_MESSAGES.fotos)
+    if (kind === 'foto' && !legacyImport && !legacyAd && totalDocs >= limits.fotos) {
       throw fail(tier === 'gratis' ? AD_MEDIA_MESSAGES.fotosGratis : AD_MEDIA_MESSAGES.fotos)
     }
     if (kind === 'video' && totalDocs >= limits.videos) throw fail(AD_MEDIA_MESSAGES.videos)

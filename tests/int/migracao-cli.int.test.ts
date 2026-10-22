@@ -32,7 +32,7 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
     expect(out).not.toContain('@')
     // --inspect legitimately prints the 4-char hash PREFIXES with counts; a full hash never appears
     expect(out).not.toMatch(/\$wp\$2y\$\d+\$\S|\$P\$\S{5}/)
-    expect(out).not.toMatch(/\b(101|102|103|104|108|501)\b/)
+    expect(out).not.toMatch(/\b(101|102|103|104|108|110|112|113|501|503|504)\b/)
     return { code: res.status, out, stderr: res.stderr ?? '' }
   }
 
@@ -45,12 +45,14 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
     uploads = path.join(dir, 'uploads')
     const jpeg = await sharp({ create: { width: 64, height: 64, channels: 3, background: '#33a' } }).jpeg().toBuffer()
     // every relPath the fixture references gets a file, so exactly the existing ones are stored
-    const { readMigracaoFixture, CLASSISEX_POST, MIGRACAO_PREFIX } = await import('../helpers/wp-migracao-fixture')
+    const { readMigracaoFixture, CLASSISEX_POST, MURAL_POST, MIGRACAO_PREFIX } = await import('../helpers/wp-migracao-fixture')
     const { extractLegacyAds, resolveFieldKeys } = await import('../../src/lib/migracao/wp-classisex')
     const tables = await readMigracaoFixture()
-    const keys = resolveFieldKeys(tables, { postId: CLASSISEX_POST })
     void MIGRACAO_PREFIX
-    for (const p of extractLegacyAds(tables, { postId: CLASSISEX_POST, keys }).ads.flatMap((a) => a.photos)) {
+    const all = [CLASSISEX_POST, MURAL_POST].flatMap(
+      (postId) => extractLegacyAds(tables, { postId, keys: resolveFieldKeys(tables, { postId }) }).ads,
+    )
+    for (const p of all.flatMap((a) => a.photos)) {
       if (!p.relPath) continue
       fs.mkdirSync(path.dirname(path.join(uploads, p.relPath)), { recursive: true })
       fs.writeFileSync(path.join(uploads, p.relPath), jpeg)
@@ -106,22 +108,40 @@ describe('CLI scripts/import/wordpress.ts (06-08)', () => {
     expect(r.out).toContain('excluídas pela equipe 1')
   })
 
-  it('writes accounts, periods, drafts and photos, then is idempotent', async () => {
+  it('--dry-run reports both boards, and --post narrows the source posts', () => {
+    const both = run(['--dry-run'])
+    expect(both.out).toContain('ClassiSex: 5 anúncios')
+    expect(both.out).toContain('Mural: 3 anúncios')
+    const only = run(['--dry-run', '--post', '749'])
+    expect(only.out).toContain('Mural: 3 anúncios')
+    expect(only.out).toContain('ClassiSex: 0 anúncios')
+    const list = run(['--dry-run', '--post', '2894,749'])
+    expect(list.out).toContain('Mural: 3 anúncios')
+    const bad = run(['--dry-run', '--post', '12'])
+    expect(bad.code).toBe(1)
+    expect(bad.out).toContain('--post só aceita os posts conhecidos')
+  })
+
+  it('writes accounts, periods, published ads and photos, then is idempotent', async () => {
     const first = run(['--uploads', uploads])
     expect(first.code).toBe(0)
     expect(first.out).toMatch(/Contas: criadas 9 /)
-    expect(first.out).toMatch(/Anúncios: rascunhos criados 5 /)
-    expect(first.out).toContain('da equipe (rascunho para revisar) 1')
+    expect(first.out).toContain('Anúncios: publicados 8 · promovidos de rascunho 0 · já existiam 0 · da equipe 2')
+    expect(first.out).toContain('ClassiSex: publicados 5 · promovidos de rascunho 0 · já existiam 0 · da equipe 1')
+    expect(first.out).toContain('Mural: publicados 3 · promovidos de rascunho 0 · já existiam 0 · da equipe 1')
     expect(first.out).toMatch(/Fotos: gravadas [1-9]/)
+    expect(first.out).toContain('Mural: gravadas 1 · ausentes 1 · recusadas 1 · fora da pasta 0')
     expect(await assinantes()).toBe(10) // 9 imported + the team placeholder
-    expect(await ads()).toBe(5)
+    expect(await ads()).toBe(8)
+    const published = await payload.count({ collection: 'ads', where: { status: { equals: 'aprovado' } }, overrideAccess: true })
+    expect(published.totalDocs).toBe(8)
 
     const second = run(['--uploads', uploads])
     expect(second.code).toBe(0)
     expect(second.out).toMatch(/Contas: criadas 0 /)
-    expect(second.out).toMatch(/rascunhos criados 0 · já existiam 5 · da equipe \(rascunho para revisar\) 0/)
+    expect(second.out).toContain('Anúncios: publicados 0 · promovidos de rascunho 0 · já existiam 8 · da equipe 0')
     expect(await assinantes()).toBe(10)
-    expect(await ads()).toBe(5)
+    expect(await ads()).toBe(8)
   })
 
   it('refuses a missing uploads folder without echoing the path', () => {

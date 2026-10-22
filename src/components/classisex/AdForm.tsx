@@ -62,6 +62,7 @@ export function AdForm({
   adId,
   withMedia = false,
   limits,
+  legacy = false,
 }: {
   action: (state: AdFormState, formData: FormData) => Promise<AdFormState>
   categories: { id: number; name: string }[]
@@ -70,6 +71,8 @@ export function AdForm({
   withMedia?: boolean
   /** Photos and videos per ad of the account's tier (the server decides again) */
   limits?: { fotos: number; videos: number }
+  /** Old-site ad (2026-10-22): no 600-character cap, contact fields optional */
+  legacy?: boolean
 }) {
   const [state, formAction, pending] = useActionState(action, null)
   const router = useRouter()
@@ -183,19 +186,21 @@ export function AdForm({
           id="texto"
           name="texto"
           rows={6}
-          maxLength={600}
+          maxLength={legacy ? 5000 : 600}
           defaultValue={values.texto}
           aria-describedby={['ajuda-texto', described('texto')].filter(Boolean).join(' ')}
           className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text focus:border-accent"
         />
         <p id="ajuda-texto" className="type-label text-muted">
-          Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.
+          {legacy
+            ? 'Anúncio do site antigo: sem limite de 600 caracteres. Se quiser, coloque o contato nos campos abaixo: só assinantes veem.'
+            : 'Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.'}
         </p>
         <FieldError id="erro-texto" message={errors.texto} />
       </div>
 
       <fieldset className="flex flex-col gap-4" aria-describedby={described('contato')}>
-        <legend className="type-label text-text">Contato (WhatsApp ou Telegram, pelo menos um; só assinantes veem)</legend>
+        <legend className="type-label text-text">Contato (WhatsApp ou Telegram{legacy ? ', opcional' : ', pelo menos um'}; só assinantes veem)</legend>
         <FieldError id="erro-contato" message={errors.contato} />
         <div className="flex flex-col gap-2">
           <label htmlFor="whatsapp" className="type-label text-text">

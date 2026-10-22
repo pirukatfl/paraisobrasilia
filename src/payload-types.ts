@@ -394,6 +394,7 @@ export interface AuditLog {
     | 'anuncio-aprovado'
     | 'anuncio-recusado'
     | 'anuncio-despublicado'
+    | 'anuncio-legado-apagado'
     | 'denuncia-resolvida'
     | 'recado-aprovado'
     | 'recado-recusado'
@@ -508,9 +509,13 @@ export interface Ad {
   moderatedBy?: (number | null) | User;
   wpCommentId?: number | null;
   /**
-   * Rascunho trazido do site antigo, só a equipe vê. Troque o anunciante, edite e aprove, ou apague.
+   * Anúncio antigo feito pela equipe no site antigo (dono técnico, ninguém entra com ele). Já vem publicado; troque o anunciante pelo dono certo, despublique ou apague.
    */
   origemLegado?: 'equipe' | null;
+  /**
+   * Anúncio trazido do site antigo. Não conta no limite de 3 anúncios e não tem limite de texto nem exigência de contato.
+   */
+  fonteLegado?: ('classisex' | 'mural') | null;
   importadoEm?: string | null;
   criadoNoSiteAntigoEm?: string | null;
   /**
@@ -1389,6 +1394,7 @@ export interface AdsSelect<T extends boolean = true> {
   moderatedBy?: T;
   wpCommentId?: T;
   origemLegado?: T;
+  fonteLegado?: T;
   importadoEm?: T;
   criadoNoSiteAntigoEm?: T;
   consentAt?: T;

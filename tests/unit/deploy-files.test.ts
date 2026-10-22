@@ -371,7 +371,7 @@ describe('migração do WordPress: guia da equipe e runbook (06-09)', () => {
       '### Senha antiga',
       '### Assinante antigo sem data de vencimento',
       '### Tempo de assinatura que veio do site antigo',
-      '### Anúncios antigos (rascunhos)',
+      '### Anúncios antigos',
       '### Links antigos',
     ]) {
       expect(guide).toContain(h)
@@ -396,6 +396,9 @@ describe('migração do WordPress: guia da equipe e runbook (06-09)', () => {
       'migracao_anuncios',
       'shred -u',
       'Fase 7',
+      'Anúncios: publicados N · promovidos de rascunho N · já existiam N · da equipe N',
+      'Mural: publicados N',
+      '2894,749',
     ]) {
       expect(runbook).toContain(s)
     }

@@ -34,7 +34,7 @@ export default async function MeusAnunciosPage({
   const assinante = await requireAssinante('/area-do-assinante/meus-anuncios')
   const [ads, access, params] = await Promise.all([getOwnAds(assinante.id), getAccessStatus(assinante.id), searchParams])
   const tier = tierOf(access)
-  const hasDrafts = ads.some((ad) => ad.status === 'rascunho')
+  const hasOldAds = ads.some((ad) => ad.antigo)
   const ok = typeof params.ok === 'string' ? OK[params.ok] : undefined
   return (
     <section aria-labelledby="titulo-meus-anuncios">
@@ -57,7 +57,7 @@ export default async function MeusAnunciosPage({
         Você pode ter até 3 anúncios ativos (em análise ou publicados). Todo anúncio novo ou editado passa pela
         equipe antes de aparecer no ClassiSex.
       </p>
-      {hasDrafts && (
+      {hasOldAds && (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
           {SITE_ANTIGO_AVISO}
         </p>

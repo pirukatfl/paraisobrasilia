@@ -62,13 +62,17 @@ async function save(
   path: string,
   write: (assinanteId: number, input: AdInput) => Promise<unknown>,
   stayWithId = false,
+  /** An edit of an old-site ad is validated by the service (it knows the ad is exempt). */
+  skipPreValidation = false,
 ): Promise<AdFormState> {
   // DAL guard first (T-04-05): a logged-in account creates or edits (free accounts too, G-02);
   // the media limits follow the account's tier and are enforced by the collection hooks
   const assinante = await requireAssinante(path)
   const { input, values } = readInput(formData)
-  const result = validateAdInput(input)
-  if (!result.ok) return { errors: result.errors as Record<string, string>, values }
+  if (!skipPreValidation) {
+    const result = validateAdInput(input)
+    if (!result.ok) return { errors: result.errors as Record<string, string>, values }
+  }
   let created: unknown
   try {
     created = await write(assinante.id, input)
@@ -103,6 +107,8 @@ export async function salvarAnuncio(_prev: AdFormState, formData: FormData): Pro
   const payload = await getPayload({ config })
   return save(formData, `${MEUS_ANUNCIOS}/${encodeURIComponent(id)}/editar`, (assinanteId, input) =>
     updateAd(payload, { assinanteId, id, input, now: new Date() }),
+    false,
+    true,
   )
 }
 

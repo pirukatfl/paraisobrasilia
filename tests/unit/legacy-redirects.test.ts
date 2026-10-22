@@ -62,7 +62,7 @@ describe('buildLegacyRedirects', () => {
     expect(result.semDestino).toContain('/beijo-grego')
     expect(get('/barraca-armada')).toBe('/contos')
     expect(get('/assine-ja')).toBeUndefined()
-    expect(get('/mural')).toBe('/assine-ja')
+    expect(get('/mural')).toBe('/classisex')
     expect(get('/wp-login.php')).toBe('/entrar')
     expect(get('/membros/:path*')).toBe('/classisex')
   })

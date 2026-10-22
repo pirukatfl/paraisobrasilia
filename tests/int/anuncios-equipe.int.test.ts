@@ -36,7 +36,7 @@ const NOW = new Date('2026-10-19T18:00:00.000Z')
 const DAY = 86_400_000
 const STAFF = { email: 'staff-equipe@teste.local', password: 'senha-equipe-123' }
 
-describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () => {
+describe('anúncios antigos da equipe: conta técnica (M-04; publicados desde 2026-10-22)', () => {
   let payload: Payload
   let decisions: AccountDecision[]
   let ads: WpLegacyAd[]
@@ -71,6 +71,18 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
         showHiddenFields: true,
       })
     ).docs as unknown as (Record<string, unknown> & { id: number })[]
+  // Staging today: the team ads of the first import are still drafts. Puts them back to that state.
+  const demote = async () => {
+    for (const r of await allAds()) {
+      await payload.update({
+        collection: 'ads',
+        id: r.id as number,
+        data: { status: 'rascunho', publishedAt: null, fonteLegado: null } as never,
+        overrideAccess: true,
+        context: { skipAudit: true, legacyImport: true },
+      })
+    }
+  }
   const run = async () => {
     await importAccounts(payload, decisions, { now: FIXTURE_NOW })
     return importLegacyAds(payload, ads, { now: FIXTURE_NOW })
@@ -85,9 +97,9 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
     return acc
   }
 
-  it('imports the administrator ad as a draft owned by one placeholder account that cannot log in', async () => {
+  it('imports the administrator ad published, owned by one placeholder account that cannot log in', async () => {
     const result = await run()
-    expect(result).toMatchObject({ criados: 5, daEquipe: 1, jaExistiam: 0 })
+    expect(result).toMatchObject({ criados: 5, promovidos: 0, daEquipe: 1, jaExistiam: 0 })
     const rows = await placeholder()
     expect(rows).toHaveLength(1)
     const team = rows[0]!
@@ -101,8 +113,8 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
     expect(team.wpUserId ?? null).toBeNull()
 
     const draft = await teamDraft()
-    expect(draft).toMatchObject({ status: 'rascunho', author: team.id, origemLegado: 'equipe', apelido: 'Anônimo', wpCommentId: 108 })
-    // the other four drafts keep their own authors and carry no team flag
+    expect(draft).toMatchObject({ status: 'aprovado', fonteLegado: 'classisex', author: team.id, origemLegado: 'equipe', apelido: 'Anônimo', wpCommentId: 108 })
+    // the other four ads keep their own authors and carry no team flag
     expect((await allAds()).filter((r) => r.origemLegado === 'equipe')).toHaveLength(1)
 
     for (const password of ['', 'senha-teste-1234', 'x'.repeat(32)]) {
@@ -121,7 +133,7 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
   it('is idempotent: a re-run creates nothing; a new team ad later reuses the same placeholder', async () => {
     await run()
     const again = await run()
-    expect(again).toMatchObject({ criados: 0, daEquipe: 0, jaExistiam: 5 })
+    expect(again).toMatchObject({ criados: 0, promovidos: 0, daEquipe: 0, jaExistiam: 5 })
     expect(await placeholder()).toHaveLength(1)
     expect(await allAds()).toHaveLength(5)
 
@@ -134,7 +146,7 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
     expect(await allAds()).toHaveLength(6)
     expect((await allAds()).filter((r) => r.origemLegado === 'equipe')).toHaveLength(2)
     expect(formatLoadLines((await importAccounts(payload, decisions, { now: FIXTURE_NOW })).result, third).join('\n')).toContain(
-      'da equipe (rascunho para revisar) 1',
+      'Anúncios: publicados 1 · promovidos de rascunho 0 · já existiam 5 · da equipe 1',
     )
   })
 
@@ -161,8 +173,21 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
     }
   })
 
-  it('stays invisible to the public, to members, in media and reports', async () => {
+  it('a published team ad shows on the boards like any other old ad (owner without access: cover only)', async () => {
     await run()
+    const d = await teamDraft()
+    const member = await paying('membro@teste.local')
+    const pub = (await findPublicAds(payload, {}, NOW)).items
+    expect(pub).toHaveLength(5)
+    expect(JSON.stringify(pub)).not.toContain('Sentinela@')
+    const mine = (await findMemberAds(payload, {}, NOW)).items.find((i) => i.id === d.id)!
+    expect(mine.autorGratuito).toBe(true)
+    expect(await listOwnAds(payload, member.id, NOW)).toHaveLength(0)
+  })
+
+  it('an unpromoted team draft stays invisible to the public, to members, in media and reports', async () => {
+    await run()
+    await demote()
     const d = await teamDraft()
     const member = await paying('membro@teste.local')
     expect((await findPublicAds(payload, {}, NOW)).items).toHaveLength(0)
@@ -174,24 +199,15 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
     await expect(reportAd(payload, { reporterId: member.id, adId: d.id as number, motivo: 'ofensivo', now: NOW })).rejects.toMatchObject({ status: 404 })
   })
 
-  it('staff approve a team draft directly once it is valid; a draft of a real member stays out of reach', async () => {
+  it('staff approve an unpromoted team draft directly; a draft of a real member stays out of reach', async () => {
     await run()
+    await demote()
     const d = await teamDraft()
     const id = d.id as number
     const req = await staffReq()
     expect((await getModerationView(req, id)).rascunhoDaEquipe).toBe(true)
 
-    // without contact the approval is refused by the normal ad rules and the draft stays a draft
-    await expect(approveAd(req, id, NOW)).rejects.toThrow()
-    expect((await payload.findByID({ collection: 'ads', id, depth: 0, overrideAccess: true })).status).toBe('rascunho')
-
-    await payload.update({
-      collection: 'ads',
-      id,
-      data: { texto: 'Texto curto revisado.', contato: { whatsapp: '5561999990000' } } as never,
-      overrideAccess: true,
-      context: { skipAudit: true },
-    })
+    // old ads are exempt from the contact rule (2026-10-22): no contact needed to approve
     await approveAd(req, id, NOW)
     const done = await payload.findByID({ collection: 'ads', id, depth: 0, overrideAccess: true })
     expect(done).toMatchObject({ status: 'aprovado' })
@@ -206,6 +222,7 @@ describe('anúncios antigos da equipe: rascunhos da conta técnica (M-04)', () =
 
   it('staff can hand the draft to the right member, who then sees it as an ordinary draft', async () => {
     await run()
+    await demote()
     const d = await teamDraft()
     const id = d.id as number
     const member = await paying('dono@teste.local')

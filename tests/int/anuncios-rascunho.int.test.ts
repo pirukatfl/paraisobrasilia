@@ -13,7 +13,6 @@ import {
   reportAd,
   unpublishAd,
   updateAd,
-  ServiceError,
 } from '../../src/lib/classisex/service'
 import { rest, tokenFor } from '../helpers/rest'
 import {
@@ -155,38 +154,38 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
       expect((await getModerationCounts(payload)).pendentes).toBe(0)
     })
 
-    it('the owner submits a valid draft to the queue; an over-long text keeps it a draft', async () => {
+    it('the owner submits an old draft to the queue; the 600-character cap and the contact do not apply to it', async () => {
       const a = await paying('a@teste.local')
       const d = await draft(a.id)
       const input = { apelido: 'Casal Teste', euSou: cats[0]!.id, cidade: 'Brasília', texto: LONG_TEXT, whatsapp: '5561999990000', telegram: '', consent: true }
-      await expect(updateAd(payload, { assinanteId: a.id, id: d.id, input, now: NOW })).rejects.toMatchObject({
-        code: 'invalido',
-        errors: { texto: 'O texto pode ter até 600 caracteres.' },
-      })
+      // 2026-10-22: only the generous ceiling applies to an old ad
+      await expect(
+        updateAd(payload, { assinanteId: a.id, id: d.id, input: { ...input, texto: 'a'.repeat(5001) }, now: NOW }),
+      ).rejects.toMatchObject({ code: 'invalido' })
       expect((await payload.findByID({ collection: 'ads', id: d.id, depth: 0, overrideAccess: true })).status).toBe('rascunho')
 
-      await updateAd(payload, { assinanteId: a.id, id: d.id, input: { ...input, texto: 'Texto curto e revisado, sem contato.' }, now: NOW })
+      await updateAd(payload, { assinanteId: a.id, id: d.id, input: { ...input, whatsapp: '' }, now: NOW })
       const after = await payload.findByID({ collection: 'ads', id: d.id, depth: 0, overrideAccess: true })
       expect(after.status).toBe('pendente')
       expect(after.submittedAt).toBe(NOW.toISOString())
+      expect(after.texto.length).toBeGreaterThan(600)
       expect(after.wpCommentId).toBe(101)
       expect(after.criadoNoSiteAntigoEm).toBeTruthy()
       expect((await getModerationCounts(payload)).pendentes).toBe(1)
     })
 
-    it('drafts do not count toward the 3 active ads, but submitting with 3 active hits the limit', async () => {
+    it('old ads never count toward the 3 active ads, and sending one is not blocked by the limit', async () => {
       const a = await paying('a@teste.local')
       for (let i = 0; i < 3; i++) await seedAd(payload, { author: a.id, status: i === 0 ? 'aprovado' : 'pendente' })
       const d1 = await draft(a.id, 201)
       const d2 = await draft(a.id, 202)
       const input = { apelido: 'Casal Teste', euSou: cats[0]!.id, cidade: '', texto: 'Texto curto.', whatsapp: '5561999990000', telegram: '', consent: true }
-      await expect(updateAd(payload, { assinanteId: a.id, id: d1.id, input, now: NOW })).rejects.toMatchObject({ code: 'limite' })
-      await expect(updateAd(payload, { assinanteId: a.id, id: d2.id, input, now: NOW })).rejects.toBeInstanceOf(ServiceError)
-      // with only two active ads the draft can be sent
-      const first = (await payload.find({ collection: 'ads', where: { status: { equals: 'pendente' } }, overrideAccess: true, limit: 1 })).docs[0]!
-      await payload.delete({ collection: 'ads', id: first.id, overrideAccess: true })
       await updateAd(payload, { assinanteId: a.id, id: d1.id, input, now: NOW })
+      await updateAd(payload, { assinanteId: a.id, id: d2.id, input, now: NOW })
       expect((await payload.findByID({ collection: 'ads', id: d1.id, depth: 0, overrideAccess: true })).status).toBe('pendente')
+      // ... but a NEW ad of the same author still hits the limit of 3
+      const { createAd } = await import('../../src/lib/classisex/service')
+      await expect(createAd(payload, { assinanteId: a.id, input, now: NOW })).rejects.toMatchObject({ code: 'limite' })
     })
 
     it('touching the photos of a draft does not submit it', async () => {
@@ -209,9 +208,13 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
   })
 
   describe('importer-only photo limit bypass (T-06-23)', () => {
+    // since 2026-10-22 an ad that carries wpCommentId is exempt from the tier count on its own; the T-06-23 flag
+    // is still the importer's switch for any other ad, so these two tests use a draft WITHOUT wpCommentId
+    const plainDraft = (author: number) => seedAd(payload, { author, status: 'rascunho', texto: 'Rascunho comum.', contato: {} })
+
     it('free author: two photos with legacyImport, the limit otherwise', async () => {
       const a = await free('a@teste.local')
-      const d = await draft(a.id)
+      const d = await plainDraft(a.id)
       const upload = (context?: Record<string, unknown>) =>
         payload.create({
           collection: 'ad-media' as never,
@@ -231,7 +234,7 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
 
     it('the flag has no effect on a staff REST upload', async () => {
       const a = await free('a@teste.local')
-      const d = await draft(a.id)
+      const d = await plainDraft(a.id)
       await seedAdMedia(payload, { ad: d.id })
       const staffToken = await tokenFor(payload, 'users', STAFF.email, STAFF.password)
       // REST cannot set req.context: whatever the body says, the limit still holds

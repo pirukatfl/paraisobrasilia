@@ -15,6 +15,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 
 export const MIGRACAO_PREFIX = 'wp26_'
 export const CLASSISEX_POST = 2894
+export const MURAL_POST = 749
 export const FIXTURE_NOW = new Date('2026-10-21T12:00:00Z')
 
 export function migracaoFixturePath(): string {
@@ -32,7 +33,7 @@ export async function readMigracaoFixture(source: string = migracaoFixturePath()
   return readWpTables(source, {
     prefix: MIGRACAO_PREFIX,
     tables: [...MIGRACAO_TABLES],
-    rowFilter: migracaoRowFilter(MIGRACAO_PREFIX, CLASSISEX_POST),
+    rowFilter: migracaoRowFilter(MIGRACAO_PREFIX, [CLASSISEX_POST, MURAL_POST]),
   })
 }
 
@@ -61,4 +62,9 @@ export const SENTINELS: string[] = [
   'Asa Norte',
   'Gama',
   'foto-sentinela',
+  'foto-mural-sentinela',
+  'gif-mural-sentinela',
+  'mural_sentinela',
+  '61 97777-6666',
+  '61 96666-5555',
 ]

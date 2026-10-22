@@ -4,7 +4,7 @@
 // T-06-05: aggregate only — never e-mails, names, logins, hashes, texts, cities or IDs
 import { spDate } from '../assinantes/periods'
 import type { AccountDecision, MotivoIgnorada } from './wp-accounts'
-import type { AdSkip, InspectReport, WpLegacyAd } from './wp-classisex'
+import { FONTES, FONTE_LABELS, type AdSkip, type Fonte, type InspectReport, type WpLegacyAd } from './wp-classisex'
 
 export type MigrationReport = {
   contasLidas: number
@@ -26,6 +26,8 @@ export type MigrationReport = {
     fotosReferencias: number
     fotosSemArquivo: number
     deContasImportadas: number | null
+    /** Per old board (ClassiSex, Mural) */
+    porFonte: Record<Fonte, { total: number; textoLongo: number; fotosReferencias: number; fotosSemArquivo: number }>
   }
 }
 
@@ -61,6 +63,10 @@ export function buildMigrationReport(
       fotosReferencias: 0,
       fotosSemArquivo: 0,
       deContasImportadas: accountIdsImported ? 0 : null,
+      porFonte: {
+        classisex: { total: 0, textoLongo: 0, fotosReferencias: 0, fotosSemArquivo: 0 },
+        mural: { total: 0, textoLongo: 0, fotosReferencias: 0, fotosSemArquivo: 0 },
+      },
     },
   }
 
@@ -95,6 +101,11 @@ export function buildMigrationReport(
     if (ad.flags.includes('texto-longo')) report.anuncios.textoLongo++
     report.anuncios.fotosReferencias += ad.photos.length
     report.anuncios.fotosSemArquivo += ad.photos.filter((p) => p.relPath === null).length
+    const fonte = report.anuncios.porFonte[ad.fonte]
+    fonte.total++
+    if (ad.flags.includes('texto-longo')) fonte.textoLongo++
+    fonte.fotosReferencias += ad.photos.length
+    fonte.fotosSemArquivo += ad.photos.filter((p) => p.relPath === null).length
     if (accountIdsImported?.has(ad.wpUserId)) report.anuncios.deContasImportadas = (report.anuncios.deContasImportadas ?? 0) + 1
   }
   return report
@@ -123,6 +134,10 @@ export function formatMigrationReport(report: MigrationReport, load: string[] = 
     `Eu sou: Casal ${an.euSou.Casal} · Homem ${an.euSou.Homem} · Mulher ${an.euSou.Mulher}`,
     `Cidade descartada: ${an.cidadeDescartada} · texto acima de 600: ${an.textoLongo}`,
     `Fotos: ${an.fotosReferencias} referências · sem arquivo no dump ${an.fotosSemArquivo}`,
+    ...FONTES.map((f) => {
+      const x = an.porFonte[f]
+      return `  ${FONTE_LABELS[f]}: ${x.total} anúncios · texto acima de 600: ${x.textoLongo} · ${x.fotosReferencias} fotos referenciadas · sem arquivo ${x.fotosSemArquivo}`
+    }),
   ]
   if (an.deContasImportadas !== null) lines.push(`Anúncios de contas importadas: ${an.deContasImportadas}`)
   return [...lines, ...load].join('\n')

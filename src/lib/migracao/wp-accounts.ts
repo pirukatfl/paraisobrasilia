@@ -14,14 +14,15 @@ export const MIGRACAO_TABLES = ['users', 'usermeta', 'comments', 'commentmeta', 
 export const USERMETA_KEYS = (prefix: string) => [`${prefix}capabilities`, '_expire_user_date', '_expire_user_expired']
 
 /** Row filter that keeps memory (and exposure) to what the migration needs. */
-export function migracaoRowFilter(prefix: string, postId: number): (table: string, row: Row) => boolean {
+export function migracaoRowFilter(prefix: string, postId: number | number[]): (table: string, row: Row) => boolean {
+  const postIds = new Set(Array.isArray(postId) ? postId : [postId])
   const usermetaKeys = new Set(USERMETA_KEYS(prefix))
   return (table, row) => {
     switch (table) {
       case 'usermeta':
         return usermetaKeys.has(String(row.meta_key))
       case 'comments':
-        return Number(row.comment_post_ID) === postId
+        return postIds.has(Number(row.comment_post_ID))
       case 'posts':
         return row.post_type === 'attachment' || row.post_type === 'wpdiscuz_form'
       case 'postmeta': {

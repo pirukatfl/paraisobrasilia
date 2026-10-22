@@ -9,6 +9,14 @@ import type { Row, WpTables } from '../contos/wp-dump'
 import { serializedFieldLabels, serializedIntegers, serializedKeys } from './php-serialized'
 
 export const CLASSISEX_POST_ID = 2894
+/** Client decision 2026-10-22: the old MURAL (wpDiscuz comments on post 749, slug `mural`) comes in too. */
+export const MURAL_POST_ID = 749
+export type Fonte = 'classisex' | 'mural'
+export const FONTES: Fonte[] = ['classisex', 'mural']
+export const FONTE_LABELS: Record<Fonte, string> = { classisex: 'ClassiSex', mural: 'Mural' }
+/** Default source posts: both boards. `--post` replaces the list. */
+export const DEFAULT_POST_IDS: number[] = [CLASSISEX_POST_ID, MURAL_POST_ID]
+export const FONTE_BY_POST: Record<number, Fonte> = { [CLASSISEX_POST_ID]: 'classisex', [MURAL_POST_ID]: 'mural' }
 export const EU_SOU_MAP = { Casal: 'Casal', Solteiro: 'Homem', Solteira: 'Mulher' } as const
 const EU_SOU_VALUES = new Set(Object.keys(EU_SOU_MAP))
 const AUTO_DETECT_SHARE = 0.9
@@ -29,6 +37,8 @@ export type WpLegacyAd = {
   cidade: string | null
   photos: { attachmentId: number; relPath: string | null }[]
   flags: AdFlag[]
+  /** Which old board the comment came from (reporting, admin filter) */
+  fonte: Fonte
 }
 
 export type InspectReport = {
@@ -47,9 +57,10 @@ const normLabel = (s: string) =>
     .trim()
 
 /** Meta rows of the comments that are on the ad post, grouped by key. */
-function adMeta(tables: WpTables, postId: number): Map<string, Row[]> {
+function adMeta(tables: WpTables, postId: number | number[]): Map<string, Row[]> {
+  const posts = new Set(Array.isArray(postId) ? postId : [postId])
   const ids = new Set(
-    (tables.comments ?? []).filter((c) => Number(c.comment_post_ID) === postId).map((c) => Number(c.comment_ID)),
+    (tables.comments ?? []).filter((c) => posts.has(Number(c.comment_post_ID))).map((c) => Number(c.comment_ID)),
   )
   const byKey = new Map<string, Row[]>()
   for (const m of tables.commentmeta ?? []) {
@@ -76,7 +87,7 @@ function formLabels(tables: WpTables): Record<string, string> {
 
 export function resolveFieldKeys(
   tables: WpTables,
-  opts: { postId: number; euSou?: string; cidade?: string },
+  opts: { postId: number | number[]; euSou?: string; cidade?: string },
 ): FieldKeys {
   const meta = adMeta(tables, opts.postId)
   let euSou = opts.euSou
@@ -130,7 +141,7 @@ function isoUtc(c: Row): string {
 
 export function extractLegacyAds(
   tables: WpTables,
-  opts: { postId: number; keys: FieldKeys },
+  opts: { postId: number; keys: FieldKeys; fonte?: Fonte },
 ): { ads: WpLegacyAd[]; skipped: Record<AdSkip, number> } {
   const skipped: Record<AdSkip, number> = {
     resposta: 0,
@@ -158,6 +169,7 @@ export function extractLegacyAds(
     .filter((c) => Number(c.comment_post_ID) === opts.postId)
     .sort((a, b) => Number(a.comment_ID) - Number(b.comment_ID))
 
+  const fonte: Fonte = opts.fonte ?? FONTE_BY_POST[opts.postId] ?? 'classisex'
   const ads: WpLegacyAd[] = []
   for (const c of comments) {
     const type = String(c.comment_type ?? '')
@@ -210,12 +222,13 @@ export function extractLegacyAds(
       cidade,
       photos,
       flags,
+      fonte,
     })
   }
   return { ads, skipped }
 }
 
-export function inspectDump(tables: WpTables, opts: { prefix: string; postId: number }): InspectReport {
+export function inspectDump(tables: WpTables, opts: { prefix: string; postId: number | number[] }): InspectReport {
   const tabelas: Record<string, number> = {}
   for (const [name, rows] of Object.entries(tables)) tabelas[name] = rows.length
 

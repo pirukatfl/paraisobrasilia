@@ -14,7 +14,7 @@ import sharp from 'sharp'
 import { writeAudit } from '../assinantes/audit'
 import { formatShortDate } from '../format/date'
 import type { AccountDecision, WpAccount } from './wp-accounts'
-import type { WpLegacyAd } from './wp-classisex'
+import { FONTES, FONTE_LABELS, type Fonte, type WpLegacyAd } from './wp-classisex'
 
 export const MIGRATION_PLAN_NAME = 'Migrado do site antigo'
 const MAX_PHOTOS = 10
@@ -267,7 +267,7 @@ export async function importAccounts(
 }
 
 // ---------------------------------------------------------------------------------------------
-// Old ads as drafts (M-04)
+// Old ads, published (M-04 superseded by the client decision of 2026-10-22)
 // ---------------------------------------------------------------------------------------------
 
 /**
@@ -331,10 +331,14 @@ export async function ensureEquipeLegadoAccount(payload: Payload, now: Date): Pr
   }
 }
 
-export type AdsLoad = {
-  criados: number
+export type FonteLoad = {
+  /** New ads published this run */
+  publicados: number
+  /** Existing untouched drafts published this run */
+  promovidos: number
+  /** Existing ads left as they were (published, touched by author/staff, reassigned…) */
   jaExistiam: number
-  /** Drafts created this run for ads whose WordPress author was not imported (owned by the team placeholder) */
+  /** Of the published/promoted ones: owned by the team placeholder (author not imported) */
   daEquipe: number
   fotosGravadas: number
   fotosAusentes: number
@@ -342,7 +346,33 @@ export type AdsLoad = {
   fotosForaDaPasta: number
 }
 
-type PhotoCounters = Pick<AdsLoad, 'fotosGravadas' | 'fotosAusentes' | 'fotosRecusadas' | 'fotosForaDaPasta'>
+export type AdsLoad = {
+  /** Totals over both sources; `criados` = new ads published this run */
+  criados: number
+  promovidos: number
+  jaExistiam: number
+  daEquipe: number
+  /** Not recreated because someone deleted them after an earlier import */
+  apagadosAntes: number
+  fotosGravadas: number
+  fotosAusentes: number
+  fotosRecusadas: number
+  fotosForaDaPasta: number
+  porFonte: Record<Fonte, FonteLoad>
+}
+
+const emptyFonteLoad = (): FonteLoad => ({
+  publicados: 0,
+  promovidos: 0,
+  jaExistiam: 0,
+  daEquipe: 0,
+  fotosGravadas: 0,
+  fotosAusentes: 0,
+  fotosRecusadas: 0,
+  fotosForaDaPasta: 0,
+})
+
+type PhotoCounters = Pick<FonteLoad, 'fotosGravadas' | 'fotosAusentes' | 'fotosRecusadas' | 'fotosForaDaPasta'>
 
 async function addPhotos(
   payload: Payload,
@@ -403,21 +433,49 @@ async function addPhotos(
   }
 }
 
+type ExistingAd = {
+  id: number
+  status: string
+  author: unknown
+  moderatedAt?: string | null
+  submittedAt?: string | null
+  fonteLegado?: string | null
+}
+
+const relIdOf = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === '') return null
+  return Number(typeof v === 'object' ? (v as { id?: number }).id : v)
+}
+
+/**
+ * Old ads (ClassiSex + Mural) come in PUBLISHED (client decision 2026-10-22, supersedes M-04 drafts).
+ * Idempotent: a re-run publishes the drafts an earlier run created ONLY while nobody touched them
+ * (no author edit/submission, no staff decision, same owner), and never recreates an ad that was deleted.
+ */
 export async function importLegacyAds(
   payload: Payload,
   ads: WpLegacyAd[],
   opts: { now: Date; uploadsDir?: string | null },
 ): Promise<AdsLoad> {
-  const result: AdsLoad = {
-    criados: 0,
-    jaExistiam: 0,
-    daEquipe: 0,
-    fotosGravadas: 0,
-    fotosAusentes: 0,
-    fotosRecusadas: 0,
-    fotosForaDaPasta: 0,
+  const porFonte: Record<Fonte, FonteLoad> = { classisex: emptyFonteLoad(), mural: emptyFonteLoad() }
+  let apagadosAntes = 0
+  const finish = (): AdsLoad => {
+    const all = Object.values(porFonte)
+    const sum = (k: keyof FonteLoad) => all.reduce((n, f) => n + f[k], 0)
+    return {
+      criados: sum('publicados'),
+      promovidos: sum('promovidos'),
+      jaExistiam: sum('jaExistiam'),
+      daEquipe: sum('daEquipe'),
+      apagadosAntes,
+      fotosGravadas: sum('fotosGravadas'),
+      fotosAusentes: sum('fotosAusentes'),
+      fotosRecusadas: sum('fotosRecusadas'),
+      fotosForaDaPasta: sum('fotosForaDaPasta'),
+      porFonte,
+    }
   }
-  if (ads.length === 0) return result
+  if (ads.length === 0) return finish()
 
   // Categories first: fail before any write when an "Eu sou" option is missing
   const { docs: categories } = await payload.find({
@@ -458,31 +516,108 @@ export async function importLegacyAds(
     pagination: false,
     depth: 0,
     overrideAccess: true,
-    select: { wpCommentId: true, status: true } as never,
+    select: {
+      wpCommentId: true,
+      status: true,
+      author: true,
+      moderatedAt: true,
+      submittedAt: true,
+      fonteLegado: true,
+    } as never,
   })
   const existingByComment = new Map(
-    existingAds.map((d) => [Number((d as unknown as { wpCommentId: number }).wpCommentId), d as unknown as { id: number; status: string }]),
+    existingAds.map((d) => [Number((d as unknown as { wpCommentId: number }).wpCommentId), d as unknown as ExistingAd]),
   )
+
+  // Old ads that someone deleted on purpose (the audit row survives the deletion): never brought back
+  const { docs: tombstones } = await payload.find({
+    collection: 'audit-log',
+    where: { action: { equals: 'anuncio-legado-apagado' } },
+    pagination: false,
+    limit: 0,
+    depth: 0,
+    overrideAccess: true,
+    select: { details: true } as never,
+  })
+  const deleted = new Set(
+    tombstones
+      .map((t) => Number(((t as unknown as { details?: { wpCommentId?: number } }).details ?? {}).wpCommentId))
+      .filter((n) => Number.isInteger(n)),
+  )
+
+  const findEquipeId = async (): Promise<number | null> => {
+    const { docs } = await payload.find({
+      collection: 'assinantes',
+      where: { email: { equals: EQUIPE_LEGADO_EMAIL } },
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+      select: { email: true } as never,
+    })
+    return (docs[0] as { id: number } | undefined)?.id ?? null
+  }
 
   let equipeId: number | null = null
   for (const ad of ads) {
+    const counters = porFonte[ad.fonte]
     const existing = existingByComment.get(ad.wpCommentId)
+    const publishedAt = ad.createdAt.startsWith('1970') ? opts.now.toISOString() : ad.createdAt
+    const author = authorByWp.get(ad.wpUserId)
     if (existing) {
-      result.jaExistiam++
-      // Photos are added later, once, and only to a draft that still has none (the author may have changed it)
-      if (uploadsReal && existing.status === 'rascunho' && ad.photos.length > 0) {
+      const expectedOwner = author ? author.id : (equipeId ??= await findEquipeId())
+      const sameOwner = expectedOwner !== null && relIdOf(existing.author) === expectedOwner
+      const untouched = !existing.moderatedAt && !existing.submittedAt && sameOwner
+      let promoted = false
+      let eligibleForPhotos = false
+      try {
+        if (existing.status === 'rascunho' && untouched) {
+          // Never touched by the author (no edit/submission) or staff (no decision): publish it now
+          await payload.update({
+            collection: 'ads',
+            id: existing.id,
+            data: { status: 'aprovado', publishedAt, fonteLegado: ad.fonte } as never,
+            overrideAccess: true,
+            context: { legacyImport: true },
+          })
+          promoted = true
+          eligibleForPhotos = true
+        } else {
+          eligibleForPhotos = untouched && (existing.status === 'rascunho' || existing.status === 'aprovado')
+          if (!existing.fonteLegado) {
+            // Only the source label is added; status and content stay as the author/staff left them
+            await payload.update({
+              collection: 'ads',
+              id: existing.id,
+              data: { fonteLegado: ad.fonte } as never,
+              overrideAccess: true,
+              context: { legacyImport: true },
+            })
+          }
+        }
+      } catch {
+        throw new Error('Não foi possível atualizar um anúncio antigo. Confira o banco e rode de novo (é seguro repetir).')
+      }
+      if (promoted) {
+        counters.promovidos++
+        if (!author) counters.daEquipe++
+      } else counters.jaExistiam++
+      // Photos are added later, once, and only to an ad nobody changed that still has none
+      if (uploadsReal && eligibleForPhotos && ad.photos.length > 0) {
         const { totalDocs } = await payload.count({
           collection: 'ad-media',
           where: { ad: { equals: existing.id } },
           overrideAccess: true,
         })
-        if (totalDocs === 0) await addPhotos(payload, existing.id, ad.photos, uploadsReal, result)
+        if (totalDocs === 0) await addPhotos(payload, existing.id, ad.photos, uploadsReal, counters)
       }
       continue
     }
-    const author = authorByWp.get(ad.wpUserId)
+    if (deleted.has(ad.wpCommentId)) {
+      apagadosAntes++
+      continue
+    }
     try {
-      // No imported author (administrator posting for a client, deleted user): the draft belongs to the
+      // No imported author (administrator posting for a client, deleted user): the ad belongs to the
       // team placeholder and shows up in the admin filter "Anúncios antigos da equipe"
       if (!author && equipeId === null) equipeId = await ensureEquipeLegadoAccount(payload, opts.now)
       const created = await payload.create({
@@ -490,11 +625,14 @@ export async function importLegacyAds(
         data: {
           author: author ? author.id : equipeId,
           ...(author ? {} : { origemLegado: 'equipe' }),
+          fonteLegado: ad.fonte,
           apelido: author?.apelido || 'Anônimo',
           euSou: categoryId.get(ad.euSou),
           cidade: ad.cidade,
           texto: ad.texto,
-          status: 'rascunho',
+          // 2026-10-22: published as they were (no contact field, no 600-character cap for old ads)
+          status: 'aprovado',
+          publishedAt,
           wpCommentId: ad.wpCommentId,
           importadoEm: opts.now.toISOString(),
           criadoNoSiteAntigoEm: ad.createdAt,
@@ -502,15 +640,15 @@ export async function importLegacyAds(
         overrideAccess: true,
         context: { legacyImport: true },
       })
-      result.criados++
-      if (!author) result.daEquipe++
-      if (uploadsReal && ad.photos.length > 0) await addPhotos(payload, created.id, ad.photos, uploadsReal, result)
+      counters.publicados++
+      if (!author) counters.daEquipe++
+      if (uploadsReal && ad.photos.length > 0) await addPhotos(payload, created.id, ad.photos, uploadsReal, counters)
     } catch {
       // generic on purpose (T-06-26): the ad text and author are never printed
       throw new Error('Não foi possível gravar um anúncio antigo. Confira o banco e rode de novo (é seguro repetir).')
     }
   }
-  return result
+  return finish()
 }
 
 export function formatLoadLines(accounts: AccountsLoad, ads?: AdsLoad): string[] {
@@ -519,10 +657,25 @@ export function formatLoadLines(accounts: AccountsLoad, ads?: AdsLoad): string[]
     `Assinaturas: períodos criados ${accounts.periodosCriados} · estendidos ${accounts.periodosEstendidos} · mantidos ${accounts.periodosMantidos} · revisar marcadas ${accounts.revisarMarcadas}`,
   ]
   if (ads) {
+    const deleted = ads.apagadosAntes > 0 ? ` · apagados antes (não recriados) ${ads.apagadosAntes}` : ''
     lines.push(
-      `Anúncios: rascunhos criados ${ads.criados} · já existiam ${ads.jaExistiam} · da equipe (rascunho para revisar) ${ads.daEquipe}`,
+      `Anúncios: publicados ${ads.criados} · promovidos de rascunho ${ads.promovidos} · já existiam ${ads.jaExistiam} · da equipe ${ads.daEquipe}${deleted}`,
+    )
+    for (const f of FONTES) {
+      const x = ads.porFonte[f]
+      lines.push(
+        `  ${FONTE_LABELS[f]}: publicados ${x.publicados} · promovidos de rascunho ${x.promovidos} · já existiam ${x.jaExistiam} · da equipe ${x.daEquipe}`,
+      )
+    }
+    lines.push(
       `Fotos: gravadas ${ads.fotosGravadas} · ausentes ${ads.fotosAusentes} · recusadas ${ads.fotosRecusadas} · fora da pasta ${ads.fotosForaDaPasta}`,
     )
+    for (const f of FONTES) {
+      const x = ads.porFonte[f]
+      lines.push(
+        `  ${FONTE_LABELS[f]}: gravadas ${x.fotosGravadas} · ausentes ${x.fotosAusentes} · recusadas ${x.fotosRecusadas} · fora da pasta ${x.fotosForaDaPasta}`,
+      )
+    }
   }
   return lines
 }

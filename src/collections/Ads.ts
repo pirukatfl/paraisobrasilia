@@ -26,6 +26,7 @@ import {
   resumoOf,
   textoError,
 } from '../lib/classisex/rules'
+import { writeAudit } from '../lib/assinantes/audit'
 
 export const AD_STATUS_OPTIONS = [
   { label: 'Em análise', value: 'pendente' },
@@ -34,6 +35,10 @@ export const AD_STATUS_OPTIONS = [
   { label: 'Despublicado', value: 'despublicado' },
   { label: 'Rascunho (site antigo)', value: 'rascunho' },
 ] as const
+
+/** Set only by the WordPress importer (field access blocks every other writer): marks the old-site ads. */
+const isLegacyAd = (doc: { wpCommentId?: unknown } | null | undefined): boolean =>
+  doc?.wpCommentId !== undefined && doc?.wpCommentId !== null
 
 const relId = (value: unknown): number | string | null => {
   if (value === null || value === undefined || value === '') return null
@@ -64,7 +69,16 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
   const merged = { ...((originalDoc?.contato as Contato | undefined) ?? {}), ...((data.contato as Contato) ?? {}) }
   // M-04: a draft brought from the old site may have no contact yet; the owner adds it before sending
   const status = (data.status ?? originalDoc?.status) as string | undefined
-  if (!merged.whatsapp && !merged.telegram && status !== DRAFT_STATUS) {
+  // Client decision 2026-10-22: old-site ads are exempt from the contact field and the text-size limit
+  // (their contacts are inside the text; the public/non-payer view redacts them on the server)
+  const legacy = isLegacyAd(data) || isLegacyAd(originalDoc)
+  if (typeof data.texto === 'string' && status !== DRAFT_STATUS && !legacy) {
+    const texto = textoError(data.texto)
+    if (texto) {
+      throw new ValidationError({ collection: 'ads', errors: [{ path: 'texto', message: texto }], req }, req.t)
+    }
+  }
+  if (!merged.whatsapp && !merged.telegram && status !== DRAFT_STATUS && !legacy) {
     throw new ValidationError(
       { collection: 'ads', errors: [{ path: 'contato.whatsapp', message: AD_MESSAGES.contato }], req },
       req.t,
@@ -190,7 +204,15 @@ export const Ads: CollectionConfig = {
       },
     ],
     afterDelete: [
-      ({ doc }) => {
+      async ({ doc, req }) => {
+        // An old-site ad that someone deleted must not come back when the importer runs again
+        if (isLegacyAd(doc)) {
+          await writeAudit(req, {
+            action: 'anuncio-legado-apagado',
+            summary: `Anúncio antigo #${doc.id} apagado`,
+            details: { anuncio: doc.id, wpCommentId: doc.wpCommentId },
+          })
+        }
         expire(['ads'])
         return doc
       },
@@ -268,13 +290,9 @@ export const Ads: CollectionConfig = {
       admin: {
         description: `Até ${TEXT_MAX} caracteres. Só assinantes veem o texto.`,
       },
-      // M-04: old texts may exceed the limit while the ad is a draft; the owner shortens it before sending
-      validate: (value: unknown, { siblingData }: { siblingData?: Record<string, unknown> }) =>
-        siblingData?.status === DRAFT_STATUS
-          ? String(value ?? '').trim()
-            ? true
-            : AD_MESSAGES.textoVazio
-          : (textoError(String(value ?? '')) ?? true),
+      // Only "not empty" here; the size limit lives in the beforeValidate hook, which knows whether the ad is
+      // an old-site ad (exempt, client decision 2026-10-22) and whether it is a draft (M-04)
+      validate: (value: unknown) => (String(value ?? '').trim() ? true : AD_MESSAGES.textoVazio),
     },
     {
       name: 'contato',
@@ -367,12 +385,31 @@ export const Ads: CollectionConfig = {
       type: 'select',
       index: true,
       label: 'Anúncio antigo da equipe',
-      options: [{ label: 'Anúncio antigo da equipe (revisar)', value: 'equipe' }],
+      options: [{ label: 'Anúncio antigo da equipe', value: 'equipe' }],
       access: { create: () => false, update: () => false, read: isStaff },
       admin: {
         position: 'sidebar',
         readOnly: true,
-        description: 'Rascunho trazido do site antigo, só a equipe vê. Troque o anunciante, edite e aprove, ou apague.',
+        description:
+          'Anúncio antigo feito pela equipe no site antigo (dono técnico, ninguém entra com ele). Já vem publicado; troque o anunciante pelo dono certo, despublique ou apague.',
+      },
+    },
+    {
+      // Client decision 2026-10-22: both old boards come in; this tells them apart (reports, admin filter)
+      name: 'fonteLegado',
+      type: 'select',
+      index: true,
+      label: 'Veio do site antigo (origem)',
+      options: [
+        { label: 'ClassiSex (site antigo)', value: 'classisex' },
+        { label: 'Mural (site antigo)', value: 'mural' },
+      ],
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description:
+          'Anúncio trazido do site antigo. Não conta no limite de 3 anúncios e não tem limite de texto nem exigência de contato.',
       },
     },
     {
