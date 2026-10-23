@@ -17,6 +17,7 @@ test.beforeEach(async ({ context, baseURL }) => {
 test.afterAll(async ({ request }) => {
   const api = await staffApi(request)
   await api.deleteAll('space-items')
+  await api.deleteAll('models')
 })
 
 test('home with a party and 6 space photos ≤ 600 KB', async ({ page, request }) => {
@@ -44,4 +45,18 @@ test('/quem-somos ≤ 250 KB', async ({ page }) => {
   const w = await measureWeight(page)
   console.log(`[budget] /quem-somos ${Math.round(w.total / KB)} KB`, w.byType)
   expect(w.total).toBeLessThanOrEqual(250 * KB)
+})
+
+test('model page with 30 photos and 3 videos ≤ 600 KB', async ({ page, request }) => {
+  test.setTimeout(300_000)
+  const api = await staffApi(request)
+  await api.deleteAll('models')
+  const slug = 'peso-orcamento'
+  await api.createModel({ name: 'Peso', photos: 30, videos: 3, slug })
+
+  await page.goto(`/modelos/${slug}`)
+  await expect(page.getByRole('heading', { name: 'Peso', level: 1 })).toBeVisible()
+  const w = await measureWeight(page)
+  console.log(`[budget] /modelos/${slug} ${Math.round(w.total / KB)} KB (+${Math.round(w.scripts / KB)} KB dev JS)`, w.byType)
+  expect(w.total).toBeLessThanOrEqual(600 * KB)
 })

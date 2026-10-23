@@ -84,7 +84,21 @@ export async function staffApi(request: APIRequestContext) {
       })
       return { item: (await check(res, 'create space video')).doc, video }
     },
-    async createModel(opts: { name: string; photos: number; order?: number; published?: boolean }) {
+    async createModel(opts: {
+      name: string
+      photos: number
+      order?: number
+      published?: boolean
+      slug?: string
+      description?: string
+      videos?: number
+    }) {
+      const videos = []
+      for (let i = 0; i < (opts.videos ?? 0); i++) {
+        const poster = await upload('media', 'flyer-portrait.jpg', { alt: `Capa do vídeo de ${opts.name}` })
+        const video = await upload('videos', 'espaco.mp4', { title: `Vídeo ${i + 1} de ${opts.name}`, poster: poster.id })
+        videos.push({ video: video.id })
+      }
       const photos = []
       for (let i = 0; i < opts.photos; i++) {
         const media = await upload('media', i % 2 ? 'flyer-square.jpg' : 'flyer-portrait.jpg', {
@@ -94,7 +108,15 @@ export async function staffApi(request: APIRequestContext) {
       }
       const res = await request.post('/api/models', {
         headers,
-        data: { name: opts.name, photos, order: opts.order ?? 0, _status: opts.published === false ? 'draft' : 'published' },
+        data: {
+          name: opts.name,
+          photos,
+          ...(videos.length ? { videos } : {}),
+          order: opts.order ?? 0,
+          ...(opts.slug ? { slug: opts.slug } : {}),
+          ...(opts.description ? { description: opts.description } : {}),
+          _status: opts.published === false ? 'draft' : 'published',
+        },
       })
       return (await check(res, 'create model')).doc
     },

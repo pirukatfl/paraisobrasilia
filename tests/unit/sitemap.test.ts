@@ -59,6 +59,29 @@ describe('sitemap (INST-06, T-02-13)', () => {
     expect(paths(buildSitemap({ base, parties: [], pages: [], hasModels: false }))).not.toContain('/dicas-hot/dica-um')
   })
 
+  it('lists each published model page (06.1)', () => {
+    const entries = buildSitemap({
+      base,
+      parties: [],
+      pages: [],
+      hasModels: true,
+      models: [{ slug: 'aurora', updatedAt: '2026-10-19T12:00:00.000Z' }],
+    })
+    const urls = paths(entries)
+    expect(urls).toContain('/modelos')
+    expect(urls).toContain('/modelos/aurora')
+    const model = entries.find((e) => e.url.endsWith('/modelos/aurora'))
+    expect(model?.lastModified).toBe('2026-10-19T12:00:00.000Z')
+  })
+
+  it('lists no model page while the section is hidden (06.1)', () => {
+    const urls = paths(
+      buildSitemap({ base, parties: [], pages: [], hasModels: false, models: [{ slug: 'aurora', updatedAt: '2026-10-19T12:00:00.000Z' }] }),
+    )
+    expect(urls).not.toContain('/modelos')
+    expect(urls).not.toContain('/modelos/aurora')
+  })
+
   it('lists /assine-ja and never the members or auth pages (T-03-05)', () => {
     const urls = paths(buildSitemap({ base, parties: [], pages, hasModels: true }))
     expect(urls).toContain('/assine-ja')

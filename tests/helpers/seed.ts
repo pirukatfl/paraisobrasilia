@@ -412,8 +412,33 @@ export async function seedSpaceVideo(
 /** Creates a model with `photoCount` fixture photos (published by default). */
 export async function seedModel(
   payload: Payload,
-  input: { name: string; photoCount: number; published?: boolean; order?: number; authorization?: { date?: string; note?: string } },
+  input: {
+    name: string
+    photoCount: number
+    published?: boolean
+    order?: number
+    slug?: string
+    description?: string
+    videoCount?: number
+    authorization?: { date?: string; note?: string }
+  },
 ) {
+  const videos = []
+  for (let i = 0; i < (input.videoCount ?? 0); i++) {
+    const poster = await payload.create({
+      collection: 'media',
+      data: { alt: `Capa do vídeo de ${input.name}` },
+      filePath: path.join(FIXTURES, 'flyer-square.jpg'),
+      overrideAccess: true,
+    })
+    const video = await payload.create({
+      collection: 'videos' as never,
+      data: { title: `Vídeo ${i + 1} de ${input.name}`, poster: poster.id } as never,
+      filePath: path.join(FIXTURES, 'espaco.mp4'),
+      overrideAccess: true,
+    })
+    videos.push({ video: (video as { id: number }).id })
+  }
   const photos = []
   for (let i = 0; i < input.photoCount; i++) {
     const media = await payload.create({
@@ -432,7 +457,10 @@ export async function seedModel(
       _status: published ? 'published' : 'draft',
       name: input.name,
       photos,
+      ...(videos.length ? { videos } : {}),
       order: input.order ?? 0,
+      ...(input.slug ? { slug: input.slug } : {}),
+      ...(input.description ? { description: input.description } : {}),
       ...(input.authorization ? { imageAuthorization: input.authorization } : {}),
     } as never,
     overrideAccess: true,

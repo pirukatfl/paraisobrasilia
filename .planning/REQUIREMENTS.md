@@ -17,6 +17,8 @@
 - [x] **MIDIA-01**: Visitante vê galeria de fotos e vídeos do espaço
 - [x] **MIDIA-02**: Visitante vê galeria de fotos profissionais das modelos da casa
 - [x] **MIDIA-03**: Fotos e vídeos carregam rápido no celular (formatos modernos, carregamento sob demanda)
+- [x] **MIDIA-06**: Visitante vê em /modelos os cards das modelos (foto de capa + nome artístico) e, ao tocar em um card, abre a página da modelo (Fase 06.1, pedido do cliente 2026-10-23)
+- [x] **MIDIA-07**: Visitante vê na página da modelo o nome, uma descrição curta e a galeria de até 30 fotos e até 3 vídeos, sem nenhum contato, aberta a todos depois do age gate
 
 ### Área aberta — Prévias e contos (PREV)
 
@@ -68,6 +70,7 @@
 - [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
 - [x] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
 - [x] **PAINEL-08**: Toda ação da equipe sobre assinantes fica registrada (quem, quando, o quê)
+- [x] **PAINEL-09**: Só a equipe cadastra modelos (nome, descrição, capa, até 30 fotos e 3 vídeos), ordena, publica e despublica pelo painel
 
 ### Conta gratuita (CONTA)
 
@@ -155,14 +158,17 @@ Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisõ
 | MIG-02 | Fase 6 | Complete |
 | MIG-03 | Fase 6 | Complete |
 | MIG-04 | Fase 7 | Pending |
+| MIDIA-06 | Fase 06.1 | Complete |
+| MIDIA-07 | Fase 06.1 | Complete |
+| PAINEL-09 | Fase 06.1 | Complete |
 | CONTA-01 | Quick 2026-10-20-conta-gratuita | Complete |
 | CONTA-02 | Quick 2026-10-20-conta-gratuita; texto revisado em Quick 2026-10-20-recados-privados | Complete |
 | CONTA-03 | Quick 2026-10-20-conta-gratuita | Complete |
 | CONTA-04 | Quick 2026-10-20-conta-gratuita | Complete |
 
 **Coverage:**
-- v1 requirements: 48 total (44 + 4 de conta gratuita, quick task)
-- Mapped to phases: 48
+- v1 requirements: 51 total (44 + 4 de conta gratuita, quick task + 3 da galeria de modelos, Fase 06.1)
+- Mapped to phases: 51
 - Unmapped: 0 ✓
 
 ---

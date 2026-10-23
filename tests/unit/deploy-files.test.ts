@@ -404,3 +404,22 @@ describe('migração do WordPress: guia da equipe e runbook (06-09)', () => {
     }
   })
 })
+
+describe('06.1 staff guide: Modelos', () => {
+  const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
+  const start = guide.search(/^## Modelos$/m)
+  const rest = guide.slice(start + 3)
+  const section = guide.slice(start, start + 3 + Math.max(rest.search(/^## /m), 0))
+
+  it('has the Modelos heading and covers 30 photos, 3 videos, cover, address and unpublish', () => {
+    expect(start).toBeGreaterThanOrEqual(0)
+    for (const text of ['30 fotos', '3 vídeos', 'a primeira é a capa', 'Endereço', 'Despublicar', 'sem contato']) {
+      expect(section.toLowerCase()).toContain(text.toLowerCase())
+    }
+  })
+
+  it('keeps Remoção de imagem with Excluir', () => {
+    expect(guide).toMatch(/^## Remoção de imagem$/m)
+    expect(guide.slice(guide.search(/^## Remoção de imagem$/m))).toContain('Excluir')
+  })
+})

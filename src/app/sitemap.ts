@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-import { hasPublishedModels } from '@/lib/gallery/queries'
+import { getPublishedModels } from '@/lib/gallery/queries'
 import { PAGE_KEYS } from '@/lib/pages/keys'
 import { getPageByKey, type PageDTO } from '@/lib/pages/queries'
 import { getPublicContoSlugs } from '@/lib/contos/public'
@@ -13,10 +13,10 @@ export const dynamic = 'force-dynamic'
 
 /** Public pages only: drafts, ended parties and an empty Modelos section are left out. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [parties, pages, hasModels, contos, dicas] = await Promise.all([
+  const [parties, pages, models, contos, dicas] = await Promise.all([
     getUpcomingParties(new Date()),
     Promise.all(PAGE_KEYS.map((key) => getPageByKey(key))),
-    hasPublishedModels(),
+    getPublishedModels(),
     getPublicContoSlugs(),
     getPublicDicaSlugs(),
   ])
@@ -24,7 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     base: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
     parties,
     pages: pages.filter((p): p is PageDTO => p !== null),
-    hasModels,
+    hasModels: models.length > 0,
+    models: models.map(({ slug, updatedAt }) => ({ slug, updatedAt })),
     contos,
     dicas,
   })

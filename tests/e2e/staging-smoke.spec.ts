@@ -280,3 +280,19 @@ test.describe('Fase 6: links antigos e vazamentos', () => {
     await anon.dispose()
   })
 })
+
+// Fase 6.1: model page (read-only; skips when no model is published)
+test('model page opens from /modelos and shows no contact (06.1)', async ({ page, context, baseURL }) => {
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const list = await page.goto('/modelos')
+  test.skip(list?.status() === 404, 'nenhuma modelo publicada')
+  expect(list?.status()).toBe(200)
+
+  const card = page.locator('main a[href^="/modelos/"]').first()
+  await expect(card).toBeVisible()
+  const href = await card.getAttribute('href')
+  const res = await page.goto(href!)
+  expect(res?.status()).toBe(200)
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(page.locator('main a[href^="tel:"], main a[href*="wa.me"], main a[href^="mailto:"]')).toHaveCount(0)
+})
