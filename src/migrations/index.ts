@@ -30,6 +30,7 @@ import * as migration_20261021_203534_anuncios_equipe from './20261021_203534_an
 import * as migration_20261022_022156_mural_publicado from './20261022_022156_mural_publicado';
 import * as migration_20261022_102706_dicas from './20261022_102706_dicas';
 import * as migration_20261022_120000_dicas_wp_bundle from './20261022_120000_dicas_wp_bundle';
+import * as migration_20261023_034454_classisex_sem_conta from './20261023_034454_classisex_sem_conta';
 import * as migration_20261023_042244_models_pagina from './20261023_042244_models_pagina';
 import * as migration_20261023_042900_models_videos from './20261023_042900_models_videos';
 
@@ -195,6 +196,11 @@ export const migrations = [
     name: '20261022_120000_dicas_wp_bundle',
   },
   {
+    up: migration_20261023_034454_classisex_sem_conta.up,
+    down: migration_20261023_034454_classisex_sem_conta.down,
+    name: '20261023_034454_classisex_sem_conta',
+  },
+  {
     up: migration_20261023_042244_models_pagina.up,
     down: migration_20261023_042244_models_pagina.down,
     name: '20261023_042244_models_pagina',
@@ -202,6 +208,6 @@ export const migrations = [
   {
     up: migration_20261023_042900_models_videos.up,
     down: migration_20261023_042900_models_videos.down,
-    name: '20261023_042900_models_videos'
+    name: '20261023_042900_models_videos',
   },
 ];

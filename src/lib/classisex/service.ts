@@ -14,6 +14,7 @@ import { withRequestState } from '../assinantes/context'
 import { spDate, spMidnight } from '../assinantes/periods'
 import { accessStatusFor } from '../assinantes/status'
 import { TIER_LABELS, tierOf } from '../assinantes/tier'
+import { notifyVisitorAd } from '../email/anuncio-visitante'
 import { MAX_AD_PHOTOS, MAX_AD_VIDEOS, uploadCodeFor, VIDEO_MIME_TYPES } from './media-messages'
 import {
   contatoOf,
@@ -43,7 +44,6 @@ import {
   AD_MESSAGES,
   DRAFT_STATUS,
   validateAdInput,
-  type AdErrors,
   type AdInput,
   type AdStatus,
 } from './rules'
@@ -51,8 +51,8 @@ import {
 export class ServiceError extends Error {
   code: string
   status: number
-  errors?: AdErrors
-  constructor(code: string, message: string, status = 400, errors?: AdErrors) {
+  errors?: Record<string, string>
+  constructor(code: string, message: string, status = 400, errors?: Record<string, string>) {
     super(message)
     this.name = 'ServiceError'
     this.code = code
@@ -68,6 +68,8 @@ type AdDoc = AdDocLike & {
   origemLegado?: string | null
   fonteLegado?: string | null
   wpCommentId?: number | null
+  enviadoSemConta?: boolean | null
+  emailVisitante?: string | null
 }
 
 /** Ad brought from the old site (set only by the importer): exempt from the new-ad limits (2026-10-22). */
@@ -111,7 +113,7 @@ function validated(input: AdInput, legacy = false) {
   return result.value
 }
 
-async function assertActiveCategory(payload: Payload, euSou: number) {
+export async function assertActiveCategory(payload: Payload, euSou: number) {
   const category = await payload.findByID({
     collection: 'ad-categories',
     id: euSou,
@@ -526,6 +528,14 @@ export async function moderateAd(
     summary: `Anúncio #${ad.id} (${ad.resumo ?? ''}) ${t.verb}${reason ? `: ${reason}` : ''}`,
     details: { anuncio: ad.id, motivo: reason, ...(auditDetails ?? {}) },
   })
+  // Client decision 2026-10-23: someone who sent the ad without an account is told by e-mail (never throws)
+  if (ad.enviadoSemConta && ad.emailVisitante) {
+    await notifyVisitorAd(
+      req.payload,
+      { adId: ad.id, to: ad.emailVisitante, kind, apelido: ad.apelido ?? '', motivo: reason },
+      (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(/\/$/, ''),
+    )
+  }
   return { status: t.to, statusLabel: STAFF_STATUS_LABELS[t.to] }
 }
 
@@ -802,7 +812,9 @@ export type ModerationView = {
   status: AdStatus
   statusLabel: string
   /** Tier of the ad author right now (Conta gratuita shows only the cover on the board) */
-  contaAutor: 'Conta gratuita' | 'Assinante'
+  contaAutor: 'Conta gratuita' | 'Assinante' | 'Sem conta (visitante)'
+  /** Sent through the open form by someone without an account (1 photo, no video, no recados) */
+  semConta: boolean
   /** Old-site draft written by the team (placeholder owner): staff can approve it directly */
   rascunhoDaEquipe: boolean
   motivo: string | null
@@ -839,13 +851,18 @@ export async function getModerationView(req: PayloadRequest, id: number | string
   const texto = redactContacts(ad.texto ?? '')
   const labels = await categoryLabels(req.payload)
   const authorId = relId(ad.author)
-  const contaAutor: ModerationView['contaAutor'] =
-    authorId === null ? TIER_LABELS.gratis : TIER_LABELS[tierOf(await accessStatusFor(req.payload, authorId, new Date(), req))]
+  const semConta = ad.enviadoSemConta === true
+  const contaAutor: ModerationView['contaAutor'] = semConta
+    ? 'Sem conta (visitante)'
+    : authorId === null
+      ? TIER_LABELS.gratis
+      : TIER_LABELS[tierOf(await accessStatusFor(req.payload, authorId, new Date(), req))]
   return {
     id: ad.id,
     status: ad.status,
     statusLabel: STAFF_STATUS_LABELS[ad.status],
     contaAutor,
+    semConta,
     rascunhoDaEquipe: ad.status === DRAFT_STATUS && ad.origemLegado === 'equipe',
     motivo: ad.motivo ?? null,
     publicApelido: apelido.text,

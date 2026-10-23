@@ -7,7 +7,7 @@ import type { PublicAdDTO } from '@/lib/classisex/dto'
 
 /**
  * The open ClassiSex board (public DTOs only): filter by Eu sou, cards with the redacted text and
- * the blurred cover, pagination. Shared by /classisex (visitors) and the members area for accounts
+ * the cover photo, pagination. Shared by /classisex (visitors) and the members area for accounts
  * without an active subscription (free accounts). Contacts and original media never reach it.
  */
 export function PublicBoard({

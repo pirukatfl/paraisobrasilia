@@ -108,11 +108,11 @@ test.describe('anonymous visitor: files and API', () => {
     await anon.dispose()
   })
 
-  test('the blurred route only answers for photos of visible ads', async ({ playwright, baseURL }) => {
+  test('the cover route only answers for photos of visible ads', async ({ playwright, baseURL }) => {
     const anon = await playwright.request.newContext({ baseURL })
     expect((await anon.get(`/classisex/previa/${s.media.video.id}`)).status()).toBe(404)
     expect((await anon.get(`/classisex/previa/${s.media.fotoPendente.id}`)).status()).toBe(404)
-    // G-05: an expired author's approved ad stays in the open preview with its blurred cover
+    // G-05: an expired author's approved ad stays in the open preview with its sharp cover
     expect((await anon.get(`/classisex/previa/${s.media.fotoExpired.id}`)).status()).toBe(200)
     expect((await anon.get(`/classisex/previa/${s.media.foto.id}`)).status()).toBe(200)
     await anon.dispose()
@@ -314,7 +314,7 @@ test.describe('pages and RSC payload', () => {
       expect(home).toContain('Texto aprovado zebra-azul procura amigos,')
       expect(home).toContain('panda-rosa')
       expect(home).toContain('[contato só para assinantes]')
-      if (!headers) expect(home).toContain('Assine para ver o contato e as fotos')
+      if (!headers) expect(home).toContain('Assine para ver o contato, todas as fotos e os vídeos')
     }
     await anon.dispose()
   })
@@ -359,6 +359,8 @@ test.describe('pages and RSC payload', () => {
     expect(previa.status()).toBe(200)
     expect(previa.headers()['cache-control']).toContain('public')
     expect(previa.headers()['content-type']).toMatch(/^image\//)
+    // staging adds a global noindex, nofollow that wins over the route's own noimageindex (checked in the int tests)
+    expect(previa.headers()['x-robots-tag']).toContain('noindex')
 
     const robots = await (await anon.get('/robots.txt')).text()
     if (/^Allow: \//m.test(robots)) expect(robots).toContain('Disallow: /area-do-assinante')
@@ -369,7 +371,7 @@ test.describe('pages and RSC payload', () => {
     await anon.dispose()
   })
 
-  test('an ad stays in the open preview with the same blurred cover after its author’s access ends (G-05)', async ({ playwright, baseURL, request }) => {
+  test('an ad stays in the open preview with the same sharp cover after its author’s access ends (G-05)', async ({ playwright, baseURL, request }) => {
     test.setTimeout(150_000)
     const api = await staffApi(request)
     const zeca = await api.createAssinante({ email: 'zeca.some@teste.local', password: 'senha-zeca-12345', name: 'Zeca Some' })
@@ -382,7 +384,7 @@ test.describe('pages and RSC payload', () => {
     const coverBefore = await anon.get(`/classisex/previa/${photo.id}`)
     expect(coverBefore.status()).toBe(200)
     const bytesBefore = (await coverBefore.body()).byteLength
-    // the blurred preview shows the cover only, even while the author pays
+    // the cover preview shows the cover only, even while the author pays
     expect((await anon.get(`/classisex/previa/${second.id}`)).status()).toBe(404)
 
     await api.encerrar(zeca.id, 'teste de vencimento')

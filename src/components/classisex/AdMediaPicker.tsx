@@ -137,11 +137,11 @@ export function AdMediaPicker({
       {MAX_AD_VIDEOS > 0 ? (
         <p className="type-label text-muted">
           Até {MAX_AD_PHOTOS} fotos JPG, PNG ou WebP (15 MB cada) e até {MAX_AD_VIDEOS} vídeos MP4 ou MOV (100 MB e {MAX_VIDEO_SECONDS} segundos
-          cada). A primeira foto é a capa. Na área aberta, só uma foto desfocada aparece. Você também pode adicionar depois, editando o anúncio.
+          cada). A primeira foto é a capa. Na área aberta, só a foto de capa aparece. Você também pode adicionar depois, editando o anúncio.
         </p>
       ) : (
         <p className="type-label text-muted">
-          {MAX_AD_PHOTOS} foto JPG, PNG ou WebP (15 MB). Ela é a capa. Na área aberta, só uma foto desfocada aparece. Você também pode
+          {MAX_AD_PHOTOS} foto JPG, PNG ou WebP (15 MB). Ela é a capa. Na área aberta, só a foto de capa aparece. Você também pode
           trocar depois, editando o anúncio.
         </p>
       )}

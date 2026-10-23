@@ -68,6 +68,7 @@ test('the sub-nav has a single Recados item; own content has no Enviar recado', 
     'ClassiSex',
     'Recados',
     'Contos',
+    'Dicas Hot',
     'Meus anúncios',
     'Trocar senha',
   ])

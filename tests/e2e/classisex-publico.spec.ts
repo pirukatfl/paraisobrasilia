@@ -1,9 +1,10 @@
 import { expect, test, type Browser } from '@playwright/test'
+import sharp from 'sharp'
 
 import { staffApi } from './helpers/api'
 
 // PREV-01 / D-04 / D-07 (revisão 2026-10-22): anonymous visitors read apelido, tipo, city and the whole
-// text with every contact removed on the server, plus one blurred photo per ad; never the video, the
+// text with every contact removed on the server, plus one sharp cover photo per ad; never the video, the
 // original photos or any contact (WhatsApp/Telegram fields, phones, e-mails, links, @) (T-04-01, T-04-11, T-04-14).
 test.describe.configure({ mode: 'serial' })
 
@@ -86,7 +87,7 @@ async function visitor(browser: Browser, baseURL: string) {
   return { context, page: await context.newPage() }
 }
 
-test('visitors read the whole text without contacts, with one blurred photo and a call to subscribe', async ({ browser, baseURL, request }) => {
+test('visitors read the whole text without contacts, with one sharp cover photo and a call to subscribe', async ({ browser, baseURL, request }) => {
   const { context, page } = await visitor(browser, baseURL!)
   const res = await page.goto('/classisex')
   expect(res?.status()).toBe(200)
@@ -108,8 +109,10 @@ test('visitors read the whole text without contacts, with one blurred photo and 
   for (const secret of ['98877', 'nina@exemplo.com', '@nina_texto', 'wa.me', 'nina-casal']) {
     await expect(cards.first()).not.toContainText(secret)
   }
-  await expect(cards.first()).not.toContainText('vídeo')
-  await expect(cards.first().getByRole('link', { name: 'Assine para ver o contato e as fotos', exact: true })).toHaveAttribute('href', '/assine-ja')
+  // the call to subscribe now says "... e os vídeos"; no video itself (text or player) may be on the card
+  await expect(cards.first()).not.toContainText(/vídeo(?!s)/i)
+  await expect(cards.first().locator('video, source')).toHaveCount(0)
+  await expect(cards.first().getByRole('link', { name: 'Assine para ver o contato, todas as fotos e os vídeos', exact: true })).toHaveAttribute('href', '/assine-ja')
   await expect(main.getByRole('link', { name: 'Já é assinante? Ver anúncios completos' })).toHaveAttribute(
     'href',
     '/area-do-assinante/classisex',
@@ -119,7 +122,7 @@ test('visitors read the whole text without contacts, with one blurred photo and 
   await expect(imgs).toHaveCount(1)
   const srcs = await imgs.evaluateAll((list) => list.map((i) => i.getAttribute('src')))
   expect(srcs).toEqual([`/classisex/previa/${photoIds[0]}`])
-  await expect(imgs.first()).toHaveAttribute('alt', 'Foto desfocada do anúncio')
+  await expect(imgs.first()).toHaveAttribute('alt', 'Foto do anúncio')
 
   const html = await page.content()
   const raw = await (await request.get('/classisex')).text() // includes the RSC payload
@@ -153,12 +156,17 @@ test('REST, HTML and RSC give visitors no contact, planted or structured', async
   await anon.dispose()
 })
 
-test('the blurred photo route serves only previews of visible ads', async ({ playwright, baseURL }) => {
+test('the cover photo route serves only previews of visible ads', async ({ playwright, baseURL }) => {
   const anon = await playwright.request.newContext({ baseURL })
   const ok = await anon.get(`/classisex/previa/${photoIds[0]}`)
   expect(ok.status()).toBe(200)
   expect(ok.headers()['content-type']).toBe('image/webp')
   expect(ok.headers()['cache-control']).toContain('public')
+  expect(ok.headers()['x-robots-tag']).toContain('noindex')
+  // client decision 2026-10-23: sharp card of the cover (480 px webp from the 1080 px source), not a blur
+  const meta = await sharp(await ok.body()).metadata()
+  expect(meta.format).toBe('webp')
+  expect(meta.width).toBe(480)
   for (const id of [videoId, 99999999, 'abc']) {
     const res = await anon.get(`/classisex/previa/${id}`)
     expect(res.status(), String(id)).toBe(404)

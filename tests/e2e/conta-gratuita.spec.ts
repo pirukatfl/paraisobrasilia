@@ -135,7 +135,7 @@ test('free account sees the Assine Já panel on board, detail and Recados, with 
   await context.close()
 })
 
-test('after approval a paying member sees the free ad with 1 photo and contacts, no Enviar recado; the visitor reads it with a blurred photo and no contact', async ({
+test('after approval a paying member sees the free ad with 1 photo and contacts, no Enviar recado; the visitor reads it with a sharp cover photo and no contact', async ({
   browser,
   baseURL,
   request,

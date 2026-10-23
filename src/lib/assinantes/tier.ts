@@ -17,6 +17,9 @@ export const TIER_LIMITS: Record<Tier, { fotos: number; videos: number; anuncios
   assinante: { fotos: MAX_AD_PHOTOS, videos: MAX_AD_VIDEOS, anunciosAtivos: ACTIVE_LIMIT },
 }
 
+/** Ad sent without an account (2026-10-23): one photo, no video, same 3 active ads per e-mail. */
+export const VISITANTE_LIMITS = { fotos: 1, videos: 0, anunciosAtivos: ACTIVE_LIMIT } as const
+
 export function tierOf(access: { state: AccessState }): Tier {
   return access.state === 'ativa' ? 'assinante' : 'gratis'
 }
@@ -50,7 +53,7 @@ export const TIER_COMPARISON: { item: string; gratis: string; assinante: string 
   { item: 'Fotos por anúncio', gratis: '1', assinante: `até ${MAX_AD_PHOTOS}` },
   { item: 'Vídeos por anúncio', gratis: 'não', assinante: `até ${MAX_AD_VIDEOS}` },
   { item: 'Anúncios ativos', gratis: `até ${ACTIVE_LIMIT}`, assinante: `até ${ACTIVE_LIMIT}` },
-  { item: 'Ver anúncios do ClassiSex', gratis: 'todos, sem contato e com fotos desfocadas', assinante: 'todos, com contato, fotos e vídeos' },
+  { item: 'Ver anúncios do ClassiSex', gratis: 'todos, sem contato', assinante: 'todos, com contato, fotos e vídeos' },
   { item: 'Recados (conversas privadas)', gratis: 'não', assinante: 'manda e recebe' },
   { item: 'Contos e Dicas Hot completos', gratis: 'só o início', assinante: 'sim' },
 ]

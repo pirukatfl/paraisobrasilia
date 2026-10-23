@@ -21,7 +21,7 @@ type View = {
   publicCidade: string | null
   publicTexto: string
   euSouLabel: string
-  contaAutor: 'Conta gratuita' | 'Assinante'
+  contaAutor: 'Conta gratuita' | 'Assinante' | 'Sem conta (visitante)'
   rascunhoDaEquipe: boolean
   removed: number
   removedApelido: number
@@ -158,9 +158,11 @@ export function ModeracaoPanel() {
 
           <p style={{ margin: 'calc(var(--base) * 0.25) 0 0' }}>
             Conta do anunciante:{' '}
-            {view.contaAutor === 'Conta gratuita'
-              ? 'Conta gratuita — no ClassiSex aparece só a capa, sem vídeos.'
-              : 'Assinante'}
+            {view.contaAutor === 'Sem conta (visitante)'
+              ? 'Sem conta (visitante) — 1 foto, sem vídeo, não recebe recados. A pessoa não consegue editar nem apagar; o e-mail para aviso está na barra lateral.'
+              : view.contaAutor === 'Conta gratuita'
+                ? 'Conta gratuita — no ClassiSex aparece só a capa, sem vídeos.'
+                : 'Assinante'}
           </p>
 
           <div role="region" aria-labelledby="moderacao-publico" style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
@@ -174,14 +176,14 @@ export function ModeracaoPanel() {
               </strong>
               {'\n'}
               {view.publicTexto}
-              {'\n'}(com uma foto desfocada)
+              {'\n'}(com a foto de capa, nítida)
             </p>
             <p style={{ margin: 'calc(var(--base) * 0.25) 0 0', opacity: 0.8 }}>
               {view.removedApelido > 0
                 ? 'O apelido tem um contato escondido: edite o apelido ou recuse o anúncio.'
                 : view.removed > 0
                   ? 'O site escondeu contatos do texto (aparece "[contato só para assinantes]"). Confira se não sobrou nenhum escrito de outro jeito, como número por extenso, antes de aprovar.'
-                  : 'Visitantes e contas gratuitas leem o apelido, o tipo, a cidade e o texto, com uma foto desfocada. Confira se não há contato escrito de outro jeito e veja as fotos antes de aprovar.'}
+                  : 'Visitantes e contas gratuitas leem o apelido, o tipo, a cidade e o texto, com a foto de capa, nítida. Confira a capa (é a foto que todo visitante de 18 anos ou mais vê) e se não há contato escrito de outro jeito antes de aprovar.'}
             </p>
           </div>
 

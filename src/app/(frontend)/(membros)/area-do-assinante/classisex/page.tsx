@@ -40,7 +40,7 @@ export default async function ClassisexPage({
   )
   const params = await searchParams
   // No restricted markup at all without active access (T-04-05): return before any members query.
-  // A free account reads the same open board as a visitor (text with contacts removed, blurred
+  // A free account reads the same open board as a visitor (text with contacts removed, cover
   // cover): the public read model only, never the members DTOs.
   if (check.inactive) {
     const publicFilters = { ...parseBoardFilters(params), cidade: undefined }
@@ -52,7 +52,7 @@ export default async function ClassisexPage({
         <div className="mt-10" data-open-board>
           <h2 className="type-heading">Anúncios publicados</h2>
           <p className="mt-2 max-w-[680px] text-body text-muted">
-            Você lê os recados na íntegra. Os contatos, as fotos sem desfoque e os vídeos aparecem para assinantes.
+            Você lê os recados na íntegra. Os contatos, as demais fotos e os vídeos aparecem para assinantes.
           </p>
           <PublicBoard basePath={PATH} result={publicResult} categories={publicCategories} filters={publicFilters} signedIn />
         </div>

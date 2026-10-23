@@ -1295,6 +1295,19 @@
           "primaryKey": false,
           "notNull": false
         },
+        "enviado_sem_conta": {
+          "name": "enviado_sem_conta",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "email_visitante": {
+          "name": "email_visitante",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
         "consent_at": {
           "name": "consent_at",
           "type": "timestamp(3) with time zone",
@@ -1457,6 +1470,36 @@
           "columns": [
             {
               "expression": "fonte_legado",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ads_enviado_sem_conta_idx": {
+          "name": "ads_enviado_sem_conta_idx",
+          "columns": [
+            {
+              "expression": "enviado_sem_conta",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "ads_email_visitante_idx": {
+          "name": "ads_email_visitante_idx",
+          "columns": [
+            {
+              "expression": "email_visitante",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

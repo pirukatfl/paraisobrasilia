@@ -4,7 +4,7 @@ import type { PublicAdDTO } from '@/lib/classisex/dto'
 
 /**
  * One ad in the open view (visitors and free accounts; PREV-01, revisão 2026-10-22): apelido, tipo,
- * city and the whole text with the contacts already removed on the server, a single blurred photo
+ * city and the whole text with the contacts already removed on the server, a single sharp cover photo
  * (/classisex/previa/…, plain <img>), the call to subscribe and a locked "Enviar recado" (same on every
  * card). No video, contact or author.
  */
@@ -13,10 +13,10 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
   return (
     <article aria-labelledby={titleId} className="flex flex-col rounded-xl border border-line bg-surface p-5">
       {ad.foto ? (
-        // eslint-disable-next-line @next/next/no-img-element -- blurred preview, served as is
+        // eslint-disable-next-line @next/next/no-img-element -- cover card, served as is
         <img
           src={ad.foto.previewUrl}
-          alt="Foto desfocada do anúncio"
+          alt="Foto do anúncio"
           width={480}
           height={360}
           loading="lazy"
@@ -38,7 +38,7 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
       {ad.texto && <p className="mt-3 whitespace-pre-line break-words text-body">{ad.texto}</p>}
       <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
         <Link href="/assine-ja" className="btn-primary text-center">
-          Assine para ver o contato e as fotos
+          Assine para ver o contato, todas as fotos e os vídeos
         </Link>
         {/* Locked on EVERY card, whoever pays: nothing here says which advertisers are subscribers (I-1, T-RP-05) */}
         <Link

@@ -33,7 +33,7 @@ export default async function NovoAnuncioPage() {
     <section aria-labelledby="titulo-novo-anuncio">
       {header}
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        O anúncio aparece no ClassiSex depois que a equipe aprovar. Na área aberta, aparecem só o apelido, o tipo e uma foto desfocada.
+        O anúncio aparece no ClassiSex depois que a equipe aprovar. Na área aberta, aparecem só o apelido, o tipo, o texto sem contatos e a foto de capa.
       </p>
       {tier === 'gratis' && (
         <p role="note" className="mt-4 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">

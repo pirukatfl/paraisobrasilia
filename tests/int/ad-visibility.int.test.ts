@@ -1,3 +1,4 @@
+import sharp from 'sharp'
 import type { Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -199,7 +200,7 @@ describe('expired author: ad stays as free, cover only (G-05)', () => {
     expect(detail?.fotos.map((f) => f.id)).toEqual([files[0].id])
     expect(detail?.videos).toEqual([])
     expect(JSON.stringify(detail)).not.toContain(`/${files[1].id}/`)
-    // the open preview shows it too, blurred, with the same cover
+    // the open preview shows it too, with the same cover
     const pub = await findPublicAds(payload, {}, NOW_E)
     expect(pub.items.map((i) => i.id)).toEqual([ad.id])
     expect(pub.items[0].foto?.previewUrl).toBe(`/classisex/previa/${files[0].id}`)
@@ -251,7 +252,15 @@ describe('expired author: ad stays as free, cover only (G-05)', () => {
       const { ad, files } = await authorWithMedia(`prev-${state}@teste.local`, { state })
       const call = (mediaId: number) =>
         previaGET(new Request(`http://localhost/classisex/previa/${mediaId}`), { params: Promise.resolve({ id: String(mediaId) }) })
-      expect((await call(files[0].id)).status).toBe(200)
+      const cover = await call(files[0].id)
+      expect(cover.status).toBe(200)
+      // client decision 2026-10-23: the sharp card of the cover, never indexed as an image
+      expect(cover.headers.get('content-type')).toBe('image/webp')
+      expect(cover.headers.get('x-robots-tag')).toBe('noindex, noimageindex')
+      expect(cover.headers.get('cache-control')).toBe('public, max-age=600')
+      const sent = await sharp(Buffer.from(await cover.arrayBuffer())).metadata()
+      expect(sent.format).toBe('webp')
+      expect(sent.width).toBeLessThanOrEqual(480)
       expect((await call(files[1].id)).status).toBe(404)
       expect((await call(files[2].id)).status).toBe(404)
       expect((await call(files[3].id)).status).toBe(404)

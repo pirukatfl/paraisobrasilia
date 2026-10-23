@@ -12,12 +12,14 @@ import { isAdVisible } from '@/lib/classisex/visibility'
 export const dynamic = 'force-dynamic'
 
 /**
- * Public blurred photo of a visible ad (PREV-01, D-04): GET /classisex/previa/{mediaId}
+ * Public cover photo of a visible ad (PREV-01): GET /classisex/previa/{mediaId}
  *
- * T-04-11: serves only the blurred derivative stored in `previa` (16 px blur, ≤ 480 px, made on
- * the server at upload). The original and its sizes are never read here — only the protected
- * route /area-do-assinante/midia/… opens those.
- * Hidden ads (pending, refused, unpublished), videos and every photo that is not the cover: 404.
+ * Client decision 2026-10-23: photos are no longer blurred. This serves the sharp `card` size of the
+ * COVER (webp, 480 px, re-encoded by Payload: no EXIF/GPS); a small photo has no card, so the stored
+ * original is served (also re-encoded webp, 2000 px at most). The path always comes from the database
+ * (basename), never from the request. What is visible did not change: the open area and free accounts
+ * see only the cover, never other photos or videos; hidden ads (pending, refused, unpublished): 404.
+ * Old `-previa.webp` files (the former blur) are never read here.
  */
 const notFound = () =>
   new Response('Não encontrado.', {
@@ -35,11 +37,17 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     collection: 'ad-media',
     id: mediaId,
     depth: 0,
-    select: { ad: true, kind: true, previa: true },
+    select: { ad: true, kind: true, filename: true, sizes: true },
     overrideAccess: true,
     disableErrors: true,
-  })) as { ad?: unknown; kind?: string; previa?: string | null } | null
-  if (!media || media.kind !== 'foto' || !media.previa) return notFound()
+  })) as {
+    ad?: unknown
+    kind?: string
+    filename?: string | null
+    sizes?: { card?: { filename?: string | null } | null } | null
+  } | null
+  const stored = media?.sizes?.card?.filename || media?.filename
+  if (!media || media.kind !== 'foto' || !stored) return notFound()
 
   const adId = relId(media.ad)
   const ad = adId
@@ -59,20 +67,21 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   })
   if (coverOf(photos as unknown as { id: number; kind: 'foto'; order?: number | null }[])?.id !== mediaId) return notFound()
 
-  const blurred = path.join(privateMediaDir(), path.basename(media.previa))
+  const file = path.join(privateMediaDir(), path.basename(stored))
   let size: number
   try {
-    size = (await fs.promises.stat(blurred)).size
+    size = (await fs.promises.stat(file)).size
   } catch {
     return notFound()
   }
-  return new Response(Readable.toWeb(fs.createReadStream(blurred)) as ReadableStream, {
+  return new Response(Readable.toWeb(fs.createReadStream(file)) as ReadableStream, {
     status: 200,
     headers: {
       'Content-Type': 'image/webp',
       'Content-Length': String(size),
       'Cache-Control': 'public, max-age=600',
       'X-Content-Type-Options': 'nosniff',
+      'X-Robots-Tag': 'noindex, noimageindex',
     },
   })
 }

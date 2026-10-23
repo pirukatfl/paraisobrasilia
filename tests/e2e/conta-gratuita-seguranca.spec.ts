@@ -20,7 +20,7 @@ import {
 } from './helpers/conta-gratuita'
 
 // Conta gratuita leak matrix (G-02..G-05, T-CG-*): free viewers read the open board (text with the
-// contacts removed, blurred covers) and nothing else of others, a free (or
+// contacts removed, sharp covers) and nothing else of others, a free (or
 // expired) author exposes only the cover and no video, unconfirmed accounts cannot log in, and
 // replayed requests create nothing. Denials are paired with controls that prove the data exists.
 test.describe.configure({ mode: 'serial' })
@@ -103,11 +103,11 @@ test.describe('free viewer (never paid)', () => {
       for (const value of hiddenFromFree()) expect(res.body, `${path} contains ${value}`).not.toContain(value)
       for (const m of allOthersMedia()) expect(mediaIdsIn(res.body), `${path} points at media ${m.id}`).not.toContain(m.id)
     }
-    // control: the board shows the approved ads' texts (contacts removed), apelido and the blurred covers
+    // control: the board shows the approved ads' texts (contacts removed), apelido and the sharp covers
     const board = await fetchAs(page, 'GET', '/area-do-assinante/classisex')
     for (const visible of openBoardVisible()) expect(board.body, visible).toContain(visible)
     expect(board.body).toContain('[contato só para assinantes]')
-    expect(board.body).toContain('Assine para ver o contato e as fotos')
+    expect(board.body).toContain('Assine para ver o contato, todas as fotos e os vídeos')
     expect(board.body).toMatch(/\/classisex\/previa\/\d+/)
     // her own pending ad is on her own page
     const own = await fetchAs(page, 'GET', '/area-do-assinante/meus-anuncios')
@@ -251,7 +251,7 @@ test.describe('paying viewer', () => {
     }
     await ranged.close()
 
-    // the open blurred preview: cover only
+    // the open cover preview: cover only
     const anon = await playwright.request.newContext({ baseURL })
     expect((await anon.get(`/classisex/previa/${cover!.id}`)).status()).toBe(200)
     expect((await anon.get(`/classisex/previa/${second!.id}`)).status()).toBe(404)

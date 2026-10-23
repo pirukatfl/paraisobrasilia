@@ -29,11 +29,12 @@ describe('dicas-wp bundle', () => {
   })
 
   it('registers the loader migration after the dicas schema migration', () => {
+    // It used to be the last migration; later schema migrations (e.g. classisex_sem_conta) may follow it
     const index = fs.readFileSync(path.join(migrationFile, 'index.ts'), 'utf8')
     const names = [...index.matchAll(/name: '([^']+)'/g)].map((m) => m[1])
-    const loader = names.findIndex((n) => /_dicas_wp_bundle$/.test(n!))
+    const loader = names.findIndex((n) => /_dicas_wp_bundle$/.test(n))
     expect(loader).toBeGreaterThan(-1)
     expect(names[loader]! > '20261022_102706_dicas').toBe(true)
-    expect(names).toEqual([...names].sort())
+    expect(loader).toBeGreaterThan(names.indexOf('20261022_102706_dicas'))
   })
 })

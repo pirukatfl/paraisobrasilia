@@ -126,7 +126,7 @@ describe('anúncios antigos publicados: isenções e redação (decisão do clie
     await expect(seedAdMedia(payload, { ad: fresh.id, order: 1 })).rejects.toThrow()
   })
 
-  it('shows a published old ad on the open board with the text redacted and a blurred cover only', async () => {
+  it('shows a published old ad on the open board with the text redacted and a sharp cover only', async () => {
     const payer = await seedAssinante(payload, { email: 'paga@teste.local', password: 'senha-paga-1234', name: 'Paga' })
     await seedSubscription(payload, {
       assinanteId: payer.id,

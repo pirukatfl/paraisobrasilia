@@ -158,3 +158,36 @@ export function validateAdInput(
     },
   }
 }
+
+// ---------------------------------------------------------------------------------------------
+// Ad sent WITHOUT an account (client decision 2026-10-23): same ad rules, plus e-mail, 18+ and terms.
+// ---------------------------------------------------------------------------------------------
+
+export const EMAIL_MAX = 254
+
+export const VISITOR_MESSAGES = {
+  email: 'Informe um e-mail válido. Só a equipe vê.',
+  maior18: 'Confirme que você tem 18 anos ou mais.',
+  termos: 'Aceite os Termos de Uso e a Política de Privacidade para enviar.',
+  limite:
+    'Este e-mail já tem 3 anúncios em análise ou publicados. Espere a análise ou crie uma conta para gerenciar seus anúncios.',
+  envios: 'Muitos envios seguidos. Tente de novo mais tarde.',
+} as const
+
+const VISITOR_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+/** Lower-case, no surrounding or inner spaces: the form in which the address is stored and compared. */
+export const normaliseVisitorEmail = (value: unknown): string => String(value ?? '').replace(/\s+/g, '').toLowerCase()
+
+export type VisitorExtras = { email: string; maior18: boolean; termos: boolean }
+export type VisitorErrors = Partial<Record<'email' | 'maior18' | 'termos', string>>
+
+/** E-mail (only staff see it), 18+ and terms. Returns only the errors found. */
+export function validateVisitorExtras(input: VisitorExtras): VisitorErrors {
+  const errors: VisitorErrors = {}
+  const email = normaliseVisitorEmail(input.email)
+  if (!email || email.length > EMAIL_MAX || !VISITOR_EMAIL_RE.test(email)) errors.email = VISITOR_MESSAGES.email
+  if (!input.maior18) errors.maior18 = VISITOR_MESSAGES.maior18
+  if (!input.termos) errors.termos = VISITOR_MESSAGES.termos
+  return errors
+}
