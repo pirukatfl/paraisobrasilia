@@ -13,7 +13,8 @@ test('home shows the upcoming party flyer linking to its page', async ({ page })
   await expect(card).toBeVisible()
   await expect(card).toHaveAttribute('href', '/festas/festa-de-teste')
 
-  const img = card.locator('img').first()
+  // the flyer is its own button (enlarges), sibling of the title/date link
+  const img = page.getByRole('button', { name: 'Ampliar flyer da festa Festa de Teste' }).first().locator('img').first()
   await expect(img).toBeVisible()
   await expect(img).toHaveAttribute('alt', /.+/)
 })

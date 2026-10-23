@@ -51,4 +51,6 @@ export type LightboxSlide = {
   image: GalleryImage
   videoUrl?: string
   label: string
+  /** Optional "more details" page for this slide (e.g. the party page), shown as a link in the footer */
+  href?: string
 }

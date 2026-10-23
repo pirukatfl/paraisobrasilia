@@ -16,7 +16,7 @@ test('home: the next party is a large featured flyer, others stay in the card gr
   // The carousel holds every upcoming party; the first slide is the next party
   const featured = page.locator('[data-featured-party]').first()
   await expect(featured).toHaveAttribute('href', '/festas/festa-de-teste')
-  const frame = featured.locator('[data-flyer-ratio]')
+  const frame = page.locator('[data-party-carousel] [data-slide="1"] [data-flyer-ratio]')
   const vw = page.viewportSize()!.width
   const b = await box(frame)
   // mobile: full content width; desktop: wide, up to ~1000 px, and never taller than 80% of the viewport
@@ -30,7 +30,7 @@ test('home: the next party is a large featured flyer, others stay in the card gr
 
 test('home card: a landscape flyer keeps its own aspect ratio (no 4:5 crop)', async ({ page }) => {
   await page.goto('/')
-  const card = page.getByRole('list').getByRole('link', { name: 'Ver detalhes da festa Festa Paisagem' })
+  const card = page.getByRole('list').getByRole('button', { name: 'Ampliar flyer da festa Festa Paisagem' })
   const frame = card.locator('[data-flyer-ratio]')
   const img = card.locator('img').first()
   await img.scrollIntoViewIfNeeded()
@@ -48,7 +48,7 @@ test('home card: a stories flyer is capped, not dominating the grid', async ({ p
   await page.goto('/')
   const frame = page
     .getByRole('list')
-    .getByRole('link', { name: 'Ver detalhes da festa Festa Stories' })
+    .getByRole('button', { name: 'Ampliar flyer da festa Festa Stories' })
     .locator('[data-flyer-ratio]')
   await frame.scrollIntoViewIfNeeded()
   const b = await box(frame)
