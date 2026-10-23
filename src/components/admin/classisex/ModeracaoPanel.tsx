@@ -21,7 +21,7 @@ type View = {
   publicCidade: string | null
   publicTexto: string
   euSouLabel: string
-  contaAutor: 'Conta gratuita' | 'Assinante'
+  contaAutor: 'Conta gratuita' | 'Assinante' | 'Sem conta (visitante)'
   rascunhoDaEquipe: boolean
   removed: number
   removedApelido: number
@@ -158,9 +158,11 @@ export function ModeracaoPanel() {
 
           <p style={{ margin: 'calc(var(--base) * 0.25) 0 0' }}>
             Conta do anunciante:{' '}
-            {view.contaAutor === 'Conta gratuita'
-              ? 'Conta gratuita — no ClassiSex aparece só a capa, sem vídeos.'
-              : 'Assinante'}
+            {view.contaAutor === 'Sem conta (visitante)'
+              ? 'Sem conta (visitante) — 1 foto, sem vídeo, não recebe recados. A pessoa não consegue editar nem apagar; o e-mail para aviso está na barra lateral.'
+              : view.contaAutor === 'Conta gratuita'
+                ? 'Conta gratuita — no ClassiSex aparece só a capa, sem vídeos.'
+                : 'Assinante'}
           </p>
 
           <div role="region" aria-labelledby="moderacao-publico" style={{ marginTop: 'calc(var(--base) * 0.75)' }}>

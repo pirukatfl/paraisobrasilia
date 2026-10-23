@@ -1,12 +1,16 @@
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 import { createLocalReq, type Payload, type PayloadRequest } from 'payload'
 import sharp from 'sharp'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { findPublicAds } from '../../src/lib/classisex/board'
 import type { AdInput } from '../../src/lib/classisex/rules'
 import { VISITANTES_EMAIL, createVisitorAd, ensureVisitantesAccount, type VisitorAdInput } from '../../src/lib/classisex/visitante'
-import { ServiceError, rejectAd } from '../../src/lib/classisex/service'
+import { approveAd, approveAds, getModerationView, ServiceError, rejectAd, unpublishAd } from '../../src/lib/classisex/service'
 import { buildMp4 } from '../helpers/mp4-fixtures'
-import { getTestPayload, resetDatabase, seedAdCategories, seedAssinante, seedStaffUser } from '../helpers/seed'
+import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante, seedStaffUser } from '../helpers/seed'
 
 const NOW = new Date('2026-10-23T15:00:00.000Z')
 let seq = 0
@@ -222,5 +226,110 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
       .findByID({ collection: 'ads', id: id!, depth: 0, overrideAccess: false, user: { ...member, collection: 'assinantes' } as never })
       .catch(() => null)) as unknown as Record<string, unknown> | null
     expect(asMember?.emailVisitante).toBeUndefined()
+  })
+
+  describe('visibility and e-mail secrecy', () => {
+    it('after approval the open board shows redacted text and the sharp cover, without contacts or the e-mail', async () => {
+      const who = fresh()
+      const { id } = await send({ email: who.email, ip: who.ip })
+      expect((await findPublicAds(payload, {} as never, NOW)).items).toHaveLength(0) // pending: invisible
+      await approveAd(staffReq, id!, NOW)
+      const board = await findPublicAds(payload, {} as never, NOW)
+      expect(board.items).toHaveLength(1)
+      const json = JSON.stringify(board)
+      expect(board.items[0].foto?.previewUrl).toMatch(/^\/classisex\/previa\/\d+$/)
+      expect(json).not.toContain('99988')
+      expect(json).not.toContain('5561999889772')
+      expect(json.toLowerCase()).not.toContain(who.email.toLowerCase())
+      expect(json).not.toContain('invalid.paraiso.local')
+    })
+
+    it('the moderation view says "Sem conta (visitante)" and never carries the e-mail', async () => {
+      const who = fresh()
+      const { id } = await send({ email: who.email, ip: who.ip })
+      const view = await getModerationView(staffReq, id!)
+      expect(view.contaAutor).toBe('Sem conta (visitante)')
+      expect(view.semConta).toBe(true)
+      expect(JSON.stringify(view).toLowerCase()).not.toContain(who.email.toLowerCase())
+      const member = await seedAd(payload, { author: (await seedAssinante(payload, { email: 'x-vis@teste.local', password: 'senha-xis-12345', name: 'Xis' })).id })
+      const memberView = await getModerationView(staffReq, member.id)
+      expect(memberView.semConta).toBe(false)
+      expect(memberView.contaAutor).toBe('Conta gratuita')
+    })
+
+    it('moderation audit rows never contain the visitor e-mail', async () => {
+      const a = fresh()
+      const b = fresh()
+      const first = await send({ email: a.email, ip: a.ip, files: [] })
+      const second = await send({ email: b.email, ip: b.ip, files: [] })
+      await approveAd(staffReq, first.id!, NOW)
+      await rejectAd(staffReq, second.id!, 'Não cumpre as regras', NOW)
+      await unpublishAd(staffReq, first.id!, 'Pedido da equipe', NOW)
+      const { docs } = await payload.find({ collection: 'audit-log', depth: 0, overrideAccess: true, limit: 100 })
+      const dump = JSON.stringify(docs).toLowerCase()
+      expect(docs.length).toBeGreaterThanOrEqual(3)
+      expect(dump).not.toContain(a.email.toLowerCase())
+      expect(dump).not.toContain(b.email.toLowerCase())
+    })
+  })
+
+  describe('e-mail notice to the visitor (S-07)', () => {
+    const capture = () => {
+      vi.stubEnv('EMAIL_CAPTURE_DIR', fs.mkdtempSync(path.join(os.tmpdir(), 'sem-conta-')))
+      return vi.spyOn(payload, 'sendEmail').mockResolvedValue(undefined as never)
+    }
+
+    it('sends exactly one e-mail on approve, refuse and unpublish, to the visitor only', async () => {
+      const spy = capture()
+      const a = fresh()
+      const b = fresh()
+      const first = await send({ email: a.email, ip: a.ip, files: [] })
+      const second = await send({ email: b.email, ip: b.ip, files: [] })
+      await approveAd(staffReq, first.id!, NOW)
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy.mock.calls[0][0]).toMatchObject({ to: a.email.toLowerCase() })
+      await rejectAd(staffReq, second.id!, 'Não cumpre as regras', NOW)
+      expect(spy).toHaveBeenCalledTimes(2)
+      expect(spy.mock.calls[1][0]).toMatchObject({ to: b.email.toLowerCase() })
+      expect(String((spy.mock.calls[1][0] as { text: string }).text)).toContain('Não cumpre as regras')
+      await unpublishAd(staffReq, first.id!, 'Pedido da pessoa', NOW)
+      expect(spy).toHaveBeenCalledTimes(3)
+    })
+
+    it('bulk approval notices each visitor ad once; a member ad sends nothing', async () => {
+      const spy = capture()
+      const a = fresh()
+      const first = await send({ email: a.email, ip: a.ip, files: [] })
+      const mine = await seedAd(payload, { author: member.id })
+      await approveAds(staffReq, [first.id, mine.id], NOW)
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(spy.mock.calls[0][0]).toMatchObject({ to: a.email.toLowerCase() })
+    })
+
+    it('a member ad gets no visitor notice', async () => {
+      const spy = capture()
+      const mine = await seedAd(payload, { author: member.id })
+      await approveAd(staffReq, mine.id, NOW)
+      expect(spy).not.toHaveBeenCalled()
+    })
+
+    it('does nothing when e-mail is off and survives a send failure', async () => {
+      const spy = vi.spyOn(payload, 'sendEmail').mockResolvedValue(undefined as never)
+      const a = fresh()
+      const first = await send({ email: a.email, ip: a.ip, files: [] })
+      await approveAd(staffReq, first.id!, NOW) // no SMTP, no capture dir
+      expect(spy).not.toHaveBeenCalled()
+
+      vi.stubEnv('EMAIL_CAPTURE_DIR', fs.mkdtempSync(path.join(os.tmpdir(), 'sem-conta-')))
+      spy.mockRejectedValue(new Error('smtp caiu'))
+      const logged = vi.spyOn(payload.logger, 'error')
+      const b = fresh()
+      const second = await send({ email: b.email, ip: b.ip, files: [] })
+      await expect(approveAd(staffReq, second.id!, NOW)).resolves.toMatchObject({ status: 'aprovado' })
+      expect((await ad(second.id!)).status).toBe('aprovado')
+      const lines = logged.mock.calls.map((c) => String(c[0])).join('\n')
+      expect(lines).toContain(String(second.id))
+      expect(lines.toLowerCase()).not.toContain(b.email.toLowerCase())
+    })
   })
 })

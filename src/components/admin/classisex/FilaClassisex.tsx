@@ -22,6 +22,14 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
     })
   ).totalDocs
   const equipeLink = `${adminRoute}/collections/ads?where[origemLegado][equals]=equipe&where[status][equals]=rascunho`
+  const semConta = (
+    await payload.count({
+      collection: 'ads',
+      where: { and: [{ enviadoSemConta: { equals: true } }, { status: { equals: 'pendente' } }] },
+      overrideAccess: true,
+    })
+  ).totalDocs
+  const semContaLink = `${adminRoute}/collections/ads?where[enviadoSemConta][equals]=true&where[status][equals]=pendente`
   const queue = `${adminRoute}/collections/ads?where[status][equals]=pendente&sort=submittedAt`
 
   return (
@@ -66,6 +74,12 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
         )}
       </p>
       <p style={{ margin: 'calc(var(--base) * 0.75) 0 0' }}>
+        {semConta === 0 ? null : (
+          <>
+            <a href={semContaLink}>{`${semConta} sem conta em análise`}</a>
+            {' · '}
+          </>
+        )}
         {equipe === 0 ? null : (
           <>
             <a href={equipeLink}>{`${equipe} ${equipe === 1 ? 'anúncio antigo da equipe' : 'anúncios antigos da equipe'} para revisar`}</a>
