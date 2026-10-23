@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 import { Pagination } from '@/components/classisex/Pagination'
+import { AssineJaCta } from '@/components/contos/AssineJaCta'
 import { DicaCard } from '@/components/dicas/DicaCard'
 import { EmptyState } from '@/components/EmptyState'
 import { getPublicDicas } from '@/lib/dicas/public'
@@ -25,7 +27,7 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   })
 }
 
-/** Open list of Dicas Hot: whole texts are public (DH-01), drafts never reach this render. */
+/** Open list of Dicas Hot: cover, title and the first lines; the full text is for subscribers. Drafts never reach this render. */
 export default async function DicasHotPage({ searchParams }: { searchParams: SearchParams }) {
   const result = await getPublicDicas(await pageOf(searchParams))
   return (
@@ -37,6 +39,11 @@ export default async function DicasHotPage({ searchParams }: { searchParams: Sea
       <p className="mt-4 max-w-[680px] text-body text-muted">
         Textos sobre swing, casais liberais, fetiches e prazer a dois, com respeito e sem tabu.
       </p>
+      <p className="mt-4">
+        <Link href="/area-do-assinante/dicas-hot" className="type-label font-semibold text-accent underline underline-offset-4">
+          Já é assinante? Ler as Dicas Hot completas
+        </Link>
+      </p>
       {result.items.length === 0 ? (
         <EmptyState heading="Nenhuma dica publicada ainda." body="Em breve novas dicas por aqui." actions={[{ href: '/', label: 'Voltar para a home', variant: 'secondary' }]} />
       ) : (
@@ -47,6 +54,11 @@ export default async function DicasHotPage({ searchParams }: { searchParams: Sea
         </div>
       )}
       <Pagination basePath="/dicas-hot" page={result.page} totalPages={result.totalPages} params={{}} />
+      <AssineJaCta
+        title="Dicas Hot completas para assinantes"
+        text="Assine para ler cada dica do começo ao fim, ver o ClassiSex e trocar mensagens."
+        membersHref="/area-do-assinante/dicas-hot"
+      />
     </section>
   )
 }

@@ -378,14 +378,14 @@ de um conto, apague e salve.
 
 ## Dicas Hot
 
-As **Dicas Hot** são textos abertos: qualquer visitante lê a dica inteira, sem assinar, e o Google mostra esses textos nas buscas. Ficam em **/dicas-hot**, com link no **menu principal** (entre Contos e Contato), no **rodapé** do site e uma seção na **página inicial** (as 3 mais recentes). Não confunda com **Dicas**, dentro de Quem somos: aquela é um texto institucional da casa e continua em **Textos**.
+As **Dicas Hot** funcionam como os **Contos**: qualquer visitante (e quem tem só conta gratuita) lê o **começo** de cada dica e o Google mostra esse começo nas buscas; **para ler tudo é preciso ser assinante ativo**, na área do assinante (**/area-do-assinante/dicas-hot**, com link no menu da área). O trecho aberto são os primeiros parágrafos, com a mesma regra dos Contos (cerca de 3 parágrafos, nunca mais que 150 palavras ou 15% do texto, e o final fica sempre para assinantes); aqui não há campo para ajustar isso. A capa e o resumo continuam abertos, então o **Resumo** deve ser só uma chamada, sem entregar o texto. Ficam em **/dicas-hot**, com link no **menu principal** (entre Contos e Contato), no **rodapé** do site e uma seção na **página inicial** (as 3 mais recentes). Não confunda com **Dicas**, dentro de Quem somos: aquela é um texto institucional da casa e continua em **Textos**.
 
 ### Criar, editar e publicar
 
 1. No painel, abra **Dicas Hot** e clique em **Criar novo**.
 2. Preencha o **Título**, o **Texto** e a **Data de publicação** (a lista mostra as mais recentes primeiro).
 3. Clique em **Salvar rascunho** para guardar sem mostrar no site, ou em **Publicar** para colocar no ar na hora. **Despublicar** tira do ar sem apagar.
-4. Confira no site numa **janela anônima**.
+4. Confira no site numa **janela anônima** (deve aparecer só o começo e o convite "Assine Já") e, se quiser, logado como assinante (texto completo).
 
 ### Endereço, resumo e capa
 

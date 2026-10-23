@@ -48,7 +48,7 @@ describe('TIER_LIMITS and labels', () => {
       'Anúncios ativos',
       'Ver anúncios do ClassiSex',
       'Recados (conversas privadas)',
-      'Contos completos',
+      'Contos e Dicas Hot completos',
     ])
     expect(TIER_COMPARISON[0]).toMatchObject({ gratis: '1', assinante: 'até 10' })
     expect(TIER_COMPARISON[1]).toMatchObject({ gratis: 'não', assinante: 'até 2' })

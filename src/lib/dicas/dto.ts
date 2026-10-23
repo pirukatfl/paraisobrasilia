@@ -1,6 +1,7 @@
-// Public DTOs for Dicas Hot. The whole text is public (DH-01); the cover is exposed only when
-// staff ticked "Capa conferida" (I-1, T-DH-03). No server-only import: unit-testable.
-import { chamadaOf, type LexicalStateLike } from '../contos/excerpt'
+// DTOs for Dicas Hot. Same paywall as contos: the public DTO carries only the open blocks, the full
+// text exists only in MemberDicaDTO (T-05-01 pattern). The cover is exposed only when staff ticked
+// "Capa conferida" (I-1, T-DH-03). No server-only import: unit-testable.
+import { chamadaOf, DEFAULT_OPEN_BLOCKS, splitConto, type LexicalStateLike } from '../contos/excerpt'
 import { formatShortDate } from '../format/date'
 import type { RichTextState } from '../parties/types'
 
@@ -42,12 +43,24 @@ export type PublicDicaDTO = {
   dateLabel: string
   publishedAt: string | null
   updatedAt: string | null
-  texto: RichTextState
+  /** Open blocks only: the rest of the text is for active subscribers */
+  open: RichTextState
+  hasMore: boolean
   /** At most 155 characters */
   description: string
   capa: DicaImageDTO | null
   ogImage: DicaImageDTO | null
 }
+
+export type MemberDicaDTO = {
+  slug: string
+  title: string
+  dateLabel: string
+  texto: RichTextState
+  capa: DicaImageDTO | null
+}
+
+const splitOf = (doc: DicaSource) => splitConto(doc.texto as LexicalStateLike | null | undefined, DEFAULT_OPEN_BLOCKS)
 
 export const DESCRIPTION_MAX = 155
 
@@ -95,7 +108,7 @@ export function toDicaCardDTO(doc: DicaSource): DicaCardDTO {
     slug: doc.slug,
     title: doc.title,
     dateLabel: dateLabelOf(doc.publishedAt),
-    resumo: doc.resumo?.trim() || chamadaOf(doc.texto as LexicalStateLike, 200),
+    resumo: doc.resumo?.trim() || chamadaOf(splitOf(doc).open, 200),
     capa: media ? imageOf(media, media.sizes?.card, true) : null,
   }
 }
@@ -104,15 +117,28 @@ export function toPublicDicaDTO(doc: DicaSource): PublicDicaDTO {
   const media = confirmedMedia(doc)
   const resumo = doc.resumo?.trim()
   const og = media ? imageOf(media, media.sizes?.og, false) : null
+  const split = splitOf(doc)
   return {
     slug: doc.slug,
     title: doc.title,
     dateLabel: dateLabelOf(doc.publishedAt),
     publishedAt: doc.publishedAt ?? null,
     updatedAt: doc.updatedAt ?? null,
-    texto: doc.texto as RichTextState,
-    description: resumo ? cutText(resumo, DESCRIPTION_MAX) : chamadaOf(doc.texto as LexicalStateLike, DESCRIPTION_MAX),
+    open: split.open as unknown as RichTextState,
+    hasMore: split.totalBlocks > split.openBlocks || split.totalWords > split.openWords,
+    description: resumo ? cutText(resumo, DESCRIPTION_MAX) : chamadaOf(split.open, DESCRIPTION_MAX),
     capa: media ? imageOf(media, media.sizes?.gallery, true) : null,
     ogImage: og ? { url: toAbsoluteUrl(og.url), width: 1200, height: 630, alt: og.alt } : null,
+  }
+}
+
+export function toMemberDicaDTO(doc: DicaSource): MemberDicaDTO {
+  const media = confirmedMedia(doc)
+  return {
+    slug: doc.slug,
+    title: doc.title,
+    dateLabel: dateLabelOf(doc.publishedAt),
+    texto: doc.texto as RichTextState,
+    capa: media ? imageOf(media, media.sizes?.gallery, true) : null,
   }
 }

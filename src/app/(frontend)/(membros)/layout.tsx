@@ -12,6 +12,7 @@ const LINKS: { href: string; label: string; badge?: boolean }[] = [
   { href: '/area-do-assinante/classisex', label: 'ClassiSex' },
   { href: '/area-do-assinante/mensagens', label: 'Recados', badge: true },
   { href: '/area-do-assinante/contos', label: 'Contos' },
+  { href: '/area-do-assinante/dicas-hot', label: 'Dicas Hot' },
   { href: '/area-do-assinante/meus-anuncios', label: 'Meus anúncios' },
   { href: '/area-do-assinante/senha', label: 'Trocar senha' },
 ]

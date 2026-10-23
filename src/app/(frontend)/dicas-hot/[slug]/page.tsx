@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { AssineJaCta } from '@/components/contos/AssineJaCta'
 import { DicaCard } from '@/components/dicas/DicaCard'
 import { DicaJsonLd } from '@/components/dicas/DicaJsonLd'
 import { RichText } from '@/components/RichText'
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-/** Public dica: the whole text, SEO metadata and JSON-LD (DH-01, DH-04). */
+/** Public excerpt of a dica (same paywall as contos): only the open blocks ever reach this render. */
 export default async function DicaPublicPage({ params }: Props) {
   const slug = (await params).slug
   const dica = await getPublicDica(slug)
@@ -58,8 +59,16 @@ export default async function DicaPublicPage({ params }: Props) {
           />
         )}
         <div className="mt-6">
-          <RichText data={dica.texto} />
+          <RichText data={dica.open} />
         </div>
+        {dica.hasMore && (
+          <AssineJaCta
+            title="Quer ler até o fim?"
+            text="Continue lendo: o restante desta dica é só para assinantes."
+            membersHref={`/area-do-assinante/dicas-hot/${dica.slug}`}
+            membersLabel="Já sou assinante: ler a dica completa"
+          />
+        )}
       </article>
       {related.length > 0 && (
         <section aria-labelledby="titulo-leia-tambem" className="mt-12">

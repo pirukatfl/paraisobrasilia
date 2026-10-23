@@ -20,7 +20,7 @@ export const getPublicDicas = cached(
   () => ['dicas'],
 )
 
-/** One published dica. Tags 'dicas' and 'dica:{slug}'. */
+/** One published dica, open blocks only. Tags 'dicas' and 'dica:{slug}'. */
 export const getPublicDica = cached(
   async (slug: string): Promise<PublicDicaDTO | null> => {
     const payload = await getPayload({ config })

@@ -1,13 +1,18 @@
 import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
+import { loginAsAssinante } from './helpers/assinante'
 
-// Dicas Hot (quick dicas-hot): a fully public, SEO-first section. Whole texts are open, drafts never
-// show (page, list, home, sitemap, REST) and a cover reaches the page and the share preview only
-// after staff tick "Capa conferida".
+// Dicas Hot (quick dicas-hot + dicas-hot-assinantes): a public, SEO-first section with the same paywall
+// as Contos. Visitors and free accounts read only the beginning; the rest is for active subscribers and
+// never reaches the public HTML/RSC/metadata/JSON-LD. Drafts never show (page, list, home, sitemap, REST)
+// and a cover reaches the page and the share preview only after staff tick "Capa conferida".
 test.describe.configure({ mode: 'serial' })
 
-const P = ['Primeiro parágrafo da dica de teste.', 'Segundo parágrafo da dica de teste.', 'ÚLTIMO-PARÁGRAFO-ABERTO fecha a dica de teste.']
+const SENTINEL = 'SENTINELA-RESTRITA-DICA'
+const P = ['Primeiro parágrafo da dica de teste.', 'Segundo parágrafo da dica de teste.', `Último parágrafo ${SENTINEL} reservado aos assinantes.`]
+const SUB = { email: 'leitora.dicas@teste.local', name: 'Leitora Dicas', password: 'senha-leitora-12345' }
+const FREE = { email: 'gratuita.dicas@teste.local', name: 'Conta Gratuita Dicas', password: 'senha-gratuita-12345' }
 const RESUMO = 'Resumo curto da dica aberta, usado como descrição no Google.'
 let capaId = 0
 let capaDicaId = 0
@@ -16,6 +21,7 @@ test.beforeAll(async ({ request }) => {
   test.setTimeout(180_000)
   const api = await staffApi(request)
   await api.deleteAll('dicas')
+  await api.deleteAll('assinantes')
   // 13 published dicas: day 1..13 of 2026-09 (dica-teste-13 is the newest)
   for (let i = 1; i <= 13; i++) {
     await api.createDica({
@@ -39,12 +45,16 @@ test.beforeAll(async ({ request }) => {
       publishedAt: '2026-08-01T12:00:00.000Z',
     })
   ).id
+  const sub = await api.createAssinante(SUB)
+  await api.liberar(sub.id, { durationDays: 30, method: 'cortesia', amount: 0 })
+  await api.createAssinante(FREE)
   await api.dispose()
 })
 
 test.afterAll(async ({ request }) => {
   const api = await staffApi(request)
   await api.deleteAll('dicas')
+  await api.deleteAll('assinantes')
   if (capaId) await api.deleteDoc('media', capaId).catch(() => undefined)
   await api.dispose()
 })
@@ -86,7 +96,8 @@ test('the list is newest first, without drafts, 12 per page', async ({ browser, 
   await expect(cards).toHaveCount(12)
   await expect(cards.first()).toContainText('Dica Teste 13')
   await expect(main).not.toContainText('Dica Rascunho')
-  await expect(main).not.toContainText('Assine Já')
+  await expect(main.getByRole('link', { name: 'Assine Já' })).toHaveAttribute('href', '/assine-ja')
+  await expect(main.getByRole('link', { name: 'Já é assinante? Ler as Dicas Hot completas' })).toHaveAttribute('href', '/area-do-assinante/dicas-hot')
   await page.goto('/dicas-hot?pagina=2')
   const page2 = page.locator('main').getByRole('article')
   await expect(page2).toHaveCount(2)
@@ -95,14 +106,69 @@ test('the list is newest first, without drafts, 12 per page', async ({ browser, 
   await context.close()
 })
 
-test('a dica shows the whole text, with no Assine Já inside the article', async ({ browser, baseURL }) => {
+test('a public dica shows the open paragraphs, then the call to subscribe', async ({ browser, baseURL }) => {
   const { context, page } = await visitor(browser, baseURL!)
   await page.goto('/dicas-hot/dica-teste-13')
   const article = page.getByRole('article').first()
   await expect(article.getByRole('heading', { name: 'Dica Teste 13', level: 1 })).toBeVisible()
-  for (const p of P) await expect(article).toContainText(p)
-  await expect(article).not.toContainText('Assine Já')
+  await expect(article).toContainText(P[0]!)
+  await expect(article).toContainText(P[1]!)
+  await expect(article).not.toContainText('Último parágrafo')
+  const main = page.locator('main')
+  await expect(main).toContainText('Continue lendo: o restante desta dica é só para assinantes.')
+  await expect(main.getByRole('link', { name: 'Assine Já' })).toHaveAttribute('href', '/assine-ja')
+  await expect(main.getByRole('link', { name: 'Já sou assinante: ler a dica completa' })).toHaveAttribute(
+    'href',
+    '/area-do-assinante/dicas-hot/dica-teste-13',
+  )
   await expect(page.getByRole('heading', { name: 'Leia também' })).toBeVisible()
+  await context.close()
+})
+
+test('the restricted text is absent from HTML, RSC payload, metadata and JSON-LD', async ({ browser, baseURL }) => {
+  const { context, page } = await visitor(browser, baseURL!)
+  for (const path of ['/dicas-hot/dica-teste-13', '/dicas-hot', '/']) {
+    expect(await (await page.request.get(path)).text()).not.toContain(SENTINEL)
+    expect(await (await page.request.get(path, { headers: { RSC: '1' } })).text()).not.toContain(SENTINEL)
+  }
+  await page.goto('/dicas-hot/dica-teste-13')
+  const ld = (await page.locator('script[type="application/ld+json"]').textContent()) ?? ''
+  expect(ld).not.toContain(SENTINEL)
+  expect(ld).toContain('"isAccessibleForFree":false')
+  await context.close()
+})
+
+test('anonymous is sent to the login; a free account sees the excerpt and the inactive panel', async ({ browser, baseURL }) => {
+  const { context, page } = await visitor(browser, baseURL!)
+  await page.goto('/area-do-assinante/dicas-hot/dica-teste-13')
+  await expect(page).toHaveURL(/\/entrar\?next=/)
+  await loginAsAssinante(page, FREE.email, FREE.password, '/area-do-assinante/dicas-hot/dica-teste-13')
+  await expect(page.getByRole('heading', { name: 'Disponível para assinantes' })).toBeVisible()
+  await expect(page.locator('main')).not.toContainText(SENTINEL)
+  expect(await (await page.request.get('/area-do-assinante/dicas-hot/dica-teste-13')).text()).not.toContain(SENTINEL)
+  await page.goto('/dicas-hot/dica-teste-13')
+  await expect(page.locator('main')).not.toContainText(SENTINEL)
+  await expect(page.locator('main').getByRole('link', { name: 'Assine Já' })).toBeVisible()
+  await context.close()
+})
+
+test('an active subscriber reads the whole dica in the members area', async ({ browser, baseURL }) => {
+  const { context, page } = await visitor(browser, baseURL!)
+  await loginAsAssinante(page, SUB.email, SUB.password, '/area-do-assinante/dicas-hot/dica-teste-13')
+  const main = page.locator('main')
+  for (const p of P) await expect(main).toContainText(p)
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
+  await page.goto('/area-do-assinante/dicas-hot')
+  await expect(page.locator('main').getByRole('article')).toHaveCount(12)
+  await expect(page.locator('main')).not.toContainText('Dica Rascunho')
+  const nav = page.getByRole('navigation', { name: 'Área do assinante' })
+  await expect(nav.getByRole('link', { name: 'Dicas Hot' })).toHaveAttribute('href', '/area-do-assinante/dicas-hot')
+  // the public page of the same dica links to the full version
+  await page.goto('/dicas-hot/dica-teste-13')
+  await page.locator('main').getByRole('link', { name: 'Já sou assinante: ler a dica completa' }).click()
+  await expect(page).toHaveURL(/\/area-do-assinante\/dicas-hot\/dica-teste-13$/)
+  await expect(page.locator('main')).toContainText(SENTINEL)
+  expect((await page.request.get('/area-do-assinante/dicas-hot/dica-rascunho')).status()).toBe(404)
   await context.close()
 })
 

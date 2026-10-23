@@ -16,6 +16,8 @@ export function DicaJsonLd({ dica }: { dica: PublicDicaDTO }) {
     author: ORG,
     publisher: ORG,
     inLanguage: 'pt-BR',
+    // Paywall: the markup carries no body text, only the open metadata
+    ...(dica.hasMore ? { isAccessibleForFree: false } : {}),
   }
   const json = JSON.stringify(data).replace(/</g, '\\u003c')
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />

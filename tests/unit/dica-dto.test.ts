@@ -1,9 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { cutText, toDicaCardDTO, toPublicDicaDTO } from '@/lib/dicas/dto'
+import { cutText, toDicaCardDTO, toMemberDicaDTO, toPublicDicaDTO } from '@/lib/dicas/dto'
 
 import { lexicalParagraphs } from '../helpers/seed'
 
+const SENTINEL = 'SENTINELA-RESTRITA-ABC'
 const media = {
   id: 7,
   url: '/api/media/file/capa.jpg',
@@ -88,9 +89,40 @@ describe('dica DTOs (DH-01, DH-04, I-1)', () => {
     expect(fromText.length).toBeLessThanOrEqual(155)
   })
 
-  it('page carries the WHOLE text (no open/closed split)', () => {
-    const page = toPublicDicaDTO({ ...base })
-    expect((page.texto as unknown as { root: { children: unknown[] } }).root.children).toHaveLength(3)
+  it('public DTO carries the open blocks only, never the full lexical (T-05-01)', () => {
+    const doc = {
+      ...base,
+      texto: lexicalParagraphs([
+        'Primeiro parágrafo aberto da dica.',
+        'Segundo parágrafo aberto da dica.',
+        'Terceiro parágrafo aberto da dica.',
+        'Quarto parágrafo só para assinantes.',
+        `Quinto parágrafo com ${SENTINEL}.`,
+      ]),
+    }
+    const page = toPublicDicaDTO(doc)
+    expect(JSON.stringify(page)).not.toContain(SENTINEL)
+    expect(JSON.stringify(page)).not.toContain('Quarto')
+    expect(page.open.root.children).toHaveLength(3)
+    expect(page.hasMore).toBe(true)
+    for (const key of ['texto', 'id']) expect(page).not.toHaveProperty(key)
+    expect(JSON.stringify(toDicaCardDTO(doc))).not.toContain(SENTINEL)
+    // a resumo-less description comes from the open text too
+    expect(toPublicDicaDTO(doc).description).not.toContain('Quarto')
+  })
+
+  it('a long single paragraph is truncated publicly', () => {
+    const words = Array.from({ length: 120 }, (_, i) => `w${i}`).join(' ')
+    const dto = toPublicDicaDTO({ ...base, texto: lexicalParagraphs([words]) })
+    expect(JSON.stringify(dto)).not.toContain('w100')
+    expect(dto.hasMore).toBe(true)
+  })
+
+  it('member DTO keeps the full text and the confirmed cover only', () => {
+    const doc = { ...base, texto: lexicalParagraphs(['A', `B ${SENTINEL}`, 'C', 'D', 'E']) }
+    expect(JSON.stringify(toMemberDicaDTO(doc))).toContain(SENTINEL)
+    expect(toMemberDicaDTO({ ...doc, capa: media, capaConferida: false }).capa).toBeNull()
+    expect(toMemberDicaDTO({ ...doc, capa: media, capaConferida: true }).capa?.url).toBe('/api/media/file/capa-1600.webp')
   })
 
   it('cutText leaves short text alone', () => {
