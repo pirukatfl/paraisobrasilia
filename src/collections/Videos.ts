@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isStaff } from '../access/roles'
+import { revalidateGalleries, revalidateGalleriesAfterDelete } from '../lib/gallery/revalidate'
 
 /**
  * Venue videos (MIDIA-01): MP4 only, stored on the server disk under MEDIA_DIR/videos
@@ -20,6 +21,11 @@ export const Videos: CollectionConfig = {
     create: isStaff,
     update: isStaff,
     delete: isStaff,
+  },
+  hooks: {
+    // T-06.1-08: edited or deleted videos disappear from /espaco and the model pages at once
+    afterChange: [revalidateGalleries],
+    afterDelete: [revalidateGalleriesAfterDelete],
   },
   upload: {
     // T-02-07: video/mp4 only

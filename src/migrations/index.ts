@@ -31,6 +31,7 @@ import * as migration_20261022_022156_mural_publicado from './20261022_022156_mu
 import * as migration_20261022_102706_dicas from './20261022_102706_dicas';
 import * as migration_20261022_120000_dicas_wp_bundle from './20261022_120000_dicas_wp_bundle';
 import * as migration_20261023_042244_models_pagina from './20261023_042244_models_pagina';
+import * as migration_20261023_042900_models_videos from './20261023_042900_models_videos';
 
 export const migrations = [
   {
@@ -196,6 +197,11 @@ export const migrations = [
   {
     up: migration_20261023_042244_models_pagina.up,
     down: migration_20261023_042244_models_pagina.down,
-    name: '20261023_042244_models_pagina'
+    name: '20261023_042244_models_pagina',
+  },
+  {
+    up: migration_20261023_042900_models_videos.up,
+    down: migration_20261023_042900_models_videos.down,
+    name: '20261023_042900_models_videos'
   },
 ];

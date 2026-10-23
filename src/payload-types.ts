@@ -1134,6 +1134,15 @@ export interface Model {
       }[]
     | null;
   /**
+   * Até 3 vídeos (MP4). Envie antes em Arquivos → Vídeos, com a imagem de capa.
+   */
+  videos?:
+    | {
+        video: number | Video;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Números menores aparecem primeiro.
    */
   order?: number | null;
@@ -1836,6 +1845,12 @@ export interface ModelsSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
+        id?: T;
+      };
+  videos?:
+    | T
+    | {
+        video?: T;
         id?: T;
       };
   order?: T;

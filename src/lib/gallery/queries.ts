@@ -6,7 +6,7 @@ import { getPayload } from 'payload'
 import type { Media, Model, SpaceItem, Video } from '../../payload-types'
 import { cached } from '../cache/cached'
 import { SLUG_RE } from '../contos/excerpt'
-import type { GalleryImage, ModelCardDTO, ModelPageDTO, SpaceItemDTO } from './types'
+import type { GalleryImage, GalleryItemDTO, ModelCardDTO, ModelPageDTO, SpaceItemDTO } from './types'
 
 const SPACE_LIMIT = 120 // bounded list
 export const SPACE_PHOTO_ALT = 'Foto do espaço do Paraíso Brasília'
@@ -32,16 +32,19 @@ export function toGalleryImage(value: unknown, altFallback: string): GalleryImag
   return { ...big, ...small, alt: media.alt?.trim() || altFallback }
 }
 
+/** Populated video relation → video tile (poster as image); null when the file or poster is gone. */
+function toVideoItem(value: unknown, id: string, caption: string | null, fallbackTitle: string): GalleryItemDTO | null {
+  const video = typeof value === 'object' && value ? (value as Video) : null
+  if (!video?.url) return null
+  const title = video.title?.trim() || caption || fallbackTitle
+  const poster = toGalleryImage(video.poster, title)
+  if (!poster) return null
+  return { id, kind: 'video', caption, image: poster, video: { url: video.url, title } }
+}
+
 export function toSpaceItemDTO(doc: SpaceItem): SpaceItemDTO | null {
   const caption = doc.caption?.trim() || null
-  if (doc.kind === 'video') {
-    const video = typeof doc.video === 'object' && doc.video ? (doc.video as Video) : null
-    if (!video?.url) return null
-    const title = video.title?.trim() || caption || 'Vídeo do espaço'
-    const poster = toGalleryImage(video.poster, title)
-    if (!poster) return null
-    return { id: String(doc.id), kind: 'video', caption, image: poster, video: { url: video.url, title } }
-  }
+  if (doc.kind === 'video') return toVideoItem(doc.video, String(doc.id), caption, 'Vídeo do espaço')
   const image = toGalleryImage(doc.image, caption || SPACE_PHOTO_ALT)
   if (!image) return null
   return { id: String(doc.id), kind: 'photo', caption, image, video: null }
@@ -70,6 +73,7 @@ export async function getSpacePhotos(limit: number): Promise<SpaceItemDTO[]> {
 
 const MODELS_LIMIT = 60 // bounded list
 export const MAX_MODEL_PHOTOS = 30
+export const MAX_MODEL_VIDEOS = 3
 
 export const modelAltFallback = (name: string) => `${name} — modelo do Paraíso Brasília`
 
@@ -79,6 +83,14 @@ function modelPhotos(doc: Model, name: string): GalleryImage[] {
     .slice(0, MAX_MODEL_PHOTOS)
     .map((row) => toGalleryImage(row.image, modelAltFallback(name)))
     .filter((p): p is GalleryImage => p !== null)
+}
+
+/** Valid videos of a model (file and poster present), in panel order, capped at the collection limit. */
+function modelVideos(doc: Model, name: string): GalleryItemDTO[] {
+  return (doc.videos ?? [])
+    .slice(0, MAX_MODEL_VIDEOS)
+    .map((row, i) => toVideoItem(row.video, `${doc.id}-v${i}`, null, `Vídeo de ${name}`))
+    .filter((v): v is GalleryItemDTO => v !== null)
 }
 
 export function toModelCardDTO(doc: Model): ModelCardDTO | null {
@@ -92,7 +104,7 @@ export function toModelCardDTO(doc: Model): ModelCardDTO | null {
     name,
     cover: photos[0],
     photoCount: photos.length,
-    videoCount: 0,
+    videoCount: modelVideos(doc, name).length,
     updatedAt: doc.updatedAt,
   }
 }
@@ -102,6 +114,7 @@ export function toModelPageDTO(doc: Model): ModelPageDTO | null {
   if (!name || !doc.slug) return null
   const photos = modelPhotos(doc, name)
   if (photos.length === 0) return null
+  const videos = modelVideos(doc, name)
   const cover = photos[0]
   const coverMedia = asMedia(doc.photos?.[0]?.image)
   const og = coverMedia?.sizes?.og
@@ -110,14 +123,17 @@ export function toModelPageDTO(doc: Model): ModelPageDTO | null {
     slug: doc.slug,
     name,
     description: doc.description?.trim() || null,
-    items: photos.map((image, i) => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null })),
+    items: [
+      ...videos,
+      ...photos.map((image, i): GalleryItemDTO => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null })),
+    ],
     cover,
     ogImage:
       og?.url && og.width && og.height
         ? { url: og.url, width: og.width, height: og.height, alt: cover.alt }
         : { url: cover.url, width: cover.width, height: cover.height, alt: cover.alt },
     photoCount: photos.length,
-    videoCount: 0,
+    videoCount: videos.length,
     updatedAt: doc.updatedAt,
   }
 }

@@ -9,10 +9,12 @@ import { uniqueSlug } from '../lib/gallery/model-slug'
 import { revalidateModels, revalidateModelsAfterDelete } from '../lib/gallery/revalidate'
 
 export const MAX_MODEL_PHOTOS = 30
+export const MAX_MODEL_VIDEOS = 3
 
 export const MODEL_MESSAGES = {
   maxPhotos: 'Cada modelo pode ter no máximo 30 fotos.',
   minPhotos: 'Envie pelo menos 1 foto.',
+  maxVideos: 'Cada modelo pode ter no máximo 3 vídeos.',
   slugInvalid: 'Use só letras minúsculas, números e hífens.',
   slugTaken: 'Já existe uma modelo com este endereço.',
   contact: 'Tire telefone, WhatsApp, e-mail, @ e links: esta página é aberta ao público.',
@@ -64,7 +66,7 @@ const prepareModel: CollectionBeforeValidateHook = async ({ data, originalDoc, r
 
 /**
  * House models (MIDIA-02, MIDIA-06/07, G-01..G-06): artistic name, short description and 1–30 photos,
- * one public page per model, no contact.
+ * one public page per model, up to 3 videos, no contact.
  * Image authorization is recommended, never required to publish (D-09).
  */
 export const Models: CollectionConfig = {
@@ -161,6 +163,25 @@ export const Models: CollectionConfig = {
           relationTo: 'media',
           required: true,
           label: 'Foto',
+        },
+      ],
+    },
+    {
+      name: 'videos',
+      type: 'array',
+      label: 'Vídeos',
+      labels: { singular: 'Vídeo', plural: 'Vídeos' },
+      maxRows: 3, // MAX_MODEL_VIDEOS
+      admin: { description: 'Até 3 vídeos (MP4). Envie antes em Arquivos → Vídeos, com a imagem de capa.' },
+      validate: (value: unknown) =>
+        Array.isArray(value) && value.length > MAX_MODEL_VIDEOS ? MODEL_MESSAGES.maxVideos : true,
+      fields: [
+        {
+          name: 'video',
+          type: 'upload',
+          relationTo: 'videos',
+          required: true,
+          label: 'Vídeo',
         },
       ],
     },

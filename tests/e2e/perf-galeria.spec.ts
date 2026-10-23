@@ -51,11 +51,12 @@ test('model page with 30 photos and 3 videos ≤ 600 KB', async ({ page, request
   test.setTimeout(300_000)
   const api = await staffApi(request)
   await api.deleteAll('models')
-  const model = await api.createModel({ name: 'Peso', photos: 30, videos: 3, slug: 'peso-orcamento' })
+  const slug = 'peso-orcamento'
+  await api.createModel({ name: 'Peso', photos: 30, videos: 3, slug })
 
-  await page.goto(`/modelos/${model.slug}`)
+  await page.goto(`/modelos/${slug}`)
   await expect(page.getByRole('heading', { name: 'Peso', level: 1 })).toBeVisible()
   const w = await measureWeight(page)
-  console.log(`[budget] /modelos/${model.slug} ${Math.round(w.total / KB)} KB (+${Math.round(w.scripts / KB)} KB dev JS)`, w.byType)
+  console.log(`[budget] /modelos/${slug} ${Math.round(w.total / KB)} KB (+${Math.round(w.scripts / KB)} KB dev JS)`, w.byType)
   expect(w.total).toBeLessThanOrEqual(600 * KB)
 })
