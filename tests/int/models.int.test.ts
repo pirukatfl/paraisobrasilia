@@ -26,14 +26,18 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
   beforeAll(async () => {
     payload = await getTestPayload()
     await resetDatabase(payload)
-    const media = await payload.create({ collection: 'media', data: { alt: 'foto' }, filePath: FIXTURE, overrideAccess: true })
-    mediaId = media.id
+    await freshMedia()
     const u = await seedStaffUser(payload, { email: 'staff-modelos@teste.local', password: 'senha-equipe-123' })
     staff = { ...(u as unknown as Record<string, unknown>), collection: 'users' }
     const s = await seedAssinante(payload, { email: 'sub-modelos@teste.local', password: 'senha-assinante-1', name: 'Sub Modelos' })
     sub = { ...(s as unknown as Record<string, unknown>), collection: 'assinantes' }
   })
 
+  // resetDatabase wipes media too: create the shared photo again after each reset
+  const freshMedia = async () => {
+    const media = await payload.create({ collection: 'media', data: { alt: 'foto' }, filePath: FIXTURE, overrideAccess: true })
+    mediaId = media.id
+  }
   const rows = (n: number) => Array.from({ length: n }, () => ({ image: mediaId }))
   const create = (data: Record<string, unknown>) =>
     payload.create({
@@ -53,6 +57,7 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
 
   it('creates the slug from the name, suffixes duplicates and validates staff-typed slugs', async () => {
     await resetDatabase(payload)
+    await freshMedia()
     const a = await create({ name: 'Luna Clara' })
     expect(a.slug).toBe('luna-clara')
     const b = await create({ name: 'Luna Clara' })
@@ -83,6 +88,7 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
 
   it('backfillModelSlugs fills empty slugs from the name (suffix on clash) and is idempotent', async () => {
     await resetDatabase(payload)
+    await freshMedia()
     await create({ name: 'Aurora' })
     await create({ name: 'Aurora' })
     await payload.db.drizzle.execute(sql`update models set slug = null`)

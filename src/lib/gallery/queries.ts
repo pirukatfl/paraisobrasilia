@@ -5,7 +5,8 @@ import { getPayload } from 'payload'
 
 import type { Media, Model, SpaceItem, Video } from '../../payload-types'
 import { cached } from '../cache/cached'
-import type { GalleryImage, ModelDTO, SpaceItemDTO } from './types'
+import { SLUG_RE } from '../contos/excerpt'
+import type { GalleryImage, ModelCardDTO, ModelPageDTO, SpaceItemDTO } from './types'
 
 const SPACE_LIMIT = 120 // bounded list
 export const SPACE_PHOTO_ALT = 'Foto do espaço do Paraíso Brasília'
@@ -68,21 +69,60 @@ export async function getSpacePhotos(limit: number): Promise<SpaceItemDTO[]> {
 }
 
 const MODELS_LIMIT = 60 // bounded list
-const MAX_PHOTOS = 3
+export const MAX_MODEL_PHOTOS = 30
 
 export const modelAltFallback = (name: string) => `${name} — modelo do Paraíso Brasília`
 
-export function toModelDTO(doc: Model): ModelDTO | null {
-  const name = doc.name?.trim()
-  if (!name) return null
-  const photos = (doc.photos ?? [])
-    .slice(0, MAX_PHOTOS)
+/** Valid photos of a model (media with a file), in panel order, capped at the collection limit. */
+function modelPhotos(doc: Model, name: string): GalleryImage[] {
+  return (doc.photos ?? [])
+    .slice(0, MAX_MODEL_PHOTOS)
     .map((row) => toGalleryImage(row.image, modelAltFallback(name)))
     .filter((p): p is GalleryImage => p !== null)
-  return photos.length > 0 ? { id: String(doc.id), name, photos } : null
 }
 
-async function fetchPublishedModels(): Promise<ModelDTO[]> {
+export function toModelCardDTO(doc: Model): ModelCardDTO | null {
+  const name = doc.name?.trim()
+  if (!name || !doc.slug) return null
+  const photos = modelPhotos(doc, name)
+  if (photos.length === 0) return null
+  return {
+    id: String(doc.id),
+    slug: doc.slug,
+    name,
+    cover: photos[0],
+    photoCount: photos.length,
+    videoCount: 0,
+    updatedAt: doc.updatedAt,
+  }
+}
+
+export function toModelPageDTO(doc: Model): ModelPageDTO | null {
+  const name = doc.name?.trim()
+  if (!name || !doc.slug) return null
+  const photos = modelPhotos(doc, name)
+  if (photos.length === 0) return null
+  const cover = photos[0]
+  const coverMedia = asMedia(doc.photos?.[0]?.image)
+  const og = coverMedia?.sizes?.og
+  return {
+    id: String(doc.id),
+    slug: doc.slug,
+    name,
+    description: doc.description?.trim() || null,
+    items: photos.map((image, i) => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null })),
+    cover,
+    ogImage:
+      og?.url && og.width && og.height
+        ? { url: og.url, width: og.width, height: og.height, alt: cover.alt }
+        : { url: cover.url, width: cover.width, height: cover.height, alt: cover.alt },
+    photoCount: photos.length,
+    videoCount: 0,
+    updatedAt: doc.updatedAt,
+  }
+}
+
+async function fetchPublishedModels(): Promise<ModelCardDTO[]> {
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'models',
@@ -92,11 +132,28 @@ async function fetchPublishedModels(): Promise<ModelDTO[]> {
     depth: 2,
     limit: MODELS_LIMIT,
   })
-  return docs.map(toModelDTO).filter((d): d is ModelDTO => d !== null)
+  return docs.map(toModelCardDTO).filter((d): d is ModelCardDTO => d !== null)
 }
 
-/** Published models with 1–3 photos, by `order` then name. Tag 'models'. */
+/** Published models with a cover, by `order` then name. Tag 'models'. */
 export const getPublishedModels = cached(fetchPublishedModels, ['gallery:models'], () => ['models'])
+
+async function fetchPublishedModel(slug: string): Promise<ModelPageDTO | null> {
+  if (!SLUG_RE.test(slug)) return null
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({
+    collection: 'models',
+    where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
+    draft: false,
+    depth: 2,
+    limit: 1,
+    pagination: false,
+  })
+  return docs[0] ? toModelPageDTO(docs[0]) : null
+}
+
+/** One published model page by slug, or null (draft, unknown, malformed). Tag 'models'. */
+export const getPublishedModel = cached(fetchPublishedModel, ['gallery:model'], () => ['models'])
 
 /** Whether the Modelos section exists (nav, footer, sitemap, /modelos). Same tag 'models'. */
 export async function hasPublishedModels(): Promise<boolean> {

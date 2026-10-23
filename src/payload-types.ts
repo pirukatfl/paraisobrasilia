@@ -1108,7 +1108,7 @@ export interface SpaceItem {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Nome artístico e até 3 fotos. Sem nudez explícita: esta galeria é aberta ao público.
+ * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita e sem contato: esta galeria é aberta ao público.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "models".
@@ -1117,7 +1117,15 @@ export interface Model {
   id: number;
   name: string;
   /**
-   * De 1 a 3 fotos.
+   * Endereço da página: /modelos/…  Se ficar vazio, é criado a partir do nome. Mudar o endereço quebra links já compartilhados.
+   */
+  slug: string;
+  /**
+   * Até 300 caracteres. Aparece na página da modelo e nas prévias do Google e do WhatsApp. Sem telefone, WhatsApp, e-mail, @ ou links.
+   */
+  description?: string | null;
+  /**
+   * De 1 a 30 fotos. A primeira é a capa: arraste para mudar a ordem.
    */
   photos?:
     | {
@@ -1822,6 +1830,8 @@ export interface SpaceItemsSelect<T extends boolean = true> {
  */
 export interface ModelsSelect<T extends boolean = true> {
   name?: T;
+  slug?: T;
+  description?: T;
   photos?:
     | T
     | {

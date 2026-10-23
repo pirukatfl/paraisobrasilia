@@ -30,6 +30,7 @@ import * as migration_20261021_203534_anuncios_equipe from './20261021_203534_an
 import * as migration_20261022_022156_mural_publicado from './20261022_022156_mural_publicado';
 import * as migration_20261022_102706_dicas from './20261022_102706_dicas';
 import * as migration_20261022_120000_dicas_wp_bundle from './20261022_120000_dicas_wp_bundle';
+import * as migration_20261023_042244_models_pagina from './20261023_042244_models_pagina';
 
 export const migrations = [
   {
@@ -185,11 +186,16 @@ export const migrations = [
   {
     up: migration_20261022_102706_dicas.up,
     down: migration_20261022_102706_dicas.down,
-    name: '20261022_102706_dicas'
+    name: '20261022_102706_dicas',
   },
   {
     up: migration_20261022_120000_dicas_wp_bundle.up,
     down: migration_20261022_120000_dicas_wp_bundle.down,
     name: '20261022_120000_dicas_wp_bundle',
+  },
+  {
+    up: migration_20261023_042244_models_pagina.up,
+    down: migration_20261023_042244_models_pagina.down,
+    name: '20261023_042244_models_pagina'
   },
 ];
