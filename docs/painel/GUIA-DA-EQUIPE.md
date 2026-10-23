@@ -378,7 +378,7 @@ de um conto, apague e salve.
 
 ## Dicas Hot
 
-As **Dicas Hot** são textos abertos: qualquer visitante lê a dica inteira, sem assinar, e o Google mostra esses textos nas buscas. Ficam em **/dicas-hot**, com link no **rodapé** do site e uma seção na **página inicial** (as 3 mais recentes). Não aparecem no menu principal. Não confunda com **Dicas**, dentro de Quem somos: aquela é um texto institucional da casa e continua em **Textos**.
+As **Dicas Hot** são textos abertos: qualquer visitante lê a dica inteira, sem assinar, e o Google mostra esses textos nas buscas. Ficam em **/dicas-hot**, com link no **menu principal** (entre Contos e Contato), no **rodapé** do site e uma seção na **página inicial** (as 3 mais recentes). Não confunda com **Dicas**, dentro de Quem somos: aquela é um texto institucional da casa e continua em **Textos**.
 
 ### Criar, editar e publicar
 

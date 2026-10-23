@@ -26,3 +26,6 @@ typecheck e lint limpos; Vitest 78 arquivos / 747 testes passando; `next build -
 2. Cliente extrai só esses arquivos do backup para `/opt/paraiso-site/importacao/uploads` (AAAA/MM) e `chown -R 1000:1000 /opt/paraiso-site/importacao/uploads`; backup do banco antes (7.6 passo 2); `docker volume ls | grep media` para confirmar o nome do volume.
 3. `docker compose --env-file .env.staging run --rm -v /opt/paraiso-site/importacao:/importacao:ro -v paraiso-staging_media:/app/media -e MEDIA_DIR=/app/media migrate node_modules/.bin/payload run scripts/import/dicas.ts -- --from-bundle src/migrations/seed/dicas-wp.json --uploads /importacao/uploads`
 4. Cliente devolve só a linha `Capas: gravadas N · ausentes N · ...`; repetir é seguro; capas entram desmarcadas ("Capa conferida").
+
+## Follow-up (2026-10-23)
+Dicas Hot passou a ter link no menu principal (depois de Contos, antes de Contato; segue no rodapé): `src/lib/site/nav.ts`, specs `modelos` e `dicas-hot` atualizados, GUIA-DA-EQUIPE ajustado.

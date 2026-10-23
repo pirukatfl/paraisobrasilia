@@ -55,12 +55,12 @@ async function visitor(browser: Browser, baseURL: string) {
   return { context, page: await context.newPage() }
 }
 
-test('the footer links to Dicas Hot and the main menu does not', async ({ browser, baseURL, isMobile }) => {
+test('the main menu and the footer both link to Dicas Hot', async ({ browser, baseURL, isMobile }) => {
   const { context, page } = await visitor(browser, baseURL!)
   await page.goto('/contato')
   const menu = page.getByRole('navigation', { name: isMobile ? 'Menu' : 'Principal' })
   if (isMobile) await page.getByRole('button', { name: 'Abrir menu' }).click()
-  await expect(menu.getByRole('link', { name: 'Dicas Hot' })).toHaveCount(0)
+  await expect(menu.getByRole('link', { name: 'Dicas Hot' })).toHaveAttribute('href', '/dicas-hot')
   await page.getByRole('contentinfo').getByRole('link', { name: 'Dicas Hot' }).click()
   await expect(page).toHaveURL(/\/dicas-hot$/)
   await expect(page.getByRole('heading', { name: 'Dicas Hot', level: 1 })).toBeVisible()

@@ -1,11 +1,12 @@
 /**
  * Site navigation registry (header menu, mobile menu, footer).
  * Fixed order (UI-SPEC Phase 2, updated by 05-03; Recados removed 2026-10-20, quick recados-privados): Festas · Quem somos ·
- * Espaço · Modelos · ClassiSex · Contos (05-03) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
+ * Espaço · Modelos · ClassiSex · Contos (05-03) · Dicas Hot (quick dicas-hot-menu) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
  * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
  */
+// Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
 import { pathForKey } from '../pages/keys'
 
 export type NavItem = { href: string; label: string; children?: NavItem[] }
@@ -29,6 +30,8 @@ export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels:
     { href: '/classisex', label: 'ClassiSex' },
     // PREV-03: open excerpts of the contos (05-03)
     { href: '/contos', label: 'Contos' },
+    // quick dicas-hot-menu: client asked for the open Dicas Hot section in the main menu (also stays in the footer)
+    { href: '/dicas-hot', label: 'Dicas Hot' },
     { href: '/contato', label: 'Contato' },
     // Phase 3: plans page (03-02) and members area
     { href: '/assine-ja', label: 'Assine Já' },

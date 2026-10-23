@@ -44,7 +44,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
     `type-eyebrow flex min-h-11 items-center ${isActivePath(href, pathname) ? 'text-accent' : 'text-text'} hover:text-accent`
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <noscript dangerouslySetInnerHTML={{ __html: `<style>${NOSCRIPT_CSS}</style>` }} />
       <button
         ref={buttonRef}

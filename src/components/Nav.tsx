@@ -9,7 +9,7 @@ import { isActivePath, type NavItem } from '@/lib/site/nav'
 export function Nav({ items }: { items: NavItem[] }) {
   const pathname = usePathname() ?? '/'
   return (
-    <nav aria-label="Principal" className="hidden lg:block">
+    <nav aria-label="Principal" className="hidden xl:block">
       <ul className="flex items-center gap-4 xl:gap-5">
         {items.map((item) => {
           const active = isActivePath(item.href, pathname)
