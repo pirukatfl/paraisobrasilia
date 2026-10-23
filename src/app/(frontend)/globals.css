@@ -111,6 +111,10 @@
     font-size: var(--text-body);
     line-height: 1.5;
   }
+  /* Quem somos tabs: ~18px body text (1.125rem scales with the user's font setting) */
+  .rich-text-lg {
+    font-size: 1.125rem;
+  }
   .rich-text > :first-child {
     margin-top: 0;
   }
