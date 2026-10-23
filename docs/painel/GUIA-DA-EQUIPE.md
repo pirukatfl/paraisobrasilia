@@ -58,7 +58,7 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 
 ## Modelos
 
-Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição, fotos e vídeos. O item
+Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição e fotos (por enquanto, **só fotos**: vídeos de modelos estão desligados). O item
 **Modelos** fica sempre no menu; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
 no mapa do site, para o Google, quando há pelo menos uma modelo publicada).
 A área é aberta ao público: **sem nudez explícita e sem contato** (telefone, WhatsApp, e-mail, @ ou links).
@@ -73,11 +73,9 @@ A área é aberta ao público: **sem nudez explícita e sem contato** (telefone,
    para mudar a ordem. Cada foto precisa do **Texto alternativo**.
    **Dica:** envie várias fotos de uma vez em **Arquivos → Mídias** e depois use **Escolher existente** em cada linha.
    A 31ª foto não é aceita: "Cada modelo pode ter no máximo 30 fotos.".
-6. **Vídeos**: até **3 vídeos**. Envie antes em **Arquivos → Vídeos**, com a **Imagem de capa** (MP4, até 100 MB,
-   cerca de 2 minutos) e escolha cada um na lista. O 4º vídeo não é aceito: "Cada modelo pode ter no máximo 3 vídeos.".
-7. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
-8. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
-9. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
+6. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
+7. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
+8. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
    menu somem).
 
 ---
@@ -146,7 +144,7 @@ imagem do site nunca causa problema.
    (No caso de vídeo, exclua também a **Imagem de capa** em **Mídias**, se ela mostrar a pessoa.)
 4. Depois apague ou ajuste o item que usava o arquivo:
    - **Galeria do espaço**: abra o item → **⋯** → **Excluir**;
-   - **Modelos**: abra a modelo, remova a linha da foto (ou do vídeo) e **Publicar**; se era a capa, a próxima foto
+   - **Modelos**: abra a modelo, remova a linha da foto e **Publicar**; se era a capa, a próxima foto
      passa a ser a capa. Se era a modelo inteira, **⋯** → **Excluir**.
 5. Confira no celular que a imagem sumiu da página. Cópias reduzidas guardadas pelo site somem sozinhas em algumas horas.
 6. Responda à pessoa confirmando a remoção.

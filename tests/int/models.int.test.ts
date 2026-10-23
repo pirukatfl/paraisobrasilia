@@ -3,6 +3,7 @@ import { sql } from '@payloadcms/db-postgres'
 import type { Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { MODEL_VIDEOS_ENABLED } from '../../src/lib/gallery/flags'
 import { backfillModelSlugs } from '../../src/lib/gallery/model-slug'
 import {
   getPublishedModel,
@@ -189,20 +190,19 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
       expect(none._status).toBe('published')
     })
 
-    it('page DTO lists videos first (poster as image) then photos; counts include videos', async () => {
+    it('stored videos are NOT shown publicly while MODEL_VIDEOS_ENABLED is off (client 2026-10-23)', async () => {
+      expect(MODEL_VIDEOS_ENABLED).toBe(false)
       await resetDatabase(payload)
       await seedModel(payload, { name: 'Aurora', photoCount: 2, videoCount: 1 })
+      const stored = await payload.find({ collection: 'models', overrideAccess: true, depth: 0 })
+      expect(stored.docs[0].videos).toHaveLength(1) // data survives
       const page = await getPublishedModel('aurora')
-      expect(page?.items).toHaveLength(3)
-      expect(page?.items[0].kind).toBe('video')
-      expect(page?.items[0].video?.url).toMatch(/\.mp4$/)
-      expect(page?.items[0].image.thumbUrl).toBeTruthy()
-      expect(page?.items[1].kind).toBe('photo')
-      expect(page?.items[2].kind).toBe('photo')
-      expect(page?.videoCount).toBe(1)
+      expect(page?.items).toHaveLength(2)
+      expect(page?.items.every((i) => i.kind === 'photo' && i.video === null)).toBe(true)
+      expect(page?.videoCount).toBe(0)
       expect(page?.photoCount).toBe(2)
       const models = await getPublishedModels()
-      expect(models[0].videoCount).toBe(1)
+      expect(models[0].videoCount).toBe(0)
     })
 
     it('anonymous find of the model still has no imageAuthorization', async () => {

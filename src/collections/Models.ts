@@ -66,7 +66,7 @@ const prepareModel: CollectionBeforeValidateHook = async ({ data, originalDoc, r
 
 /**
  * House models (MIDIA-02, MIDIA-06/07, G-01..G-06): artistic name, short description and 1–30 photos,
- * one public page per model, up to 3 videos, no contact.
+ * one public page per model, no contact. Videos are off for now (client, 2026-10-23).
  * Image authorization is recommended, never required to publish (D-09).
  */
 export const Models: CollectionConfig = {
@@ -172,7 +172,9 @@ export const Models: CollectionConfig = {
       label: 'Vídeos',
       labels: { singular: 'Vídeo', plural: 'Vídeos' },
       maxRows: 3, // MAX_MODEL_VIDEOS
-      admin: { description: 'Até 3 vídeos (MP4). Envie antes em Arquivos → Vídeos, com a imagem de capa.' },
+      // Temporarily off per client (2026-10-23): hidden in the panel and not shown on the site
+      // (MODEL_VIDEOS_ENABLED in src/lib/gallery/flags.ts). Field and columns kept so stored data survives.
+      admin: { hidden: true, description: 'Até 3 vídeos (MP4). Envie antes em Arquivos → Vídeos, com a imagem de capa.' },
       validate: (value: unknown) =>
         Array.isArray(value) && value.length > MAX_MODEL_VIDEOS ? MODEL_MESSAGES.maxVideos : true,
       fields: [
