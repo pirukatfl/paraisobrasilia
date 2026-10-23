@@ -411,11 +411,12 @@ describe('06.1 staff guide: Modelos', () => {
   const rest = guide.slice(start + 3)
   const section = guide.slice(start, start + 3 + Math.max(rest.search(/^## /m), 0))
 
-  it('has the Modelos heading and covers 30 photos, 3 videos, cover, address and unpublish', () => {
+  it('has the Modelos heading and covers 30 photos, cover, address and unpublish, and no videos for now (client 2026-10-23)', () => {
     expect(start).toBeGreaterThanOrEqual(0)
-    for (const text of ['30 fotos', '3 vídeos', 'a primeira é a capa', 'Endereço', 'Despublicar', 'sem contato']) {
+    for (const text of ['30 fotos', 'só fotos', 'a primeira é a capa', 'Endereço', 'Despublicar', 'sem contato']) {
       expect(section.toLowerCase()).toContain(text.toLowerCase())
     }
+    expect(section).not.toMatch(/3 vídeos|Arquivos → Vídeos/)
   })
 
   it('keeps Remoção de imagem with Excluir', () => {

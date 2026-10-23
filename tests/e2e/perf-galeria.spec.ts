@@ -47,7 +47,7 @@ test('/quem-somos ≤ 250 KB', async ({ page }) => {
   expect(w.total).toBeLessThanOrEqual(250 * KB)
 })
 
-test('model page with 30 photos and 3 videos ≤ 600 KB', async ({ page, request }) => {
+test('model page with 30 photos (3 stored videos not rendered) ≤ 600 KB', async ({ page, request }) => {
   test.setTimeout(300_000)
   const api = await staffApi(request)
   await api.deleteAll('models')

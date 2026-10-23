@@ -6,6 +6,7 @@ import { getPayload } from 'payload'
 import type { Media, Model, SpaceItem, Video } from '../../payload-types'
 import { cached } from '../cache/cached'
 import { SLUG_RE } from '../contos/excerpt'
+import { MODEL_VIDEOS_ENABLED } from './flags'
 import type { GalleryImage, GalleryItemDTO, ModelCardDTO, ModelPageDTO, SpaceItemDTO } from './types'
 
 const SPACE_LIMIT = 120 // bounded list
@@ -87,6 +88,7 @@ function modelPhotos(doc: Model, name: string): GalleryImage[] {
 
 /** Valid videos of a model (file and poster present), in panel order, capped at the collection limit. */
 function modelVideos(doc: Model, name: string): GalleryItemDTO[] {
+  if (!MODEL_VIDEOS_ENABLED) return [] // off for now (client 2026-10-23); stored videos are kept, never shown
   return (doc.videos ?? [])
     .slice(0, MAX_MODEL_VIDEOS)
     .map((row, i) => toVideoItem(row.video, `${doc.id}-v${i}`, null, `Vídeo de ${name}`))

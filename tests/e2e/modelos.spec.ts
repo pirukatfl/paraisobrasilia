@@ -66,7 +66,7 @@ test('cards open the model page with name, description and photos (G-01)', async
   await expect(page).toHaveURL(/\/modelos$/)
 })
 
-test('model page shows videos first and plays them (G-05)', async ({ page, request }) => {
+test('model shows photos only: stored videos are not rendered (client 2026-10-23)', async ({ page, request }) => {
   test.setTimeout(180_000)
   const api = await staffApi(request)
   await api.deleteAll('models')
@@ -74,19 +74,20 @@ test('model page shows videos first and plays them (G-05)', async ({ page, reque
 
   await page.goto('/modelos')
   const card = page.locator('main ul[role="list"] > li').first()
-  await expect(card).toContainText('2 fotos · 1 vídeo')
+  await expect(card).toContainText('2 fotos')
+  await expect(card).not.toContainText('vídeo')
 
   await card.getByRole('link', { name: 'Ver fotos de Aurora' }).click()
   await expect(page.getByRole('heading', { name: 'Aurora', level: 1 })).toBeVisible()
-  await expect(page.locator('main')).toContainText('2 fotos · 1 vídeo')
+  await expect(page.locator('main')).toContainText('2 fotos')
+  await expect(page.locator('main')).not.toContainText('vídeo')
   const tiles = page.locator('main ul[role="list"] > li')
-  await expect(tiles).toHaveCount(3)
-  const first = tiles.nth(0).getByRole('button')
-  await expect(first).toHaveAccessibleName(/^Assistir vídeo:/)
-  await first.click()
+  await expect(tiles).toHaveCount(2)
+  await expect(page.getByRole('button', { name: /Assistir vídeo/ })).toHaveCount(0)
+  await tiles.nth(0).getByRole('button').click()
   const dialog = page.getByRole('dialog', { name: 'Galeria de fotos' })
-  await expect(dialog).toContainText('1 de 3')
-  await expect(dialog.locator('video')).toHaveAttribute('src', /\.mp4$/)
+  await expect(dialog).toContainText('1 de 2')
+  await expect(dialog.locator('video')).toHaveCount(0)
 })
 
 test('drafts and unknown slugs are 404', async ({ page, request }) => {
