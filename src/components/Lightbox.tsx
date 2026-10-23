@@ -14,6 +14,8 @@ const SWIPE_THRESHOLD = 48
  * and Escape built in), ←/→ keys, swipe, counter announced politely, video only for the active slide.
  * `plainImages`: render a plain <img> instead of next/image — required for ClassiSex media, which
  * must never pass through the image optimizer (T-04-07).
+ * `fitScreen`: next/image branch only — scale the photo UP to fill the available area (keeping its
+ * proportions) instead of showing small originals at intrinsic size. Videos and `plainImages` unchanged.
  */
 export function Lightbox({
   slides,
@@ -22,6 +24,7 @@ export function Lightbox({
   onClose,
   label = 'Galeria de fotos',
   plainImages = false,
+  fitScreen = false,
 }: {
   slides: LightboxSlide[]
   index: number | null
@@ -29,6 +32,7 @@ export function Lightbox({
   onClose: () => void
   label?: string
   plainImages?: boolean
+  fitScreen?: boolean
 }) {
   const ref = useRef<HTMLDialogElement>(null)
   const pointerStart = useRef<number | null>(null)
@@ -125,6 +129,17 @@ export function Lightbox({
                 decoding="async"
                 className="max-h-[calc(100dvh-128px)] w-auto max-w-full object-contain"
               />
+            ) : fitScreen ? (
+              <div className="absolute inset-x-4 inset-y-0 sm:inset-x-16">
+                <Image
+                  key={slide.image.url}
+                  src={slide.image.url}
+                  alt={slide.image.alt}
+                  fill
+                  sizes="100vw"
+                  className="object-contain"
+                />
+              </div>
             ) : (
               <Image
                 key={slide.image.url}
@@ -138,11 +153,11 @@ export function Lightbox({
             )}
             {total > 1 && (
               <>
-                <button type="button" className={`${iconButton} absolute left-2`} onClick={() => go(-1)}>
+                <button type="button" className={`${iconButton} absolute left-2 z-10`} onClick={() => go(-1)}>
                   <ChevronLeftIcon />
                   <span className="sr-only">Anterior</span>
                 </button>
-                <button type="button" className={`${iconButton} absolute right-2`} onClick={() => go(1)}>
+                <button type="button" className={`${iconButton} absolute right-2 z-10`} onClick={() => go(1)}>
                   <ChevronRightIcon />
                   <span className="sr-only">Próxima</span>
                 </button>

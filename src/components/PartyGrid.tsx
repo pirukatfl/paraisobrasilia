@@ -57,7 +57,7 @@ export function PartyGrid({ parties }: { parties: PartyCardDTO[] }) {
           ))}
         </ul>
       )}
-      <Lightbox slides={slides} index={index} onIndexChange={setIndex} onClose={close} label="Flyers das festas" />
+      <Lightbox slides={slides} index={index} onIndexChange={setIndex} onClose={close} label="Flyers das festas" fitScreen />
     </div>
   )
 }

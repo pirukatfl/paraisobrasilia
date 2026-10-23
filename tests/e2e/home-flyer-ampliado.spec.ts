@@ -28,6 +28,19 @@ test('clicking the flyer opens it big, with a link to the party page', async ({ 
   await expect(page.getByRole('link', { name: 'Ver detalhes da festa Festa de Teste' }).first()).toBeAttached()
 })
 
+test('a small flyer is scaled up to fill the lightbox on desktop', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'desktop viewport only')
+  await page.goto('/')
+  await page.getByRole('button', { name: OPEN_NAME }).first().click()
+  const dialog = page.getByRole('dialog', { name: 'Flyers das festas' })
+  await expect(dialog).toBeVisible()
+  const img = dialog.locator('img').first()
+  await expect(img).toBeVisible()
+  const box = await img.boundingBox()
+  const viewport = page.viewportSize()!
+  expect(box!.height >= viewport.height * 0.6 || box!.width >= viewport.width * 0.8).toBe(true)
+})
+
 test('arrow keys move between the upcoming parties', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: OPEN_NAME }).first().click()
