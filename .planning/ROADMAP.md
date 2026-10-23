@@ -11,7 +11,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 - [x] **Phase 3: Assinantes e controle de acesso** - Login, validade de assinatura e gestão de assinantes pela equipe (completed 2026-10-19)
 - [x] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato (completed 2026-10-20)
 - [x] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais (completed 2026-10-21)
-- [ ] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo
+- [x] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo (completed 2026-10-23)
 - [ ] **Phase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
 
 ## Phase Details
@@ -212,7 +212,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 06-07-PLAN.md — Carga idempotente: contas, períodos "Migrado do site antigo", rascunhos e fotos (wave 5)
 - [x] 06-08-PLAN.md — CLI import:wordpress (--inspect, --dry-run, gravação, --uploads), saída só com contagens (wave 6)
 - [x] 06-09-PLAN.md — Guia da equipe, runbook 7.6 (importação na VPS) e smoke de staging (wave 7)
-- [ ] 06-10-PLAN.md — Orquestrador no dump real, ensaio no staging pelo cliente e conferência do cliente (wave 8)
+- [x] 06-10-PLAN.md — Orquestrador no dump real, ensaio no staging pelo cliente e conferência do cliente (wave 8)
 
 ### Phase 7: Lançamento e desempenho
 
@@ -236,5 +236,5 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 3. Assinantes e controle de acesso | 7/7 | Complete    | 2026-10-19 |
 | 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
 | 5. Recados, mensagens e contos | 12/12 | Complete    | 2026-10-21 |
-| 6. Migração do WordPress | 9/10 | In Progress|  |
+| 6. Migração do WordPress | 10/10 | Complete    | 2026-10-23 |
 | 7. Lançamento e desempenho | 0/? | Not started | - |
