@@ -231,7 +231,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 **Plans**: 4 plans
 - [x] 06.1-01-PLAN.md — Página por modelo: card → /modelos/<slug> com nome, descrição curta e até 30 fotos; slug + descrição sem contato; migração que só adiciona campos e preenche o slug das modelos existentes (wave 1)
 - [x] 06.1-02-PLAN.md — Até 3 vídeos por modelo (coleção videos, lightbox), contagem "fotos · vídeos" e orçamento de peso no celular com 30 fotos (wave 2)
-- [ ] 06.1-03-PLAN.md — Sitemap com cada página de modelo publicada, prévia de compartilhamento com a capa e link antigo /galeria-hot/ (wave 3)
+- [x] 06.1-03-PLAN.md — Sitemap com cada página de modelo publicada, prévia de compartilhamento com a capa e link antigo /galeria-hot/ (wave 3)
 - [ ] 06.1-04-PLAN.md — Guia da equipe (Modelos), smoke de staging, deploy com as migrações e conferência do cliente (wave 4)
 **UI hint**: yes
 
@@ -258,5 +258,5 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
 | 5. Recados, mensagens e contos | 12/12 | Complete    | 2026-10-21 |
 | 6. Migração do WordPress | 10/10 | Complete    | 2026-10-23 |
-| 06.1. Galeria de modelos | 2/4 | In Progress | - |
+| 06.1. Galeria de modelos | 3/4 | In Progress | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |
