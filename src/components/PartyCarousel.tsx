@@ -12,10 +12,18 @@ import type { PartyCardDTO } from '@/lib/parties/types'
  * Home carousel of ALL upcoming parties (the old site had a flyer slider). CSS scroll-snap does the
  * sliding and the touch swipe; this component adds the arrows, the dots and the auto-advance
  * (every ~6 s, paused on hover/focus/touch, off with prefers-reduced-motion or after the visitor
- * stops it). Each slide keeps the whole flyer at its own proportions and links to the party page.
+ * stops it). Each slide keeps the whole flyer at its own proportions: the flyer button enlarges it,
+ * the title/date link goes to the party page.
  * A single party shows no controls.
  */
-export function PartyCarousel({ parties }: { parties: PartyCardDTO[] }) {
+export function PartyCarousel({
+  parties,
+  onOpenFlyer,
+}: {
+  parties: PartyCardDTO[]
+  /** Click on a slide's flyer: index in `parties` + the button to return focus to */
+  onOpenFlyer: (index: number, opener: HTMLElement) => void
+}) {
   const total = parties.length
   const trackRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
@@ -99,26 +107,33 @@ export function PartyCarousel({ parties }: { parties: PartyCardDTO[] }) {
             data-slide={i + 1}
             className="w-full shrink-0 snap-center"
           >
-            <Link
-              href={`/festas/${party.slug}`}
-              aria-label={`Ver detalhes da festa ${party.title}`}
-              data-featured-party
-              className="group flex w-full flex-col overflow-hidden rounded-lg border border-line bg-surface transition-colors duration-200 hover:border-accent focus-visible:border-accent"
-            >
-              <FlyerFrame
-                flyer={party.flyer}
-                sizes="(max-width: 1000px) 100vw, 1000px"
-                priority={i === 0}
-                minRatio={0}
-                maxHeightClass="max-h-[80vh]"
-              />
-              <div className="flex flex-col gap-2 p-4 sm:p-6">
+            <div className="group flex w-full flex-col overflow-hidden rounded-lg border border-line bg-surface transition-colors duration-200 focus-within:border-accent hover:border-accent">
+              <button
+                type="button"
+                aria-label={`Ampliar flyer da festa ${party.title}`}
+                onClick={(event) => onOpenFlyer(i, event.currentTarget)}
+                className="block w-full cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+              >
+                <FlyerFrame
+                  flyer={party.flyer}
+                  sizes="(max-width: 1000px) 100vw, 1000px"
+                  priority={i === 0}
+                  minRatio={0}
+                  maxHeightClass="max-h-[80vh]"
+                />
+              </button>
+              <Link
+                href={`/festas/${party.slug}`}
+                aria-label={`Ver detalhes da festa ${party.title}`}
+                data-featured-party
+                className="flex flex-col gap-2 p-4 sm:p-6"
+              >
                 <p className="type-label text-gold">
                   <time dateTime={party.startsAt}>{formatCardDate(party.startsAt)}</time>
                 </p>
                 <h2 className="type-heading">{party.title}</h2>
-              </div>
-            </Link>
+              </Link>
+            </div>
           </div>
         ))}
       </div>

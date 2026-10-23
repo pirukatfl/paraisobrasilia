@@ -161,6 +161,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-22 | dicas-hot | Dicas Hot (M-08): public SEO section /dicas-hot + /dicas-hot/<slug>, staff-only `dicas` collection with draft/publish, cover gate `capaConferida`, footer link + home teaser + sitemap, importer `pnpm import:dicas`, 30 dicas bundle + loader, 30 old slugs + /dicas-hot/ + /category/dicas-hot/ redirected (DH-01..DH-10); migrations 20261022_102706_dicas and 20261022_120000_dicas_wp_bundle (see .planning/quick/2026-10-22-dicas-hot/) |
 | 2026-10-23 | menu-modelos | Modelos always in header, mobile menu and footer; /modelos shows an empty state instead of 404 until a model is published; sitemap still lists it only with a published model (see .planning/quick/2026-10-23-menu-modelos/) |
 | 2026-10-23 | modelos-so-fotos | Modelos: videos desligados por enquanto (flag `MODEL_VIDEOS_ENABLED`, campo `videos` escondido no painel, sem migracao); site mostra so fotos (see .planning/quick/2026-10-23-modelos-so-fotos/) |
+| 2026-10-23 | flyer-ampliado | Home: clicar no flyer abre o flyer grande no lightbox (todas as proximas festas, link "Ver detalhes da festa"); titulo/data seguem linkando a /festas/<slug> (see .planning/quick/2026-10-23-flyer-ampliado/) |
 
 ## Deferred Items
 

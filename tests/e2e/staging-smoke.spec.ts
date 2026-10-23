@@ -71,7 +71,8 @@ test('party flyer, page and share image are served by the site', async ({ page, 
 
   // Card image: the original upload under /api/media/file/ (via next/image or directly),
   // read from the `media` volume through the app
-  const img = cards.first().locator('img').first()
+  // the flyer is a button next to the title link
+  const img = page.getByRole('button', { name: /^Ampliar flyer da festa / }).first().locator('img').first()
   await expect(img).toBeVisible()
   const src = await img.evaluate((el) => (el as HTMLImageElement).currentSrc || (el as HTMLImageElement).src)
   expect(new URL(src).host).toBe(host)

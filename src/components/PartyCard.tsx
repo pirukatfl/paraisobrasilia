@@ -7,30 +7,42 @@ import type { PartyCardDTO } from '@/lib/parties/types'
 interface Props {
   party: PartyCardDTO
   priority?: boolean
+  /** Click on the flyer: the grid opens it in the lightbox (receives the button to return focus to) */
+  onOpenFlyer: (opener: HTMLElement) => void
 }
 
-/** Grid card: the flyer at its own proportions (very tall ones letterboxed), aligned by the top. */
-export function PartyCard({ party, priority = false }: Props) {
+/**
+ * Grid card: the flyer at its own proportions (very tall ones letterboxed), aligned by the top.
+ * Two sibling targets, never nested: the flyer button (enlarge) and the title/date link (party page).
+ */
+export function PartyCard({ party, priority = false, onOpenFlyer }: Props) {
   return (
-    <Link
-      href={`/festas/${party.slug}`}
-      aria-label={`Ver detalhes da festa ${party.title}`}
-      className="group flex flex-col overflow-hidden rounded-lg border border-line bg-surface transition-colors duration-200 hover:border-accent focus-visible:border-accent"
-    >
-      <FlyerFrame
-        flyer={party.flyer}
-        sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 560px"
-        priority={priority}
-        imageClassName="transition-transform duration-200 group-hover:scale-[1.02] group-focus-visible:scale-[1.02]"
-      />
-      <div className="flex flex-col gap-2 p-5">
+    <div className="group flex flex-col overflow-hidden rounded-lg border border-line bg-surface transition-colors duration-200 focus-within:border-accent hover:border-accent">
+      <button
+        type="button"
+        aria-label={`Ampliar flyer da festa ${party.title}`}
+        onClick={(event) => onOpenFlyer(event.currentTarget)}
+        className="block w-full cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+      >
+        <FlyerFrame
+          flyer={party.flyer}
+          sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 560px"
+          priority={priority}
+          imageClassName="transition-transform duration-200 group-hover:scale-[1.02]"
+        />
+      </button>
+      <Link
+        href={`/festas/${party.slug}`}
+        aria-label={`Ver detalhes da festa ${party.title}`}
+        className="flex flex-col gap-2 p-5"
+      >
         <p className="type-label flex items-center gap-1 text-gold">
           <CalendarIcon />
           <time dateTime={party.startsAt}>{formatCardDate(party.startsAt)}</time>
         </p>
         <h2 className="type-heading line-clamp-2">{party.title}</h2>
-      </div>
-    </Link>
+      </Link>
+    </div>
   )
 }
 

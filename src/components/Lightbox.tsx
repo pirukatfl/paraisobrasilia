@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useCallback, useEffect, useRef } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '@/components/icons'
@@ -149,7 +150,17 @@ export function Lightbox({
             )}
           </div>
 
-          <p className="type-label px-4 py-4 text-center">{slide.label}</p>
+          <div className="flex flex-col items-center px-4 pb-2 pt-4">
+            <p className="type-label text-center">{slide.label}</p>
+            {slide.href && (
+              <Link
+                href={slide.href}
+                className="type-label inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent"
+              >
+                Ver detalhes da festa
+              </Link>
+            )}
+          </div>
         </div>
       )}
     </dialog>
