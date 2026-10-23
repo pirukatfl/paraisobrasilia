@@ -12,19 +12,31 @@ export type SitemapInput = {
   contos?: { slug: string; updatedAt: string }[]
   /** Published Dicas Hot (quick dicas-hot) */
   dicas?: { slug: string; updatedAt: string }[]
+  /** Published models (06.1) */
+  models?: { slug: string; updatedAt: string }[]
 }
 
 /**
  * Public URLs only (T-02-13): home, contact, space gallery, published institutional pages,
- * /modelos while a model is published, upcoming published parties, /assine-ja and the ClassiSex
+ * /modelos and /modelos/{slug} while a model is published, upcoming published parties, /assine-ja and the ClassiSex
  * preview /classisex (redacted, blurred; listing it is a client decision kept open in 04-RESEARCH Q2).
  */
-export function buildSitemap({ base, parties, pages, hasModels, contos = [], dicas = [] }: SitemapInput): MetadataRoute.Sitemap {
+export function buildSitemap({ base, parties, pages, hasModels, contos = [], dicas = [], models = [] }: SitemapInput): MetadataRoute.Sitemap {
   const root = base.replace(/\/$/, '')
   return [
     { url: `${root}/`, changeFrequency: 'daily', priority: 1 },
     { url: `${root}/espaco`, changeFrequency: 'weekly', priority: 0.7 },
-    ...(hasModels ? [{ url: `${root}/modelos`, changeFrequency: 'weekly' as const, priority: 0.5 }] : []),
+    ...(hasModels
+      ? [
+          { url: `${root}/modelos`, changeFrequency: 'weekly' as const, priority: 0.5 },
+          ...models.map((m) => ({
+            url: `${root}/modelos/${m.slug}`,
+            lastModified: m.updatedAt,
+            changeFrequency: 'weekly' as const,
+            priority: 0.5,
+          })),
+        ]
+      : []),
     { url: `${root}/contato`, changeFrequency: 'monthly', priority: 0.6 },
     // Members (/area-do-assinante) and auth pages (/entrar, /nova-senha) are never listed (T-03-05)
     { url: `${root}/assine-ja`, changeFrequency: 'monthly', priority: 0.7 },
