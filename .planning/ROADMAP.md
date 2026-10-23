@@ -12,6 +12,7 @@ Cada fase entrega uma capacidade ponta a ponta. A Fase 1 já coloca no ar (em st
 - [x] **Phase 4: ClassiSex e prévias de perfis** - Perfis completos para assinantes, moderação e prévias sem contato (completed 2026-10-20)
 - [x] **Phase 5: Recados, mensagens e contos** - Recados e mensagens entre assinantes e contos parciais (completed 2026-10-21)
 - [x] **Phase 6: Migração do WordPress** - Assinantes, perfis e links antigos trazidos para o site novo (completed 2026-10-23)
+- [ ] **Phase 06.1: Galeria de modelos com página por modelo** (INSERTED) - Cards das modelos abrem a página de cada uma com até 30 fotos e 3 vídeos
 - [ ] **Phase 7: Lançamento e desempenho** - Virada de DNS com site abrindo em menos de 2,5 s no celular
 
 ## Phase Details
@@ -214,6 +215,22 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 06-09-PLAN.md — Guia da equipe, runbook 7.6 (importação na VPS) e smoke de staging (wave 7)
 - [x] 06-10-PLAN.md — Orquestrador no dump real, ensaio no staging pelo cliente e conferência do cliente (wave 8)
 
+### Phase 06.1: Galeria de modelos com página por modelo (INSERTED)
+
+**Goal**: Visitante abre a Galeria, vê os cards das modelos e, ao tocar em um card, abre a página daquela modelo com nome, descrição e a galeria completa de fotos e vídeos; a equipe cadastra tudo sozinha pelo painel
+**Mode:** mvp
+**Depends on**: Fase 6 (evolui a /modelos da Fase 2, 02-04)
+**Requirements**: MIDIA-06, MIDIA-07, PAINEL-09
+**Success Criteria** (what must be TRUE):
+
+  1. Visitante (sem login, só o age gate) vê em /modelos os cards das modelos publicadas com foto de capa e nome artístico
+  2. Ao tocar em um card, abre a página própria da modelo (/modelos/<slug>) com nome, descrição curta e a galeria de até 30 fotos e até 3 vídeos, que carrega rápido no celular
+  3. Equipe cadastra, ordena, publica e despublica modelos com até 30 fotos e 3 vídeos pelo painel, sem ajuda técnica; despublicar tira a página do ar na hora
+  4. Nenhuma página de modelo mostra contato, e links antigos e o sitemap continuam corretos
+
+**Plans**: TBD (run /gsd:plan-phase 06.1)
+**UI hint**: yes
+
 ### Phase 7: Lançamento e desempenho
 
 **Goal**: Site novo vai ao ar em swingbrasilia.com.br e as páginas abertas abrem em menos de 2,5 s no celular
@@ -237,4 +254,5 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 | 4. ClassiSex e prévias de perfis | 10/10 | Complete    | 2026-10-20 |
 | 5. Recados, mensagens e contos | 12/12 | Complete    | 2026-10-21 |
 | 6. Migração do WordPress | 10/10 | Complete    | 2026-10-23 |
+| 06.1. Galeria de modelos | 0/? | Not started | - |
 | 7. Lançamento e desempenho | 0/? | Not started | - |
