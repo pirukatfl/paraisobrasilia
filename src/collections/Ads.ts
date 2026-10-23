@@ -174,14 +174,14 @@ export const Ads: CollectionConfig = {
   admin: {
     group: 'ClassiSex',
     useAsTitle: 'resumo',
-    defaultColumns: ['resumo', 'status', 'submittedAt', 'author', 'aprovarNaLista'],
+    defaultColumns: ['resumo', 'status', 'submittedAt', 'author', 'enviadoSemConta', 'aprovarNaLista'],
     listSearchableFields: ['resumo', 'apelido', 'texto', 'cidade'],
     components: {
       // "Aprovar selecionados" above the list (staff); the per-row button is the `aprovarNaLista` column
       beforeListTable: ['/components/admin/classisex/AprovarSelecionados#AprovarSelecionados'],
     },
     description:
-      'Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados.',
+      'Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados. Os enviados sem conta (coluna "Enviado sem conta") também passam por aqui.',
   },
   defaultSort: '-submittedAt',
   access: {
@@ -248,7 +248,7 @@ export const Ads: CollectionConfig = {
       label: 'Anunciante',
       admin: {
         description:
-          'Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).',
+          'Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios). "Visitantes (sem conta)" é a conta técnica dos anúncios enviados sem cadastro.',
       },
     },
     {
@@ -425,6 +425,34 @@ export const Ads: CollectionConfig = {
       label: 'Publicado no site antigo em',
       access: { create: () => false, update: () => false, read: isStaff },
       admin: dateAdmin(),
+    },
+    {
+      // Client decision 2026-10-23: set only by createVisitorAd (Local API + overrideAccess); never REST, never the owner
+      name: 'enviadoSemConta',
+      type: 'checkbox',
+      defaultValue: false,
+      index: true,
+      label: 'Enviado sem conta',
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Enviado pelo formulário aberto, por alguém sem conta. 1 foto, sem vídeo, sempre passa por aqui antes de aparecer.',
+      },
+    },
+    {
+      name: 'emailVisitante',
+      type: 'text',
+      maxLength: 254,
+      index: true,
+      label: 'E-mail de quem anunciou sem conta (só a equipe vê)',
+      access: { create: () => false, update: () => false, read: isStaff },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description:
+          'Privado: não divulgue. Serve para avisar a pessoa quando o anúncio for aprovado ou recusado e para limitar a 3 anúncios por e-mail. Some junto com o anúncio.',
+      },
     },
     {
       name: 'consentAt',

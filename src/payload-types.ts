@@ -442,7 +442,7 @@ export interface AdCategory {
   createdAt: string;
 }
 /**
- * Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados.
+ * Anúncios do ClassiSex. Novos e editados entram como "Em análise" e só aparecem depois de aprovados. Os enviados sem conta (coluna "Enviado sem conta") também passam por aqui.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ads".
@@ -454,7 +454,7 @@ export interface Ad {
    */
   resumo?: string | null;
   /**
-   * Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).
+   * Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios). "Visitantes (sem conta)" é a conta técnica dos anúncios enviados sem cadastro.
    */
   author: number | Assinante;
   /**
@@ -520,6 +520,14 @@ export interface Ad {
   fonteLegado?: ('classisex' | 'mural') | null;
   importadoEm?: string | null;
   criadoNoSiteAntigoEm?: string | null;
+  /**
+   * Enviado pelo formulário aberto, por alguém sem conta. 1 foto, sem vídeo, sempre passa por aqui antes de aparecer.
+   */
+  enviadoSemConta?: boolean | null;
+  /**
+   * Privado: não divulgue. Serve para avisar a pessoa quando o anúncio for aprovado ou recusado e para limitar a 3 anúncios por e-mail. Some junto com o anúncio.
+   */
+  emailVisitante?: string | null;
   /**
    * O anunciante declarou ter 18 anos ou mais e autorização de todas as pessoas das fotos e do vídeo.
    */
@@ -1468,6 +1476,8 @@ export interface AdsSelect<T extends boolean = true> {
   fonteLegado?: T;
   importadoEm?: T;
   criadoNoSiteAntigoEm?: T;
+  enviadoSemConta?: T;
+  emailVisitante?: T;
   consentAt?: T;
   updatedAt?: T;
   createdAt?: T;

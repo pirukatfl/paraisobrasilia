@@ -43,7 +43,6 @@ import {
   AD_MESSAGES,
   DRAFT_STATUS,
   validateAdInput,
-  type AdErrors,
   type AdInput,
   type AdStatus,
 } from './rules'
@@ -51,8 +50,8 @@ import {
 export class ServiceError extends Error {
   code: string
   status: number
-  errors?: AdErrors
-  constructor(code: string, message: string, status = 400, errors?: AdErrors) {
+  errors?: Record<string, string>
+  constructor(code: string, message: string, status = 400, errors?: Record<string, string>) {
     super(message)
     this.name = 'ServiceError'
     this.code = code
@@ -111,7 +110,7 @@ function validated(input: AdInput, legacy = false) {
   return result.value
 }
 
-async function assertActiveCategory(payload: Payload, euSou: number) {
+export async function assertActiveCategory(payload: Payload, euSou: number) {
   const category = await payload.findByID({
     collection: 'ad-categories',
     id: euSou,

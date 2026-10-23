@@ -26,6 +26,8 @@ export const AD_MEDIA_MESSAGES = {
   fotosGratis: 'Conta gratuita: 1 foto por anúncio. Assine para enviar até 10 fotos e 2 vídeos.',
   videoGratis: 'Conta gratuita não envia vídeos. Assine para enviar até 2 vídeos.',
   semAnuncio: 'Anúncio não encontrado.',
+  fotosSemConta: 'Anúncio sem conta: 1 foto, sem vídeo. Assinantes enviam até 10 fotos e 2 vídeos.',
+  videoSemConta: 'Anúncio sem conta: 1 foto, sem vídeo. Assinantes enviam até 10 fotos e 2 vídeos.',
 } as const
 
 export type UploadErrorCode =
@@ -41,6 +43,8 @@ export type UploadErrorCode =
   | 'video-ilegivel'
   | 'indisponivel'
   | 'limite-anuncios'
+  | 'fotos-sem-conta'
+  | 'video-sem-conta'
 
 /** Shown on the edit page from ?midia=erro&codigo=… (the URL carries only the code). */
 export const UPLOAD_ERROR_MESSAGES: Record<UploadErrorCode, string> = {
@@ -56,6 +60,8 @@ export const UPLOAD_ERROR_MESSAGES: Record<UploadErrorCode, string> = {
   'video-ilegivel': AD_MEDIA_MESSAGES.videoIlegivel,
   indisponivel: 'Envio de fotos indisponível no momento. Tente mais tarde ou avise a equipe.',
   'limite-anuncios': 'Você já tem 3 anúncios ativos. Apague um para mandar este de volta para análise.',
+  'fotos-sem-conta': AD_MEDIA_MESSAGES.fotosSemConta,
+  'video-sem-conta': AD_MEDIA_MESSAGES.videoSemConta,
 }
 
 export const MEDIA_OK_MESSAGES: Record<string, string> = {

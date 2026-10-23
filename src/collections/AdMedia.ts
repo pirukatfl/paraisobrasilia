@@ -2,7 +2,6 @@ import fs from 'fs/promises'
 import path from 'path'
 import {
   APIError,
-  type CollectionAfterChangeHook,
   type CollectionAfterDeleteHook,
   type CollectionBeforeOperationHook,
   type CollectionConfig,

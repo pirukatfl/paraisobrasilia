@@ -17,6 +17,9 @@ export const TIER_LIMITS: Record<Tier, { fotos: number; videos: number; anuncios
   assinante: { fotos: MAX_AD_PHOTOS, videos: MAX_AD_VIDEOS, anunciosAtivos: ACTIVE_LIMIT },
 }
 
+/** Ad sent without an account (2026-10-23): one photo, no video, same 3 active ads per e-mail. */
+export const VISITANTE_LIMITS = { fotos: 1, videos: 0, anunciosAtivos: ACTIVE_LIMIT } as const
+
 export function tierOf(access: { state: AccessState }): Tier {
   return access.state === 'ativa' ? 'assinante' : 'gratis'
 }
