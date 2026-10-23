@@ -58,22 +58,22 @@ describe('aprovação em lote dos anúncios (lista do admin)', () => {
 
   it('reports what fails with the reason and leaves it as it was; the rest is approved', async () => {
     const ok = await seedAd(payload, { author: author.id })
-    const noContact = await seedAd(payload, { author: author.id, status: 'rascunho', origemLegado: 'equipe', contato: {} })
+    const tooLong = await seedAd(payload, { author: author.id, status: 'rascunho', origemLegado: 'equipe', texto: 'a'.repeat(601) })
     const memberDraft = await seedAd(payload, { author: author.id, status: 'rascunho' })
     const already = await seedAd(payload, { author: author.id, status: 'aprovado' })
     const missing = 999_999
 
-    const result = await approveAds(req, [noContact.id, ok.id, memberDraft.id, already.id, missing], NOW)
+    const result = await approveAds(req, [tooLong.id, ok.id, memberDraft.id, already.id, missing], NOW)
     expect(result.aprovados).toEqual([ok.id])
-    expect(result.falhas.map((f) => f.id)).toEqual([noContact.id, memberDraft.id, already.id, missing])
+    expect(result.falhas.map((f) => f.id)).toEqual([tooLong.id, memberDraft.id, already.id, missing])
     const reasons = Object.fromEntries(result.falhas.map((f) => [f.id, f.motivo]))
-    expect(reasons[noContact.id]).toMatch(/WhatsApp|Telegram|contato/i)
+    expect(reasons[tooLong.id]).toMatch(/600/)
     expect(reasons[memberDraft.id]).toBe('Este anúncio já está em rascunho (só o anunciante pode enviar).')
     expect(reasons[already.id]).toBe('Este anúncio já está publicado.')
     expect(reasons[missing]).toBe('Anúncio não encontrado.')
-    expect(result.falhas.find((f) => f.id === noContact.id)?.resumo).toBeTruthy()
+    expect(result.falhas.find((f) => f.id === tooLong.id)?.resumo).toBeTruthy()
 
-    expect((await load(noContact.id)).status).toBe('rascunho')
+    expect((await load(tooLong.id)).status).toBe('rascunho')
     expect((await load(memberDraft.id)).status).toBe('rascunho')
     expect((await load(ok.id)).status).toBe('aprovado')
     expect(await audit('anuncio-aprovado')).toHaveLength(1)

@@ -50,7 +50,7 @@ type Contato = { whatsapp?: string | null; telegram?: string | null }
 
 /**
  * Same normalisation as the members form (src/lib/classisex/rules.ts) for staff edits in the
- * admin, plus "at least one contact" (a group-level rule Payload field validation cannot express).
+ * admin; the contact is optional (client 2026-10-23).
  */
 const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, originalDoc, req }) => {
   if (!data) return data
@@ -66,7 +66,6 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
   if (typeof data.cidade === 'string') data.cidade = data.cidade.replace(/\s+/g, ' ').trim() || null
   if (typeof data.texto === 'string') data.texto = data.texto.replace(/\r\n/g, '\n').trim()
 
-  const merged = { ...((originalDoc?.contato as Contato | undefined) ?? {}), ...((data.contato as Contato) ?? {}) }
   // M-04: a draft brought from the old site may have no contact yet; the owner adds it before sending
   const status = (data.status ?? originalDoc?.status) as string | undefined
   // Client decision 2026-10-22: old-site ads are exempt from the contact field and the text-size limit
@@ -77,12 +76,6 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
     if (texto) {
       throw new ValidationError({ collection: 'ads', errors: [{ path: 'texto', message: texto }], req }, req.t)
     }
-  }
-  if (!merged.whatsapp && !merged.telegram && status !== DRAFT_STATUS && !legacy) {
-    throw new ValidationError(
-      { collection: 'ads', errors: [{ path: 'contato.whatsapp', message: AD_MESSAGES.contato }], req },
-      req.t,
-    )
   }
   return data
 }

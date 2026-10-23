@@ -10,9 +10,9 @@ import {
 } from '../../src/lib/classisex/rules'
 
 describe('ad sent without an account: extras (S-02, S-05)', () => {
-  const ok = { email: 'Pessoa@Exemplo.com', maior18: true, termos: true }
+  const ok = { email: 'Pessoa@Exemplo.com', termos: true }
 
-  it('accepts a valid e-mail, 18+ and terms', () => {
+  it('accepts a valid e-mail and terms', () => {
     expect(validateVisitorExtras(ok)).toEqual({})
   })
 
@@ -21,15 +21,19 @@ describe('ad sent without an account: extras (S-02, S-05)', () => {
     expect(normaliseVisitorEmail(undefined)).toBe('')
   })
 
-  it.each(['', '   ', 'sem-arroba', 'a@b', '@x.com', 'a@.com'.slice(0, 0), `${'a'.repeat(EMAIL_MAX)}@b.co`])(
+  it('the e-mail is optional', () => {
+    expect(validateVisitorExtras({ ...ok, email: '' })).toEqual({})
+    expect(validateVisitorExtras({ ...ok, email: '   ' })).toEqual({})
+  })
+
+  it.each(['sem-arroba', 'a@b', '@x.com', `${'a'.repeat(EMAIL_MAX)}@b.co`])(
     'refuses the e-mail %j',
     (email) => {
       expect(validateVisitorExtras({ ...ok, email }).email).toBe(VISITOR_MESSAGES.email)
     },
   )
 
-  it('requires 18+ and the terms', () => {
-    expect(validateVisitorExtras({ ...ok, maior18: false })).toEqual({ maior18: VISITOR_MESSAGES.maior18 })
+  it('requires the terms', () => {
     expect(validateVisitorExtras({ ...ok, termos: false })).toEqual({ termos: VISITOR_MESSAGES.termos })
   })
 

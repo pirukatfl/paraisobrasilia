@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Open ad form for people WITHOUT an account (client decision 2026-10-23, S-13): POST multipart with the
- * ad fields, e-mail, 18+, terms, the honeypot `website` and at most one `foto`. One request, so the ad and
+ * ad fields (incl. the 18+ declaration `consent`), e-mail, terms, the honeypot `website` and at most one `foto`. One request, so the ad and
  * its photo succeed or fail together (a failed photo deletes the ad).
  *
  * - Not a server action: the server-action body limit stays as it is.
@@ -122,7 +122,6 @@ export async function POST(request: Request) {
         consent: text(form, 'consent') === 'sim',
       },
       email: text(form, 'email'),
-      maior18: text(form, 'maior18') === 'sim',
       termos: text(form, 'termos') === 'sim',
       website: text(form, 'website'),
       files,

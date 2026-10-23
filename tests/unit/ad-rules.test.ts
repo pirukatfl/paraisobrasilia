@@ -60,7 +60,6 @@ describe('ClassiSex ad rules (D-01, D-02)', () => {
   })
 
   it.each([
-    [{ whatsapp: '', telegram: '' }, 'contato', 'Informe pelo menos um contato: WhatsApp ou Telegram.'],
     [{ apelido: '  ' }, 'apelido', 'Escolha um apelido para o anúncio.'],
     [{ apelido: 'a'.repeat(41) }, 'apelido', 'O apelido pode ter até 40 caracteres.'],
     [{ texto: '   ' }, 'texto', 'Escreva o texto do anúncio.'],
@@ -91,9 +90,10 @@ describe('ClassiSex ad rules (D-01, D-02)', () => {
     expect(validateAdInput({ ...valid, apelido: 'a'.repeat(40) }).ok).toBe(true)
   })
 
-  it('has no e-mail contact', () => {
+  it('the contact is optional and an e-mail is never stored as contact', () => {
     const result = validateAdInput({ ...valid, whatsapp: '', telegram: '', email: 'a@b.com' } as AdInput)
-    expect(result.ok).toBe(false)
+    expect(result.ok).toBe(true)
+    if (result.ok) expect(result.value.contato).toEqual({ whatsapp: null, telegram: null })
   })
 
   it('accepts exactly 600 characters', () => {

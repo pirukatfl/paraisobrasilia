@@ -258,7 +258,7 @@ ou Trans), **cidade** e o **texto na íntegra** — com a **foto de capa, nítid
 O mural carrega **sozinho conforme a pessoa rola a página** (rolagem infinita, 20 anúncios por vez), sem botão de "próxima página"; no fim aparece "Você chegou ao fim dos anúncios". Se a internet falhar, o botão **Carregar mais** continua disponível. Só os **meios de contato** ficam de fora: o site apaga sozinho do texto telefones, e-mails, links, @usuários e nomes de
 aplicativo seguidos de contato (aparece "[contato só para assinantes]"), e os campos de WhatsApp e Telegram nunca saem do
 servidor. Por isso confira o texto na **Moderação**: o apagamento automático não pega tudo (números escritos por extenso,
-por exemplo). As demais fotos, os vídeos e os contatos (**WhatsApp e Telegram**, pelo menos um; não há campo de
+por exemplo). As demais fotos, os vídeos e os contatos (**WhatsApp e Telegram**, opcionais; não há campo de
 e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
 vence, o anúncio da pessoa **continua no ar como gratuito**: só a capa, sem vídeos, até ela renovar.
 
@@ -270,12 +270,12 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 1. No painel inicial, a caixa **ClassiSex** mostra "N anúncios para aprovar" e "N denúncias abertas".
 2. Clique em **Ver fila**: os anúncios em análise aparecem, **os mais antigos primeiro**.
 3. **Aprovar direto na lista** (sem abrir o anúncio): cada linha de anúncio em análise (e de rascunho antigo da equipe) tem
-   o botão **Aprovar**. Ele faz exatamente o mesmo que o botão do quadro Moderação: vale a regra do contato obrigatório,
-   do texto de até 600 caracteres e fica no Registro de ações. Se algo não passar, a mensagem aparece na própria linha e o
+   o botão **Aprovar**. Ele faz exatamente o mesmo que o botão do quadro Moderação: vale a regra do
+   texto de até 600 caracteres e fica no Registro de ações. Se algo não passar, a mensagem aparece na própria linha e o
    anúncio continua como estava.
 4. **Aprovar vários de uma vez**: marque os anúncios na lista (a caixa do topo marca a página inteira; "selecionar todos"
    pega todas as páginas do filtro, até 200 por vez) e clique em **Aprovar selecionados (N)**, acima da tabela. O quadro
-   mostra quantos foram aprovados e, para os que **não** passaram (sem contato, já publicado, rascunho de assinante...), o
+   mostra quantos foram aprovados e, para os que **não** passaram (texto acima de 600 caracteres, já publicado, rascunho de assinante...), o
    motivo de cada um com o link do anúncio; esses ficam como estavam. Dica: **leia antes de aprovar em massa**, porque o
    texto vai ao ar para visitantes.
 5. Quando o anunciante edita um anúncio já aprovado, ele **volta para a fila** e sai do ar até você aprovar de novo.
@@ -323,17 +323,20 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 ### Anúncios sem conta
 
 Desde 23/10/2026 **qualquer pessoa pode anunciar, sem cadastro**: o botão **Anunciar** do ClassiSex abre um formulário com
-os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, WhatsApp ou Telegram, declaração) mais o **e-mail**
-da pessoa, "tenho 18 anos ou mais" e o aceite dos Termos.
+os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, WhatsApp ou Telegram, declaração de 18 anos) mais o
+**e-mail** da pessoa (opcional) e o aceite dos Termos. **Só são obrigatórios**: apelido, Eu sou, texto, a declaração de
+18 anos ou mais e o aceite dos Termos (no anúncio de assinante, os mesmos, menos os Termos). Cidade, contato, foto e e-mail são opcionais.
 
 - Vale a **mesma regra de quem paga**, menos a mídia: **1 foto (opcional) e nenhum vídeo**, até 600 caracteres, contato
-  obrigatório. No máximo **3 anúncios em análise ou publicados por e-mail**.
+  opcional. No máximo **3 anúncios em análise ou publicados por e-mail** (o limite só vale quando a pessoa informa o
+  e-mail; em qualquer caso há um limite de envios por hora por conexão). A foto aceita JPG, PNG ou WebP até 15 MB; foto
+  HEIC do iPhone é convertida em JPG pelo próprio celular ao escolher.
 - O anúncio **sempre entra "Em análise"** e só aparece depois de você aprovar. Na lista de **Anúncios** há a coluna
   **Enviado sem conta** (e o filtro pelo mesmo campo) e, no painel inicial, o link **"N sem conta em análise"** na caixa
   ClassiSex. Na **Moderação**, "Conta do anunciante" mostra "Sem conta (visitante)".
 - O **e-mail** da pessoa aparece só na barra lateral do anúncio (**E-mail de quem anunciou sem conta**). É **privado**:
   nunca passe a ninguém. Ele some junto com o anúncio quando você o apaga.
-- A pessoa **recebe um e-mail** quando você **aprova, recusa ou despublica** (com o motivo, se houver). Não há e-mail ao
+- Se a pessoa informou o e-mail, ela **recebe um e-mail** quando você **aprova, recusa ou despublica** (com o motivo, se houver). Não há e-mail ao
   enviar. O e-mail não é confirmado: pode ter erro de digitação, e a pessoa então não recebe o aviso.
 - A pessoa **não consegue editar nem apagar** (não tem login). Se pedir para tirar, **apague o anúncio** pelo painel. Ela
   pode criar uma conta gratuita para ter esse controle nos próximos anúncios.

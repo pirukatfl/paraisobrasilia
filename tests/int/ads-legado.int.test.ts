@@ -58,16 +58,13 @@ describe('anúncios antigos publicados: isenções e redação (decisão do clie
     expect(doc.texto.length).toBeGreaterThan(TEXT_MAX)
   })
 
-  it('keeps every limit for NEW ads: contact required, 600 characters', async () => {
+  it('keeps the text limit for NEW ads (600 characters); the contact is optional', async () => {
     await createAd(payload, { assinanteId: owner.id, input: input(), now: NOW }) // control: the valid input passes
-    await expect(seedAd(payload, { author: owner.id, status: 'aprovado', contato: {} })).rejects.toThrow()
+    await seedAd(payload, { author: owner.id, status: 'aprovado', contato: {} }) // no contact is fine
     await expect(seedAd(payload, { author: owner.id, status: 'aprovado', texto: LONG_TEXT })).rejects.toThrow()
     await expect(createAd(payload, { assinanteId: owner.id, input: input({ texto: LONG_TEXT }), now: NOW })).rejects.toBeInstanceOf(
       ServiceError,
     )
-    await expect(
-      createAd(payload, { assinanteId: owner.id, input: input({ whatsapp: '' }), now: NOW }),
-    ).rejects.toBeInstanceOf(ServiceError)
   })
 
   it('does not count old ads in the active-ads limit of new ads', async () => {
@@ -103,11 +100,9 @@ describe('anúncios antigos publicados: isenções e redação (decisão do clie
     ).rejects.toBeInstanceOf(ServiceError)
   })
 
-  it('an edited NEW ad still needs a contact and 600 characters', async () => {
+  it('an edited NEW ad still needs 600 characters at most (the contact is optional)', async () => {
     const ad = await seedAd(payload, { author: owner.id, status: 'aprovado' })
-    await expect(
-      updateAd(payload, { assinanteId: owner.id, id: ad.id, input: input({ whatsapp: '' }), now: NOW }),
-    ).rejects.toBeInstanceOf(ServiceError)
+    await updateAd(payload, { assinanteId: owner.id, id: ad.id, input: input({ whatsapp: '', telegram: '' }), now: NOW })
     await expect(
       updateAd(payload, { assinanteId: owner.id, id: ad.id, input: input({ texto: LONG_TEXT }), now: NOW }),
     ).rejects.toBeInstanceOf(ServiceError)

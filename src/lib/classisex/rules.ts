@@ -23,7 +23,6 @@ export const ACTIVE_LIMIT = 3
 export const ACTIVE_STATUSES: AdStatus[] = ['pendente', 'aprovado']
 
 export const AD_MESSAGES = {
-  contato: 'Informe pelo menos um contato: WhatsApp ou Telegram.',
   apelidoVazio: 'Escolha um apelido para o anúncio.',
   apelidoLongo: `O apelido pode ter até ${APELIDO_MAX} caracteres.`,
   apelidoContato: 'O apelido não pode ter telefone, e-mail, @ ou link. Use só um nome ou apelido.',
@@ -59,7 +58,7 @@ export type NormalisedAd = {
   contato: AdContato
 }
 
-export type AdErrors = Partial<Record<keyof AdInput | 'contato', string>>
+export type AdErrors = Partial<Record<keyof AdInput, string>>
 
 const WHATSAPP_RE = /^55\d{10,11}$/
 const TELEGRAM_RE = /^[A-Za-z0-9_]{5,32}$/
@@ -142,7 +141,6 @@ export function validateAdInput(
   if (tErr) errors.texto = tErr
   if (whatsapp && !isValidWhatsapp(whatsapp)) errors.whatsapp = AD_MESSAGES.whatsapp
   if (telegram && !isValidTelegram(telegram)) errors.telegram = AD_MESSAGES.telegram
-  if (!whatsapp && !telegram && !legacy) errors.contato = AD_MESSAGES.contato
   if (!input.consent) errors.consent = AD_MESSAGES.consent
 
   if (Object.keys(errors).length > 0) return { ok: false, errors }
@@ -160,14 +158,13 @@ export function validateAdInput(
 }
 
 // ---------------------------------------------------------------------------------------------
-// Ad sent WITHOUT an account (client decision 2026-10-23): same ad rules, plus e-mail, 18+ and terms.
+// Ad sent WITHOUT an account (client decision 2026-10-23): same ad rules, plus e-mail and terms.
 // ---------------------------------------------------------------------------------------------
 
 export const EMAIL_MAX = 254
 
 export const VISITOR_MESSAGES = {
   email: 'Informe um e-mail válido. Só a equipe vê.',
-  maior18: 'Confirme que você tem 18 anos ou mais.',
   termos: 'Aceite os Termos de Uso e a Política de Privacidade para enviar.',
   limite:
     'Este e-mail já tem 3 anúncios em análise ou publicados. Espere a análise ou crie uma conta para gerenciar seus anúncios.',
@@ -179,15 +176,15 @@ const VISITOR_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 /** Lower-case, no surrounding or inner spaces: the form in which the address is stored and compared. */
 export const normaliseVisitorEmail = (value: unknown): string => String(value ?? '').replace(/\s+/g, '').toLowerCase()
 
-export type VisitorExtras = { email: string; maior18: boolean; termos: boolean }
-export type VisitorErrors = Partial<Record<'email' | 'maior18' | 'termos', string>>
+export type VisitorExtras = { email: string; termos: boolean }
+export type VisitorErrors = Partial<Record<'email' | 'termos', string>>
 
-/** E-mail (only staff see it), 18+ and terms. Returns only the errors found. */
+/** Optional e-mail (only staff see it) and terms. Returns only the errors found. */
 export function validateVisitorExtras(input: VisitorExtras): VisitorErrors {
   const errors: VisitorErrors = {}
   const email = normaliseVisitorEmail(input.email)
-  if (!email || email.length > EMAIL_MAX || !VISITOR_EMAIL_RE.test(email)) errors.email = VISITOR_MESSAGES.email
-  if (!input.maior18) errors.maior18 = VISITOR_MESSAGES.maior18
+  // The e-mail is optional (client 2026-10-23): checked only when given
+  if (email && (email.length > EMAIL_MAX || !VISITOR_EMAIL_RE.test(email))) errors.email = VISITOR_MESSAGES.email
   if (!input.termos) errors.termos = VISITOR_MESSAGES.termos
   return errors
 }

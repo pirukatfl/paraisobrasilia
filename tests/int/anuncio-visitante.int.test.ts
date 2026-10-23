@@ -8,7 +8,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 import { findPublicAds } from '../../src/lib/classisex/board'
 import type { AdInput } from '../../src/lib/classisex/rules'
 import { VISITANTES_EMAIL, createVisitorAd, ensureVisitantesAccount, type VisitorAdInput } from '../../src/lib/classisex/visitante'
-import { approveAd, approveAds, getModerationView, ServiceError, rejectAd, unpublishAd } from '../../src/lib/classisex/service'
+import { approveAd, approveAds, getModerationView, rejectAd, unpublishAd } from '../../src/lib/classisex/service'
 import { buildMp4 } from '../helpers/mp4-fixtures'
 import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante, seedStaffUser } from '../helpers/seed'
 
@@ -65,7 +65,6 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     return createVisitorAd(payload, {
       input: input(partial),
       email: over.email ?? who.email,
-      maior18: true,
       termos: true,
       website: '',
       files: [{ data: await jpeg(), mimetype: 'image/jpeg', name: 'foto.jpg', size: 1000 }],
@@ -133,10 +132,7 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     expect(await countAds()).toBe(0)
   })
 
-  it('applies the same text and contact rules as a paying author', async () => {
-    const noContact = await send({ input: { whatsapp: '', telegram: '' } }).catch((e) => e)
-    expect(noContact).toBeInstanceOf(ServiceError)
-    expect(noContact.errors.contato).toBeTruthy()
+  it('applies the same text rules as a paying author', async () => {
     const longText = await send({ input: { texto: 'a'.repeat(601) } }).catch((e) => e)
     expect(longText.errors.texto).toBeTruthy()
     const nickWithPhone = await send({ input: { apelido: 'Casal 61 99988-9772' } }).catch((e) => e)
@@ -146,10 +142,18 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     expect(await countAds()).toBe(0)
   })
 
-  it('validates e-mail, 18+ and terms', async () => {
-    const err = await send({ email: 'sem-arroba', maior18: false, termos: false }).catch((e) => e)
+  it('accepts an ad with no contact and no e-mail (both optional); only the IP limit applies', async () => {
+    const r = await send({ email: '', input: { whatsapp: '', telegram: '' } })
+    expect(r.id).toEqual(expect.any(Number))
+    const doc = await payload.findByID({ collection: 'ads', id: r.id as number, depth: 0, overrideAccess: true })
+    expect(doc.status).toBe('pendente')
+    expect(doc.emailVisitante ?? null).toBeNull()
+  })
+
+  it('validates e-mail (when given) and terms', async () => {
+    const err = await send({ email: 'sem-arroba', termos: false }).catch((e) => e)
     expect(err.code).toBe('invalido')
-    expect(Object.keys(err.errors)).toEqual(expect.arrayContaining(['email', 'maior18', 'termos']))
+    expect(Object.keys(err.errors)).toEqual(expect.arrayContaining(['email', 'termos']))
     expect(await countAds()).toBe(0)
   })
 
