@@ -70,6 +70,7 @@ test('1. Ana and Beto see the conversation in Recados; the unread number sits ne
     'ClassiSex',
     'Recados',
     'Contos',
+    'Dicas Hot',
     'Meus anúncios',
     'Trocar senha',
   ])
