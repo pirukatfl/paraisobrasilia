@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-19)
 
 **Core value:** Quem chega ao site entende rapidamente o que é a casa, vê as próximas festas e consegue chegar até ela; quem é assinante encontra perfis e consegue fazer contato.
-**Current focus:** Phase 7 — lançamento e desempenho
+**Current focus:** Phase 06.1 — galeria de modelos com página por modelo (planned, 4 plans) · depois Phase 7
 
 ## Current Position
 
-Phase: 7 of 7 (lançamento e desempenho)
-Plan: Not started
-Status: Ready to plan
+Phase: 06.1 (galeria de modelos com página por modelo, inserida antes da 7)
+Plan: 0 of 4
+Status: Ready to execute
 Last activity: 2026-10-23
 
 Progress: [██████████] 98%
