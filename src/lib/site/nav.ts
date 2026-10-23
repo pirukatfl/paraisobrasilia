@@ -3,7 +3,7 @@
  * Fixed order (UI-SPEC Phase 2, updated by 05-03; Recados removed 2026-10-20, quick recados-privados): Festas · Quem somos ·
  * Espaço · Modelos · ClassiSex · Contos (05-03) · Dicas Hot (quick dicas-hot-menu) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
- * 02-04 Modelos (only when at least one model is published), 03-01 Área do assinante, 03-02 Assine Já,
+ * 02-04 Modelos (always listed since quick menu-modelos; the page shows an empty state until a model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
@@ -11,7 +11,7 @@ import { pathForKey } from '../pages/keys'
 
 export type NavItem = { href: string; label: string; children?: NavItem[] }
 
-export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels: false }): NavItem[] {
+export function getNavItems(): NavItem[] {
   return [
     { href: '/', label: 'Festas' },
     {
@@ -24,8 +24,8 @@ export function getNavItems({ hasModels }: { hasModels: boolean } = { hasModels:
       ],
     },
     { href: '/espaco', label: 'Espaço' },
-    // D-08: secondary section, listed only while at least one model is published
-    ...(hasModels ? [{ href: '/modelos', label: 'Modelos' }] : []),
+    // quick menu-modelos: always listed (client request); /modelos shows an empty state until a model is published
+    { href: '/modelos', label: 'Modelos' },
     // PREV-01: open preview; the full board lives in the members area
     { href: '/classisex', label: 'ClassiSex' },
     // PREV-03: open excerpts of the contos (05-03)

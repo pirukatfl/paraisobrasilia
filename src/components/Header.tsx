@@ -2,19 +2,10 @@ import Link from 'next/link'
 
 import { MobileMenu } from '@/components/MobileMenu'
 import { Nav } from '@/components/Nav'
-import { hasPublishedModels } from '@/lib/gallery/queries'
 import { getNavItems } from '@/lib/site/nav'
 
-async function modelsVisible(): Promise<boolean> {
-  try {
-    return await hasPublishedModels()
-  } catch {
-    return false // no database (build-time prerender of the static 404 page)
-  }
-}
-
-export async function Header() {
-  const items = getNavItems({ hasModels: await modelsVisible() })
+export function Header() {
+  const items = getNavItems()
   return (
     <header className="header-line relative z-30 bg-bg">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 lg:px-8">

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 
-// MIDIA-06/07, PAINEL-09 (Phase 06.1): cards link to /modelos/{slug}; the section exists only when a model is published.
+// MIDIA-06/07, PAINEL-09 (Phase 06.1): cards link to /modelos/{slug}; the menu item is always there; /modelos shows an empty state until a model is published.
 test.describe.configure({ mode: 'serial' })
 
 test.beforeEach(async ({ context, baseURL }) => {
@@ -14,12 +14,16 @@ test.afterAll(async ({ request }) => {
   await api.deleteAll('models')
 })
 
-test('without published models /modelos is a 404', async ({ page, request }) => {
+test('without published models /modelos shows the empty state (not a 404)', async ({ page, request }) => {
   const api = await staffApi(request)
   await api.deleteAll('models')
   await api.createModel({ name: 'Rascunho', photos: 1, published: false })
   const res = await page.goto('/modelos')
-  expect(res?.status()).toBe(404)
+  expect(res?.status()).toBe(200)
+  await expect(page.getByRole('heading', { name: 'Modelos', level: 1 })).toBeVisible()
+  await expect(page.getByText('Em breve, as modelos da casa aqui.')).toBeVisible()
+  await expect(page.locator('main a[href^="/modelos/"]')).toHaveCount(0)
+  expect((await page.goto('/modelos/rascunho'))?.status()).toBe(404)
 })
 
 test('cards open the model page with name, description and photos (G-01)', async ({ page, request }) => {
@@ -95,7 +99,7 @@ test('drafts and unknown slugs are 404', async ({ page, request }) => {
   expect((await page.goto('/modelos/publicada'))?.status()).toBe(200)
 })
 
-test('Modelos appears in nav, footer and sitemap only while a model is published', async ({
+test('Modelos is always in nav and footer; the sitemap lists it only while a model is published', async ({
   page,
   request,
   isMobile,
@@ -115,8 +119,8 @@ test('Modelos appears in nav, footer and sitemap only while a model is published
 
   let links = await navLinks()
   await expect(links.filter({ hasText: 'Contato' })).toHaveCount(1)
-  await expect(links.filter({ hasText: 'Modelos' })).toHaveCount(0)
-  await expect(page.locator('footer').getByRole('link', { name: 'Modelos' })).toHaveCount(0)
+  await expect(links.filter({ hasText: 'Modelos' })).toHaveCount(1)
+  await expect(page.locator('footer').getByRole('link', { name: 'Modelos' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/modelos</loc>')
 
   await api.createModel({ name: 'Aurora', photos: 1 })
@@ -147,7 +151,7 @@ test.describe('staff unpublishes a model (fast removal)', () => {
   test.skip(({ isMobile }) => isMobile, 'admin flow runs on desktop only')
   test.use({ locale: 'pt-BR', timezoneId: 'America/Sao_Paulo' })
 
-  test('Despublicar removes /modelos, the model page and the nav link at once', async ({ page, request, context }) => {
+  test('Despublicar takes the model page down at once and /modelos falls back to the empty state', async ({ page, request, context }) => {
     test.setTimeout(180_000)
     const api = await staffApi(request)
     await api.deleteAll('models')
@@ -167,9 +171,10 @@ test.describe('staff unpublishes a model (fast removal)', () => {
     await confirm.getByRole('button', { name: 'Confirmar' }).click()
     await expect(page.getByText('Status: Rascunho')).toBeVisible()
 
-    expect((await site.goto('/modelos'))?.status()).toBe(404)
+    expect((await site.goto('/modelos'))?.status()).toBe(200)
+    await expect(site.getByText('Em breve, as modelos da casa aqui.')).toBeVisible()
     expect((await site.goto('/modelos/aurora'))?.status()).toBe(404)
     await site.goto('/')
-    await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Modelos' })).toHaveCount(0)
+    await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Modelos' })).toHaveCount(1)
   })
 })
