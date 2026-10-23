@@ -96,9 +96,9 @@ test('new ad: fields, contact error keeps the text, valid submit waits for appro
   await main.getByLabel('Cidade (opcional, só assinantes veem)').fill('Brasília')
   await main.getByLabel('Texto do anúncio').fill(TEXTO)
   await main.getByLabel('WhatsApp').fill('')
-  await main.getByLabel(DECLARACAO).check()
+  // The contact is optional; the declaration is not
   await main.getByRole('button', { name: 'Enviar para aprovação' }).click()
-  await expect(main.getByRole('alert').filter({ hasText: 'Informe pelo menos um contato' })).toBeVisible()
+  await expect(main.getByRole('alert').filter({ hasText: 'Confirme a declaração' })).toBeVisible()
   await expect(main.getByLabel('Texto do anúncio')).toHaveValue(TEXTO)
 
   await main.getByLabel('WhatsApp').fill(BIA.whatsapp)

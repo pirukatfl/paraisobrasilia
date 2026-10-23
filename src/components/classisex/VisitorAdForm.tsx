@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRef, useState, type FormEvent } from 'react'
 
-import { AdFormFields, FieldError, inputClass } from './AdFormFields'
+import { AdFormFields, FieldError, Required, inputClass } from './AdFormFields'
+import { VisitorPhotoPicker } from './VisitorPhotoPicker'
 
 import type { AdFormValues } from '@/lib/classisex/actions'
 
@@ -19,7 +20,7 @@ const field = (form: FormData, name: string) => {
 
 /**
  * Open form of /classisex/anunciar for people without an account (client decision 2026-10-23, S-01).
- * The same ad fields as the subscriber form (AdFormFields) plus e-mail, 18+, terms, a hidden honeypot and ONE
+ * The same ad fields as the subscriber form (AdFormFields) plus e-mail, terms, a hidden honeypot and ONE
  * photo. Without JavaScript it is a plain multipart POST (303 back with ?erro=); with JavaScript it posts with
  * fetch and keeps what was typed when the server refuses. The server decides every limit again.
  */
@@ -37,6 +38,8 @@ export function VisitorAdForm({
   const [values, setValues] = useState<AdFormValues>(EMPTY)
   const [email, setEmail] = useState('')
   const [pending, setPending] = useState(false)
+
+  const fieldsKey = JSON.stringify([values, email])
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -82,10 +85,8 @@ export function VisitorAdForm({
   }
 
   return (
-    // The key re-mounts the uncontrolled fields with the values the server just refused
     <form
       ref={formRef}
-      key={JSON.stringify(values)}
       action="/classisex/anunciar/enviar"
       method="post"
       encType="multipart/form-data"
@@ -99,11 +100,12 @@ export function VisitorAdForm({
         </p>
       )}
 
-      <AdFormFields categories={categories} values={values} errors={errors} />
+      {/* The key re-mounts the uncontrolled fields with the values the server just refused; the photo picker sits outside it so the chosen photo survives a refusal */}
+      <AdFormFields key={fieldsKey} categories={categories} values={values} errors={errors} />
 
-      <div className="flex flex-col gap-2">
+      <div key={fieldsKey} className="flex flex-col gap-2">
         <label htmlFor="email" className="type-label text-text">
-          Seu e-mail
+          Seu e-mail (opcional)
         </label>
         <input
           id="email"
@@ -115,41 +117,17 @@ export function VisitorAdForm({
           className={inputClass}
         />
         <p id="ajuda-email" className="type-label text-muted">
-          Só a equipe vê. Usamos para avisar quando o anúncio for publicado ou recusado.
+          Opcional, para avisarmos quando o anúncio for publicado ou recusado. Só a equipe vê.
         </p>
         <FieldError id="erro-email" message={errors.email} />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label htmlFor="foto" className="type-label text-text">
-          Foto (opcional)
-        </label>
-        <input
-          id="foto"
-          name="foto"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          aria-describedby={['ajuda-foto', errors.foto ? 'erro-foto' : ''].filter(Boolean).join(' ')}
-          className="text-body"
-        />
-        <p id="ajuda-foto" className="type-label text-muted">
-          Sem conta: 1 foto (JPG, PNG ou WebP, até 15 MB), sem vídeo. Assinantes enviam até 10 fotos e 2 vídeos.
-        </p>
-        <FieldError id="erro-foto" message={errors.foto} />
-      </div>
+      <VisitorPhotoPicker error={errors.foto} />
 
       {/* Honeypot: people never see or fill it */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label htmlFor="vis-website">Não preencha este campo</label>
         <input id="vis-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
-      </div>
-
-      <div className="flex flex-col gap-1">
-        <label className="flex items-start gap-3 text-body text-text">
-          <input type="checkbox" name="maior18" value="sim" className={checkbox} aria-describedby={errors.maior18 ? 'erro-maior18' : undefined} />
-          <span>Tenho 18 anos ou mais</span>
-        </label>
-        <FieldError id="erro-maior18" message={errors.maior18} />
       </div>
 
       <div className="flex flex-col gap-1">
@@ -163,7 +141,8 @@ export function VisitorAdForm({
             e a{' '}
             <Link href="/politica-de-privacidade" className="text-accent underline underline-offset-4">
               Política de Privacidade
-            </Link>
+            </Link>{' '}
+            <Required />
           </span>
         </label>
         <FieldError id="erro-termos" message={errors.termos} />

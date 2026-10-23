@@ -6,6 +6,11 @@ export const DECLARACAO =
 export const inputClass =
   'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent'
 
+/** Visual marker of the few required fields (client 2026-10-23) */
+export function Required() {
+  return <span className="text-accent">(obrigatório)</span>
+}
+
 export function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null
   return (
@@ -37,7 +42,7 @@ export function AdFormFields({
     <>
       <div className="flex flex-col gap-2">
         <label htmlFor="apelido" className="type-label text-text">
-          Apelido
+          Apelido <Required />
         </label>
         <input
           id="apelido"
@@ -56,7 +61,7 @@ export function AdFormFields({
       </div>
 
       <fieldset className="flex flex-col gap-2" aria-describedby={described('euSou')}>
-        <legend className="type-label text-text">Eu sou</legend>
+        <legend className="type-label text-text">Eu sou <Required /></legend>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           {categories.map((c) => (
             <label key={c.id} className="inline-flex min-h-11 items-center gap-2 text-body">
@@ -93,7 +98,7 @@ export function AdFormFields({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
-          Texto do anúncio
+          Texto do anúncio <Required />
         </label>
         <textarea
           id="texto"
@@ -113,7 +118,7 @@ export function AdFormFields({
       </div>
 
       <fieldset className="flex flex-col gap-4" aria-describedby={described('contato')}>
-        <legend className="type-label text-text">Contato (WhatsApp ou Telegram{legacy ? ', opcional' : ', pelo menos um'}; só assinantes veem)</legend>
+        <legend className="type-label text-text">Contato (WhatsApp ou Telegram, opcional; só assinantes veem)</legend>
         <FieldError id="erro-contato" message={errors.contato} />
         <div className="flex flex-col gap-2">
           <label htmlFor="whatsapp" className="type-label text-text">
@@ -159,7 +164,9 @@ export function AdFormFields({
             aria-describedby={described('consent')}
             className="mt-1 size-5 shrink-0 accent-accent"
           />
-          {DECLARACAO}
+          <span>
+            {DECLARACAO} <Required />
+          </span>
         </label>
         <FieldError id="erro-consent" message={errors.consent} />
       </div>

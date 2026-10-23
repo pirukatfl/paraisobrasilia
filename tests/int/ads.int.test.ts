@@ -14,7 +14,6 @@ import {
 } from '../helpers/seed'
 
 const DAY = 86_400_000
-const CONTATO_MSG = 'Informe pelo menos um contato: WhatsApp ou Telegram.'
 
 describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () => {
   let payload: Payload
@@ -98,14 +97,12 @@ describe('ads and ad-categories (CLAS-03, CLAS-04, D-01, T-04-04, T-04-20)', () 
 
   it('validates contacts and text in Portuguese for staff edits', async () => {
     const asStaff = { overrideAccess: false, user: staff as never }
-    await expectFieldError(
-      payload.create({
-        collection: 'ads',
-        data: { author: owner.id, apelido: 'Casal', euSou: casal, texto: 'Sem contato' } as never,
-        ...asStaff,
-      }),
-      CONTATO_MSG,
-    )
+    // The contact is optional (client 2026-10-23): an ad without it is accepted
+    await payload.create({
+      collection: 'ads',
+      data: { author: owner.id, apelido: 'Casal', euSou: casal, texto: 'Sem contato' } as never,
+      ...asStaff,
+    })
     await expectFieldError(
       payload.create({
         collection: 'ads',

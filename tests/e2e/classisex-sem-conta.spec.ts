@@ -37,15 +37,14 @@ async function visitor(browser: Browser, baseURL: string) {
 }
 
 async function fillForm(page: Page, opts: { apelido: string; texto: string; email: string; foto?: string }) {
-  await page.getByLabel('Apelido', { exact: true }).fill(opts.apelido)
+  await page.getByLabel('Apelido').fill(opts.apelido)
   await page.getByRole('radio', { name: 'Casal' }).check()
   await page.getByLabel('Texto do anúncio').fill(opts.texto)
   await page.getByLabel('WhatsApp', { exact: true }).fill(WHATSAPP)
   await page.getByLabel('Seu e-mail').fill(opts.email)
   await page.getByLabel(DECLARACAO).check()
-  await page.getByRole('checkbox', { name: 'Tenho 18 anos ou mais', exact: true }).check()
   await page.getByLabel(/Li e aceito os/).check()
-  if (opts.foto) await page.getByLabel('Foto (opcional)').setInputFiles(path.join(FIXTURES, opts.foto))
+  if (opts.foto) await page.getByLabel('Escolher foto').setInputFiles(path.join(FIXTURES, opts.foto))
 }
 
 const multipart = (fields: Record<string, string>, files: { field: string; name: string; mimeType: string; buffer: Buffer }[]) => {
@@ -95,7 +94,7 @@ test('a visitor opens ClassiSex, clicks Anunciar, fills the form with one photo 
   await expect(page.getByRole('heading', { level: 1, name: 'Anunciar no ClassiSex' })).toBeVisible()
   await expect(page.getByText('Depois de enviar, não dá para editar nem apagar este anúncio.')).toBeVisible()
   // one photo only: the file input is not "multiple"
-  await expect(page.getByLabel('Foto (opcional)')).not.toHaveAttribute('multiple', /.*/)
+  await expect(page.getByLabel('Escolher foto')).not.toHaveAttribute('multiple', /.*/)
   await expect(page.locator('input[type="file"][name="video"]')).toHaveCount(0)
 
   await fillForm(page, { apelido: APELIDO, texto: TEXTO, email: VISITOR_EMAIL, foto: 'flyer-square.jpg' })
@@ -111,6 +110,28 @@ test('a visitor opens ClassiSex, clicks Anunciar, fills the form with one photo 
   await context.close()
 })
 
+test('the photo picker is a visible bordered button with preview and file name, and survives a refusal', async ({ browser, baseURL }) => {
+  const { context, page } = await visitor(browser, baseURL!)
+  await page.goto('/classisex/anunciar')
+  const button = page.locator('label[for="foto"]')
+  await expect(button).toBeVisible()
+  await expect(button).toHaveText('Escolher foto')
+  expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+  await expect(button).toHaveCSS('border-top-width', '1px')
+  await expect(page.getByAltText('Prévia da foto escolhida')).toHaveCount(0)
+  await page.getByLabel('Escolher foto').setInputFiles(path.join(FIXTURES, 'flyer-square.jpg'))
+  await expect(page.getByAltText('Prévia da foto escolhida')).toBeVisible()
+  await expect(page.getByText('flyer-square.jpg')).toBeVisible()
+  await expect(button).toHaveText('Trocar foto')
+  await page.screenshot({ path: 'test-results/foto-picker-' + test.info().project.name + '.png', fullPage: true })
+  // a refusal (no declaration, no terms) keeps the chosen photo
+  await page.getByLabel('Apelido').fill(`Casal Foto ${RUN}`)
+  await page.getByRole('button', { name: 'Enviar para aprovação' }).click()
+  await expect(page.getByText('Confirme a declaração para enviar.')).toBeVisible()
+  await expect(page.getByAltText('Prévia da foto escolhida')).toBeVisible()
+  await context.close()
+})
+
 test('the server keeps what was typed when it refuses (missing e-mail) and creates nothing', async ({ browser, baseURL, request }) => {
   const { context, page } = await visitor(browser, baseURL!)
   await page.goto('/classisex/anunciar')
@@ -118,7 +139,7 @@ test('the server keeps what was typed when it refuses (missing e-mail) and creat
   await fillForm(page, { apelido, texto: `Casal ${SENTINELA}-erro procura amizades.`, email: 'isto-nao-e-email' })
   await page.getByRole('button', { name: 'Enviar para aprovação' }).click()
   await expect(page.getByText('Informe um e-mail válido. Só a equipe vê.')).toBeVisible()
-  await expect(page.getByLabel('Apelido', { exact: true })).toHaveValue(apelido)
+  await expect(page.getByLabel('Apelido')).toHaveValue(apelido)
   await expect(page.getByLabel('Texto do anúncio')).toHaveValue(/-erro procura/)
   await context.close()
 
@@ -140,7 +161,6 @@ test('the server refuses 2 photos or a video straight to the endpoint and create
     whatsapp: WHATSAPP,
     consent: 'sim',
     email: `midia.${RUN}@exemplo.com`,
-    maior18: 'sim',
     termos: 'sim',
   }
   const post = async (files: { field: string; name: string; mimeType: string; buffer: Buffer }[]) => {
@@ -182,8 +202,7 @@ test('a filled honeypot gets the usual answer and creates nothing', async ({ pla
       whatsapp: WHATSAPP,
       consent: 'sim',
       email: `robo.${RUN}@exemplo.com`,
-      maior18: 'sim',
-      termos: 'sim',
+        termos: 'sim',
       website: 'http://spam.example',
     },
     [],

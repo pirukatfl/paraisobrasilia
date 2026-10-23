@@ -77,9 +77,8 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
       await expect(draft(a.id, 101)).rejects.toThrow()
     })
 
-    it('outside draft the contact and 600-character rules are back', async () => {
+    it('outside draft the 600-character rule is back (the contact is optional)', async () => {
       const a = await free('a@teste.local')
-      await expect(seedAd(payload, { author: a.id, status: 'pendente', contato: {} } as never)).rejects.toThrow()
       await expect(seedAd(payload, { author: a.id, status: 'pendente', texto: LONG_TEXT })).rejects.toThrow()
     })
 

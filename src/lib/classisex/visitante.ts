@@ -85,7 +85,6 @@ export async function ensureVisitantesAccount(payload: Payload, now: Date): Prom
 export type VisitorAdInput = {
   input: AdInput
   email: string
-  maior18: boolean
   termos: boolean
   /** Honeypot: real people leave it empty */
   website?: string
@@ -96,7 +95,7 @@ export type VisitorAdInput = {
 
 /** Creates the pending ad (and its photo). Returns `{ id: null }` for a honeypot hit (nothing created). */
 export async function createVisitorAd(payload: Payload, params: VisitorAdInput): Promise<{ id: number | null }> {
-  const { input, maior18, termos, files, ip, now } = params
+  const { input, termos, files, ip, now } = params
   // (1) honeypot: neutral success, nothing is created
   if ((params.website ?? '').trim() !== '') return { id: null }
 
@@ -113,10 +112,10 @@ export async function createVisitorAd(payload: Payload, params: VisitorAdInput):
     if (f.size > MAX_AD_PHOTO_BYTES) throw new ServiceError('grande', 'A foto passa de 15 MB.', 400)
   }
 
-  // (3) the same rules as a paying author (no legacy exemption), plus e-mail, 18+ and terms
+  // (3) the same rules as a paying author (no legacy exemption), plus e-mail and terms (18+ is the `consent` declaration of validateAdInput)
   const email = normaliseVisitorEmail(params.email)
   const checked = validateAdInput(input)
-  const extras = validateVisitorExtras({ email, maior18, termos })
+  const extras = validateVisitorExtras({ email, termos })
   if (!checked.ok || Object.keys(extras).length > 0) {
     throw new ServiceError('invalido', 'Confira os campos destacados.', 400, {
       ...(checked.ok ? {} : (checked.errors as Record<string, string>)),
@@ -132,23 +131,26 @@ export async function createVisitorAd(payload: Payload, params: VisitorAdInput):
   const nowMs = now.getTime()
   if (
     !allowAttempt(`anuncio-visitante-ip:${ip}`, nowMs, VISITOR_MAX_PER_HOUR) ||
-    !allowAttempt(`anuncio-visitante-email:${email}`, nowMs, VISITOR_MAX_PER_HOUR)
+    (email && !allowAttempt(`anuncio-visitante-email:${email}`, nowMs, VISITOR_MAX_PER_HOUR))
   ) {
     throw new ServiceError('envios', VISITOR_MESSAGES.envios, 429)
   }
 
   // (6) at most ACTIVE_LIMIT pending/published ads per e-mail (stored lower-case)
-  const { totalDocs } = await payload.count({
-    collection: 'ads',
-    where: {
-      and: [
-        { enviadoSemConta: { equals: true } },
-        { emailVisitante: { equals: email } },
-        { status: { in: ACTIVE_STATUSES } },
-      ],
-    },
-    overrideAccess: true,
-  })
+  // The e-mail is optional: without it only the IP limit above applies
+  const { totalDocs } = email
+    ? await payload.count({
+        collection: 'ads',
+        where: {
+          and: [
+            { enviadoSemConta: { equals: true } },
+            { emailVisitante: { equals: email } },
+            { status: { in: ACTIVE_STATUSES } },
+          ],
+        },
+        overrideAccess: true,
+      })
+    : { totalDocs: 0 }
   if (totalDocs >= ACTIVE_LIMIT) throw new ServiceError('limite', VISITOR_MESSAGES.limite, 409)
 
   // (7) the ad: owner, status and marker are decided here only
@@ -166,7 +168,7 @@ export async function createVisitorAd(payload: Payload, params: VisitorAdInput):
       submittedAt: now.toISOString(),
       consentAt: now.toISOString(),
       enviadoSemConta: true,
-      emailVisitante: email,
+      emailVisitante: email || null,
     },
     overrideAccess: true,
     context: { ownerEdit: true },
