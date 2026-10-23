@@ -75,7 +75,7 @@ test('the open ClassiSex shows the redacted text of the ad, never its phone or @
   const card = page.locator('main article').filter({ hasText: APELIDO })
   await expect(card).toContainText('Casal tranquilo, chama no')
   await expect(card).toContainText('[contato só para assinantes]')
-  await expect(card.getByRole('link', { name: 'Assine para ver o contato e as fotos' })).toHaveAttribute('href', '/assine-ja')
+  await expect(card.getByRole('link', { name: 'Assine para ver o contato, todas as fotos e os vídeos' })).toHaveAttribute('href', '/assine-ja')
   for (const headers of [{} as Record<string, string>, { RSC: '1' }]) {
     const body = await (await page.request.get('/classisex', { headers })).text()
     for (const planted of ['98877-6655', '98877', '@ritacasal', 'ritacasal']) expect(body, planted).not.toContain(planted)

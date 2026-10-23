@@ -107,7 +107,7 @@ test.describe('free viewer (never paid)', () => {
     const board = await fetchAs(page, 'GET', '/area-do-assinante/classisex')
     for (const visible of openBoardVisible()) expect(board.body, visible).toContain(visible)
     expect(board.body).toContain('[contato só para assinantes]')
-    expect(board.body).toContain('Assine para ver o contato e as fotos')
+    expect(board.body).toContain('Assine para ver o contato, todas as fotos e os vídeos')
     expect(board.body).toMatch(/\/classisex\/previa\/\d+/)
     // her own pending ad is on her own page
     const own = await fetchAs(page, 'GET', '/area-do-assinante/meus-anuncios')

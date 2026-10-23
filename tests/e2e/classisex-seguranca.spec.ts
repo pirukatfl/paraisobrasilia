@@ -314,7 +314,7 @@ test.describe('pages and RSC payload', () => {
       expect(home).toContain('Texto aprovado zebra-azul procura amigos,')
       expect(home).toContain('panda-rosa')
       expect(home).toContain('[contato só para assinantes]')
-      if (!headers) expect(home).toContain('Assine para ver o contato e as fotos')
+      if (!headers) expect(home).toContain('Assine para ver o contato, todas as fotos e os vídeos')
     }
     await anon.dispose()
   })
@@ -359,7 +359,8 @@ test.describe('pages and RSC payload', () => {
     expect(previa.status()).toBe(200)
     expect(previa.headers()['cache-control']).toContain('public')
     expect(previa.headers()['content-type']).toMatch(/^image\//)
-    expect(previa.headers()['x-robots-tag']).toContain('noimageindex')
+    // staging adds a global noindex, nofollow that wins over the route's own noimageindex (checked in the int tests)
+    expect(previa.headers()['x-robots-tag']).toContain('noindex')
 
     const robots = await (await anon.get('/robots.txt')).text()
     if (/^Allow: \//m.test(robots)) expect(robots).toContain('Disallow: /area-do-assinante')

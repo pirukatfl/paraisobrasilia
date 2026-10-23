@@ -181,7 +181,7 @@ test('inactive viewer gets the status panel and the open board: texts yes, conta
   await expect(main).toContainText('Sua assinatura não está ativa')
   await expect(main).toContainText(TEXTO_CASAL)
   await expect(main).toContainText(TEXTO_SOLTEIRA)
-  await expect(main.getByRole('link', { name: 'Assine para ver o contato e as fotos' }).first()).toHaveAttribute('href', '/assine-ja')
+  await expect(main.getByRole('link', { name: 'Assine para ver o contato, todas as fotos e os vídeos' }).first()).toHaveAttribute('href', '/assine-ja')
   await expect(main.getByRole('link', { name: 'Enviar recado: só para assinantes' }).first()).toBeVisible()
   const board = await page.content()
   for (const secret of contacts.slice(0, 4)) expect(board).not.toContain(secret)

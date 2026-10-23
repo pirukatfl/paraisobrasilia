@@ -109,8 +109,10 @@ test('visitors read the whole text without contacts, with one sharp cover photo 
   for (const secret of ['98877', 'nina@exemplo.com', '@nina_texto', 'wa.me', 'nina-casal']) {
     await expect(cards.first()).not.toContainText(secret)
   }
-  await expect(cards.first()).not.toContainText('vídeo')
-  await expect(cards.first().getByRole('link', { name: 'Assine para ver o contato e as fotos', exact: true })).toHaveAttribute('href', '/assine-ja')
+  // the call to subscribe now says "... e os vídeos"; no video itself (text or player) may be on the card
+  await expect(cards.first()).not.toContainText(/vídeo(?!s)/i)
+  await expect(cards.first().locator('video, source')).toHaveCount(0)
+  await expect(cards.first().getByRole('link', { name: 'Assine para ver o contato, todas as fotos e os vídeos', exact: true })).toHaveAttribute('href', '/assine-ja')
   await expect(main.getByRole('link', { name: 'Já é assinante? Ver anúncios completos' })).toHaveAttribute(
     'href',
     '/area-do-assinante/classisex',

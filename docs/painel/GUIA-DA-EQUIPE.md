@@ -254,11 +254,11 @@ No site novo o ClassiSex é um **mural de anúncios** — o roteiro antigo chama
 escreve o anúncio, com **até 10 fotos e até 2 vídeos curtos (cada um com até 60 segundos)** (a conta gratuita tem 1 foto e
 nenhum vídeo: veja **Contas gratuitas**); **nada vai ao ar sem a sua
 aprovação**. Quem não é assinante (visitante ou conta gratuita) lê o **anúncio inteiro** — **apelido**, **tipo** (Casal, Mulher, Homem
-ou Trans), **cidade** e o **texto na íntegra** — com **uma foto desfocada** e o botão "Assine para ver o contato e as fotos".
+ou Trans), **cidade** e o **texto na íntegra** — com a **foto de capa, nítida**, e o botão "Assine para ver o contato, todas as fotos e os vídeos".
 O mural carrega **sozinho conforme a pessoa rola a página** (rolagem infinita, 20 anúncios por vez), sem botão de "próxima página"; no fim aparece "Você chegou ao fim dos anúncios". Se a internet falhar, o botão **Carregar mais** continua disponível. Só os **meios de contato** ficam de fora: o site apaga sozinho do texto telefones, e-mails, links, @usuários e nomes de
 aplicativo seguidos de contato (aparece "[contato só para assinantes]"), e os campos de WhatsApp e Telegram nunca saem do
 servidor. Por isso confira o texto na **Moderação**: o apagamento automático não pega tudo (números escritos por extenso,
-por exemplo). As fotos sem desfoque, os vídeos e os contatos (**WhatsApp e Telegram**, pelo menos um; não há campo de
+por exemplo). As demais fotos, os vídeos e os contatos (**WhatsApp e Telegram**, pelo menos um; não há campo de
 e-mail) só aparecem para assinantes com acesso ativo. Quando a assinatura
 vence, o anúncio da pessoa **continua no ar como gratuito**: só a capa, sem vídeos, até ela renovar.
 
@@ -284,7 +284,7 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 
 1. Abra o anúncio. No topo está o quadro **Moderação**.
 2. Confira **Como aparece na área aberta**: é exatamente o que o visitante e a conta gratuita vão ler (apelido, tipo,
-   cidade e o texto inteiro, com uma foto desfocada). O site já troca telefone, e-mail, link e @ por "[contato só para
+   cidade e o texto inteiro, com a foto de capa, nítida). O site já troca telefone, e-mail, link e @ por "[contato só para
    assinantes]", mas **leia o texto procurando contato escrito de outro jeito** (número por extenso, letras separadas) e, se
    achar, edite o texto ou recuse. O **apelido** não pode ter contato: o site recusa ao salvar, mas confira mesmo assim.
    Confira também as fotos e os vídeos em **Fotos e vídeos**.
@@ -320,6 +320,26 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 5. As demais denúncias não tiram o anúncio do ar sozinhas: decida você.
 6. O anunciante nunca vê quem denunciou.
 
+### Anúncios sem conta
+
+Desde 23/10/2026 **qualquer pessoa pode anunciar, sem cadastro**: o botão **Anunciar** do ClassiSex abre um formulário com
+os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, WhatsApp ou Telegram, declaração) mais o **e-mail**
+da pessoa, "tenho 18 anos ou mais" e o aceite dos Termos.
+
+- Vale a **mesma regra de quem paga**, menos a mídia: **1 foto (opcional) e nenhum vídeo**, até 600 caracteres, contato
+  obrigatório. No máximo **3 anúncios em análise ou publicados por e-mail**.
+- O anúncio **sempre entra "Em análise"** e só aparece depois de você aprovar. Na lista de **Anúncios** há a coluna
+  **Enviado sem conta** (e o filtro pelo mesmo campo) e, no painel inicial, o link **"N sem conta em análise"** na caixa
+  ClassiSex. Na **Moderação**, "Conta do anunciante" mostra "Sem conta (visitante)".
+- O **e-mail** da pessoa aparece só na barra lateral do anúncio (**E-mail de quem anunciou sem conta**). É **privado**:
+  nunca passe a ninguém. Ele some junto com o anúncio quando você o apaga.
+- A pessoa **recebe um e-mail** quando você **aprova, recusa ou despublica** (com o motivo, se houver). Não há e-mail ao
+  enviar. O e-mail não é confirmado: pode ter erro de digitação, e a pessoa então não recebe o aviso.
+- A pessoa **não consegue editar nem apagar** (não tem login). Se pedir para tirar, **apague o anúncio** pelo painel. Ela
+  pode criar uma conta gratuita para ter esse controle nos próximos anúncios.
+- Sem recados: ninguém consegue mandar recado para esse anúncio. Quem é assinante ativo vê o WhatsApp/Telegram normalmente.
+- Antes de aprovar, confira o texto (contato escondido de outro jeito) e **a capa**: é a foto que todo visitante vê.
+
 ### Opções "Eu sou"
 
 Em **ClassiSex → Opções "Eu sou"** você edita o nome, a ordem e se a opção está ativa (hoje: Casal, Mulher, Homem e Trans). O
@@ -328,8 +348,10 @@ Para parar de usar uma opção, **desative**; **não apague** uma opção que j�
 
 ### Fotos e vídeos dos anúncios
 
-- Ficam **fora da área pública**: só a equipe, o dono do anúncio e assinantes ativos abrem. O visitante vê apenas uma
-  versão desfocada da primeira foto, e um link de foto copiado não abre fora da área do assinante.
+- Ficam **fora da área pública**: só a equipe, o dono do anúncio e assinantes ativos abrem. O visitante (e a conta
+  gratuita) vê apenas a **capa** (a primeira foto), **nítida**, em tamanho de miniatura; as outras fotos e os vídeos só
+  abrem na área do assinante. **Desde 23/10/2026 a capa aparece sempre nítida**: confira a capa antes de aprovar, porque
+  é a foto que todo visitante de 18 anos ou mais vai ver (e que buscadores podem tentar indexar; o site pede que não).
 - **Pedido de remoção** (como em Remoção de imagem): em até **24 horas**, abra o anúncio, apague a foto ou o vídeo em
   **ClassiSex → Mídias de anúncios → ⋯ → Excluir**, ou **Excluir o anúncio inteiro**. Na dúvida, remova.
 - Quando a pessoa pede para apagar a conta, **Excluir** a conta do assinante apaga também os anúncios, as fotos e os vídeos.
@@ -471,18 +493,18 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
 | Fotos por anúncio | 1 | até 10 |
 | Vídeos por anúncio | não | até 2 |
 | Anúncios ativos | até 3 | até 3 |
-| Ver anúncios do ClassiSex | todos, sem contato e com fotos desfocadas | todos, com WhatsApp, Telegram, fotos e vídeos |
+| Ver anúncios do ClassiSex | todos, sem contato (só a capa, nítida) | todos, com WhatsApp, Telegram, fotos e vídeos |
 | Recados (conversas privadas) | não | manda e recebe |
 | Contos completos | só o início | sim |
 
 - Esse mesmo quadro aparece para a pessoa em **/cadastro**, **/assine-ja**, **Meus anúncios** e **Novo anúncio**, com o
   botão "Assine Já".
 - O anúncio de uma conta gratuita **passa pela sua aprovação como qualquer outro**. Depois de aprovado ele aparece na
-  lista dos assinantes (com **só a capa**) e na área aberta (apelido, tipo, cidade, texto sem contatos e a foto desfocada).
+  lista dos assinantes (com **só a capa**) e na área aberta (apelido, tipo, cidade, texto sem contatos e a capa, nítida).
 - Na tela de **Moderação** do anúncio há a linha **"Conta do anunciante"**: "Conta gratuita — no ClassiSex aparece só a
   capa, sem vídeos" ou "Assinante". Use para saber o que a pessoa vai mostrar depois de aprovado.
 - A conta gratuita logada, em **ClassiSex** da área do assinante, vê o mesmo mural aberto dos visitantes: os anúncios dos
-  outros com o **texto na íntegra, sem contatos**, e a foto desfocada. Não vê contatos, fotos sem desfoque nem vídeos, não
+  outros com o **texto na íntegra, sem contatos**, e a foto de capa. Não vê contatos, as demais fotos nem vídeos, não
   abre o anúncio completo e não manda recados.
 - O assinante que vê o anúncio de uma conta gratuita enxerga o **WhatsApp e o Telegram** do anúncio, mas **não tem o botão
   "Enviar recado"** (conta gratuita não recebe recados). Conta gratuita também não manda recados.
@@ -587,7 +609,7 @@ Algumas contas do site antigo eram de assinante, mas **sem data de vencimento** 
 ### Anúncios antigos
 
 - Desde 22/10/2026 **todos** os anúncios do ClassiSex antigo e do **Mural** antigo vêm **já publicados**, não mais como rascunho. A origem aparece no campo **Veio do site antigo (origem)** de cada anúncio e serve de filtro na lista de **Anúncios**.
-- As regras de ver são as de sempre: quem não assina vê o texto **sem telefone, e-mail, link ou @** e a foto de capa desfocada; anúncio de quem não paga fica no ar só com a capa; quem assina vê tudo.
+- As regras de ver são as de sempre: quem não assina vê o texto **sem telefone, e-mail, link ou @** e a foto de capa (nítida); anúncio de quem não paga fica no ar só com a capa; quem assina vê tudo.
 - Anúncios antigos **não têm limites**: não contam nos 3 anúncios ativos, não têm limite de 600 caracteres, não exigem WhatsApp ou Telegram e não têm limite de fotos por plano (no máximo 10 fotos). Os anúncios **novos** continuam com todos os limites.
 - O autor vê e edita cada um em **Meus anúncios**. Quando ele edita um anúncio antigo, o anúncio volta para a fila de moderação, como qualquer anúncio editado, mas continua sem o limite de texto e sem exigir contato.
 - Se o importador rodar de novo, ele **publica os rascunhos antigos que ninguém mexeu** e não mexe em mais nada: anúncio recusado, despublicado, editado pelo autor, passado para outro dono ou **apagado** continua como está (um anúncio apagado não volta).
