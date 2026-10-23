@@ -37,9 +37,12 @@ export default async function ClassisexPublicPage({
         ClassiSex
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Anúncios dos assinantes do Paraíso. Leia os recados na íntegra; os contatos (WhatsApp, Telegram, telefone, e-mail e links), as demais fotos e os vídeos ficam para assinantes.
+        Anúncios do Paraíso: qualquer pessoa pode anunciar, com ou sem conta. Leia os recados na íntegra; os contatos (WhatsApp, Telegram, telefone, e-mail e links), as demais fotos e os vídeos ficam para assinantes.
       </p>
-      <p className="mt-4">
+      <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <Link href="/classisex/anunciar" className="btn-primary">
+          Anunciar
+        </Link>
         <Link
           href="/area-do-assinante/classisex"
           className="type-label font-semibold text-accent underline underline-offset-4"
