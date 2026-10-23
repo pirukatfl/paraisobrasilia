@@ -58,16 +58,26 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 
 ## Modelos
 
-A página **Modelos** e o item "Modelos" no menu **só aparecem quando há pelo menos uma modelo publicada**.
+Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição, fotos e vídeos. A página
+**Modelos** (a galeria) e o item "Modelos" no menu **só aparecem quando há pelo menos uma modelo publicada**.
+A área é aberta ao público: **sem nudez explícita e sem contato** (telefone, WhatsApp, e-mail, @ ou links).
 
 1. **Site → Modelos** → **Criar novo**.
-2. **Nome artístico** (nunca o nome verdadeiro).
-3. **Fotos**: de **1 a 3 fotos** (clique em **Adicionar Foto** para cada uma; a primeira é a capa).
-   Uma 4ª foto não é aceita — o painel mostra "Cada modelo pode ter no máximo 3 fotos.".
-   Cada foto precisa do **Texto alternativo**.
-4. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
-5. **Ordem** (menores primeiro) → **Publicar**.
-6. Confira `/modelos` no celular. Para tirar do site: **Despublicar** (se for a única modelo, a página e o item do menu somem).
+2. **Nome artístico** (nunca o nome verdadeiro, e sem contato).
+3. **Endereço** (coluna da direita): deixe **vazio** para o site criar a partir do nome. Mudar o endereço depois
+   **quebra os links já compartilhados** da página.
+4. **Descrição curta**: até 300 caracteres, **sem contato**. Se você digitar telefone, WhatsApp, e-mail, @ ou link,
+   o painel recusa: "Tire telefone, WhatsApp, e-mail, @ e links: esta página é aberta ao público.".
+5. **Fotos**: de **1 a 30 fotos** (clique em **Adicionar Foto** para cada uma). **A primeira é a capa**; arraste a linha
+   para mudar a ordem. Cada foto precisa do **Texto alternativo**.
+   **Dica:** envie várias fotos de uma vez em **Arquivos → Mídias** e depois use **Escolher existente** em cada linha.
+   A 31ª foto não é aceita: "Cada modelo pode ter no máximo 30 fotos.".
+6. **Vídeos**: até **3 vídeos**. Envie antes em **Arquivos → Vídeos**, com a **Imagem de capa** (MP4, até 100 MB,
+   cerca de 2 minutos) e escolha cada um na lista. O 4º vídeo não é aceito: "Cada modelo pode ter no máximo 3 vídeos.".
+7. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
+8. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
+9. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
+   menu somem).
 
 ---
 
@@ -135,7 +145,8 @@ imagem do site nunca causa problema.
    (No caso de vídeo, exclua também a **Imagem de capa** em **Mídias**, se ela mostrar a pessoa.)
 4. Depois apague ou ajuste o item que usava o arquivo:
    - **Galeria do espaço**: abra o item → **⋯** → **Excluir**;
-   - **Modelos**: tire a foto da lista e **Publicar**; se era a modelo inteira, **⋯** → **Excluir**.
+   - **Modelos**: abra a modelo, remova a linha da foto (ou do vídeo) e **Publicar**; se era a capa, a próxima foto
+     passa a ser a capa. Se era a modelo inteira, **⋯** → **Excluir**.
 5. Confira no celular que a imagem sumiu da página. Cópias reduzidas guardadas pelo site somem sozinhas em algumas horas.
 6. Responda à pessoa confirmando a remoção.
 

@@ -28,10 +28,12 @@ describe('dicas-wp bundle', () => {
     for (const l of legado) if (l.slug !== null) expect(published.has(l.slug)).toBe(true)
   })
 
-  it('registers the loader migration last', () => {
+  it('registers the loader migration after the dicas schema migration', () => {
     const index = fs.readFileSync(path.join(migrationFile, 'index.ts'), 'utf8')
     const names = [...index.matchAll(/name: '([^']+)'/g)].map((m) => m[1])
-    expect(names.at(-1)).toMatch(/_dicas_wp_bundle$/)
-    expect(names.at(-1)! > '20261022_102706_dicas').toBe(true)
+    const loader = names.findIndex((n) => /_dicas_wp_bundle$/.test(n!))
+    expect(loader).toBeGreaterThan(-1)
+    expect(names[loader]! > '20261022_102706_dicas').toBe(true)
+    expect(names).toEqual([...names].sort())
   })
 })
