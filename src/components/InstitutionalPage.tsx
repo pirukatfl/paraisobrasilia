@@ -16,7 +16,12 @@ export function InstitutionalPage({ page, activeKey }: { page: PageDTO; activeKe
       <SubNav activeKey={activeKey} />
       <h1 className="type-display mt-8">{page.title}</h1>
       {page.intro && <p className="mt-4 text-[1.125rem] leading-normal text-muted">{page.intro}</p>}
-      {page.body && <RichText data={page.body} className="rich-text-lg mt-8" />}
+      {/* RichText renders bare nodes (no wrapper), so the 18px size goes on this div and the text inherits it. */}
+      {page.body && (
+        <div className="rich-text-lg mt-8">
+          <RichText data={page.body} />
+        </div>
+      )}
       <div className="mt-12">
         {next ? (
           <Link href={pathForKey(next.key)} className="btn-secondary">
