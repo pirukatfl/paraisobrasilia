@@ -162,4 +162,52 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
     } as unknown as Model)
     expect(dto?.cover.alt).toBe('Luna — modelo do Paraíso Brasília')
   })
+
+  describe('videos (G-05)', () => {
+    const videoRows = async (n: number) => {
+      const out = []
+      for (let i = 0; i < n; i++) {
+        const poster = await payload.create({ collection: 'media', data: { alt: 'capa' }, filePath: FIXTURE, overrideAccess: true })
+        const v = await payload.create({
+          collection: 'videos' as never,
+          data: { title: `Vídeo ${i + 1}`, poster: poster.id } as never,
+          filePath: path.resolve('tests/fixtures/espaco.mp4'),
+          overrideAccess: true,
+        })
+        out.push({ video: (v as { id: number }).id })
+      }
+      return out
+    }
+
+    it('refuses a 4th video with the Portuguese message; accepts 3 and 0', async () => {
+      await resetDatabase(payload)
+      await freshMedia()
+      await expectFieldError(create({ name: 'Quatro', videos: await videoRows(4) }), 'Cada modelo pode ter no máximo 3 vídeos.')
+      const three = await create({ name: 'Tres', videos: await videoRows(3) })
+      expect(three.videos).toHaveLength(3)
+      const none = await create({ name: 'Zero' })
+      expect(none._status).toBe('published')
+    })
+
+    it('page DTO lists videos first (poster as image) then photos; counts include videos', async () => {
+      await resetDatabase(payload)
+      await seedModel(payload, { name: 'Aurora', photoCount: 2, videoCount: 1 })
+      const page = await getPublishedModel('aurora')
+      expect(page?.items).toHaveLength(3)
+      expect(page?.items[0].kind).toBe('video')
+      expect(page?.items[0].video?.url).toMatch(/\.mp4$/)
+      expect(page?.items[0].image.thumbUrl).toBeTruthy()
+      expect(page?.items[1].kind).toBe('photo')
+      expect(page?.items[2].kind).toBe('photo')
+      expect(page?.videoCount).toBe(1)
+      expect(page?.photoCount).toBe(2)
+      const models = await getPublishedModels()
+      expect(models[0].videoCount).toBe(1)
+    })
+
+    it('anonymous find of the model still has no imageAuthorization', async () => {
+      const { docs } = await payload.find({ collection: 'models', overrideAccess: false, depth: 1 })
+      expect(docs[0]).not.toHaveProperty('imageAuthorization')
+    })
+  })
 })
