@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 
-// MIDIA-02 / D-08: models grid with lightbox; the section exists only when a model is published.
+// MIDIA-06/07, PAINEL-09 (Phase 06.1): cards link to /modelos/{slug}; the section exists only when a model is published.
 test.describe.configure({ mode: 'serial' })
 
 test.beforeEach(async ({ context, baseURL }) => {
@@ -22,11 +22,11 @@ test('without published models /modelos is a 404', async ({ page, request }) => 
   expect(res?.status()).toBe(404)
 })
 
-test('published models show as cards with a lightbox, no profile pages', async ({ page, request }) => {
+test('cards open the model page with name, description and photos (G-01)', async ({ page, request }) => {
   test.setTimeout(120_000)
   const api = await staffApi(request)
   await api.deleteAll('models')
-  await api.createModel({ name: 'Aurora', photos: 3, order: 1 })
+  await api.createModel({ name: 'Aurora', photos: 3, order: 1, description: 'Ruiva, simpática e muito animada.' })
   await api.createModel({ name: 'Bella', photos: 1, order: 2 })
 
   await page.goto('/modelos')
@@ -38,18 +38,38 @@ test('published models show as cards with a lightbox, no profile pages', async (
   await expect(cards.nth(1)).toContainText('Bella')
   await expect(cards.nth(1)).not.toContainText('fotos')
 
-  await page.getByRole('button', { name: 'Ver fotos de Aurora' }).click()
+  const link = cards.nth(0).getByRole('link', { name: 'Ver fotos de Aurora' })
+  await expect(link).toHaveAttribute('href', '/modelos/aurora')
+  await link.click()
+  await expect(page).toHaveURL(/\/modelos\/aurora$/)
+  await expect(page.getByRole('heading', { name: 'Aurora', level: 1 })).toBeVisible()
+  await expect(page.getByText('Ruiva, simpática e muito animada.')).toBeVisible()
+  const tiles = page.locator('main ul[role="list"] > li')
+  await expect(tiles).toHaveCount(3)
+
+  await tiles.nth(0).locator('a, button').first().click()
   const dialog = page.getByRole('dialog', { name: 'Galeria de fotos' })
   await expect(dialog).toContainText('1 de 3')
   await dialog.getByRole('button', { name: 'Próxima' }).click()
   await expect(dialog).toContainText('2 de 3')
-  await expect(dialog).toContainText('Aurora')
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
 
-  // D-08: no individual model page, no contact
-  await expect(page.locator('a[href^="/modelos/"]')).toHaveCount(0)
-  expect((await page.goto('/modelos/aurora'))?.status()).toBe(404)
+  // G-03: no contact anywhere on the page
+  await expect(page.locator('main a[href^="tel:"], main a[href*="wa.me"], main a[href^="mailto:"]')).toHaveCount(0)
+
+  await page.getByRole('link', { name: 'Ver todas as modelos' }).click()
+  await expect(page).toHaveURL(/\/modelos$/)
+})
+
+test('drafts and unknown slugs are 404', async ({ page, request }) => {
+  const api = await staffApi(request)
+  await api.deleteAll('models')
+  await api.createModel({ name: 'Publicada', photos: 1 })
+  await api.createModel({ name: 'Rascunho', photos: 1, published: false })
+  expect((await page.goto('/modelos/rascunho'))?.status()).toBe(404)
+  expect((await page.goto('/modelos/nao-existe'))?.status()).toBe(404)
+  expect((await page.goto('/modelos/publicada'))?.status()).toBe(200)
 })
 
 test('Modelos appears in nav, footer and sitemap only while a model is published', async ({
@@ -104,7 +124,7 @@ test.describe('staff unpublishes a model (fast removal)', () => {
   test.skip(({ isMobile }) => isMobile, 'admin flow runs on desktop only')
   test.use({ locale: 'pt-BR', timezoneId: 'America/Sao_Paulo' })
 
-  test('Despublicar removes /modelos and the nav link at once', async ({ page, request, context }) => {
+  test('Despublicar removes /modelos, the model page and the nav link at once', async ({ page, request, context }) => {
     test.setTimeout(180_000)
     const api = await staffApi(request)
     await api.deleteAll('models')
@@ -112,6 +132,7 @@ test.describe('staff unpublishes a model (fast removal)', () => {
 
     const site = await context.newPage()
     expect((await site.goto('/modelos'))?.status()).toBe(200)
+    expect((await site.goto('/modelos/aurora'))?.status()).toBe(200)
 
     const { loginAsStaff } = await import('./helpers/staff')
     await loginAsStaff(page)
@@ -124,6 +145,7 @@ test.describe('staff unpublishes a model (fast removal)', () => {
     await expect(page.getByText('Status: Rascunho')).toBeVisible()
 
     expect((await site.goto('/modelos'))?.status()).toBe(404)
+    expect((await site.goto('/modelos/aurora'))?.status()).toBe(404)
     await site.goto('/')
     await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Modelos' })).toHaveCount(0)
   })

@@ -412,7 +412,15 @@ export async function seedSpaceVideo(
 /** Creates a model with `photoCount` fixture photos (published by default). */
 export async function seedModel(
   payload: Payload,
-  input: { name: string; photoCount: number; published?: boolean; order?: number; authorization?: { date?: string; note?: string } },
+  input: {
+    name: string
+    photoCount: number
+    published?: boolean
+    order?: number
+    slug?: string
+    description?: string
+    authorization?: { date?: string; note?: string }
+  },
 ) {
   const photos = []
   for (let i = 0; i < input.photoCount; i++) {
@@ -433,6 +441,8 @@ export async function seedModel(
       name: input.name,
       photos,
       order: input.order ?? 0,
+      ...(input.slug ? { slug: input.slug } : {}),
+      ...(input.description ? { description: input.description } : {}),
       ...(input.authorization ? { imageAuthorization: input.authorization } : {}),
     } as never,
     overrideAccess: true,
