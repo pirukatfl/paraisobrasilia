@@ -58,8 +58,9 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 
 ## Modelos
 
-Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição, fotos e vídeos. A página
-**Modelos** (a galeria) e o item "Modelos" no menu **só aparecem quando há pelo menos uma modelo publicada**.
+Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição, fotos e vídeos. O item
+**Modelos** fica sempre no menu; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
+no mapa do site, para o Google, quando há pelo menos uma modelo publicada).
 A área é aberta ao público: **sem nudez explícita e sem contato** (telefone, WhatsApp, e-mail, @ ou links).
 
 1. **Site → Modelos** → **Criar novo**.
