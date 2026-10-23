@@ -15,7 +15,6 @@ import { withRequestState } from '../lib/assinantes/context'
 import { accessStatusFor } from '../lib/assinantes/status'
 import { TIER_LIMITS, tierOf } from '../lib/assinantes/tier'
 import { expire } from '../lib/cache/expire'
-import { makeBlurredPreview } from '../lib/classisex/blur'
 import {
   AD_MEDIA_MESSAGES,
   MAX_AD_PHOTO_BYTES,
@@ -129,7 +128,7 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
       : 'gratis'
     const limits = TIER_LIMITS[tier]
     // T-06-23: server-only flag for the WordPress import (Local API + overrideAccess; REST cannot set
-    // req.context). Skips only the per-tier photo count; size, decoding, EXIF strip and blur still apply.
+    // req.context). Skips only the per-tier photo count; size, decoding and EXIF strip still apply.
     const legacyImport =
       req.context?.legacyImport === true && (args as { overrideAccess?: boolean }).overrideAccess === true
     // Client decision 2026-10-22: old-site ads are exempt from the per-tier photo count (absolute cap stays)
@@ -149,32 +148,7 @@ const staticDirOf = (req: PayloadRequest): string => {
   return (typeof upload === 'object' && upload.staticDir) || ''
 }
 
-const previaName = (filename: string) => `${path.parse(filename).name}-previa.webp`
-
-/** Blurred twin of each photo for the public preview (D-04), next to the original. */
-const writePreview: CollectionAfterChangeHook = async ({ doc, operation, req }) => {
-  if (req.context?.skipPreview) return doc
-  if (doc.kind !== 'foto' || !doc.filename) return doc
-  if (operation !== 'create' && doc.previa) return doc
-  const dir = staticDirOf(req)
-  const source = await fs.readFile(path.join(dir, path.basename(doc.filename)))
-  const name = previaName(path.basename(doc.filename))
-  await fs.writeFile(path.join(dir, name), await makeBlurredPreview(source))
-  await withRequestState(req, () =>
-    req.payload.update({
-      collection: 'ad-media',
-      id: doc.id,
-      data: { previa: name },
-      overrideAccess: true,
-      context: { skipPreview: true },
-      req,
-    }),
-  )
-  expire(['ads'])
-  return { ...doc, previa: name }
-}
-
-/** Payload removes the original and its sizes; the blurred twin is ours. */
+/** Payload removes the original and its sizes; old blurred twins (client decision 2026-10-23: no more blur) are ours. */
 const removePreview: CollectionAfterDeleteHook = async ({ doc, req }) => {
   if (doc.previa) {
     await fs.unlink(path.join(staticDirOf(req), path.basename(doc.previa))).catch((err: NodeJS.ErrnoException) => {
@@ -214,7 +188,6 @@ export const AdMedia: CollectionConfig = {
   hooks: {
     beforeOperation: [validateAndClean],
     afterChange: [
-      writePreview,
       ({ doc }) => {
         expire(['ads'])
         return doc

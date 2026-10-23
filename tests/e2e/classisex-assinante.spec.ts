@@ -175,7 +175,7 @@ test('inactive viewer gets the status panel and the open board: texts yes, conta
   await expect(page.locator('main')).toContainText('Sua assinatura não está ativa')
   const detail = await page.content()
   for (const secret of [TEXTO_CASAL, TEXTO_SOLTEIRA, ...contacts.slice(0, 4)]) expect(detail).not.toContain(secret)
-  // board: the same open board as visitors (texts with contacts removed, blurred covers, "Assine ...")
+  // board: the same open board as visitors (texts with contacts removed, sharp covers, "Assine ...")
   await page.goto('/area-do-assinante/classisex')
   const main = page.locator('main')
   await expect(main).toContainText('Sua assinatura não está ativa')

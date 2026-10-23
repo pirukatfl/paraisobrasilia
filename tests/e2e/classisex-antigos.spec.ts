@@ -4,7 +4,7 @@ import { staffApi } from './helpers/api'
 import { getTestPayload, seedAd, seedAdMedia } from '../helpers/seed'
 
 // Client decision 2026-10-22: the old ClassiSex and Mural ads come in PUBLISHED. Visitors read the text with
-// every contact removed on the server and see one blurred photo; the contact stays inside the member area.
+// every contact removed on the server and see one sharp photo; the contact stays inside the member area.
 test.skip(({ isMobile }) => isMobile, 'one project is enough for this flow')
 test.describe.configure({ mode: 'serial' })
 
@@ -47,7 +47,7 @@ test.afterAll(async ({ request }) => {
   await api.dispose()
 })
 
-test('the open board shows a published old ad with the text redacted and a blurred cover', async ({ browser, baseURL, request }) => {
+test('the open board shows a published old ad with the text redacted and a sharp cover', async ({ browser, baseURL, request }) => {
   const context = await browser.newContext({ baseURL })
   await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
   const page = await context.newPage()
@@ -58,7 +58,7 @@ test('the open board shows a published old ad with the text redacted and a blurr
   await expect(card).toContainText(VISIVEL)
   await expect(card).toContainText('[contato só para assinantes]')
   await expect(card.locator('img')).toHaveCount(1)
-  await expect(card.locator('img').first()).toHaveAttribute('alt', 'Foto desfocada do anúncio')
+  await expect(card.locator('img').first()).toHaveAttribute('alt', 'Foto do anúncio')
   const html = await page.content()
   const raw = await (await request.get('/classisex')).text() // includes the RSC payload
   for (const body of [html, raw]) for (const secret of SECRETS) expect(body, secret).not.toContain(secret)

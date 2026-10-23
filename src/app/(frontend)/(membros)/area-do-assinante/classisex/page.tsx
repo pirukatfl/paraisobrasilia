@@ -40,7 +40,7 @@ export default async function ClassisexPage({
   )
   const params = await searchParams
   // No restricted markup at all without active access (T-04-05): return before any members query.
-  // A free account reads the same open board as a visitor (text with contacts removed, blurred
+  // A free account reads the same open board as a visitor (text with contacts removed, cover
   // cover): the public read model only, never the members DTOs.
   if (check.inactive) {
     const publicFilters = { ...parseBoardFilters(params), cidade: undefined }

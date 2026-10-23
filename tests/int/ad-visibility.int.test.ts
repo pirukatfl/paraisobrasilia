@@ -199,7 +199,7 @@ describe('expired author: ad stays as free, cover only (G-05)', () => {
     expect(detail?.fotos.map((f) => f.id)).toEqual([files[0].id])
     expect(detail?.videos).toEqual([])
     expect(JSON.stringify(detail)).not.toContain(`/${files[1].id}/`)
-    // the open preview shows it too, blurred, with the same cover
+    // the open preview shows it too, with the same cover
     const pub = await findPublicAds(payload, {}, NOW_E)
     expect(pub.items.map((i) => i.id)).toEqual([ad.id])
     expect(pub.items[0].foto?.previewUrl).toBe(`/classisex/previa/${files[0].id}`)

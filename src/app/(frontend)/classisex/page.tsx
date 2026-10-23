@@ -20,7 +20,7 @@ const PATH = '/classisex'
 
 /**
  * Open view of the ClassiSex (PREV-01, D-04, D-07). Reads only the public read model (apelido, tipo,
- * city, text with contacts removed, blurred cover photo): never the members DTO (T-04-01).
+ * city, text with contacts removed, cover photo): never the members DTO (T-04-01).
  */
 export default async function ClassisexPublicPage({
   searchParams,
@@ -37,7 +37,7 @@ export default async function ClassisexPublicPage({
         ClassiSex
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Anúncios dos assinantes do Paraíso. Leia os recados na íntegra; os contatos (WhatsApp, Telegram, telefone, e-mail e links), as fotos sem desfoque e os vídeos ficam para assinantes.
+        Anúncios dos assinantes do Paraíso. Leia os recados na íntegra; os contatos (WhatsApp, Telegram, telefone, e-mail e links), as demais fotos e os vídeos ficam para assinantes.
       </p>
       <p className="mt-4">
         <Link
@@ -48,7 +48,7 @@ export default async function ClassisexPublicPage({
         </Link>
       </p>
       <AssineJaCta
-        title="Assine para ver o contato e as fotos"
+        title="Assine para ver o contato, todas as fotos e os vídeos"
         text="Assinantes veem os contatos, as fotos e os vídeos, mandam recados privados e anunciam também."
         membersHref="/area-do-assinante/classisex"
       />

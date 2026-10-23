@@ -164,7 +164,7 @@ export async function findMemberAd(payload: Payload, id: number | string, now: D
 
 /**
  * Open-area preview (PREV-01, D-04, D-07): same visibility, order, filters and page size as the
- * members board, but only the public DTO leaves this function. Media: only id/kind/order/previa
+ * members board, but only the public DTO leaves this function. Media: only id/kind/order
  * are read (never filenames).
  */
 export async function findPublicAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<PublicAdDTO>> {
@@ -176,7 +176,7 @@ export async function findPublicAds(payload: Payload, filters: BoardFilters, now
     const { docs } = await payload.find({
       collection: 'ad-media',
       where: { ad: { in: ids } },
-      select: { ad: true, kind: true, order: true, previa: true },
+      select: { ad: true, kind: true, order: true },
       sort: 'order',
       depth: 0,
       limit: ids.length * (MAX_AD_PHOTOS + MAX_AD_VIDEOS),

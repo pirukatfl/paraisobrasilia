@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { toPublicAdDTO } from '../../src/lib/classisex/dto'
 
 // PREV-01 / D-04 / T-04-01 (revisão 2026-10-22): the open view (visitors and free accounts) carries
-// apelido, tipo, city and the FULL text with every contact removed, plus one blurred photo.
+// apelido, tipo, city and the FULL text with every contact removed, plus one sharp cover photo.
 // No contact fields, video, author data or member URLs.
 const doc = {
   id: 12,
@@ -63,19 +63,19 @@ describe('toPublicAdDTO (PREV-01, D-04)', () => {
     expect(dto.cidade).toContain('Brasília')
   })
 
-  it('points only at the blurred cover (first photo by order) and ignores the video', () => {
+  it('points only at the cover (first photo by order) and ignores the video', () => {
     expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media }).foto).toEqual({ previewUrl: '/classisex/previa/51' })
     expect(toPublicAdDTO(doc, { euSouLabel: 'Casal' }).foto).toBeNull()
     expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media: [media[3]] }).foto).toBeNull()
   })
 
-  it('uses coverOf: the blurred cover is the first photo even when it has no previa', () => {
-    const noPrevia = [
+  it('uses coverOf: the cover is the first photo whether or not it has an old blurred twin (previa)', () => {
+    const mixed = [
       { id: 70, kind: 'foto' as const, order: 0, previa: null },
       { id: 71, kind: 'foto' as const, order: 1, previa: 'x-previa.webp' },
     ]
-    // the cover (70) has no blurred twin yet: nothing is shown instead of leaking another photo
-    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media: noPrevia }).foto).toBeNull()
+    // never another photo instead of the cover
+    expect(toPublicAdDTO(doc, { euSouLabel: 'Casal', media: mixed }).foto).toEqual({ previewUrl: '/classisex/previa/70' })
   })
 
   it('redacts a contact that slipped into the apelido (staff edit, old data)', () => {

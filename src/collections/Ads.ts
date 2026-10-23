@@ -134,7 +134,7 @@ const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, r
 }
 
 /**
- * Photos and video go with the ad (Payload deletes each file; AdMedia removes the blurred twin).
+ * Photos and video go with the ad (Payload deletes each file; AdMedia removes old blurred twins).
  * Its reports stay for the record: they only lose the link (the snapshot keeps the summary).
  */
 const removeMedia: CollectionBeforeDeleteHook = async ({ id, req }) => {

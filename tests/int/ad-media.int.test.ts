@@ -68,7 +68,7 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     vi.unstubAllEnvs()
   })
 
-  it('stores photos privately as webp without EXIF, with a card size and a blurred twin', async () => {
+  it('stores photos privately as webp without EXIF, with a card size and no blurred twin', async () => {
     const input = await jpegWithExif(2600, 1800)
     expect((await sharp(input).metadata()).exif).toBeDefined()
     const doc = await upload(input, 'image/jpeg', 'foto.jpg')
@@ -85,11 +85,12 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     expect(fs.existsSync(path.join(dir, doc.sizes!.card!.filename!))).toBe(true)
 
     const reread = (await payload.findByID({ collection: 'ad-media', id: doc.id, overrideAccess: true })) as unknown as MediaDoc
-    expect(reread.previa).toBeTruthy()
-    const previa = fs.readFileSync(path.join(dir, reread.previa!))
-    const pmeta = await sharp(previa).metadata()
-    expect(pmeta.format).toBe('webp')
-    expect(pmeta.width).toBeLessThanOrEqual(480)
+    // client decision 2026-10-23: photos are no longer blurred, nothing named -previa is written
+    expect(reread.previa ?? null).toBeNull()
+    expect(fs.readdirSync(dir).filter((f) => f.includes('-previa'))).toEqual([])
+    const card = await sharp(fs.readFileSync(path.join(dir, doc.sizes!.card!.filename!))).metadata()
+    expect(card.format).toBe('webp')
+    expect(card.width).toBeLessThanOrEqual(480)
 
     // never under the public media dir
     expect(fs.existsSync(path.join(mediaDir, doc.filename))).toBe(false)
@@ -154,8 +155,11 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
 
   it('deleting the media or the ad removes every file', async () => {
     const doc = await upload(await jpegWithExif(400, 400), 'image/jpeg', 'apagar.jpg')
-    const reread = (await payload.findByID({ collection: 'ad-media', id: doc.id, overrideAccess: true })) as unknown as MediaDoc
-    const files = [doc.filename, doc.sizes!.card!.filename!, reread.previa!].map((f) => path.join(dir, f))
+    // an old blurred twin (made before 2026-10-23) must still be cleaned up on delete
+    const oldTwin = `${path.parse(doc.filename).name}-previa.webp`
+    fs.writeFileSync(path.join(dir, oldTwin), Buffer.from('antigo'))
+    await payload.update({ collection: 'ad-media', id: doc.id, data: { previa: oldTwin }, overrideAccess: true })
+    const files = [doc.filename, doc.sizes!.card!.filename!, oldTwin].map((f) => path.join(dir, f))
     for (const f of files) expect(fs.existsSync(f)).toBe(true)
     await payload.delete({ collection: 'ad-media', id: doc.id, overrideAccess: true })
     for (const f of files) expect(fs.existsSync(f)).toBe(false)

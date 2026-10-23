@@ -84,7 +84,6 @@ export type AdMediaDocLike = {
   kind: 'foto' | 'video'
   order?: number | null
   durationSeconds?: number | null
-  previa?: string | null
   width?: number | null
   height?: number | null
   sizes?: { card?: { width?: number | null; height?: number | null } | null } | null
@@ -233,8 +232,8 @@ export function toMemberAdDTO(
 
 // ---------------------------------------------------------------------------------------------
 // Open-area preview (PREV-01, D-04). T-04-01: contacts and the author never leave the server for
-// the public area — this DTO is built from the redacted text only, and photos are the blurred
-// derivatives served by /classisex/previa/{id} (never the originals).
+// the public area — this DTO is built from the redacted text only, and the only photo is the
+// cover card served by /classisex/previa/{id} (never other photos or videos).
 // ---------------------------------------------------------------------------------------------
 
 export type PublicAdDTO = {
@@ -245,7 +244,7 @@ export type PublicAdDTO = {
   cidade: string | null
   /** The ad text in full, with every contact removed on the server (redactContacts). */
   texto: string
-  /** One blurred photo (the cover) or null; the open area shows no video, contact or author. */
+  /** One photo (the cover, sharp) or null; the open area shows no video, contact or author. */
   foto: { previewUrl: string } | null
 }
 
@@ -255,16 +254,15 @@ export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
  * Revisão 2026-10-22: the open view (visitors and free accounts) carries the whole ad text, apelido,
  * tipo and city, exactly as the author wrote it EXCEPT the contacts: phones, e-mails, links, @handles
  * and WhatsApp/Telegram are removed here on the server (redactContacts) and the structured contact
- * fields are never read. The only photo is the blurred derivative of the cover; no video, no author.
+ * fields are never read. The only photo is the (sharp) card of the cover; no video, no author.
  * Staff review the redacted result in the moderation panel (obfuscations cannot be caught by a heuristic).
  */
 export function toPublicAdDTO(
   doc: AdDocLike,
   { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
 ): PublicAdDTO {
-  // The same file as the members board and the media route (coverOf); it needs its blurred twin
-  const found = coverOf(media)
-  const cover = found && found.previa ? found : null
+  // The same file as the members board and the media route (coverOf)
+  const cover = coverOf(media)
   const cidade = redactContacts(doc.cidade ?? '').text
   return {
     id: doc.id,
