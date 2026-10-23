@@ -46,9 +46,6 @@ export type ModelPageDTO = {
   updatedAt: string
 }
 
-/** Kept until ModelGrid moves to ModelCardDTO. */
-export type ModelDTO = { id: string; name: string; photos: GalleryImage[] }
-
 export type LightboxSlide = {
   kind: 'photo' | 'video'
   image: GalleryImage

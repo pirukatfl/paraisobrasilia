@@ -148,7 +148,7 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
 
   it('anonymous visitors cannot create or update models', async () => {
     await expect(
-      payload.create({ collection: 'models', overrideAccess: false, data: { name: 'x', photos: [{ image: mediaId }] } }),
+      payload.create({ collection: 'models', overrideAccess: false, data: { name: 'x', photos: [{ image: mediaId }] } as never }),
     ).rejects.toThrow(/permiss|forbidden|not allowed/i)
   })
 

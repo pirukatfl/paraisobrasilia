@@ -1,4 +1,4 @@
-import { sql, type SQL } from '@payloadcms/db-postgres'
+import { sql } from '@payloadcms/db-postgres'
 
 import { slugify } from '../contos/excerpt'
 
@@ -16,7 +16,7 @@ export function uniqueSlug(base: string, taken: Set<string>): string {
   return `${root}-${n}`
 }
 
-type Db = { execute: (query: SQL) => Promise<{ rows: unknown[] }> }
+type Db = { execute: (query: ReturnType<typeof sql>) => Promise<{ rows: unknown[] }> }
 
 /**
  * Fills `models.slug` from the name for rows created before the slug existed (suffix -2, -3 on
