@@ -15,8 +15,8 @@ export function InstitutionalPage({ page, activeKey }: { page: PageDTO; activeKe
     <article className="max-w-[680px]">
       <SubNav activeKey={activeKey} />
       <h1 className="type-display mt-8">{page.title}</h1>
-      {page.intro && <p className="mt-4 text-body text-muted">{page.intro}</p>}
-      {page.body && <RichText data={page.body} className="mt-8" />}
+      {page.intro && <p className="mt-4 text-[1.125rem] leading-normal text-muted">{page.intro}</p>}
+      {page.body && <RichText data={page.body} className="rich-text-lg mt-8" />}
       <div className="mt-12">
         {next ? (
           <Link href={pathForKey(next.key)} className="btn-secondary">
