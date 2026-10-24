@@ -71,7 +71,7 @@ const prepareModel: CollectionBeforeValidateHook = async ({ data, originalDoc, r
  */
 export const Models: CollectionConfig = {
   slug: 'models',
-  labels: { singular: 'Modelo', plural: 'Modelos' },
+  labels: { singular: 'Profissional ou amadora', plural: 'Profissionais e amadoras' },
   admin: {
     group: 'Site',
     useAsTitle: 'name',

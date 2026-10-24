@@ -120,12 +120,12 @@ test.describe('staff', () => {
     test.setTimeout(150_000)
     await loginAsStaff(page)
     await page.goto('/admin')
-    await expect(page.getByRole('link', { name: 'Recados: 1 denúncia aberta' })).toBeVisible()
-    await expect(page.locator('nav a[href="/admin/collections/message-reports"]')).toHaveCount(1)
+    await expect(page.getByRole('link', { name: 'Recados: 1 denúncia aberta' })).toHaveCount(0)
+    await expect(page.locator('nav a[href="/admin/collections/message-reports"]')).toHaveCount(0)
     for (const hidden of ['conversations', 'messages', 'blocks']) {
       await expect(page.locator(`a[href="/admin/collections/${hidden}"]`)).toHaveCount(0)
     }
-    await page.getByRole('link', { name: 'Recados: 1 denúncia aberta' }).click()
+    await page.goto('/admin/collections/message-reports?where[status][equals]=aberta')
     await expect(page.locator('table tbody tr')).toHaveCount(1)
     const href = await page.locator('table tbody tr').first().getByRole('link').first().getAttribute('href')
     await page.goto(href!)

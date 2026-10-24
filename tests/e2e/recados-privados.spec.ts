@@ -271,18 +271,16 @@ test('7. REST: the legacy table is closed to members, the moderation endpoint is
   await api.dispose()
 })
 
-test('8. admin (desktop): no recados moderation line or menu entry; report line and queue remain', async ({ page, isMobile }) => {
+test('8. admin (desktop): no recados moderation line, no report line, no menu entry', async ({ page, isMobile }) => {
   test.skip(isMobile, 'admin flow runs on desktop only')
   test.setTimeout(120_000)
   await loginAsStaff(page)
   await page.goto('/admin')
   const body = page.locator('main, body').first()
-  await expect(body).toContainText(/Recados: \d+ denúncias? abertas?|Nenhuma denúncia de recado\./)
+  expect(await page.content()).not.toMatch(/Recados: \d+ denúncias? abertas?|Nenhuma denúncia de recado\./)
   expect(await page.content()).not.toMatch(/Recados: \d+ para aprovar|Nenhum recado para aprovar/)
   await expect(page.locator('a[href="/admin/collections/recados"]')).toHaveCount(0)
-  const res = await page.goto('/admin/collections/message-reports')
-  expect(res?.status()).toBe(200)
-  await expect(page.getByRole('heading', { name: /Denúncias de recados/ }).first()).toBeVisible()
+  await expect(page.locator('nav a[href="/admin/collections/message-reports"]')).toHaveCount(0)
 })
 
 test('9. the sitemap has no /recados', async ({ playwright, baseURL }) => {

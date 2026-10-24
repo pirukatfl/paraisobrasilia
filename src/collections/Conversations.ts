@@ -9,7 +9,7 @@ import type { CollectionConfig } from 'payload'
 export const Conversations: CollectionConfig = {
   slug: 'conversations',
   labels: { singular: 'Conversa', plural: 'Conversas' },
-  admin: { group: 'Recados', hidden: true, useAsTitle: 'pairKey' },
+  admin: { group: 'ClassiSex', hidden: true, useAsTitle: 'pairKey' },
   access: {
     read: () => false,
     create: () => false,

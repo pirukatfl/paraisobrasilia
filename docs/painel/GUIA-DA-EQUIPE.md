@@ -56,14 +56,14 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 
 ---
 
-## Modelos
+## Profissionais e amadoras
 
 Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição e fotos (por enquanto, **só fotos**: vídeos de modelos estão desligados). O item
-**Modelos** fica sempre no menu; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
+**Profissionais e amadoras** fica sempre no menu; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
 no mapa do site, para o Google, quando há pelo menos uma modelo publicada).
 A área é aberta ao público: **sem nudez explícita e sem contato** (telefone, WhatsApp, e-mail, @ ou links).
 
-1. **Site → Modelos** → **Criar novo**.
+1. **Site → Profissionais e amadoras** → **Criar novo**.
 2. **Nome artístico** (nunca o nome verdadeiro, e sem contato).
 3. **Endereço** (coluna da direita): deixe **vazio** para o site criar a partir do nome. Mudar o endereço depois
    **quebra os links já compartilhados** da página.
@@ -135,7 +135,7 @@ imagem do site nunca causa problema.
 
 ### Passo a passo (em até 24 horas)
 
-1. Ache o item: **Galeria do espaço** ou **Modelos** (veja a imagem em miniatura na lista).
+1. Ache o item: **Galeria do espaço** ou **Profissionais e amadoras** (veja a imagem em miniatura na lista).
 2. Se o item **vai continuar** no site (ex.: a modelo tira só uma de três fotos), anote antes, em **Autorização de uso de
    imagem → Observação**, a data e o canal do pedido (ex.: "Pediu remoção de 1 foto por WhatsApp em 20/10/2026").
 3. Apague o **arquivo**: menu da esquerda → **Mídias** (fotos) ou **Arquivos → Vídeos** (vídeos) → abra o arquivo →
@@ -144,7 +144,7 @@ imagem do site nunca causa problema.
    (No caso de vídeo, exclua também a **Imagem de capa** em **Mídias**, se ela mostrar a pessoa.)
 4. Depois apague ou ajuste o item que usava o arquivo:
    - **Galeria do espaço**: abra o item → **⋯** → **Excluir**;
-   - **Modelos**: abra a modelo, remova a linha da foto e **Publicar**; se era a capa, a próxima foto
+   - **Profissionais e amadoras**: abra a modelo, remova a linha da foto e **Publicar**; se era a capa, a próxima foto
      passa a ser a capa. Se era a modelo inteira, **⋯** → **Excluir**.
 5. Confira no celular que a imagem sumiu da página. Cópias reduzidas guardadas pelo site somem sozinhas em algumas horas.
 6. Responda à pessoa confirmando a remoção.
@@ -461,29 +461,19 @@ painel.
 ### Privacidade dos recados
 
 **A equipe não lê as conversas.** Não existe tela com as conversas e vocês não veem quem fala com quem. Só quando alguém
-**denuncia**, a denúncia guarda os **últimos 20 recados** daquela conversa, e só isso fica visível para vocês. Os bloqueios
 são de cada assinante: a equipe não vê nem desfaz.
 
 ### Denúncias de recados
 
-1. No painel inicial, a caixa mostra **"Recados: N denúncias abertas"**. Clique para ver a lista: as **urgentes** (motivo
-   "Pessoa menor de idade") aparecem primeiro. **Urgente é para agir na hora.**
-2. Abra a denúncia: veja o motivo, os detalhes, o apelido da pessoa denunciada e os recados guardados.
-3. Escolha uma ação:
-   - **Descartar**: não há problema (denúncia sem fundamento).
-   - **Resolver**: o problema existe e foi tratado de outra forma (por exemplo, conversa com a pessoa pelo WhatsApp). A nota
-     é obrigatória.
-   - **Suspender mensagens**: a pessoa denunciada deixa de mandar recados. A nota é obrigatória e fica no
-     **Registro de ações**.
-4. Denúncia de **menor de idade**: o site **suspende o envio da pessoa denunciada sozinho, na mesma hora**, antes de
-   vocês abrirem a denúncia. Leiam em seguida, decidam se mantêm (**Suspender mensagens**) ou se foi engano (**Descartar** e
-   libere a pessoa), e tratem a conta como no ClassiSex (anúncio e acesso).
+Desde 24/10/2026 o painel não mostra mais as denúncias de recados (nem no painel inicial, nem no menu). Elas continuam guardadas; nada foi apagado.
 
 ### Suspender o envio de recados
 
 A pessoa suspensa continua entrando no site e usando o resto, mas ao tentar enviar vê "Seu envio de recados foi suspenso
 pela equipe. Fale com a casa pelo WhatsApp." Para **liberar**, abra a conta em **Assinantes** e desmarque **Mensagens
 suspensas**.
+
+Suspender o envio a partir de uma denúncia não é mais possível no painel, porque a tela de denúncias saiu dele.
 
 ### Testar com dois assinantes
 
