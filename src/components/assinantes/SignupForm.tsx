@@ -18,6 +18,11 @@ export function SignupForm() {
   const values = state?.values
   return (
     <form action={action} className="mt-6 flex max-w-[440px] flex-col gap-4" noValidate={false}>
+      {errors.form && (
+        <p role="alert" className="rounded-lg border border-danger px-4 py-2 text-body text-text">
+          {errors.form}
+        </p>
+      )}
       <FormField id="cad-email" name="email" type="email" label="E-mail" autoComplete="email" defaultValue={values?.email} error={errors.email} />
       <FormField
         id="cad-senha"

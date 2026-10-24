@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { postJson, type BulkReply } from './aprovar-lista'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /** Same cap as the server (BULK_APPROVE_MAX in src/lib/classisex/service.ts). */
 const MAX = 200
@@ -53,7 +54,7 @@ export function AprovarSelecionados() {
         const res = await fetch(`${api}/ads${query}&limit=${MAX + 1}&depth=0&pagination=false&select[id]=true`, {
           credentials: 'include',
         })
-        if (!res.ok) throw new Error('Não foi possível listar os anúncios selecionados.')
+        if (!res.ok) throw new Error(`Não foi possível listar os anúncios selecionados: ${mensagemDaResposta(res.status, await res.json().catch(() => null))}`)
         ids = ((await res.json()) as { docs: { id: number }[] }).docs.map((d) => d.id)
       }
       if (ids.length === 0) throw new Error('Nenhum anúncio para aprovar na seleção.')
@@ -62,7 +63,7 @@ export function AprovarSelecionados() {
       setReply(result)
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }

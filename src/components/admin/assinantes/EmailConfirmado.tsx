@@ -3,6 +3,7 @@
 import { useConfig, useDocumentInfo, useField } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * "E-mail confirmado" on the subscriber page (G-01): shows the state and lets staff mark it for
@@ -28,10 +29,11 @@ export function EmailConfirmado({ path }: { path: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ confirmado: !confirmed }),
       })
-      if (!res.ok) setError('Não foi possível alterar. Tente de novo.')
-      else router.refresh()
-    } catch {
-      setError('Não foi possível alterar. Tente de novo.')
+      if (!res.ok) {
+        setError(`Não foi possível alterar: ${mensagemDaResposta(res.status, await res.json().catch(() => null))}`)
+      } else router.refresh()
+    } catch (err) {
+      setError(`Não foi possível alterar: ${mensagemDeExcecao(err)}`)
     } finally {
       setBusy(false)
     }

@@ -54,7 +54,7 @@ function mimeOf(file: File): string {
   return EXTENSION_TYPES[ext] ?? ''
 }
 
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+async function handle(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   if (!/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) <= 0) return notFound()
   const adId = Number(id)
@@ -127,4 +127,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     return back('midia=erro')
   }
   return back(`midia=${tipo}-ok`)
+}
+
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
+  try {
+    return await handle(request, context)
+  } catch (err) {
+    // Session/database failures before the upload starts: back to the edit page with a readable reason
+    console.error(`[midia] erro inesperado: ${(err as Error).message}`)
+    const { id } = await context.params
+    return seeOther(`/area-do-assinante/meus-anuncios/${Number(id) || ''}/editar?midia=erro&codigo=erro`)
+  }
 }

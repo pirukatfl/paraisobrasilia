@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 
 import { renewalWindow, validUntilLabel } from '../../../lib/assinantes/periods'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * "Assinatura" panel on the subscriber page in /admin (PAINEL-05): situation, release/renew
@@ -88,7 +89,7 @@ const buttonStyle = (variant: 'primary' | 'danger' | 'secondary'): React.CSSProp
 async function fetchSituacao(url: string): Promise<Situacao> {
   const res = await fetch(url, { credentials: 'include' })
   const json = (await res.json().catch(() => ({}))) as Situacao & { message?: string }
-  if (!res.ok) throw new Error(json.message ?? 'Erro')
+  if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
   return json
 }
 
@@ -127,7 +128,7 @@ export function AssinaturaPanel() {
         setLoadError(null)
       },
       (err: Error) => {
-        if (!cancelled) setLoadError(`Não foi possível carregar a assinatura: ${err.message}`)
+        if (!cancelled) setLoadError(`Não foi possível carregar a assinatura: ${mensagemDeExcecao(err)}`)
       },
     )
     return () => {
@@ -166,7 +167,7 @@ export function AssinaturaPanel() {
       body: JSON.stringify(body),
     })
     const json = (await res.json().catch(() => ({}))) as Record<string, unknown>
-    if (!res.ok) throw new Error(String(json.message ?? 'Não foi possível concluir.'))
+    if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
     return json
   }
 
@@ -189,7 +190,7 @@ export function AssinaturaPanel() {
       reload()
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }
@@ -208,7 +209,7 @@ export function AssinaturaPanel() {
       reload()
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }
@@ -223,7 +224,7 @@ export function AssinaturaPanel() {
       setLink({ url: String(result.url), whatsappUrl: (result.whatsappUrl as string | null) ?? null })
       setLinkStatus('Link gerado. Links anteriores deixaram de valer.')
     } catch (err) {
-      setLinkError((err as Error).message)
+      setLinkError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }

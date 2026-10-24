@@ -2,6 +2,7 @@ import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
 import { ServiceError } from '../classisex/service'
+import { respostaDeErroInesperado } from '../errors/endpoint'
 import { resolveMessageReport, type MessageResolveAction } from './service'
 
 /**
@@ -37,7 +38,7 @@ export const messageReportEndpoints: Endpoint[] = [
         )
       } catch (err) {
         if (err instanceof ServiceError) return Response.json({ message: err.message }, { status: err.status })
-        throw err
+        return respostaDeErroInesperado(err, req)
       }
     },
   },

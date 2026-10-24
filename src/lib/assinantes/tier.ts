@@ -53,6 +53,5 @@ export const TIER_COMPARISON: { item: string; gratis: string; assinante: string 
   { item: 'Fotos por anúncio', gratis: '1', assinante: `até ${MAX_AD_PHOTOS}` },
   { item: 'Vídeos por anúncio', gratis: 'não', assinante: `até ${MAX_AD_VIDEOS}` },
   { item: 'Ver anúncios do ClassiSex', gratis: 'todos, sem contato', assinante: 'todos, com contato, fotos e vídeos' },
-  { item: 'Recados (conversas privadas)', gratis: 'não', assinante: 'manda e recebe' },
   { item: 'Contos e Dicas Hot completos', gratis: 'só o início', assinante: 'sim' },
 ]

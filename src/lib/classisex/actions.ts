@@ -1,9 +1,11 @@
 'use server'
 
 import config from '@payload-config'
-import { notFound, redirect } from 'next/navigation'
+import { notFound, redirect, unstable_rethrow } from 'next/navigation'
 import { getPayload } from 'payload'
 
+import { mensagemAmigavel } from '../errors'
+import { registrarErro } from '../errors/server'
 import { requireActiveSubscription, requireAssinante } from '../assinantes/session'
 import type { AdInput } from './rules'
 import { validateAdInput } from './rules'
@@ -81,7 +83,10 @@ async function save(
       if (err.code === 'nao-encontrado') notFound()
       return { errors: (err.errors as Record<string, string> | undefined) ?? { form: err.message }, values }
     }
-    throw err
+    // redirect()/notFound() raised inside write() must keep going
+    unstable_rethrow(err)
+    registrarErro('anuncio-salvar', err)
+    return { errors: { form: `Não foi possível salvar o anúncio: ${mensagemAmigavel(err)}` }, values }
   }
   // New ad with files chosen: the browser uploads them next (one request per file) and then goes to the edit page
   const createdId = (created as { id?: number } | undefined)?.id
@@ -120,7 +125,11 @@ export async function apagarAnuncio(formData: FormData): Promise<void> {
   try {
     await deleteAd(payload, { assinanteId: assinante.id, id: field(formData, 'id') })
   } catch (err) {
-    if (!(err instanceof ServiceError)) throw err
+    if (!(err instanceof ServiceError)) {
+      unstable_rethrow(err)
+      registrarErro('anuncio-apagar', err)
+      redirect(`${MEUS_ANUNCIOS}?erro=inesperado`)
+    }
     failed = true
   }
   redirect(`${MEUS_ANUNCIOS}?${failed ? 'erro=nao-encontrado' : 'ok=apagado'}`)
@@ -141,7 +150,9 @@ async function changeMedia(
     target = `${MEUS_ANUNCIOS}/${owned}/editar?midia=${ok}`
   } catch (err) {
     if (err instanceof ServiceError && err.code === 'nao-encontrado') notFound()
-    throw err
+    unstable_rethrow(err)
+    registrarErro('anuncio-midia', err)
+    redirect(`${editar}?midia=erro&codigo=erro`)
   }
   redirect(target)
 }
@@ -179,7 +190,9 @@ export async function denunciarAnuncio(_prev: ReportState, formData: FormData): 
     }))
   } catch (err) {
     if (err instanceof ServiceError) return { ok: false, message: err.message }
-    throw err
+    unstable_rethrow(err)
+    registrarErro('anuncio-denunciar', err)
+    return { ok: false, message: `Não foi possível enviar a denúncia: ${mensagemAmigavel(err)}` }
   }
   // A report of a minor takes the ad down at once, so this page no longer exists: confirm on the board
   if (hidden) redirect(`${CLASSISEX}?denuncia=enviada`)

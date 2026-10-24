@@ -49,6 +49,11 @@ export default async function MeusAnunciosPage({
           Anúncio não encontrado.
         </p>
       )}
+      {params.erro === 'inesperado' && (
+        <p role="alert" className="mb-8 rounded-lg border border-danger px-4 py-2 text-body">
+          Não foi possível apagar o anúncio por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.
+        </p>
+      )}
       <p className="type-eyebrow text-muted">Área do assinante</p>
       <h1 id="titulo-meus-anuncios" className="type-display mt-2">
         Meus anúncios

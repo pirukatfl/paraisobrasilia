@@ -20,9 +20,10 @@ function uploadOne(adId: number, item: Item, onProgress: (fraction: number) => v
     const xhr = new XMLHttpRequest()
     xhr.open('POST', `/area-do-assinante/meus-anuncios/${adId}/midia?tipo=${item.tipo}`)
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(e.loaded / e.total)
-    xhr.onerror = () => resolve('erro')
+    xhr.onerror = () => resolve('rede')
     xhr.onload = () => {
       // The route answers 303 to the edit page with ?midia=…; XHR follows it and exposes the final URL
+      if (xhr.status === 413) return resolve('grande')
       try {
         const url = new URL(xhr.responseURL)
         const midia = url.searchParams.get('midia')

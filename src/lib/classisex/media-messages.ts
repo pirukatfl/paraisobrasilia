@@ -45,6 +45,8 @@ export type UploadErrorCode =
   | 'limite-anuncios'
   | 'fotos-sem-conta'
   | 'video-sem-conta'
+  | 'rede'
+  | 'erro'
 
 /** Shown on the edit page from ?midia=erro&codigo=… (the URL carries only the code). */
 export const UPLOAD_ERROR_MESSAGES: Record<UploadErrorCode, string> = {
@@ -62,6 +64,8 @@ export const UPLOAD_ERROR_MESSAGES: Record<UploadErrorCode, string> = {
   'limite-anuncios': 'Você já tem 3 anúncios ativos. Apague um para mandar este de volta para análise.',
   'fotos-sem-conta': AD_MEDIA_MESSAGES.fotosSemConta,
   'video-sem-conta': AD_MEDIA_MESSAGES.videoSemConta,
+  rede: 'Sem conexão com o servidor. Confira sua internet e tente de novo.',
+  erro: 'Não foi possível enviar o arquivo por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.',
 }
 
 export const MEDIA_OK_MESSAGES: Record<string, string> = {
@@ -97,7 +101,7 @@ export function uploadCodeFor(message: string, kind: 'foto' | 'video'): UploadEr
 }
 
 export function uploadErrorMessage(code: string | undefined): string {
-  return (code && UPLOAD_ERROR_MESSAGES[code as UploadErrorCode]) || 'Não foi possível enviar o arquivo. Tente de novo.'
+  return (code && UPLOAD_ERROR_MESSAGES[code as UploadErrorCode]) || UPLOAD_ERROR_MESSAGES.erro
 }
 
 /** Limits shown by the create form (client side); the server enforces the same ones. */
