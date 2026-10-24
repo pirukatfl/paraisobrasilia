@@ -3,16 +3,22 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import { UnreadBadge } from '@/components/mensagens/UnreadBadge'
+import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 
 /** Desktop inline navigation (≥ 1024px). Active item: accent underline + aria-current. */
-export function Nav({ items }: { items: NavItem[] }) {
+export function Nav({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
   const pathname = usePathname() ?? '/'
   return (
     <nav aria-label="Principal" className="hidden xl:block">
-      <ul className="flex items-center gap-4 xl:gap-5">
+      <ul
+        className={
+          logado ? 'flex flex-wrap items-center justify-end gap-x-4 gap-y-0' : 'flex items-center gap-4 xl:gap-5'
+        }
+      >
         {items.map((item) => {
-          const active = isActivePath(item.href, pathname)
+          const active = isActivePath(item.href, pathname, item.exact)
           return (
             <li key={item.href}>
               <Link
@@ -23,10 +29,23 @@ export function Nav({ items }: { items: NavItem[] }) {
                 }`}
               >
                 {item.label}
+                {item.badge && <UnreadBadge />}
               </Link>
             </li>
           )
         })}
+        {logado && (
+          <li>
+            <form action={sair}>
+              <button
+                type="submit"
+                className="type-eyebrow inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-muted hover:text-accent"
+              >
+                Sair
+              </button>
+            </form>
+          </li>
+        )}
       </ul>
     </nav>
   )

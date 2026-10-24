@@ -5,13 +5,15 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 import { CloseIcon, MenuIcon } from '@/components/icons'
+import { UnreadBadge } from '@/components/mensagens/UnreadBadge'
+import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 
 // Without JavaScript the panel is shown inline (UI-SPEC: no-JS fallback).
 const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:static!important}[data-mobile-menu-button]{display:none!important}'
 
 /** Disclosure menu for < 1024px (UI-SPEC Global — Header navigation). */
-export function MobileMenu({ items }: { items: NavItem[] }) {
+export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
   const pathname = usePathname() ?? '/'
   // Open state is tied to the path it was opened on: navigating closes the menu by itself.
   const [openOn, setOpenOn] = useState<string | null>(null)
@@ -40,8 +42,8 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [open, close])
 
-  const linkClass = (href: string) =>
-    `type-eyebrow flex min-h-11 items-center ${isActivePath(href, pathname) ? 'text-accent' : 'text-text'} hover:text-accent`
+  const linkClass = (item: NavItem) =>
+    `type-eyebrow flex min-h-11 items-center ${isActivePath(item.href, pathname, item.exact) ? 'text-accent' : 'text-text'} hover:text-accent`
 
   return (
     <div className="xl:hidden">
@@ -72,12 +74,13 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
                 <Link
                   href={item.href}
                   aria-current={
-                    pathname === item.href || (!item.children && isActivePath(item.href, pathname)) ? 'page' : undefined
+                    pathname === item.href || (!item.children && isActivePath(item.href, pathname, item.exact)) ? 'page' : undefined
                   }
-                  className={linkClass(item.href)}
+                  className={linkClass(item)}
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
+                  {item.badge && <UnreadBadge />}
                 </Link>
                 {item.children && (
                   <ul className="pb-2 pl-4">
@@ -97,6 +100,18 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
                 )}
               </li>
             ))}
+            {logado && (
+              <li>
+                <form action={sair}>
+                  <button
+                    type="submit"
+                    className="type-eyebrow flex min-h-11 w-full cursor-pointer items-center text-left text-text hover:text-accent"
+                  >
+                    Sair
+                  </button>
+                </form>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

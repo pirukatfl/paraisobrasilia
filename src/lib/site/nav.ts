@@ -5,11 +5,15 @@
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
  * 02-04 Modelos (always listed since quick menu-modelos; the page shows an empty state until a model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
+ * Logged-in subscribers get getMemberNavItems() instead (quick menu-logado, 2026-10-24): Festas · Quem somos · Espaço ·
+ * Modelos · ClassiSex · Recados · Contos · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha (+ Sair
+ * rendered by Nav/MobileMenu). Header picks the list on the server; pinned by tests/e2e/menu-logado.spec.ts.
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
 import { pathForKey } from '../pages/keys'
 
-export type NavItem = { href: string; label: string; children?: NavItem[] }
+/** `exact`: active only on the exact path (e.g. /area-do-assinante). `badge`: show the unread-recados count. */
+export type NavItem = { href: string; label: string; children?: NavItem[]; exact?: boolean; badge?: boolean }
 
 export function getNavItems(): NavItem[] {
   return [
@@ -40,8 +44,29 @@ export function getNavItems(): NavItem[] {
   ]
 }
 
+/** Menu for a logged-in subscriber: replaces the public list (quick menu-logado). Sair is added by the menu components. */
+export function getMemberNavItems(): NavItem[] {
+  const base = getNavItems()
+  const pick = (href: string) => base.find((item) => item.href === href)!
+  return [
+    pick('/'),
+    pick(pathForKey('quem-somos')),
+    pick('/espaco'),
+    pick('/modelos'),
+    { href: '/area-do-assinante/classisex', label: 'ClassiSex' },
+    { href: '/area-do-assinante/mensagens', label: 'Recados', badge: true },
+    { href: '/area-do-assinante/contos', label: 'Contos' },
+    { href: '/area-do-assinante/dicas-hot', label: 'Dicas Hot' },
+    pick('/contato'),
+    { href: '/area-do-assinante/meus-anuncios', label: 'Meus anúncios' },
+    { href: '/area-do-assinante', label: 'Minha assinatura', exact: true },
+    { href: '/area-do-assinante/senha', label: 'Trocar senha' },
+  ]
+}
+
 /** Active state: exact match, a child path, or party pages under "Festas". */
-export function isActivePath(href: string, pathname: string): boolean {
+export function isActivePath(href: string, pathname: string, exact = false): boolean {
+  if (exact) return pathname === href
   if (href === '/') return pathname === '/' || pathname.startsWith('/festas/')
   return pathname === href || pathname.startsWith(`${href}/`)
 }

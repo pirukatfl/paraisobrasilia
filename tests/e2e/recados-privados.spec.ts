@@ -2,6 +2,7 @@ import { expect, test, type APIResponse, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginPage, type Who } from './helpers/fase5'
+import { headerMenu } from './helpers/menu'
 import {
   ANA,
   APELIDOS,
@@ -45,7 +46,8 @@ test.afterAll(async ({ request }) => {
 
 const as = (browser: Browser, baseURL: string, who: Who, next?: string) => loginPage(browser, baseURL, who, next)
 
-const subNav = (page: import('@playwright/test').Page) => page.getByRole('navigation', { name: 'Área do assinante' })
+// The members navigation is the site header menu (quick menu-logado)
+const subNav = (page: import('@playwright/test').Page) => headerMenu(page)
 
 function expectNone(body: string, values: string[]) {
   for (const v of values) expect(body, `body leaks ${v}`).not.toContain(v)
@@ -64,28 +66,33 @@ test('1. Ana and Beto see the conversation in Recados; the unread number sits ne
   baseURL,
 }) => {
   const ana = await as(browser, baseURL!, ANA, '/area-do-assinante/classisex')
-  const links = await subNav(ana.page).getByRole('link').allTextContents()
+  const links = await (await subNav(ana.page)).locator(':scope > ul > li > a').allTextContents()
   expect(links.map((l) => l.trim().replace(/\s*\d+\+?$/, ''))).toEqual([
-    'Minha assinatura',
+    'Festas',
+    'Quem somos',
+    'Espaço',
+    'Modelos',
     'ClassiSex',
     'Recados',
     'Contos',
     'Dicas Hot',
+    'Contato',
     'Meus anúncios',
+    'Minha assinatura',
     'Trocar senha',
   ])
-  const badge = subNav(ana.page).getByLabel(/recados? não lidos?/)
+  const badge = (await subNav(ana.page)).getByLabel(/recados? não lidos?/)
   await expect(badge).toHaveText('1') // Beto's last recado
-  await subNav(ana.page).getByRole('link', { name: /^Recados/ }).click()
+  await (await subNav(ana.page)).getByRole('link', { name: /^Recados/ }).click()
   await expect(ana.page.getByRole('heading', { name: 'Recados', level: 1 })).toBeVisible()
   await expect(ana.page.getByText('Só você e a outra pessoa veem cada conversa.')).toBeVisible()
   const item = ana.page.getByRole('link', { name: new RegExp(APELIDOS.beto) })
   await expect(item).toContainText(SENT.replay)
   await item.click()
   await expect(ana.page.getByRole('list', { name: 'Recados' })).toContainText(SENT.conversa)
-  await subNav(ana.page).getByRole('link', { name: 'ClassiSex' }).click()
+  await (await subNav(ana.page)).getByRole('link', { name: 'ClassiSex' }).click()
   await expect(ana.page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
-  await expect(subNav(ana.page).getByLabel(/recados? não lidos?/)).toHaveCount(0)
+  await expect((await subNav(ana.page)).getByLabel(/recados? não lidos?/)).toHaveCount(0)
   await ana.context.close()
 
   const beto = await as(browser, baseURL!, BETO, M)

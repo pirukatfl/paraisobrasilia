@@ -2,6 +2,7 @@ import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
+import { headerMenu } from './helpers/menu'
 
 // Dicas Hot (quick dicas-hot + dicas-hot-assinantes): a public, SEO-first section with the same paywall
 // as Contos. Visitors and free accounts read only the beginning; the rest is for active subscribers and
@@ -161,7 +162,7 @@ test('an active subscriber reads the whole dica in the members area', async ({ b
   await page.goto('/area-do-assinante/dicas-hot')
   await expect(page.locator('main').getByRole('article')).toHaveCount(12)
   await expect(page.locator('main')).not.toContainText('Dica Rascunho')
-  const nav = page.getByRole('navigation', { name: 'Área do assinante' })
+  const nav = await headerMenu(page)
   await expect(nav.getByRole('link', { name: 'Dicas Hot' })).toHaveAttribute('href', '/area-do-assinante/dicas-hot')
   // the public page of the same dica links to the full version
   await page.goto('/dicas-hot/dica-teste-13')

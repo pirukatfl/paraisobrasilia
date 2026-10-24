@@ -2,10 +2,22 @@ import Link from 'next/link'
 
 import { MobileMenu } from '@/components/MobileMenu'
 import { Nav } from '@/components/Nav'
-import { getNavItems } from '@/lib/site/nav'
+import { getAssinante } from '@/lib/assinantes/session'
+import { getMemberNavItems, getNavItems } from '@/lib/site/nav'
 
-export function Header() {
-  const items = getNavItems()
+async function isLoggedIn(): Promise<boolean> {
+  try {
+    return (await getAssinante()) !== null
+  } catch {
+    // No database (e.g. build-time prerender): public menu
+    return false
+  }
+}
+
+/** Logged-in subscribers get their own single menu (quick menu-logado); everyone else the public one. */
+export async function Header() {
+  const logado = await isLoggedIn()
+  const items = logado ? getMemberNavItems() : getNavItems()
   return (
     <header className="header-line relative z-30 bg-bg">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 lg:px-8">
@@ -25,8 +37,8 @@ export function Header() {
             />
           </picture>
         </Link>
-        <Nav items={items} />
-        <MobileMenu items={items} />
+        <Nav items={items} logado={logado} />
+        <MobileMenu items={items} logado={logado} />
       </div>
     </header>
   )

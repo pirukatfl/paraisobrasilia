@@ -2,6 +2,7 @@ import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
+import { headerMenu } from './helpers/menu'
 
 // CLAS-01 / CLAS-02 / D-05 / D-06 / D-07: subscribers browse, filter and open ads with contacts;
 // expired authors stay as free ads (G-05) and keep their data on renewal; inactive viewers get no ad markup (T-04-05).
@@ -95,7 +96,7 @@ async function asSubscriber(browser: Browser, baseURL: string, acc: { email: str
 test('active subscriber sees visible ads only, newest first', async ({ browser, baseURL }) => {
   const { page, context } = await asSubscriber(browser, baseURL!, GIL)
   await page.goto('/area-do-assinante')
-  await page.getByRole('navigation', { name: 'Área do assinante' }).getByRole('link', { name: 'ClassiSex' }).click()
+  await (await headerMenu(page)).getByRole('link', { name: 'ClassiSex' }).click()
   await expect(page).toHaveURL(/\/area-do-assinante\/classisex$/)
   const main = page.locator('main')
   await expect(page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
