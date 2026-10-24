@@ -83,7 +83,7 @@ export function AgeGate() {
       <div
         ref={ref}
         data-age-gate
-        className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg/92 px-4 py-8 backdrop-blur-[8px] transition-opacity duration-150 ${
+        className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg/75 px-4 py-8 backdrop-blur-[24px] transition-opacity duration-150 ${
           state === 'closing' ? 'opacity-0' : 'opacity-100'
         }`}
       >

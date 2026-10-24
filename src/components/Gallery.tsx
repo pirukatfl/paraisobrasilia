@@ -66,7 +66,7 @@ export function Gallery({ items }: { items: SpaceItemDTO[] }) {
             </>
           )
           const tileClass =
-            'relative block aspect-square w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-accent focus-visible:border-accent'
+            'relative block aspect-square w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-primary-hover hover:card-glow focus-visible:border-accent'
           return (
             <li key={item.id}>
               {hydrated ? (

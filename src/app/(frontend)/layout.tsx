@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter, Josefin_Sans } from 'next/font/google'
+import { Manrope, Playfair_Display } from 'next/font/google'
 import React from 'react'
 
 import { Footer } from '@/components/Footer'
@@ -9,19 +9,21 @@ import { AGE_HEAD_SCRIPT } from '@/lib/age-gate/head-script'
 
 import './globals.css'
 
-const josefin = Josefin_Sans({
-  weight: ['400', '600'],
+// Display and headings: Playfair Display (design system "Bordeaux & Crimson Desire")
+const playfair = Playfair_Display({
+  weight: ['500', '600'],
   // Portuguese is covered by the latin subset; latin-ext is no longer preloaded (MIDIA-03 budget)
   subsets: ['latin'],
-  variable: '--font-josefin',
+  variable: '--font-playfair',
   display: 'swap',
 })
 
-const inter = Inter({
+// Interface and body: Manrope
+const manrope = Manrope({
   weight: ['400', '600'],
   // Portuguese is covered by the latin subset; latin-ext is no longer preloaded (MIDIA-03 budget)
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-manrope',
   display: 'swap',
 })
 
@@ -53,7 +55,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // suppressHydrationWarning: the head script may add data-age-ok before hydration
-    <html lang="pt-BR" className={`${josefin.variable} ${inter.variable}`} suppressHydrationWarning>
+    <html lang="pt-BR" className={`${playfair.variable} ${manrope.variable}`} suppressHydrationWarning>
       <head>
         {/* Static constant, no user data (T-01-16) */}
         <script dangerouslySetInnerHTML={{ __html: AGE_HEAD_SCRIPT }} />

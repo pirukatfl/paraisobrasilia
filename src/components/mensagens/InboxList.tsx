@@ -10,7 +10,7 @@ export function InboxList({ items }: { items: InboxItemDTO[] }) {
         <li key={c.id}>
           <Link
             href={`/area-do-assinante/mensagens/${c.id}`}
-            className="flex flex-col gap-1 rounded-xl border border-line bg-surface p-4 hover:border-accent"
+            className="flex flex-col gap-1 rounded-xl border border-line bg-surface p-4 hover:border-primary-hover hover:card-glow"
           >
             <span className="flex flex-wrap items-center justify-between gap-2">
               <span className="type-heading">{c.outroApelido}</span>

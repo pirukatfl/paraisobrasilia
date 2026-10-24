@@ -23,7 +23,7 @@ export function ModelGrid({ models }: { models: ModelCardDTO[] }) {
             aria-label={`Ver fotos de ${model.name}`}
             className="block focus-visible:outline-none"
           >
-            <span className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-accent focus-visible:border-accent">
+            <span className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-primary-hover hover:card-glow focus-visible:border-accent">
               <Image
                 src={model.cover.thumbUrl}
                 alt={model.cover.alt}

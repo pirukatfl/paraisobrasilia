@@ -10,7 +10,7 @@ function SelfDeclarationPrompt({ onVerified }: { onVerified: () => void }) {
       aria-modal="true"
       aria-labelledby="age-gate-titulo"
       aria-describedby="age-gate-texto"
-      className="w-full max-w-[440px] rounded-xl border border-line bg-surface px-6 py-8 text-center lg:px-12 lg:py-16"
+      className="w-full max-w-[440px] card-glow rounded-xl border border-gold/20 bg-surface px-6 py-8 text-center lg:px-12 lg:py-16"
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static brand asset, no optimizer needed */}
       <img
