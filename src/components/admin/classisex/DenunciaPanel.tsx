@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { reasonLabel } from '../../../lib/classisex/report-rules'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * "Denúncia" panel on a report in /admin (D-08): the reason and details, a link to the ad, and the
@@ -72,14 +73,14 @@ export function DenunciaPanel() {
     fetch(`${api}/${id}?depth=0`, { credentials: 'include' })
       .then(async (res) => {
         const json = (await res.json().catch(() => ({}))) as Report & { message?: string }
-        if (!res.ok) throw new Error(json.message ?? 'Erro')
+        if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
         if (!cancelled) {
           setReport(json)
           setLoadError(null)
         }
       })
       .catch((err: Error) => {
-        if (!cancelled) setLoadError(`Não foi possível carregar a denúncia: ${err.message}`)
+        if (!cancelled) setLoadError(`Não foi possível carregar a denúncia: ${mensagemDeExcecao(err)}`)
       })
     return () => {
       cancelled = true
@@ -100,13 +101,13 @@ export function DenunciaPanel() {
         body: JSON.stringify({ acao, nota }),
       })
       const json = (await res.json().catch(() => ({}))) as { message?: string; closed?: number }
-      if (!res.ok) throw new Error(json.message ?? 'Não foi possível concluir.')
+      if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
       setStatus(acao === 'despublicar' ? 'Anúncio despublicado e denúncias fechadas.' : 'Denúncia descartada.')
       setNota('')
       setVersion((v) => v + 1)
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }

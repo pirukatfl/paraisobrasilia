@@ -1,5 +1,7 @@
 /** Shared by the list-view approve controls (row button and bulk bar). Browser side, no server imports. */
 
+import { mensagemDaResposta } from '../../../lib/errors'
+
 export type ApproveReply = { status: string; statusLabel: string }
 export type BulkReply = { aprovados: number[]; falhas: { id: number; resumo: string | null; motivo: string }[] }
 
@@ -8,7 +10,7 @@ export function podeAprovarNaLista(row: { status?: string; origemLegado?: string
   return row.status === 'pendente' || (row.status === 'rascunho' && row.origemLegado === 'equipe')
 }
 
-/** POST JSON with the staff session cookie; failures become Errors with the server's message (Portuguese). */
+/** POST JSON with the staff session cookie; failures become Errors with a clear Portuguese reason (server message, or one by status). */
 export async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
     method: 'POST',
@@ -16,10 +18,7 @@ export async function postJson<T>(url: string, body: unknown): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
-  const json = (await res.json().catch(() => ({}))) as T & { message?: string; errors?: { message?: string; data?: { errors?: { message?: string }[] } }[] }
-  if (!res.ok) {
-    const nested = json.errors?.[0]?.data?.errors?.map((e) => e.message).filter(Boolean).join(' ')
-    throw new Error(json.message ?? (nested || json.errors?.[0]?.message) ?? 'Não foi possível concluir.')
-  }
+  const json = (await res.json().catch(() => ({}))) as T
+  if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
   return json
 }

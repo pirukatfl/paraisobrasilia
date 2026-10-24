@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { messageReasonLabel } from '../../../lib/mensagens/rules'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * "Denúncia" panel on a message report in /admin (REC-03): reason, details, a link to the reported
@@ -73,14 +74,14 @@ export function MensagemDenunciaPanel() {
     fetch(`${api}/${id}?depth=0`, { credentials: 'include' })
       .then(async (res) => {
         const json = (await res.json().catch(() => ({}))) as Report & { message?: string }
-        if (!res.ok) throw new Error(json.message ?? 'Erro')
+        if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
         if (!cancelled) {
           setReport(json)
           setLoadError(null)
         }
       })
       .catch((err: Error) => {
-        if (!cancelled) setLoadError(`Não foi possível carregar a denúncia: ${err.message}`)
+        if (!cancelled) setLoadError(`Não foi possível carregar a denúncia: ${mensagemDeExcecao(err)}`)
       })
     return () => {
       cancelled = true
@@ -105,7 +106,7 @@ export function MensagemDenunciaPanel() {
         body: JSON.stringify({ acao, nota }),
       })
       const json = (await res.json().catch(() => ({}))) as { message?: string }
-      if (!res.ok) throw new Error(json.message ?? 'Não foi possível concluir.')
+      if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
       setStatus(
         acao === 'suspender'
           ? 'Mensagens da pessoa suspensas e denúncias fechadas.'
@@ -117,7 +118,7 @@ export function MensagemDenunciaPanel() {
       setVersion((v) => v + 1)
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }

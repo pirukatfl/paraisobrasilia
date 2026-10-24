@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { SEM_DATA_LABEL } from '../../../lib/assinantes/site-antigo-label'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * Warning box on the record of an old subscriber who had no expiry date (M-02, client adjustment
@@ -30,10 +31,11 @@ export function AvisoSemData() {
         headers: { 'Content-Type': 'application/json' },
         body: '{}',
       })
-      if (!res.ok) setError('Não foi possível dispensar o aviso. Tente de novo.')
-      else router.refresh()
-    } catch {
-      setError('Não foi possível dispensar o aviso. Tente de novo.')
+      if (!res.ok) {
+        setError(`Não foi possível dispensar o aviso: ${mensagemDaResposta(res.status, await res.json().catch(() => null))}`)
+      } else router.refresh()
+    } catch (err) {
+      setError(`Não foi possível dispensar o aviso: ${mensagemDeExcecao(err)}`)
     } finally {
       setBusy(false)
     }

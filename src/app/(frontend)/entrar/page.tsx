@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 const ERRORS: Record<string, string> = {
   credenciais: 'E-mail ou senha incorretos.',
   bloqueado: 'Muitas tentativas. Aguarde 10 minutos ou fale com a equipe pelo WhatsApp.',
+  inesperado: 'Não foi possível entrar por um erro inesperado no servidor. Tente de novo em instantes; se continuar, avise a equipe.',
   'nao-confirmado': 'Confirme seu e-mail antes de entrar. Enviamos o link quando você criou a conta.',
 }
 

@@ -97,7 +97,7 @@ export function InfiniteAds({
         )}
         {failed && (
           <p role="alert" className="type-label text-muted">
-            Não foi possível carregar mais anúncios.
+            Não foi possível carregar mais anúncios agora (falha de conexão ou instabilidade do servidor). Toque em &ldquo;Carregar mais&rdquo; para tentar de novo.
           </p>
         )}
         {!done && !loading && (

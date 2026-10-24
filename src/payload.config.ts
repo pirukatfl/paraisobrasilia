@@ -1,7 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { en } from '@payloadcms/translations/languages/en'
 import { pt } from '@payloadcms/translations/languages/pt'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -31,6 +30,7 @@ import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
+import { traduzirErroDaApi } from './lib/errors/after-error'
 import { buildEmailAdapter } from './lib/email/config'
 import { assertOutsidePublicMedia, privateMediaDir } from './lib/classisex/storage'
 
@@ -108,12 +108,18 @@ export default buildConfig({
     Models,
   ],
   globals: [Contact],
+  hooks: {
+    // Clear Portuguese reason on every API error (admin and site), see lib/errors/after-error.ts
+    afterError: [traduzirErroDaApi],
+  },
   // T-03-12: no `csrf` allowlist — it made extractJWT drop the cookie whenever Origin and
   // Sec-Fetch-Site were both absent (logged users out). Cookies are SameSite=Lax and src/proxy.ts
   // rejects state-changing requests carrying a foreign Origin.
   editor: lexicalEditor(),
   i18n: {
-    supportedLanguages: { pt, en },
+    // Portuguese only: the whole staff is Brazilian and an English browser would otherwise get
+    // "An error has occurred." and English API messages
+    supportedLanguages: { pt },
     fallbackLanguage: 'pt',
   },
   secret: process.env.PAYLOAD_SECRET || '',

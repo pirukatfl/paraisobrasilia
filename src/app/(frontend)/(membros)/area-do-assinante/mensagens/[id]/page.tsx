@@ -28,7 +28,8 @@ export default async function ConversaPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const { id } = await params
-  const raw = (await searchParams).antes
+  const query = await searchParams
+  const raw = query.antes
   const antesNum = Number.parseInt(Array.isArray(raw) ? (raw[0] ?? '') : (raw ?? ''), 10)
   const antes = Number.isInteger(antesNum) && antesNum > 0 ? antesNum : undefined
   const check = await requireActiveSubscription(`/area-do-assinante/mensagens/${encodeURIComponent(id)}`)
@@ -54,6 +55,11 @@ export default async function ConversaPage({
         Conversa com {thread.outroApelido}
       </h1>
       <p className="type-label mt-2 text-muted">{thread.assunto}</p>
+      {query.erro === 'inesperado' && (
+        <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">
+          Não foi possível concluir essa ação por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.
+        </p>
+      )}
       <ThreadView thread={thread} />
       {euBloqueei ? (
         <p className="mt-8 max-w-[560px] text-body text-muted">{MENSAGEM_MESSAGES.voceBloqueou}</p>

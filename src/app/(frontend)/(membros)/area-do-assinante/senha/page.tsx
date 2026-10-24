@@ -15,6 +15,7 @@ const ERRORS: Record<string, string> = {
   atual: 'Senha atual incorreta.',
   curta: 'A nova senha precisa ter pelo menos 8 caracteres.',
   diferente: 'As senhas não conferem.',
+  inesperado: 'Não foi possível trocar a senha por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.',
   bloqueado: 'Muitas tentativas. Aguarde 10 minutos ou fale com a equipe pelo WhatsApp.',
 }
 

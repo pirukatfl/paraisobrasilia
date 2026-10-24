@@ -645,6 +645,19 @@ Os anúncios que a própria equipe (contas de administrador do site antigo) e us
 - Mudança que não apareceu no site: confira se clicou em **Publicar** (e não só em Salvar rascunho) e recarregue a página.
 - Qualquer outro problema: fale com o desenvolvedor com um print da tela.
 
+## Quando aparece um erro
+
+Todo erro do painel e do site agora diz o motivo em português. O que cada um quer dizer:
+
+- **Texto vermelho ao lado de um campo**: o campo está vazio ou errado. Corrija e salve de novo.
+- **"Já existe um cadastro com esse valor"**: e-mail, título ou apelido repetido. Troque o valor.
+- **"Este item ainda está ligado a outros registros"**: não dá para apagar enquanto houver anúncios, assinaturas ou mensagens ligados a ele. Remova ou encerre esses primeiro.
+- **"Sua sessão expirou. Entre de novo."**: faça login outra vez e repita a ação.
+- **"Você não tem permissão para fazer isso."**: seu usuário não pode essa ação; peça ao administrador.
+- **"O arquivo é grande demais"**: reduza a foto (até 15 MB) ou o vídeo (até 100 MB).
+- **"Sem conexão com o servidor"**: confira a internet e tente de novo.
+- **"Erro inesperado no servidor"**: tente de novo em instantes. Se continuar, mande para o desenvolvedor o **horário** e, se aparecer, o **código** (no site, abaixo do aviso "Algo deu errado ao abrir esta página"), com um print da tela.
+
 ## Problemas comuns
 
 ### O painel desloga sozinho logo depois do login
