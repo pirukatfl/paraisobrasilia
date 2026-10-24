@@ -217,10 +217,13 @@ export const AdMedia: CollectionConfig = {
       name: 'owner',
       type: 'relationship',
       relationTo: 'assinantes',
-      required: true,
+      required: false,
       index: true,
       label: 'Anunciante',
-      admin: { readOnly: true, description: 'Preenchido com o autor do anúncio.' },
+      admin: {
+        readOnly: true,
+        description: 'Preenchido com o autor do anúncio; vazio quando o anúncio foi enviado sem conta.',
+      },
     },
     {
       name: 'kind',

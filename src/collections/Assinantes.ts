@@ -112,7 +112,7 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
  * Deleting an account removes its periods first (subscriptions.assinante is required, and the
  * API never deletes periods on its own). Same request/transaction; the count is kept in
  * req.context for the audit entry.
- * Phase 4 (T-04-20, LGPD): the account's ClassiSex ads go too (ads.author is required); deleting
+ * Phase 4 (T-04-20, LGPD): the account's ClassiSex ads go too (ads.author is optional, but an ad that does have an author goes with it); deleting
  * an ad cascades to its media files and detaches its reports.
  */
 const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {

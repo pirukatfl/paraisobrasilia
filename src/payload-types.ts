@@ -454,9 +454,9 @@ export interface Ad {
    */
   resumo?: string | null;
   /**
-   * Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios). "Visitantes (sem conta)" é a conta técnica dos anúncios enviados sem cadastro.
+   * Opcional. Assinante que escreveu o anúncio; não aparece no site. Fica vazio nos anúncios enviados sem conta ("Enviado sem conta"), e a equipe pode preencher. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).
    */
-  author: number | Assinante;
+  author?: (number | null) | Assinante;
   /**
    * Aparece na área aberta. Sem telefone, e-mail, @ ou link.
    */
@@ -545,9 +545,9 @@ export interface AdMedia {
   id: number;
   ad: number | Ad;
   /**
-   * Preenchido com o autor do anúncio.
+   * Preenchido com o autor do anúncio; vazio quando o anúncio foi enviado sem conta.
    */
-  owner: number | Assinante;
+  owner?: (number | null) | Assinante;
   kind: 'foto' | 'video';
   /**
    * Menor aparece primeiro.

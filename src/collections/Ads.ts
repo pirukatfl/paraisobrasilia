@@ -80,10 +80,13 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
   return data
 }
 
-/** Only a team draft from the old site can change owner (staff reassign it to the right member). */
+/** Only a team draft from the old site can change owner (staff reassign it to the right member); an empty author can be filled. */
 const guardAuthorChange: CollectionBeforeValidateHook = ({ data, operation, originalDoc, req }) => {
   if (operation !== 'update' || !data || !originalDoc || data.author === undefined) return data
-  if (relId(data.author) !== relId(originalDoc.author) && originalDoc.origemLegado !== 'equipe') {
+  const current = relId(originalDoc.author)
+  // Ads sent without an account have no author: staff may set one (admin only; owners never reach this field)
+  if (current === null) return data
+  if (relId(data.author) !== current && originalDoc.origemLegado !== 'equipe') {
     throw new ValidationError(
       {
         collection: 'ads',
@@ -236,12 +239,12 @@ export const Ads: CollectionConfig = {
       name: 'author',
       type: 'relationship',
       relationTo: 'assinantes',
-      required: true,
+      required: false,
       index: true,
       label: 'Anunciante',
       admin: {
         description:
-          'Assinante que escreveu o anúncio. Não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios). "Visitantes (sem conta)" é a conta técnica dos anúncios enviados sem cadastro.',
+          'Opcional. Assinante que escreveu o anúncio; não aparece no site. Fica vazio nos anúncios enviados sem conta ("Enviado sem conta"), e a equipe pode preencher. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).',
       },
     },
     {
