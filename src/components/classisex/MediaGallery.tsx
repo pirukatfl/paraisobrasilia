@@ -42,7 +42,7 @@ export function MediaGallery({ fotos, videos }: { fotos: MemberPhotoDTO[]; video
 
   if (fotos.length === 0 && videos.length === 0) return null
   const tileClass =
-    'relative block aspect-square w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-accent focus-visible:border-accent'
+    'relative block aspect-square w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-primary-hover hover:card-glow focus-visible:border-accent'
 
   return (
     <div className="mt-6 flex flex-col gap-6">

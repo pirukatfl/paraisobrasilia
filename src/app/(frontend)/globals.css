@@ -1,32 +1,45 @@
 @import 'tailwindcss';
 
-/* Design tokens — UI-SPEC "Color", "Typography" (values sampled from brand/logo-original.webp). */
+/* Design tokens — "Bordeaux & Crimson Desire" design system (DESIGN.md). */
 @theme {
-  --color-bg: #0B0908;
-  --color-surface: #17120F;
-  --color-line: #2A221D;
-  --color-text: #F4EDE4;
-  --color-muted: #B8ADA2;
-  --color-accent: #E8821E;
-  --color-gold: #DEB436;
-  --color-brand-red: #A82A1E;
-  --color-danger: #E5533D;
+  /* Surfaces step up in luminance: canvas → panel → elevated tile */
+  --color-bg: #0E0B0D;
+  --color-surface: #190E13;
+  --color-surface-2: #25121B;
+  /* Hairline: ruby-tinted 1px borders */
+  --color-line: #3A1D28;
+  --color-ruby: #5C1124;
+  /* Ivory and rose-taupe text (never pure white) */
+  --color-text: #F5EBE6;
+  --color-muted: #B59FA8;
+  /* Interactive highlight readable on dark (links, active states, focus) */
+  --color-accent: #FFB2BD;
+  /* Bordeaux Passion (primary CTA) and Vibrant Crimson (hover / live) */
+  --color-primary: #8B1538;
+  --color-primary-hover: #B81D48;
+  /* Champagne Gold: metadata, VIP seals, secondary buttons */
+  --color-gold: #DFB746;
+  --color-gold-deep: #C59B27;
+  --color-brand-red: #8B1538;
+  --color-danger: #FF8A7A;
 
-  /* Exactly 4 sizes (14 / 16 / 24 / 36) with their line heights */
+  /* Type scale: label 14 / body 16 / heading 28 / display 38→56 */
   --text-label: 14px;
   --text-label--line-height: 1.4;
   --text-body: 16px;
-  --text-body--line-height: 1.5;
-  --text-heading: 24px;
-  --text-heading--line-height: 1.2;
-  --text-display: 36px;
-  --text-display--line-height: 1.1;
+  --text-body--line-height: 1.625;
+  --text-heading: 28px;
+  --text-heading--line-height: 1.3;
+  --text-display: clamp(2.375rem, 1.7rem + 2.2vw, 3.5rem);
+  --text-display--line-height: 1.15;
+
+  --radius-xl: 0.75rem;
 }
 
 /* Font families come from next/font CSS variables set on <html> */
 @theme inline {
-  --font-display: var(--font-josefin), ui-sans-serif, system-ui, sans-serif;
-  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-playfair), Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -40,9 +53,14 @@
     color: var(--color-text);
     font-family: var(--font-body);
     font-size: var(--text-body);
-    line-height: 1.5;
+    line-height: 1.625;
     font-weight: 400;
     -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-text);
   }
 
   :focus-visible {
@@ -52,23 +70,21 @@
 }
 
 @layer components {
-  /* Heading (24px) and Display (36px): Josefin Sans uppercase */
+  /* Heading (28px) and Display (38→56px): Playfair Display, editorial, slight negative tracking */
   .type-heading {
     font-family: var(--font-display);
     font-size: var(--text-heading);
-    line-height: 1.2;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    line-height: 1.3;
+    font-weight: 500;
+    letter-spacing: -0.005em;
   }
 
   .type-display {
     font-family: var(--font-display);
     font-size: var(--text-display);
-    line-height: 1.1;
+    line-height: 1.15;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
 
@@ -79,15 +95,16 @@
     font-weight: 600;
   }
 
+  /* Hotel-signage microcopy: Manrope uppercase with wide tracking */
   .type-eyebrow {
-    font-size: var(--text-label);
-    line-height: 1.4;
+    font-size: 13px;
+    line-height: 18px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
 
-  /* Primary button: accent background, text in page background color, 44px touch target */
+  /* Primary button (Crimson Desire): bordeaux fill, ivory text, crimson on hover, 44px touch target */
   .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -96,20 +113,31 @@
     min-width: 44px;
     padding: 8px 24px;
     border-radius: 8px;
-    background-color: var(--color-accent);
-    color: var(--color-bg);
+    background-color: var(--color-primary);
+    color: var(--color-text);
     font-size: var(--text-label);
     line-height: 1.4;
     font-weight: 600;
+    letter-spacing: 0.02em;
     text-decoration: none;
     cursor: pointer;
+    transition:
+      background-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+  }
+  .btn-primary:focus-visible {
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 0 0 4px rgb(139 21 56 / 0.35), 0 0 20px rgb(223 183 70 / 0.12);
   }
 
   /* Institutional pages rich text (UI-SPEC Phase 2 Typography): H2 = Heading, H3 = Label uppercase */
   .rich-text {
     max-width: 680px;
     font-size: var(--text-body);
-    line-height: 1.5;
+    line-height: 1.625;
   }
   /* Quem somos tabs: ~18px body text (1.125rem scales with the user's font setting) */
   .rich-text-lg {
@@ -122,10 +150,8 @@
     margin-top: 32px;
     font-family: var(--font-display);
     font-size: var(--text-heading);
-    line-height: 1.2;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    line-height: 1.3;
+    font-weight: 500;
   }
   .rich-text h3 {
     margin-top: 24px;
@@ -162,7 +188,7 @@
     font-weight: 600;
   }
 
-  /* Secondary button (UI-SPEC Phase 2): transparent, 1px line border, accent border on hover/focus */
+  /* Secondary button (Champagne Gild): 1px gold outline, gold text, faint gold fill on hover/focus */
   .btn-secondary {
     display: inline-flex;
     align-items: center;
@@ -172,24 +198,37 @@
     min-width: 44px;
     padding: 8px 24px;
     border-radius: 8px;
-    border: 1px solid var(--color-line);
+    border: 1px solid var(--color-gold);
     background-color: transparent;
-    color: var(--color-text);
+    color: var(--color-gold);
     font-size: var(--text-label);
     line-height: 1.4;
     font-weight: 600;
+    letter-spacing: 0.02em;
     text-decoration: none;
     cursor: pointer;
+    transition: background-color 150ms ease;
   }
   .btn-secondary:hover,
   .btn-secondary:focus-visible {
-    border-color: var(--color-accent);
+    background-color: rgb(223 183 70 / 0.1);
   }
 
+  /* Bordeaux → gold hairline on top; frosted dark glass with a faint gold edge below */
   .header-line {
     border-top: 2px solid transparent;
-    border-image: linear-gradient(90deg, var(--color-accent), var(--color-brand-red)) 1;
+    border-image: linear-gradient(90deg, var(--color-primary), var(--color-gold), var(--color-primary)) 1;
+    box-shadow: inset 0 -1px 0 rgb(223 183 70 / 0.15);
   }
+
+
+}
+
+/* Card halo (Bordeaux glow & candlelit diffusion); a utility so it works with hover:/focus-within: */
+@utility card-glow {
+  box-shadow:
+    0 16px 40px -12px rgb(139 21 56 / 0.35),
+    0 0 20px 0 rgb(223 183 70 / 0.06);
 }
 
 @media (prefers-reduced-motion: reduce) {

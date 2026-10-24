@@ -107,7 +107,7 @@ export function PartyCarousel({
             data-slide={i + 1}
             className="w-full shrink-0 snap-center"
           >
-            <div className="group flex w-full flex-col overflow-hidden rounded-lg border border-line bg-surface transition-colors duration-200 focus-within:border-accent hover:border-accent">
+            <div className="group flex w-full flex-col overflow-hidden rounded-lg border border-line bg-surface transition-[border-color,box-shadow] duration-200 focus-within:border-primary-hover focus-within:card-glow hover:border-primary-hover hover:card-glow">
               <button
                 type="button"
                 aria-label={`Ampliar flyer da festa ${party.title}`}
