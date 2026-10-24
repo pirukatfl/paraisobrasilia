@@ -7,7 +7,7 @@ import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vite
 
 import { findPublicAds } from '../../src/lib/classisex/board'
 import type { AdInput } from '../../src/lib/classisex/rules'
-import { VISITANTES_EMAIL, createVisitorAd, ensureVisitantesAccount, type VisitorAdInput } from '../../src/lib/classisex/visitante'
+import { createVisitorAd, type VisitorAdInput } from '../../src/lib/classisex/visitante'
 import { approveAd, approveAds, getModerationView, rejectAd, unpublishAd } from '../../src/lib/classisex/service'
 import { buildMp4 } from '../helpers/mp4-fixtures'
 import { getTestPayload, resetDatabase, seedAd, seedAdCategories, seedAssinante, seedStaffUser } from '../helpers/seed'
@@ -79,16 +79,20 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
   const mediaOf = async (id: number) =>
     (await payload.find({ collection: 'ad-media', where: { ad: { equals: id } }, depth: 0, overrideAccess: true })).docs
 
-  it('creates a pending ad owned by the technical account, with the e-mail lower-cased and one photo', async () => {
+  it('creates a pending ad with NO author, with the e-mail lower-cased and one photo', async () => {
     const who = fresh()
     const { id } = await send({ email: who.email, ip: who.ip })
     const doc = await ad(id!)
     expect(doc.status).toBe('pendente')
     expect(doc.enviadoSemConta).toBe(true)
     expect(doc.emailVisitante).toBe(who.email.toLowerCase())
-    const owner = await payload.findByID({ collection: 'assinantes', id: doc.author as number, depth: 0, overrideAccess: true })
-    expect(owner.email).toBe(VISITANTES_EMAIL)
-    expect((await mediaOf(id!)).map((m) => m.kind)).toEqual(['foto'])
+    expect(doc.author ?? null).toBeNull()
+    const media = await mediaOf(id!)
+    expect(media.map((m) => m.kind)).toEqual(['foto'])
+    expect(media[0].owner ?? null).toBeNull()
+    // no technical account is created any more
+    const { totalDocs } = await payload.count({ collection: 'assinantes', where: { email: { equals: 'visitantes@invalid.paraiso.local' } }, overrideAccess: true })
+    expect(totalDocs).toBe(0)
   })
 
   it('works without a photo too (the photo is optional)', async () => {
@@ -97,19 +101,30 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     expect((await ad(id!)).status).toBe('pendente')
   })
 
-  it('the technical account is created once and can never sign in', async () => {
-    const a = await ensureVisitantesAccount(payload, NOW)
-    const b = await ensureVisitantesAccount(payload, NOW)
-    expect(b).toBe(a)
-    const { totalDocs } = await payload.count({ collection: 'assinantes', where: { email: { equals: VISITANTES_EMAIL } }, overrideAccess: true })
-    expect(totalDocs).toBe(1)
-    const row = (await payload.findByID({ collection: 'assinantes', id: a, depth: 0, overrideAccess: true, showHiddenFields: true })) as unknown as Record<string, unknown>
-    expect(row._verified).toBe(false)
-    await expect(payload.login({ collection: 'assinantes', data: { email: VISITANTES_EMAIL, password: 'qualquer-senha-123' } })).rejects.toThrow()
-    // two parallel first requests still end with one account
-    await resetDatabase(payload)
-    const ids = await Promise.all([ensureVisitantesAccount(payload, NOW), ensureVisitantesAccount(payload, NOW)])
-    expect(ids[0]).toBe(ids[1])
+  it('staff can create an ad without an author and upload media to it (owner stays empty); later set an author', async () => {
+    const created = await payload.create({
+      collection: 'ads',
+      data: { apelido: 'Sem dono', euSou: casal, texto: 'Anúncio criado pela equipe sem anunciante.', status: 'pendente' } as never,
+      overrideAccess: true,
+    })
+    expect((created as unknown as Record<string, unknown>).author ?? null).toBeNull()
+    const m = await payload.create({
+      collection: 'ad-media',
+      data: { ad: created.id, order: 0 } as never,
+      file: { data: await jpeg(), mimetype: 'image/jpeg', name: 'foto.jpg', size: 1000 },
+      depth: 0,
+      overrideAccess: true,
+    })
+    expect((m as unknown as Record<string, unknown>).owner ?? null).toBeNull()
+    // staff may fill the empty author afterwards
+    const updated = await payload.update({
+      collection: 'ads',
+      id: created.id,
+      data: { author: member.id } as never,
+      overrideAccess: true,
+    })
+    const a = updated.author
+    expect(typeof a === 'object' && a ? a.id : a).toBe(member.id)
   })
 
   it('refuses two photos and creates nothing', async () => {
@@ -203,10 +218,12 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     expect(await countAds()).toBe(0)
   })
 
-  it('cannot be reassigned to a real account', async () => {
+  it('staff can fill the empty author once, but a real owner cannot be swapped afterwards', async () => {
     const { id } = await send({ files: [] })
+    await payload.update({ collection: 'ads', id: id!, data: { author: member.id } as never, overrideAccess: true })
+    const other = await seedAssinante(payload, { email: 'outro-vis@teste.local', password: 'senha-membro-1234', name: 'Outro' })
     await expect(
-      payload.update({ collection: 'ads', id: id!, data: { author: member.id } as never, overrideAccess: true }),
+      payload.update({ collection: 'ads', id: id!, data: { author: other.id } as never, overrideAccess: true }),
     ).rejects.toThrow()
   })
 

@@ -2,18 +2,16 @@
  * Ads sent WITHOUT an account (client decision 2026-10-23, S-01..S-09).
  *
  * Same fields and rules as a paying author's ad (validateAdInput, no legacy exemption), but at most one
- * photo and no video, always 'pendente', owned by a technical account nobody can sign in to. Nothing that
+ * photo and no video, always 'pendente', with NO author (`author` stays empty; staff may fill it later). Nothing that
  * decides ownership, status or limits comes from the visitor. The e-mail is staff-only: it is stored in
  * `emailVisitante` (field access: only this service writes it) and never goes in a DTO, an audit row or a log.
  * No 'server-only' import: used by the route handler and int tests.
  */
-import { randomBytes } from 'node:crypto'
-
-import type { Payload } from 'payload'
+import { APIError, type Payload } from 'payload'
 
 import { VISITANTE_LIMITS } from '../assinantes/tier'
 import { allowAttempt } from '../email/rate-limit'
-import { MAX_AD_PHOTO_BYTES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from './media-messages'
+import { MAX_AD_PHOTO_BYTES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES, uploadCodeFor } from './media-messages'
 import {
   ACTIVE_LIMIT,
   ACTIVE_STATUSES,
@@ -23,64 +21,10 @@ import {
   validateVisitorExtras,
   type AdInput,
 } from './rules'
-import { ServiceError, assertActiveCategory, attachMedia, type UploadFile } from './service'
-
-/** Reserved non-routable domain (RFC 6761 style): no mail ever leaves for it. */
-export const VISITANTES_EMAIL = 'visitantes@invalid.paraiso.local'
-export const VISITANTES_NAME = 'Visitantes (sem conta)'
+import { ServiceError, assertActiveCategory, type UploadFile } from './service'
 
 /** Max submissions that pass validation per IP and per e-mail in one hour (S-08). */
 export const VISITOR_MAX_PER_HOUR = 5
-
-/**
- * The single technical owner of every ad sent without an account (pattern of ensureEquipeLegadoAccount).
- * Random unknown password, e-mail never confirmed (`_verified: false`: no login, no session), no period:
- * it is never an active subscriber, so it can neither receive messages nor see contacts.
- */
-export async function ensureVisitantesAccount(payload: Payload, now: Date): Promise<number> {
-  const find = async () => {
-    const { docs } = await payload.find({
-      collection: 'assinantes',
-      where: { email: { equals: VISITANTES_EMAIL } },
-      limit: 1,
-      depth: 0,
-      overrideAccess: true,
-      select: { email: true } as never,
-    })
-    return (docs[0] as { id: number } | undefined)?.id
-  }
-  const existing = await find()
-  if (existing) return existing
-  try {
-    const created = await payload.create({
-      collection: 'assinantes',
-      data: {
-        email: VISITANTES_EMAIL,
-        password: randomBytes(32).toString('base64url'),
-        name: VISITANTES_NAME,
-        origem: 'equipe',
-        importadoEm: now.toISOString(),
-        staffNotes:
-          'Conta técnica: dona dos anúncios enviados sem conta pelo formulário aberto. Ninguém entra com ela.',
-      } as never,
-      overrideAccess: true,
-      context: { trustedCreate: true, skipAudit: true },
-    })
-    // trusted creates are born confirmed; this one never is, so it can neither log in nor hold a session
-    await payload.update({
-      collection: 'assinantes',
-      id: created.id,
-      data: { _verified: false } as never,
-      overrideAccess: true,
-      context: { skipAudit: true },
-    })
-    return created.id
-  } catch (err) {
-    const raced = await find() // a parallel request created it first
-    if (raced) return raced
-    throw err
-  }
-}
 
 export type VisitorAdInput = {
   input: AdInput
@@ -153,12 +97,11 @@ export async function createVisitorAd(payload: Payload, params: VisitorAdInput):
     : { totalDocs: 0 }
   if (totalDocs >= ACTIVE_LIMIT) throw new ServiceError('limite', VISITOR_MESSAGES.limite, 409)
 
-  // (7) the ad: owner, status and marker are decided here only
-  const ownerId = await ensureVisitantesAccount(payload, now)
+  // (7) the ad: no author; status and marker are decided here only
   const doc = await payload.create({
     collection: 'ads',
     data: {
-      author: ownerId,
+      author: null,
       apelido: value.apelido,
       euSou: value.euSou,
       cidade: value.cidade,
@@ -176,10 +119,31 @@ export async function createVisitorAd(payload: Payload, params: VisitorAdInput):
 
   // (8) the photo; if it fails the ad does not stay behind
   try {
-    for (const file of photos) await attachMedia(payload, { assinanteId: ownerId, adId: doc.id, file, now })
+    // the ad is already 'pendente' and has no owner: create the media directly (hooks set owner null, tier 'gratis', 1 photo)
+    let order = 0
+    for (const file of photos) {
+      await attachVisitorPhoto(payload, doc.id, file, order++)
+    }
   } catch (err) {
     await payload.delete({ collection: 'ads', id: doc.id, overrideAccess: true }).catch(() => undefined)
     throw err
   }
   return { id: doc.id }
+}
+
+async function attachVisitorPhoto(payload: Payload, adId: number, file: UploadFile, order: number): Promise<void> {
+  try {
+    await payload.create({
+      collection: 'ad-media',
+      data: { ad: adId, order } as never,
+      file,
+      depth: 0,
+      overrideAccess: true,
+    })
+  } catch (err) {
+    if (err instanceof APIError && err.status < 600 && err.status >= 400 && err.status !== 500) {
+      throw new ServiceError(uploadCodeFor(err.message, 'foto'), err.message, err.status === 503 ? 503 : 400)
+    }
+    throw err
+  }
 }

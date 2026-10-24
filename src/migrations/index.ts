@@ -34,6 +34,7 @@ import * as migration_20261023_034454_classisex_sem_conta from './20261023_03445
 import * as migration_20261023_042244_models_pagina from './20261023_042244_models_pagina';
 import * as migration_20261023_042900_models_videos from './20261023_042900_models_videos';
 import * as migration_20261024_114938_contos_enviados from './20261024_114938_contos_enviados';
+import * as migration_20261025_000000_anunciante_opcional from './20261025_000000_anunciante_opcional';
 
 export const migrations = [
   {
@@ -215,5 +216,10 @@ export const migrations = [
     up: migration_20261024_114938_contos_enviados.up,
     down: migration_20261024_114938_contos_enviados.down,
     name: '20261024_114938_contos_enviados'
+  },
+  {
+    up: migration_20261025_000000_anunciante_opcional.up,
+    down: migration_20261025_000000_anunciante_opcional.down,
+    name: '20261025_000000_anunciante_opcional'
   },
 ];
