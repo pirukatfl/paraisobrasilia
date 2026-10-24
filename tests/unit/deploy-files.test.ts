@@ -347,7 +347,8 @@ describe('Phase 5 staff guide and runbook 7.4 (plan 05-12)', () => {
     }
     expect(guide).not.toContain('em revisão')
     expect(guide).toContain('Desde 20/10/2026 não existe mais mural de recados')
-    expect(guide).toContain('Recados: N denúncias abertas')
+    expect(guide).not.toContain('Recados: N denúncias abertas')
+    expect(guide).toContain('Desde 24/10/2026 o painel não mostra mais as denúncias de recados')
     expect(guide).toContain('A equipe não lê as conversas')
     expect(guide).toContain('janela anônima')
     expect(guide).toContain('menor de idade')

@@ -17,16 +17,18 @@ const computeUrgent: CollectionBeforeChangeHook = ({ data, originalDoc }) => {
  * after the members-area DAL check; staff resolve through `/api/message-reports/:id/resolver`
  * (audited). Staff see only the snapshot taken at report time (T-05-09), never the conversation.
  * Relations are optional so a report outlives deleted accounts.
+ * Hidden from the admin since 24/10/2026 at the client's request; collection, data and endpoints are kept.
  */
 export const MessageReports: CollectionConfig = {
   slug: 'message-reports',
   labels: { singular: 'Denúncia de recado', plural: 'Denúncias de recados' },
   admin: {
+    hidden: true, // hidden from the admin since 24/10/2026 (client request); data kept
     group: 'ClassiSex',
     useAsTitle: 'reportedApelido',
     defaultColumns: ['urgente', 'motivo', 'reportedApelido', 'status', 'createdAt'],
     listSearchableFields: ['reportedApelido', 'detalhes'],
-    description: 'Denúncias de conversas privadas. As urgentes (pessoa menor de idade) aparecem primeiro.',
+    description: 'Denúncias de conversas privadas (oculta do painel desde 24/10/2026, dados mantidos). As urgentes (pessoa menor de idade) aparecem primeiro.',
   },
   defaultSort: ['-urgente', 'createdAt'] as unknown as string,
   access: {

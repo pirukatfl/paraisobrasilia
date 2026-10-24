@@ -461,31 +461,19 @@ painel.
 ### Privacidade dos recados
 
 **A equipe não lê as conversas.** Não existe tela com as conversas e vocês não veem quem fala com quem. Só quando alguém
-   (Pelo menu da esquerda: **ClassiSex → Denúncias de recados**.)
 são de cada assinante: a equipe não vê nem desfaz.
 
 ### Denúncias de recados
 
-Menu da esquerda: **ClassiSex → Denúncias de recados**.
-
-1. No painel inicial, a caixa mostra **"Recados: N denúncias abertas"**. Clique para ver a lista: as **urgentes** (motivo
-   "Pessoa menor de idade") aparecem primeiro. **Urgente é para agir na hora.**
-2. Abra a denúncia: veja o motivo, os detalhes, o apelido da pessoa denunciada e os recados guardados.
-3. Escolha uma ação:
-   - **Descartar**: não há problema (denúncia sem fundamento).
-   - **Resolver**: o problema existe e foi tratado de outra forma (por exemplo, conversa com a pessoa pelo WhatsApp). A nota
-     é obrigatória.
-   - **Suspender mensagens**: a pessoa denunciada deixa de mandar recados. A nota é obrigatória e fica no
-     **Registro de ações**.
-4. Denúncia de **menor de idade**: o site **suspende o envio da pessoa denunciada sozinho, na mesma hora**, antes de
-   vocês abrirem a denúncia. Leiam em seguida, decidam se mantêm (**Suspender mensagens**) ou se foi engano (**Descartar** e
-   libere a pessoa), e tratem a conta como no ClassiSex (anúncio e acesso).
+Desde 24/10/2026 o painel não mostra mais as denúncias de recados (nem no painel inicial, nem no menu). Elas continuam guardadas; nada foi apagado.
 
 ### Suspender o envio de recados
 
 A pessoa suspensa continua entrando no site e usando o resto, mas ao tentar enviar vê "Seu envio de recados foi suspenso
 pela equipe. Fale com a casa pelo WhatsApp." Para **liberar**, abra a conta em **Assinantes** e desmarque **Mensagens
 suspensas**.
+
+Suspender o envio a partir de uma denúncia não é mais possível no painel, porque a tela de denúncias saiu dele.
 
 ### Testar com dois assinantes
 
