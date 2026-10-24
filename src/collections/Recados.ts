@@ -93,7 +93,7 @@ export const Recados: CollectionConfig = {
   slug: 'recados',
   labels: { singular: 'Recado', plural: 'Recados' },
   admin: {
-    group: 'Recados',
+    group: 'ClassiSex',
     hidden: true,
     useAsTitle: 'resumo',
     defaultColumns: ['resumo', 'status', 'submittedAt', 'author'],

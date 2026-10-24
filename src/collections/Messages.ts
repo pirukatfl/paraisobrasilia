@@ -10,7 +10,7 @@ import { MESSAGE_MAX } from '../lib/mensagens/rules'
 export const Messages: CollectionConfig = {
   slug: 'messages',
   labels: { singular: 'Mensagem', plural: 'Mensagens' },
-  admin: { group: 'Recados', hidden: true },
+  admin: { group: 'ClassiSex', hidden: true },
   access: {
     read: () => false,
     create: () => false,

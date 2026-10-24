@@ -75,7 +75,7 @@ describe('Phase 2 runbook and staff guide (plan 02-06)', () => {
     const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
     for (const heading of [
       'Fotos e vídeos do espaço',
-      'Modelos',
+      'Profissionais e amadoras',
       'Textos (Quem Somos, Normas, Regras, Dicas, Termos, Privacidade)',
       'Contato e endereço',
       'Remoção de imagem',
@@ -405,13 +405,13 @@ describe('migração do WordPress: guia da equipe e runbook (06-09)', () => {
   })
 })
 
-describe('06.1 staff guide: Modelos', () => {
+describe('06.1 staff guide: Profissionais e amadoras', () => {
   const guide = read('docs/painel/GUIA-DA-EQUIPE.md')
-  const start = guide.search(/^## Modelos$/m)
+  const start = guide.search(/^## Profissionais e amadoras$/m)
   const rest = guide.slice(start + 3)
   const section = guide.slice(start, start + 3 + Math.max(rest.search(/^## /m), 0))
 
-  it('has the Modelos heading and covers 30 photos, cover, address and unpublish, and no videos for now (client 2026-10-23)', () => {
+  it('has the Profissionais e amadoras heading and covers 30 photos, cover, address and unpublish, and no videos for now (client 2026-10-23)', () => {
     expect(start).toBeGreaterThanOrEqual(0)
     for (const text of ['30 fotos', 'só fotos', 'a primeira é a capa', 'Endereço', 'Despublicar', 'sem contato']) {
       expect(section.toLowerCase()).toContain(text.toLowerCase())

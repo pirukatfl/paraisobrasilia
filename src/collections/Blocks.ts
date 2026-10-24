@@ -9,7 +9,7 @@ import type { CollectionConfig } from 'payload'
 export const Blocks: CollectionConfig = {
   slug: 'blocks',
   labels: { singular: 'Bloqueio', plural: 'Bloqueios' },
-  admin: { group: 'Recados', hidden: true },
+  admin: { group: 'ClassiSex', hidden: true },
   access: {
     read: () => false,
     create: () => false,

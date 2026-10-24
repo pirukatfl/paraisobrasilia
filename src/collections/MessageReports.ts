@@ -22,7 +22,7 @@ export const MessageReports: CollectionConfig = {
   slug: 'message-reports',
   labels: { singular: 'Denúncia de recado', plural: 'Denúncias de recados' },
   admin: {
-    group: 'Recados',
+    group: 'ClassiSex',
     useAsTitle: 'reportedApelido',
     defaultColumns: ['urgente', 'motivo', 'reportedApelido', 'status', 'createdAt'],
     listSearchableFields: ['reportedApelido', 'detalhes'],
