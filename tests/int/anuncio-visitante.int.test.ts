@@ -5,6 +5,7 @@ import { createLocalReq, type Payload, type PayloadRequest } from 'payload'
 import sharp from 'sharp'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { Ads } from '../../src/collections/Ads'
 import { findPublicAds } from '../../src/lib/classisex/board'
 import type { AdInput } from '../../src/lib/classisex/rules'
 import { createVisitorAd, type VisitorAdInput } from '../../src/lib/classisex/visitante'
@@ -19,6 +20,8 @@ const fresh = () => {
   seq += 1
   return { ip: `203.0.113.${seq}`, email: `Visitante${seq}@Exemplo.com` }
 }
+
+const relIdOf = (v: unknown) => (typeof v === 'object' && v ? (v as { id: number }).id : v)
 
 const jpeg = (w = 900, h = 700) =>
   sharp({ create: { width: w, height: h, channels: 3, background: { r: 90, g: 120, b: 60 } } }).jpeg().toBuffer()
@@ -225,6 +228,42 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     await expect(
       payload.update({ collection: 'ads', id: id!, data: { author: other.id } as never, overrideAccess: true }),
     ).rejects.toThrow()
+  })
+
+  it('a real author is locked: clearing or swapping throws and the media owner stays', async () => {
+    const { id } = await send({ files: [] })
+    await payload.update({ collection: 'ads', id: id!, data: { author: member.id } as never, overrideAccess: true })
+    await payload.create({
+      collection: 'ad-media',
+      data: { ad: id, order: 0 } as never,
+      file: { data: await jpeg(), mimetype: 'image/jpeg', name: 'foto.jpg', size: 1000 },
+      depth: 0,
+      overrideAccess: true,
+    })
+    expect((await mediaOf(id!))[0].owner).toBe(member.id)
+    await expect(
+      payload.update({ collection: 'ads', id: id!, data: { author: null } as never, overrideAccess: true }),
+    ).rejects.toThrow()
+    expect(relIdOf((await ad(id!)).author)).toBe(member.id)
+    expect((await mediaOf(id!)).map((m) => m.owner)).toEqual([member.id])
+  })
+
+  it('field access: the author is editable only while empty', async () => {
+    const { id } = await send({ files: [] })
+    const upd = Ads.fields.find((f) => 'name' in f && f.name === 'author') as unknown as {
+      access: { update: (a: { doc?: unknown }) => boolean }
+    }
+    expect(upd.access.update({ doc: await ad(id!) })).toBe(true)
+    await payload.update({ collection: 'ads', id: id!, data: { author: member.id } as never, overrideAccess: true })
+    expect(upd.access.update({ doc: await ad(id!) })).toBe(false)
+    expect(upd.access.update({ doc: { author: member.id, origemLegado: 'equipe' } })).toBe(true)
+  })
+
+  it('filling an empty author moves the media owner to that member', async () => {
+    const { id } = await send()
+    expect((await mediaOf(id!)).map((m) => m.owner ?? null)).toEqual([null])
+    await payload.update({ collection: 'ads', id: id!, data: { author: member.id } as never, overrideAccess: true })
+    expect((await mediaOf(id!)).map((m) => m.owner)).toEqual([member.id])
   })
 
   it('the e-mail field cannot be written or read outside the service (REST access)', async () => {

@@ -80,29 +80,34 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
   return data
 }
 
-/** Only a team draft from the old site can change owner (staff reassign it to the right member); an empty author can be filled. */
+/**
+ * The author is locked once a logged-in member made the ad (no swap, no clearing); only ads sent without an
+ * account (empty author) can get one, and old-site team drafts can be handed to the right member.
+ * Field access hides the field in the admin; this guard covers Local API calls with overrideAccess.
+ */
 const guardAuthorChange: CollectionBeforeValidateHook = ({ data, operation, originalDoc, req }) => {
   if (operation !== 'update' || !data || !originalDoc || data.author === undefined) return data
   const current = relId(originalDoc.author)
-  // Ads sent without an account have no author: staff may set one (admin only; owners never reach this field)
-  if (current === null) return data
-  if (relId(data.author) !== current && originalDoc.origemLegado !== 'equipe') {
-    throw new ValidationError(
-      {
-        collection: 'ads',
-        errors: [{ path: 'author', message: 'Só dá para trocar o anunciante de um anúncio antigo da equipe.' }],
-        req,
-      },
-      req.t,
-    )
-  }
-  return data
+  if (current === null || relId(data.author) === current || originalDoc.origemLegado === 'equipe') return data
+  throw new ValidationError(
+    {
+      collection: 'ads',
+      errors: [
+        {
+          path: 'author',
+          message: 'O anunciante de um anúncio feito por alguém com conta não pode ser trocado nem apagado.',
+        },
+      ],
+      req,
+    },
+    req.t,
+  )
 }
 
 /** cidadeBusca (filter target) and resumo (admin title) follow the current values. */
 const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, req }) => {
   // Handed to a real owner: it leaves the team filter and becomes that member's own draft
-  if (originalDoc?.origemLegado === 'equipe' && data.author !== undefined && relId(data.author) !== relId(originalDoc.author)) {
+  if (originalDoc?.origemLegado === 'equipe' && relId(data.author) !== null && relId(data.author) !== relId(originalDoc.author)) {
     data.origemLegado = null
   }
   const merged = { ...(originalDoc ?? {}), ...data } as Record<string, unknown>
@@ -194,7 +199,19 @@ export const Ads: CollectionConfig = {
     // Media files (04-05) and report detaching (04-08)
     beforeDelete: [removeMedia],
     afterChange: [
-      ({ doc }) => {
+      // ad-media.owner grants file access (canViewMedia): it follows the ad's author (cleared, filled or reassigned)
+      async ({ doc, operation, previousDoc, req }) => {
+        if (operation === 'update' && previousDoc && relId(doc.author) !== relId(previousDoc.author)) {
+          await withRequestState(req, () =>
+            req.payload.update({
+              collection: 'ad-media',
+              where: { ad: { equals: doc.id } },
+              data: { owner: relId(doc.author) as number | null },
+              overrideAccess: true,
+              req,
+            }),
+          )
+        }
         expire(['ads'])
         return doc
       },
@@ -242,9 +259,10 @@ export const Ads: CollectionConfig = {
       required: false,
       index: true,
       label: 'Anunciante',
+      access: { update: ({ doc }) => relId(doc?.author) === null || doc?.origemLegado === 'equipe' },
       admin: {
         description:
-          'Opcional. Assinante que escreveu o anúncio; não aparece no site. Fica vazio nos anúncios enviados sem conta ("Enviado sem conta"), e a equipe pode preencher. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).',
+          'Opcional. Preenchido e travado quando quem anunciou tinha conta. Vazio (e editável pela equipe) quando o anúncio foi enviado sem conta ("Enviado sem conta"); não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios; as fotos acompanham).',
       },
     },
     {

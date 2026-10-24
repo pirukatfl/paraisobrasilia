@@ -454,7 +454,7 @@ export interface Ad {
    */
   resumo?: string | null;
   /**
-   * Opcional. Assinante que escreveu o anúncio; não aparece no site. Fica vazio nos anúncios enviados sem conta ("Enviado sem conta"), e a equipe pode preencher. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).
+   * Opcional. Preenchido e travado quando quem anunciou tinha conta. Vazio (e editável pela equipe) quando o anúncio foi enviado sem conta ("Enviado sem conta"); não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios; as fotos acompanham).
    */
   author?: (number | null) | Assinante;
   /**
@@ -698,7 +698,7 @@ export interface Block {
   createdAt: string;
 }
 /**
- * Denúncias de conversas privadas. As urgentes (pessoa menor de idade) aparecem primeiro.
+ * Denúncias de conversas privadas (oculta do painel desde 24/10/2026, dados mantidos). As urgentes (pessoa menor de idade) aparecem primeiro.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "message-reports".
