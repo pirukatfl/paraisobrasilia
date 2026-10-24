@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { podeAprovarNaLista, postJson, type ApproveReply } from './aprovar-lista'
+import { mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * "Aprovar" in each row of the Anúncios list (staff, /admin). Only for ads waiting for approval and the
@@ -30,7 +31,7 @@ export function AprovarCelula({ rowData }: { rowData?: Record<string, unknown> }
       setDone(true)
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }

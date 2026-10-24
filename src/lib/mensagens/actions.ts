@@ -2,11 +2,13 @@
 
 import config from '@payload-config'
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
+import { redirect, unstable_rethrow } from 'next/navigation'
 import { getPayload } from 'payload'
 
 import { requireActiveSubscription } from '../assinantes/session'
 import { ServiceError } from '../classisex/service'
+import { mensagemAmigavel } from '../errors'
+import { registrarErro } from '../errors/server'
 import { MENSAGEM_MESSAGES, REPORT_MESSAGES_PT } from './rules'
 import { blockUser, reportConversation, sendMessage, startConversation, unblockUser } from './service'
 
@@ -41,7 +43,9 @@ export async function iniciarConversa(_prev: MessageFormState, formData: FormDat
     conversationId = result.conversationId
   } catch (err) {
     if (err instanceof ServiceError) return { error: err.message, values }
-    throw err
+    unstable_rethrow(err)
+    registrarErro('conversa-iniciar', err)
+    return { error: `Não foi possível enviar a mensagem: ${mensagemAmigavel(err)}`, values }
   }
   // redirect() throws: keep it outside the try block
   redirect(`${BASE}/${conversationId}`)
@@ -63,7 +67,9 @@ export async function responderMensagem(_prev: MessageFormState, formData: FormD
     })
   } catch (err) {
     if (err instanceof ServiceError) return { error: err.message, values }
-    throw err
+    unstable_rethrow(err)
+    registrarErro('conversa-responder', err)
+    return { error: `Não foi possível enviar a mensagem: ${mensagemAmigavel(err)}`, values }
   }
   // Same URL as the page that posted: revalidate so the router shows the new message (a hash-only
   // redirect would be treated as in-page navigation and keep the stale thread)
@@ -82,7 +88,11 @@ export async function bloquear(formData: FormData): Promise<void> {
   try {
     await blockUser(payload, { me: check.assinante.id, conversationId: conversa })
   } catch (err) {
-    if (!(err instanceof ServiceError)) throw err
+    if (!(err instanceof ServiceError)) {
+      unstable_rethrow(err)
+      registrarErro('conversa-bloquear', err)
+      redirect(`${BASE}/${Number(conversa)}?erro=inesperado`)
+    }
     redirect(BASE)
   }
   revalidatePath(`${BASE}/${Number(conversa)}`)
@@ -97,7 +107,11 @@ export async function desbloquear(formData: FormData): Promise<void> {
   try {
     await unblockUser(payload, { me: check.assinante.id, conversationId: conversa })
   } catch (err) {
-    if (!(err instanceof ServiceError)) throw err
+    if (!(err instanceof ServiceError)) {
+      unstable_rethrow(err)
+      registrarErro('conversa-desbloquear', err)
+      redirect(`${BASE}/${Number(conversa)}?erro=inesperado`)
+    }
     redirect(BASE)
   }
   revalidatePath(`${BASE}/${Number(conversa)}`)
@@ -121,7 +135,9 @@ export async function denunciarConversa(_prev: ReportState, formData: FormData):
     })
   } catch (err) {
     if (err instanceof ServiceError) return { ok: false, message: err.message }
-    throw err
+    unstable_rethrow(err)
+    registrarErro('conversa-denunciar', err)
+    return { ok: false, message: `Não foi possível enviar a denúncia: ${mensagemAmigavel(err)}` }
   }
   revalidatePath(`${BASE}/${Number(conversa)}`)
   return { ok: true, message: REPORT_MESSAGES_PT.enviada }

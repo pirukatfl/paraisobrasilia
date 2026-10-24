@@ -3,6 +3,7 @@
 import { useConfig, useDocumentInfo, useForm } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
  * "Moderação" panel at the top of an ad in /admin (PAINEL-07, D-03). Thin client over the
@@ -67,7 +68,7 @@ const buttonStyle = (variant: 'primary' | 'danger' | 'secondary', disabled: bool
 async function fetchView(url: string): Promise<View> {
   const res = await fetch(url, { credentials: 'include' })
   const json = (await res.json().catch(() => ({}))) as View & { message?: string }
-  if (!res.ok) throw new Error(json.message ?? 'Erro')
+  if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
   return json
 }
 
@@ -107,7 +108,7 @@ export function ModeracaoPanel() {
         setModified(false)
       },
       (err: Error) => {
-        if (!cancelled) setLoadError(`Não foi possível carregar a moderação: ${err.message}`)
+        if (!cancelled) setLoadError(`Não foi possível carregar a moderação: ${mensagemDeExcecao(err)}`)
       },
     )
     return () => {
@@ -131,13 +132,13 @@ export function ModeracaoPanel() {
         body: JSON.stringify(kind === 'aprovar' ? {} : { motivo }),
       })
       const json = (await res.json().catch(() => ({}))) as { message?: string }
-      if (!res.ok) throw new Error(json.message ?? 'Não foi possível concluir.')
+      if (!res.ok) throw new Error(mensagemDaResposta(res.status, json))
       setStatus(DONE[kind])
       setMotivo('')
       setVersion((v) => v + 1)
       router.refresh()
     } catch (err) {
-      setError((err as Error).message)
+      setError(mensagemDeExcecao(err))
     } finally {
       setBusy(false)
     }

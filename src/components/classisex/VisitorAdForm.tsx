@@ -8,6 +8,7 @@ import { AdFormFields, FieldError, Required, inputClass } from './AdFormFields'
 import { VisitorPhotoPicker } from './VisitorPhotoPicker'
 
 import type { AdFormValues } from '@/lib/classisex/actions'
+import { mensagemDaResposta, mensagemDeFalhaDeRede } from '@/lib/errors'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
@@ -53,8 +54,9 @@ export function VisitorAdForm({
         body: data,
         headers: { Accept: 'application/json' },
       })
-      const json = (await response.json()) as { ok: boolean; redirect?: string; errors?: Record<string, string> }
-      if (json.ok && json.redirect) {
+      // A proxy answer (413, 502) is not JSON: the status then tells the reason
+      const json = (await response.json().catch(() => null)) as { ok: boolean; redirect?: string; errors?: Record<string, string> } | null
+      if (json?.ok && json.redirect) {
         router.push(json.redirect)
         return
       }
@@ -67,7 +69,7 @@ export function VisitorAdForm({
         telegram: field(data, 'telegram'),
       })
       setEmail(field(data, 'email'))
-      const next = json.errors ?? { form: 'Não foi possível enviar agora. Tente de novo.' }
+      const next = json?.errors ?? { form: `Não foi possível enviar o anúncio: ${mensagemDaResposta(response.status, json)}` }
       setErrors(next)
       requestAnimationFrame(() => {
         const first = Object.keys(next)[0]
@@ -77,8 +79,8 @@ export function VisitorAdForm({
             : formRef.current?.querySelector<HTMLElement>(`[name="${first === 'consent' ? 'consent' : first}"], #erro-${first}`)
         target?.focus?.()
       })
-    } catch {
-      setErrors({ form: 'Sem conexão. Confira a internet e tente de novo.' })
+    } catch (err) {
+      setErrors({ form: mensagemDeFalhaDeRede(err) })
     } finally {
       setPending(false)
     }

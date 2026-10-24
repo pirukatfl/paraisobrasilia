@@ -3,11 +3,13 @@
 import config from '@payload-config'
 import { logout } from '@payloadcms/next/auth'
 import { cookies, headers } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { redirect, unstable_rethrow } from 'next/navigation'
 import { AuthenticationError, createLocalReq, getPayload, LockedAuth, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
 
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
+import { mensagemAmigavel } from '../errors'
+import { registrarErro } from '../errors/server'
 import { writeAudit } from './audit'
 import { loginWithLegacy } from './legacy-login'
 import { safeNext } from './redirect'
@@ -15,7 +17,7 @@ import { requestPasswordEmail } from './reset-email'
 import { requireAssinante } from './session'
 import { confirmEmail, resendVerification, signUp } from './signup'
 
-type LoginError = 'credenciais' | 'bloqueado' | 'nao-confirmado'
+type LoginError = 'credenciais' | 'bloqueado' | 'nao-confirmado' | 'inesperado'
 
 const field = (formData: FormData, name: string) => {
   const value = formData.get(name)
@@ -59,10 +61,16 @@ export async function entrar(formData: FormData): Promise<void> {
   const payload = await getPayload({ config })
   // M-03: old WordPress passwords are checked first, only for accounts that still hold the old hash;
   // everything else (and every failure) goes through Payload's own login inside loginWithLegacy.
-  const outcome = await loginWithLegacy(payload, { email, password })
-  if (outcome.ok) await setAuthCookie(outcome.token)
-  else if ('novaSenhaToken' in outcome) novaSenhaToken = outcome.novaSenhaToken
-  else error = outcome.error
+  try {
+    const outcome = await loginWithLegacy(payload, { email, password })
+    if (outcome.ok) await setAuthCookie(outcome.token)
+    else if ('novaSenhaToken' in outcome) novaSenhaToken = outcome.novaSenhaToken
+    else error = outcome.error
+  } catch (err) {
+    unstable_rethrow(err)
+    registrarErro('entrar', err)
+    error = 'inesperado'
+  }
   // redirect() throws: keep it out of any try block
   if (novaSenhaToken) redirect(`/nova-senha?token=${encodeURIComponent(novaSenhaToken)}&aviso=senha-curta`)
   if (error) redirect(loginErrorUrl(error, next))
@@ -91,13 +99,17 @@ export async function trocarSenha(formData: FormData): Promise<void> {
   if (nova !== confirmacao) redirect(`${SENHA_PATH}?erro=diferente`)
 
   const payload = await getPayload({ config })
-  let error: 'atual' | 'bloqueado' | null = null
+  let error: 'atual' | 'bloqueado' | 'inesperado' | null = null
   try {
     await payload.login({ collection: 'assinantes', data: { email: assinante.email, password: atual } })
   } catch (err) {
     if (err instanceof LockedAuth) error = 'bloqueado'
     else if (err instanceof AuthenticationError || err instanceof ValidationError) error = 'atual'
-    else throw err
+    else {
+      unstable_rethrow(err)
+      registrarErro('trocar-senha', err)
+      error = 'inesperado'
+    }
   }
   if (error) redirect(`${SENHA_PATH}?erro=${error}`)
 
@@ -196,11 +208,18 @@ export async function cadastrar(_prev: CadastroState, formData: FormData): Promi
     termos: field(formData, 'termos') === 'sim',
   }
   const payload = await getPayload({ config })
-  const result = await signUp(
-    payload,
-    { ...values, password: field(formData, 'password'), website: field(formData, 'website') },
-    { ip: await clientIp() },
-  )
+  let result: Awaited<ReturnType<typeof signUp>>
+  try {
+    result = await signUp(
+      payload,
+      { ...values, password: field(formData, 'password'), website: field(formData, 'website') },
+      { ip: await clientIp() },
+    )
+  } catch (err) {
+    unstable_rethrow(err)
+    registrarErro('cadastrar', err)
+    return { errors: { form: `Não foi possível criar a conta: ${mensagemAmigavel(err)}` }, values }
+  }
   if (typeof result === 'object') return { errors: result.errors, values }
   if (result === 'fechado') redirect('/cadastro')
   if (result === 'limite') redirect('/cadastro?erro=limite')

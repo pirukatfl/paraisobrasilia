@@ -1,6 +1,7 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
+import { respostaDeErroInesperado } from '../errors/endpoint'
 import { whatsappUrl } from '../site/contact'
 import { dismissSemDataAviso } from './site-antigo'
 import { createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError, setEmailConfirmed } from './service'
@@ -35,7 +36,7 @@ async function run(fn: () => Promise<unknown>): Promise<Response> {
     return Response.json(await fn())
   } catch (err) {
     if (err instanceof ServiceError) return Response.json({ message: err.message }, { status: err.status })
-    throw err
+    return respostaDeErroInesperado(err)
   }
 }
 

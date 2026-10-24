@@ -1,6 +1,7 @@
 import type { Endpoint, PayloadRequest } from 'payload'
 
 import { isStaff } from '../../access/roles'
+import { respostaDeErroInesperado } from '../errors/endpoint'
 import { approveAd, approveAds, getModerationView, rejectAd, resolveReport, ServiceError, unpublishAd } from './service'
 
 /**
@@ -32,7 +33,7 @@ async function run(fn: () => Promise<unknown>): Promise<Response> {
     return Response.json(await fn())
   } catch (err) {
     if (err instanceof ServiceError) return Response.json({ message: err.message }, { status: err.status })
-    throw err
+    return respostaDeErroInesperado(err)
   }
 }
 
