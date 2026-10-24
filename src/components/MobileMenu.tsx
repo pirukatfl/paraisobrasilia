@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 
 import { CloseIcon, MenuIcon } from '@/components/icons'
-import { UnreadBadge } from '@/components/mensagens/UnreadBadge'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 
@@ -80,7 +79,6 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                   onClick={() => setOpen(false)}
                 >
                   {item.label}
-                  {item.badge && <UnreadBadge />}
                 </Link>
                 {item.children && (
                   <ul className="pb-2 pl-4">

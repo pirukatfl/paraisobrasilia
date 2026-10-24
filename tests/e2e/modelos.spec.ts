@@ -120,15 +120,15 @@ test('Modelos is always in nav and footer; the sitemap lists it only while a mod
 
   let links = await navLinks()
   await expect(links.filter({ hasText: 'Contato' })).toHaveCount(1)
-  await expect(links.filter({ hasText: 'Modelos' })).toHaveCount(1)
-  await expect(page.locator('footer').getByRole('link', { name: 'Modelos' })).toHaveCount(1)
+  await expect(links.filter({ hasText: 'Profissionais e amadoras' })).toHaveCount(1)
+  await expect(page.locator('footer').getByRole('link', { name: 'Profissionais e amadoras' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/modelos</loc>')
 
   await api.createModel({ name: 'Aurora', photos: 1 })
   links = await navLinks()
   // UI-SPEC order, pinned explicitly: Contos (05-03) sits between ClassiSex and Dicas Hot; Dicas Hot (quick dicas-hot-menu) precedes Contato.
   // Recados removed 2026-10-20 (quick recados-privados, R-08)
-  const order = ['Festas', 'Quem somos', 'Espaço', 'Modelos', 'ClassiSex', 'Contos', 'Dicas Hot', 'Contato', 'Assine Já', 'Área do assinante']
+  const order = ['Festas', 'Quem somos', 'Espaço', 'Profissionais e amadoras', 'ClassiSex', 'Contos', 'Dicas Hot', 'Contato', 'Assine Já', 'Área do assinante']
   await expect(links).toHaveText(order)
   if (!isMobile) {
     // the eleven items stay on one line at 1280 px
@@ -144,7 +144,7 @@ test('Modelos is always in nav and footer; the sitemap lists it only while a mod
     expect(fits.oneLine).toBe(true)
     expect(fits.right).toBeLessThanOrEqual(fits.viewport)
   }
-  await expect(page.locator('footer').getByRole('link', { name: 'Modelos' })).toHaveCount(1)
+  await expect(page.locator('footer').getByRole('link', { name: 'Profissionais e amadoras' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).toContain('/modelos</loc>')
 })
 
@@ -176,6 +176,6 @@ test.describe('staff unpublishes a model (fast removal)', () => {
     await expect(site.getByText('Em breve, as modelos da casa aqui.')).toBeVisible()
     expect((await site.goto('/modelos/aurora'))?.status()).toBe(404)
     await site.goto('/')
-    await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Modelos' })).toHaveCount(1)
+    await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Profissionais e amadoras' })).toHaveCount(1)
   })
 })

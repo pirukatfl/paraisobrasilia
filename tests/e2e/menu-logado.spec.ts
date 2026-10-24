@@ -14,9 +14,8 @@ const LABELS = [
   'Festas',
   'Quem somos',
   'Espaço',
-  'Modelos',
+  'Profissionais e amadoras',
   'ClassiSex',
-  'Recados',
   'Contos',
   'Dicas Hot',
   'Contato',
@@ -30,7 +29,6 @@ const HREFS = [
   '/espaco',
   '/modelos',
   '/area-do-assinante/classisex',
-  '/area-do-assinante/mensagens',
   '/area-do-assinante/contos',
   '/area-do-assinante/dicas-hot',
   '/contato',
@@ -69,6 +67,7 @@ async function expectMemberMenu(page: Page, name: 'Principal' | 'Menu') {
   expect(hrefs).toEqual(HREFS)
   await expect(nav.getByRole('button', { name: 'Sair' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'Assine Já' })).toHaveCount(0)
+  await expect(nav.getByRole('link', { name: /Recados/ })).toHaveCount(0)
   await expect(nav.getByRole('link', { name: 'Área do assinante' })).toHaveCount(0)
   // never a second menu
   await expect(page.getByRole('navigation', { name: 'Área do assinante' })).toHaveCount(0)
@@ -112,6 +111,7 @@ test('mobile: the menu button opens the same logged-in list', async ({ browser, 
   expect(top.map((t) => t.trim().replace(/\s*\d+\+?$/, ''))).toEqual(LABELS)
   await expect(nav.getByRole('button', { name: 'Sair' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'Assine Já' })).toHaveCount(0)
+  await expect(nav.getByRole('link', { name: /Recados/ })).toHaveCount(0)
   await expect(page.getByRole('navigation', { name: 'Principal' })).toHaveCount(0)
   await expect(page.getByRole('navigation', { name: 'Área do assinante' })).toHaveCount(0)
   await context.close()

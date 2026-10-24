@@ -56,7 +56,7 @@ export async function Footer() {
     { href: pathForKey('regras'), label: 'Regras' },
     { href: pathForKey('dicas'), label: 'Dicas' },
     { href: '/espaco', label: 'Espaço' },
-    { href: '/modelos', label: 'Modelos' },
+    { href: '/modelos', label: 'Profissionais e amadoras' },
     { href: '/classisex', label: 'ClassiSex' },
     { href: '/contos', label: 'Contos' },
     { href: '/dicas-hot', label: 'Dicas Hot' },

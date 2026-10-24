@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { UnreadBadge } from '@/components/mensagens/UnreadBadge'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 
@@ -29,7 +28,6 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
                 }`}
               >
                 {item.label}
-                {item.badge && <UnreadBadge />}
               </Link>
             </li>
           )

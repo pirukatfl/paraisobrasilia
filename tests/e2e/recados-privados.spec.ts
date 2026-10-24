@@ -61,7 +61,7 @@ async function anaInbox(browser: Browser, baseURL: string): Promise<string> {
   return html
 }
 
-test('1. Ana and Beto see the conversation in Recados; the unread number sits next to the single Recados item and clears', async ({
+test('1. Ana and Beto see the conversation in Recados; there is no Recados menu item', async ({
   browser,
   baseURL,
 }) => {
@@ -71,9 +71,8 @@ test('1. Ana and Beto see the conversation in Recados; the unread number sits ne
     'Festas',
     'Quem somos',
     'Espaço',
-    'Modelos',
+    'Profissionais e amadoras',
     'ClassiSex',
-    'Recados',
     'Contos',
     'Dicas Hot',
     'Contato',
@@ -81,18 +80,14 @@ test('1. Ana and Beto see the conversation in Recados; the unread number sits ne
     'Minha assinatura',
     'Trocar senha',
   ])
-  const badge = (await subNav(ana.page)).getByLabel(/recados? não lidos?/)
-  await expect(badge).toHaveText('1') // Beto's last recado
-  await (await subNav(ana.page)).getByRole('link', { name: /^Recados/ }).click()
+  // no Recados item in the menu (client request): the inbox is opened by its address
+  await ana.page.goto(M)
   await expect(ana.page.getByRole('heading', { name: 'Recados', level: 1 })).toBeVisible()
   await expect(ana.page.getByText('Só você e a outra pessoa veem cada conversa.')).toBeVisible()
   const item = ana.page.getByRole('link', { name: new RegExp(APELIDOS.beto) })
   await expect(item).toContainText(SENT.replay)
   await item.click()
   await expect(ana.page.getByRole('list', { name: 'Recados' })).toContainText(SENT.conversa)
-  await (await subNav(ana.page)).getByRole('link', { name: 'ClassiSex' }).click()
-  await expect(ana.page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
-  await expect((await subNav(ana.page)).getByLabel(/recados? não lidos?/)).toHaveCount(0)
   await ana.context.close()
 
   const beto = await as(browser, baseURL!, BETO, M)
