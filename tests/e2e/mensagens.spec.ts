@@ -1,4 +1,4 @@
-import { expect, test, type Browser, type Page } from '@playwright/test'
+import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
@@ -59,18 +59,16 @@ async function login(browser: Browser, baseURL: string, who: typeof ANA, next = 
   return { context, page }
 }
 
-const badge = async (page: Page) => (await headerMenu(page)).getByLabel(/recados? não lidos?/)
 
-test('the header menu has a single Recados item; own content has no Enviar recado', async ({ browser, baseURL }) => {
+test('the header menu has no Recados item; own content has no Enviar recado', async ({ browser, baseURL }) => {
   const ana = await login(browser, baseURL!, ANA, `/area-do-assinante/classisex/${adId}`)
   const labels = await (await headerMenu(ana.page)).locator(':scope > ul > li > a').allTextContents()
   expect(labels.map((l) => l.trim())).toEqual([
     'Festas',
     'Quem somos',
     'Espaço',
-    'Modelos',
+    'Profissionais e amadoras',
     'ClassiSex',
-    'Recados',
     'Contos',
     'Dicas Hot',
     'Contato',
@@ -108,23 +106,17 @@ test('Beto writes to Ana from her ad; empty text keeps the apelido; the thread o
   await beto.context.close()
 })
 
-test('Ana sees the unread number, opens and replies; Beto reads the reply; the number clears on navigation', async ({
+test('Ana sees the new recado in her inbox, opens and replies; Beto reads the reply', async ({
   browser,
   baseURL,
 }) => {
-  const ana = await login(browser, baseURL!, ANA, '/area-do-assinante/classisex')
-  await expect(await badge(ana.page)).toHaveText('1')
-  await expect(await badge(ana.page)).toHaveAttribute('aria-label', '1 recado não lido')
-  await (await headerMenu(ana.page)).getByRole('link', { name: /Recados/ }).click()
+  // Recados is not in the header menu (quick menu-logado, client request): the inbox is opened by its address
+  const ana = await login(browser, baseURL!, ANA, BASE)
   const item = ana.page.getByRole('link', { name: /BetoDF/ })
   await expect(item).toContainText('Oi, vi seu anúncio')
   await expect(item).toContainText('Nova')
   await item.click()
   await expect(ana.page.getByRole('heading', { name: 'Conversa com BetoDF', level: 1 })).toBeVisible()
-  // client navigation: the badge disappears without a reload
-  await (await headerMenu(ana.page)).getByRole('link', { name: 'ClassiSex' }).click()
-  await expect(ana.page.getByRole('heading', { name: 'ClassiSex', level: 1 })).toBeVisible()
-  await expect(await badge(ana.page)).toHaveCount(0)
   await ana.page.goto(`${BASE}/${conversaId}`)
   await ana.page.getByLabel('Recado', { exact: true }).fill('Oi Beto!')
   await ana.page.getByRole('button', { name: 'Enviar' }).click()

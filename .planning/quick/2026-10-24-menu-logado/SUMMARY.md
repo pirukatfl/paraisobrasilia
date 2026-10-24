@@ -8,3 +8,9 @@
 - Obs.: `browser.newContext` herda o dispositivo do projeto (Pixel 7 no projeto mobile), por isso o helper abre o menu quando preciso.
 
 Resultados: `pnpm typecheck` e `pnpm lint` limpos; `pnpm test:unit` 41 arquivos/421 testes ok; playwright menu-logado + classisex-assinante + contos + dicas-hot + mensagens + meus-anuncios + minha-assinatura + recados-privados: 112 passed, 2 skipped (skips ja existentes); shell + modelos + institucional + assine-ja: 48 passed, 6 skipped (skips de projeto mobile/desktop ja existentes); 0 falhas.
+
+## Ajustes do mesmo dia (2026-10-24)
+
+- "Modelos" passa a se chamar "Profissionais e amadoras" no menu público, no menu logado e no rodapé (o link segue `/modelos`; título da página inalterado). O menu público continua em uma linha a 1280 px.
+- "Recados" saiu do menu logado e não ganhou link em outro lugar (escolha do cliente). A caixa segue em `/area-do-assinante/mensagens`; o `UnreadBadge` ficou sem uso e foi removido (a rota `nao-lidas` permanece).
+- Resultados: typecheck e lint limpos; vitest unit ok; playwright menu-logado + modelos + mensagens + recados-privados + shell + fase5-seguranca + minha-assinatura: 114 passed, 4 skipped, 0 falhas.
