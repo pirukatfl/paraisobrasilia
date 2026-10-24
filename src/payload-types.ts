@@ -742,6 +742,10 @@ export interface MessageReport {
 export interface Media {
   id: number;
   /**
+   * Imagem enviada pelo formulário aberto de contos. Fica escondida até a equipe publicar o conto.
+   */
+  pendente?: boolean | null;
+  /**
    * Descreva a imagem para quem usa leitor de tela (ex.: Flyer da Festa do Branco).
    */
   alt: string;
@@ -997,9 +1001,26 @@ export interface Conto {
     [k: string]: unknown;
   };
   /**
+   * Opcional. Aparece na lista e na página do conto, para todo mundo: sem nudez explícita e sem contatos.
+   */
+  imagem?: (number | null) | Media;
+  /**
    * Quantos parágrafos do início qualquer visitante lê. O resto é só para assinantes. Mesmo que você aumente, o trecho aberto nunca passa de 150 palavras ou 15% do conto (vale o maior) e a última parte fica sempre para assinantes. Títulos curtos no começo não contam.
    */
   paragrafosAbertos: number;
+  /**
+   * Enviado pelo formulário aberto: confira texto e imagem antes de publicar.
+   */
+  enviadoPorVisitante?: boolean | null;
+  /**
+   * Apelido de quem enviou. Aparece como "por …" quando o conto é publicado.
+   */
+  assinadoComo?: string | null;
+  /**
+   * Só a equipe vê.
+   */
+  emailVisitante?: string | null;
+  enviadoEm?: string | null;
   /**
    * Preenchido pela importação. Não mexa.
    */
@@ -1639,6 +1660,7 @@ export interface MessageReportsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  pendente?: T;
   alt?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1793,7 +1815,12 @@ export interface ContosSelect<T extends boolean = true> {
   slug?: T;
   publishedAt?: T;
   texto?: T;
+  imagem?: T;
   paragrafosAbertos?: T;
+  enviadoPorVisitante?: T;
+  assinadoComo?: T;
+  emailVisitante?: T;
+  enviadoEm?: T;
   wpId?: T;
   wpSlug?: T;
   wpRestrito?: T;

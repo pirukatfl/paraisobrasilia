@@ -33,6 +33,7 @@ import * as migration_20261022_120000_dicas_wp_bundle from './20261022_120000_di
 import * as migration_20261023_034454_classisex_sem_conta from './20261023_034454_classisex_sem_conta';
 import * as migration_20261023_042244_models_pagina from './20261023_042244_models_pagina';
 import * as migration_20261023_042900_models_videos from './20261023_042900_models_videos';
+import * as migration_20261024_114938_contos_enviados from './20261024_114938_contos_enviados';
 
 export const migrations = [
   {
@@ -209,5 +210,10 @@ export const migrations = [
     up: migration_20261023_042900_models_videos.up,
     down: migration_20261023_042900_models_videos.down,
     name: '20261023_042900_models_videos',
+  },
+  {
+    up: migration_20261024_114938_contos_enviados.up,
+    down: migration_20261024_114938_contos_enviados.down,
+    name: '20261024_114938_contos_enviados'
   },
 ];

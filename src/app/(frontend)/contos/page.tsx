@@ -33,11 +33,16 @@ export default async function ContosPage({
         Contos
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Leia o começo de cada conto. O restante é só para assinantes.
+        Leia o começo de cada conto. O restante é só para assinantes. Qualquer pessoa pode enviar o seu: ele aparece depois que a equipe aprovar.
       </p>
       <p className="mt-4">
         <Link href="/area-do-assinante/contos" className="type-label font-semibold text-accent underline underline-offset-4">
           Já é assinante? Ler os contos completos
+        </Link>
+      </p>
+      <p className="mt-2">
+        <Link href="/contos/enviar" className="type-label font-semibold text-accent underline underline-offset-4">
+          Enviar um conto
         </Link>
       </p>
       {result.items.length === 0 ? (

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -40,7 +41,22 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
       <h1 id="titulo-conto" className="type-display mt-2">
         {conto.title}
       </h1>
-      {conto.dateLabel && <p className="type-label mt-2 text-muted">{conto.dateLabel}</p>}
+      {(conto.dateLabel || conto.assinadoComo) && (
+        <p className="type-label mt-2 text-muted">
+          {[conto.dateLabel, conto.assinadoComo ? `por ${conto.assinadoComo}` : ''].filter(Boolean).join(' · ')}
+        </p>
+      )}
+      {conto.imagem && (
+        <Image
+          src={conto.imagem.url}
+          alt={conto.imagem.alt}
+          width={conto.imagem.width}
+          height={conto.imagem.height}
+          sizes="(min-width: 768px) 720px, 100vw"
+          priority
+          className="mt-6 h-auto w-full rounded-xl"
+        />
+      )}
       <div className="mt-6">
         <RichText data={conto.texto} />
       </div>

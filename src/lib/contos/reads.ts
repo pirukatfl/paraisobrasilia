@@ -17,7 +17,8 @@ export async function findPublishedContos(
     where: { _status: { equals: 'published' } },
     draft: false,
     sort: '-publishedAt',
-    depth: 0,
+    // Depth 1 populates the image (the only relationship of a conto)
+    depth: 1,
     page: Math.max(1, Math.trunc(page) || 1),
     limit,
     overrideAccess: true,
@@ -30,7 +31,7 @@ export async function findPublishedConto(payload: Payload, slug: string): Promis
     collection: 'contos',
     where: { and: [{ _status: { equals: 'published' } }, { slug: { equals: slug } }] },
     draft: false,
-    depth: 0,
+    depth: 1,
     limit: 1,
     overrideAccess: true,
   })
