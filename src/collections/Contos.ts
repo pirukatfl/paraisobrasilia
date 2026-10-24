@@ -11,7 +11,7 @@ import {
 } from '@payloadcms/richtext-lexical'
 import { ValidationError, type CollectionBeforeValidateHook, type CollectionConfig } from 'payload'
 
-import { isStaff } from '../access/roles'
+import { isStaff, staffOnlyField } from '../access/roles'
 import { withRequestState } from '../lib/assinantes/context'
 import {
   DEFAULT_OPEN_BLOCKS,
@@ -20,6 +20,7 @@ import {
   SLUG_RE,
   slugify,
 } from '../lib/contos/excerpt'
+import { clearPendingImageAfterPublish } from '../lib/contos/imagem-pendente'
 import { revalidateContoAfterChange, revalidateContoAfterDelete } from '../lib/contos/revalidate'
 
 export const CONTO_MESSAGES = {
@@ -84,7 +85,7 @@ export const Contos: CollectionConfig = {
   admin: {
     group: 'Contos',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'publishedAt', '_status', 'paragrafosAbertos'],
+    defaultColumns: ['title', 'publishedAt', '_status', 'enviadoPorVisitante', 'paragrafosAbertos'],
     listSearchableFields: ['title', 'slug'],
     description: 'Contos do site. Visitantes leem só os primeiros parágrafos; o resto é para assinantes.',
   },
@@ -99,7 +100,7 @@ export const Contos: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [prepare],
-    afterChange: [revalidateContoAfterChange],
+    afterChange: [clearPendingImageAfterPublish, revalidateContoAfterChange],
     afterDelete: [revalidateContoAfterDelete],
   },
   fields: [
@@ -155,6 +156,16 @@ export const Contos: CollectionConfig = {
       }),
     },
     {
+      name: 'imagem',
+      type: 'upload',
+      relationTo: 'media',
+      label: 'Imagem',
+      admin: {
+        description:
+          'Opcional. Aparece na lista e na página do conto, para todo mundo: sem nudez explícita e sem contatos.',
+      },
+    },
+    {
       name: 'paragrafosAbertos',
       type: 'number',
       required: true,
@@ -176,6 +187,41 @@ export const Contos: CollectionConfig = {
       type: 'ui',
       label: 'Trecho aberto',
       admin: { components: { Field: '/components/admin/contos/TrechoAbertoPanel#TrechoAbertoPanel' } },
+    },
+    {
+      name: 'enviadoPorVisitante',
+      type: 'checkbox',
+      label: 'Enviado pelo formulário aberto',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Enviado pelo formulário aberto: confira texto e imagem antes de publicar.',
+      },
+    },
+    {
+      name: 'assinadoComo',
+      type: 'text',
+      maxLength: 60,
+      label: 'Assinado como',
+      admin: {
+        position: 'sidebar',
+        description: 'Apelido de quem enviou. Aparece como "por …" quando o conto é publicado.',
+      },
+    },
+    {
+      // Staff-only: never in a DTO, a log or an API answer to anyone else
+      name: 'emailVisitante',
+      type: 'email',
+      label: 'E-mail de quem enviou',
+      access: staffOnlyField,
+      admin: { position: 'sidebar', readOnly: true, description: 'Só a equipe vê.' },
+    },
+    {
+      name: 'enviadoEm',
+      type: 'date',
+      label: 'Enviado em',
+      admin: { position: 'sidebar', readOnly: true, date: { displayFormat: 'dd/MM/yyyy HH:mm' } },
     },
     {
       name: 'wpId',

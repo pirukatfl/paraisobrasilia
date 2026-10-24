@@ -26,7 +26,8 @@ export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Mídia', plural: 'Mídias' },
   access: {
-    read: () => true,
+    // Images sent through the open conto form stay hidden (documents and files) until the conto is published
+    read: ({ req }) => (isStaff({ req }) ? true : { pendente: { not_equals: true } }),
     create: isStaff,
     update: isStaff,
     delete: isStaff,
@@ -38,6 +39,20 @@ export const Media: CollectionConfig = {
     afterDelete: [revalidateGalleriesAfterDelete],
   },
   fields: [
+    {
+      // Set only by the open conto form; cleared when the conto is published (afterChange of contos)
+      name: 'pendente',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Aguardando aprovação',
+      index: true,
+      access: { create: () => false, update: () => false },
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'Imagem enviada pelo formulário aberto de contos. Fica escondida até a equipe publicar o conto.',
+      },
+    },
     {
       name: 'alt',
       type: 'text',

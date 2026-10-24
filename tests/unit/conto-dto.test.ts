@@ -50,3 +50,38 @@ describe('conto DTOs (T-05-01)', () => {
     expect(dto.hasMore).toBe(true)
   })
 })
+
+describe('conto DTOs with image and signature', () => {
+  const media = {
+    url: '/api/media/file/capa.webp',
+    width: 1000,
+    height: 800,
+    alt: 'Imagem do conto Um',
+    sizes: { card: { url: '/api/media/file/capa-640.webp', width: 640, height: 512 }, gallery: { url: '/api/media/file/capa-1600.webp', width: 1000, height: 800 } },
+  }
+  const withImage = { ...doc, imagem: media, assinadoComo: ' Casal BSB ' }
+
+  it('the card uses the card size and the page uses the gallery size', () => {
+    expect(toContoCardDTO(withImage).imagem).toEqual({ url: '/api/media/file/capa-640.webp', width: 640, height: 512, alt: 'Imagem do conto Um' })
+    expect(toPublicContoDTO(withImage).imagem?.url).toBe('/api/media/file/capa-1600.webp')
+    expect(toMemberContoDTO(withImage).imagem?.url).toBe('/api/media/file/capa-1600.webp')
+    expect(toContoCardDTO(withImage).assinadoComo).toBe('Casal BSB')
+  })
+
+  it('falls back to the original when the size is missing', () => {
+    expect(toContoCardDTO({ ...doc, imagem: { ...media, sizes: {} } }).imagem?.url).toBe('/api/media/file/capa.webp')
+  })
+
+  it('has no image for an id, a missing url, a pending media or no value', () => {
+    expect(toContoCardDTO({ ...doc, imagem: 12 }).imagem).toBeNull()
+    expect(toContoCardDTO({ ...doc, imagem: { alt: 'x' } }).imagem).toBeNull()
+    expect(toContoCardDTO({ ...doc, imagem: { ...media, pendente: true } }).imagem).toBeNull()
+    expect(toPublicContoDTO(doc).imagem).toBeNull()
+    expect(toContoCardDTO(doc).assinadoComo).toBeNull()
+  })
+
+  it('never carries the visitor e-mail', () => {
+    const dto = toPublicContoDTO({ ...withImage, emailVisitante: 'leitor@exemplo.com' } as never)
+    expect(JSON.stringify(dto)).not.toContain('leitor@exemplo.com')
+  })
+})
