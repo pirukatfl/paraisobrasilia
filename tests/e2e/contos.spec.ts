@@ -2,6 +2,7 @@ import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
+import { headerMenu } from './helpers/menu'
 
 // PREV-03 / PREV-04: visitors read the beginning of each conto with an "Assine Já"; the rest is
 // for active subscribers. The restricted part never reaches public HTML, RSC or metadata (T-05-01).
@@ -106,7 +107,7 @@ test('members: anonymous is sent to the login, an active subscriber reads everyt
   await page.goto('/area-do-assinante/contos')
   await expect(page.locator('main').getByRole('article').filter({ hasText: 'Conto Aberto Um' })).toHaveCount(1)
   await expect(page.locator('main')).not.toContainText('Conto Rascunho')
-  const nav = page.getByRole('navigation', { name: 'Área do assinante' })
+  const nav = await headerMenu(page)
   await expect(nav.getByRole('link', { name: 'Contos' })).toHaveAttribute('href', '/area-do-assinante/contos')
   await context.close()
 })
