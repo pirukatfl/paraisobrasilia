@@ -505,7 +505,6 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
 |---|---|---|
 | Fotos por anúncio | 1 | até 10 |
 | Vídeos por anúncio | não | até 2 |
-| Anúncios ativos | até 3 | até 3 |
 | Ver anúncios do ClassiSex | todos, sem contato (só a capa, nítida) | todos, com WhatsApp, Telegram, fotos e vídeos |
 | Recados (conversas privadas) | não | manda e recebe |
 | Contos completos | só o início | sim |

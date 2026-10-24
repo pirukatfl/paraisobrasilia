@@ -45,7 +45,6 @@ describe('TIER_LIMITS and labels', () => {
     expect(items).toEqual([
       'Fotos por anúncio',
       'Vídeos por anúncio',
-      'Anúncios ativos',
       'Ver anúncios do ClassiSex',
       'Recados (conversas privadas)',
       'Contos e Dicas Hot completos',
