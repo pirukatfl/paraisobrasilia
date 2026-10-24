@@ -11,6 +11,7 @@ import { isStaff } from '../../access/roles'
 import { assinanteLabel, writeAudit } from './audit'
 import { withRequestState } from './context'
 import { daysLeft, renewalWindow, validUntilLabel } from './periods'
+import { RENEWAL_WARNING_DAYS } from './renewal'
 import { accessStatusFor, accessStatusOf, findPeriods, type AccessStatus } from './status'
 
 const isStaffUser = (req: PayloadRequest) => isStaff({ req })
@@ -314,7 +315,7 @@ export type ExpiringRow = {
  * than `now + days`, soonest first. Uses the denormalised accessUntil (latest non-ended period),
  * so renewed and ended accounts drop out on their own. Staff-only caller (dashboard).
  */
-export async function getExpiringSoon(payload: Payload, now: Date, days = 7): Promise<ExpiringRow[]> {
+export async function getExpiringSoon(payload: Payload, now: Date, days = RENEWAL_WARNING_DAYS): Promise<ExpiringRow[]> {
   const limit = new Date(now.getTime() + days * 24 * 3600_000)
   const { docs } = await payload.find({
     collection: 'assinantes',

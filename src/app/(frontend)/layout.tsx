@@ -4,6 +4,7 @@ import React from 'react'
 
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { RenewalBanner } from '@/components/assinantes/RenewalBanner'
 import { AgeGate } from '@/lib/age-gate/AgeGate'
 import { AGE_HEAD_SCRIPT } from '@/lib/age-gate/head-script'
 
@@ -68,6 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Pular para o conteúdo
         </a>
+        <RenewalBanner />
         <Header />
         <main id="conteudo" className="mx-auto w-full max-w-[1200px] flex-1 px-4 pt-12 lg:px-8">
           {children}
