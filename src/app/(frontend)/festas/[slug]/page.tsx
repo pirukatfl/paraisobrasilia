@@ -8,15 +8,11 @@ import { formatPartyDate, formatPartyTime } from '@/lib/format/date'
 import { getPartyBySlug } from '@/lib/parties/queries'
 import { buildPartyMetadata } from '@/lib/seo/metadata'
 
-// ISR on demand: no page is prerendered at build (the Docker/CI build has no database).
-// Each party page is generated on its first request, cached, and expired by the
-// 'party:{slug}' tag on publish/edit/unpublish or after 600 s.
-export const revalidate = 600
-export const dynamicParams = true
-
-export async function generateStaticParams(): Promise<{ slug: string }[]> {
-  return []
-}
+// Rendered per request, like every other public page: the root layout reads the session
+// cookie (logged-in menu, renewal banner), so ISR here failed at runtime with
+// "Page changed from static to dynamic". The party data stays in the Next data cache
+// (tag 'party:{slug}'), so staff edits still show at once.
+export const dynamic = 'force-dynamic'
 
 interface Props {
   params: Promise<{ slug: string }>
