@@ -238,12 +238,12 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 
 Plans:
 
-- [ ] 06.2-01-PLAN.md — Registro de textos, globals no painel, leitura com fallback e área "geral" (wave 1)
-- [ ] 06.2-02-PLAN.md — Vitrine: início, festas, espaço, modelos, institucional, contato (wave 2)
-- [ ] 06.2-03-PLAN.md — Assine Já, conta e área do assinante (wave 2)
-- [ ] 06.2-04-PLAN.md — ClassiSex, Meus anúncios e Enviar conto (wave 2)
-- [ ] 06.2-05-PLAN.md — Contos, Dicas Hot e Recados (wave 2)
-- [ ] 06.2-06-PLAN.md — Migração, testes, verificação completa e guia (wave 3)
+- [x] 06.2-01-PLAN.md — Registro de textos, globals no painel, leitura com fallback e área "geral" (wave 1)
+- [x] 06.2-02-PLAN.md — Vitrine: início, festas, espaço, modelos, institucional, contato (wave 2)
+- [x] 06.2-03-PLAN.md — Assine Já, conta e área do assinante (wave 2)
+- [x] 06.2-04-PLAN.md — ClassiSex, Meus anúncios e Enviar conto (wave 2)
+- [x] 06.2-05-PLAN.md — Contos, Dicas Hot e Recados (wave 2)
+- [x] 06.2-06-PLAN.md — Migração, testes, verificação completa e guia (wave 3)
 
 ### Phase 06.1: Galeria de modelos com página por modelo (INSERTED)
 
