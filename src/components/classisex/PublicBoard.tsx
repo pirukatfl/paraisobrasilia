@@ -4,13 +4,14 @@ import { Pagination } from '@/components/classisex/Pagination'
 import { EmptyState } from '@/components/EmptyState'
 import type { BoardFilters, BoardPage } from '@/lib/classisex/board'
 import type { PublicAdDTO } from '@/lib/classisex/dto'
+import { getTextos } from '@/lib/textos/queries'
 
 /**
  * The open ClassiSex board (public DTOs only): filter by Eu sou, cards with the redacted text and
  * the cover photo, pagination. Shared by /classisex (visitors) and the members area for accounts
  * without an active subscription (free accounts). Contacts and original media never reach it.
  */
-export function PublicBoard({
+export async function PublicBoard({
   basePath,
   result,
   categories,
@@ -24,6 +25,7 @@ export function PublicBoard({
   /** Free account inside the members area: the page already carries the subscribe call, so no second one here. */
   signedIn?: boolean
 }) {
+  const t = await getTextos('classisex')
   const filtered = Boolean(filters.euSou)
   const paginationEl = (
     <Pagination
@@ -39,15 +41,15 @@ export function PublicBoard({
       {result.items.length === 0 ? (
         filtered ? (
           <EmptyState
-            heading="Nenhum anúncio encontrado."
-            body="Tente outra opção em Eu sou."
-            actions={[{ href: basePath, label: 'Ver todos os anúncios', variant: 'secondary' }]}
+            heading={t.vazioFiltroTitulo}
+            body={t.vazioFiltroPublicoTexto}
+            actions={[{ href: basePath, label: t.vazioVerTodos, variant: 'secondary' }]}
           />
         ) : (
           <EmptyState
-            heading="Ainda não há anúncios publicados."
-            body="Assinantes publicam anúncios com fotos, vídeo e contato. Assine para anunciar e ver tudo."
-            actions={signedIn ? [] : [{ href: '/assine-ja', label: 'Assine Já', variant: 'primary' }]}
+            heading={t.vazioTitulo}
+            body={t.vazioPublicoTexto}
+            actions={signedIn ? [] : [{ href: '/assine-ja', label: t.vazioPublicoBotao, variant: 'primary' }]}
           />
         )
       ) : (
@@ -55,6 +57,7 @@ export function PublicBoard({
           // New filter = new navigation; the key also resets the list on ?pagina= changes
           key={`${filters.euSou ?? ''}:${result.page}`}
           scope="publico"
+          textos={t}
           initialItems={result.items}
           initialPage={result.page}
           totalPages={result.totalPages}

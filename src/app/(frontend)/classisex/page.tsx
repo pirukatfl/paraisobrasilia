@@ -6,17 +6,17 @@ import { PublicBoard } from '@/components/classisex/PublicBoard'
 import { parseBoardFilters } from '@/lib/classisex/board'
 import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { getTextos } from '@/lib/textos/queries'
 
 // Per request (query string, no database at build); data from the tagged cache 'ads'.
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = buildPageMetadata({
-  title: 'ClassiSex',
-  description: 'Anúncios de casais, mulheres, homens e trans do Paraíso Brasília. Leia os anúncios; assine para ver os contatos e as fotos.',
-  path: '/classisex',
-})
-
 const PATH = '/classisex'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('classisex')
+  return buildPageMetadata({ title: t.publicoGoogleTitulo, description: t.publicoGoogleDescricao, path: PATH })
+}
 
 /**
  * Open view of the ClassiSex (PREV-01, D-04, D-07). Reads only the public read model (apelido, tipo,
@@ -28,31 +28,32 @@ export default async function ClassisexPublicPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   // The open area filters by tipo only; ?cidade= is ignored (the city is shown, never searched)
+  const t = await getTextos('classisex')
   const filters = { ...parseBoardFilters(await searchParams), cidade: undefined }
   const [result, categories] = await Promise.all([getPublicAds(filters), getPublicAdFilters()])
   return (
     <section aria-labelledby="titulo-classisex">
-      <p className="type-eyebrow text-muted">Anúncios</p>
+      <p className="type-eyebrow text-muted">{t.publicoTopo}</p>
       <h1 id="titulo-classisex" className="type-display mt-2">
-        ClassiSex
+        {t.publicoTitulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Anúncios do Paraíso: qualquer pessoa pode anunciar, com ou sem conta. Leia os recados na íntegra; os contatos (WhatsApp, Telegram, telefone, e-mail e links), as demais fotos e os vídeos ficam para assinantes.
+        {t.publicoIntro}
       </p>
       <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
         <Link href="/classisex/anunciar" className="btn-primary">
-          Anunciar
+          {t.publicoBotaoAnunciar}
         </Link>
         <Link
           href="/area-do-assinante/classisex"
           className="type-label font-semibold text-accent underline underline-offset-4"
         >
-          Já é assinante? Ver anúncios completos
+          {t.publicoLinkAssinante}
         </Link>
       </p>
       <AssineJaCta
-        title="Assine para ver o contato, todas as fotos e os vídeos"
-        text="Assinantes veem os contatos, as fotos e os vídeos, mandam recados privados e anunciam também."
+        title={t.publicoAssineTitulo}
+        text={t.publicoAssineTexto}
         membersHref="/area-do-assinante/classisex"
       />
       <PublicBoard basePath={PATH} result={result} categories={categories} filters={filters} />

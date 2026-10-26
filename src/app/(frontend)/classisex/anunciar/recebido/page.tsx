@@ -1,27 +1,30 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-export const metadata: Metadata = {
-  title: 'Anúncio recebido',
-  robots: { index: false, follow: false },
+import { getTextos } from '@/lib/textos/queries'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('classisex')
+  return { title: t.recebidoGoogleTitulo, robots: { index: false, follow: false } }
 }
 
-export default function AnuncioRecebidoPage() {
+export default async function AnuncioRecebidoPage() {
+  const t = await getTextos('classisex')
   return (
     <section aria-labelledby="titulo-recebido">
-      <p className="type-eyebrow text-muted">ClassiSex</p>
+      <p className="type-eyebrow text-muted">{t.recebidoTopo}</p>
       <h1 id="titulo-recebido" className="type-display mt-2">
-        Recebemos seu anúncio
+        {t.recebidoTitulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Ele aparece no ClassiSex depois da análise da equipe. Avisamos no e-mail informado.
+        {t.recebidoTexto}
       </p>
       <p className="mt-6 flex flex-wrap gap-4">
         <Link href="/classisex" className="btn-primary">
-          Ver o ClassiSex
+          {t.recebidoBotaoVer}
         </Link>
         <Link href="/cadastro" className="btn-secondary">
-          Criar conta gratuita
+          {t.recebidoBotaoConta}
         </Link>
       </p>
     </section>

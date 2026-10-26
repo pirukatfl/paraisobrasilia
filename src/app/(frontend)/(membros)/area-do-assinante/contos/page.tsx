@@ -7,12 +7,13 @@ import { ContoCard } from '@/components/contos/ContoCard'
 import { EmptyState } from '@/components/EmptyState'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { listMemberContos } from '@/lib/contos/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Contos',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('contos')
+  return { title: t.membrosGoogleLista, robots: { index: false, follow: false } }
 }
 
 const PATH = '/area-do-assinante/contos'
@@ -24,12 +25,13 @@ export default async function MembrosContosPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const check = await requireActiveSubscription(PATH)
+  const t = await getTextos('contos')
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.membrosEyebrow}</p>
       <h1 id="titulo-contos" className="type-display mt-2">
-        Contos
+        {t.membrosTitulo}
       </h1>
     </>
   )
@@ -47,9 +49,9 @@ export default async function MembrosContosPage({
   return (
     <section aria-labelledby="titulo-contos">
       {header}
-      <p className="mt-4 max-w-[680px] text-body text-muted">Todos os contos, do começo ao fim.</p>
+      <p className="mt-4 max-w-[680px] text-body text-muted">{t.membrosIntro}</p>
       {result.items.length === 0 ? (
-        <EmptyState heading="Nenhum conto publicado ainda." body="Volte em breve: a equipe publica contos novos." actions={[]} />
+        <EmptyState heading={t.membrosVazioTitulo} body={t.membrosVazioTexto} actions={[]} />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {result.items.map((c) => (

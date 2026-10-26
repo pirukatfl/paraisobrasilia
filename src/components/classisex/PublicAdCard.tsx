@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import type { PublicAdDTO } from '@/lib/classisex/dto'
+import type { Textos } from '@/lib/textos/areas'
 
 /**
  * One ad in the open view (visitors and free accounts; PREV-01, revisão 2026-10-22): apelido, tipo,
@@ -8,7 +9,7 @@ import type { PublicAdDTO } from '@/lib/classisex/dto'
  * (/classisex/previa/…, plain <img>), the call to subscribe and a locked "Enviar recado" (same on every
  * card). No video, contact or author.
  */
-export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
+export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Textos<'classisex'> }) {
   const titleId = `previa-${ad.id}`
   return (
     <article aria-labelledby={titleId} className="flex flex-col rounded-xl border border-line bg-surface p-5">
@@ -25,7 +26,7 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
         />
       ) : (
         <div className="type-label flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-line text-muted">
-          Sem foto
+          {t.cardSemFoto}
         </div>
       )}
       <h2 id={titleId} className="type-heading mt-4">
@@ -38,7 +39,7 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
       {ad.texto && <p className="mt-3 whitespace-pre-line break-words text-body">{ad.texto}</p>}
       <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
         <Link href="/assine-ja" className="btn-primary text-center">
-          Assine para ver o contato, todas as fotos e os vídeos
+          {t.cardPublicoAssine}
         </Link>
         {/* Locked on EVERY card, whoever pays: nothing here says which advertisers are subscribers (I-1, T-RP-05) */}
         <Link
@@ -50,9 +51,9 @@ export function PublicAdCard({ ad }: { ad: PublicAdDTO }) {
             <rect x="5" y="11" width="14" height="9" rx="2" />
             <path d="M8 11V8a4 4 0 0 1 8 0v3" />
           </svg>
-          Enviar recado
+          {t.cardEnviarRecado}
         </Link>
-        <p className="type-label text-muted">Recados privados só entre assinantes.</p>
+        <p className="type-label text-muted">{t.cardRecadosNota}</p>
       </div>
     </article>
   )

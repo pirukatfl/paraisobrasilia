@@ -8,9 +8,12 @@ import {
   wazeUrl,
   whatsappUrl,
 } from '@/lib/site/contact'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 /** Address card with "Como chegar" and WhatsApp buttons (UI-SPEC S8). */
-export function ContactBlock({ contact }: { contact: ContactDTO }) {
+export async function ContactBlock({ contact }: { contact: ContactDTO }) {
+  const t = await getTextos('contato')
   const instagram = instagramUrl(contact.instagram)
   const textLink =
     'type-label inline-flex min-h-11 items-center gap-2 text-text underline-offset-4 hover:text-accent hover:underline'
@@ -21,21 +24,21 @@ export function ContactBlock({ contact }: { contact: ContactDTO }) {
         <span className="flex flex-col">
           <span className="text-body">{contact.addressLine}</span>
           <span className="text-body">{contact.addressDetail}</span>
-          {contact.postalCode && <span className="text-body text-muted">CEP {contact.postalCode}</span>}
+          {contact.postalCode && <span className="text-body text-muted">{preencher(t.cep, { cep: contact.postalCode })}</span>}
         </span>
       </address>
       {contact.hours && <p className="type-label mt-4 text-gold">{contact.hours}</p>}
 
       <div className="mt-6 flex flex-col gap-2">
         <ExternalLink href={googleMapsUrl(contact)} className="btn-primary w-full">
-          Como chegar — Google Maps
+          {t.botaoGoogleMaps}
         </ExternalLink>
         <ExternalLink href={wazeUrl(contact)} className="btn-primary w-full">
-          Como chegar — Waze
+          {t.botaoWaze}
         </ExternalLink>
         <ExternalLink href={whatsappUrl(contact.whatsapp)} className="btn-primary w-full gap-2">
           <WhatsAppIcon />
-          Chamar no WhatsApp
+          {t.botaoWhatsapp}
         </ExternalLink>
       </div>
 
@@ -66,7 +69,7 @@ export function ContactBlock({ contact }: { contact: ContactDTO }) {
           <li>
             <ExternalLink href={instagram} className={textLink}>
               <InstagramIcon className="text-muted" />
-              Instagram @{contact.instagram}
+              {preencher(t.instagram, { usuario: contact.instagram ?? '' })}
             </ExternalLink>
           </li>
         )}

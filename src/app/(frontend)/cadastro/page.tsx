@@ -11,17 +11,17 @@ import { emailEnabled } from '@/lib/email/config'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 // Depends on the session and on runtime configuration (SMTP): per request, never cached
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  ...buildPageMetadata({
-    title: 'Criar conta grátis',
-    description: 'Crie uma conta gratuita no Paraíso Brasília e publique seu anúncio no ClassiSex.',
-    path: '/cadastro',
-  }),
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('conta')
+  return {
+    ...buildPageMetadata({ title: t.cadastroGoogleTitulo, description: t.cadastroGoogleDescricao, path: '/cadastro' }),
+    robots: { index: false, follow: false },
+  }
 }
 
 export default async function CadastroPage({
@@ -34,33 +34,32 @@ export default async function CadastroPage({
   const enabled = emailEnabled()
   const enviado = enabled && params.enviado === '1'
   const limite = enabled && params.erro === 'limite'
-  const contact = await getContact()
+  const [contact, t] = await Promise.all([getContact(), getTextos('conta')])
 
   return (
     <section aria-labelledby="titulo-cadastro">
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.etiqueta}</p>
       <h1 id="titulo-cadastro" className="type-display mt-2">
-        Criar conta grátis
+        {t.cadastroTitulo}
       </h1>
 
       {!enabled ? (
         <div className="mt-6 max-w-[560px]">
           <p role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text">
-            O cadastro pelo site está fechado no momento. Fale com a equipe pelo WhatsApp.
+            {t.cadastroFechado}
           </p>
           {contact.whatsapp && (
             <ExternalLink href={whatsappUrl(contact.whatsapp)} className="btn-primary mt-4">
-              Chamar no WhatsApp
+              {t.botaoWhatsapp}
             </ExternalLink>
           )}
         </div>
       ) : enviado ? (
         <div className="mt-6 max-w-[560px]">
           <p role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text">
-            Enviamos um link para o seu e-mail. Abra o link para ativar a conta (vale por 7 dias). Olhe também a caixa
-            de spam.
+            {t.cadastroEnviado}
           </p>
-          <h2 className="type-heading mt-8">Não recebeu?</h2>
+          <h2 className="type-heading mt-8">{t.cadastroNaoRecebeu}</h2>
           <ResendForm />
         </div>
       ) : (
@@ -70,11 +69,8 @@ export default async function CadastroPage({
               Muitas tentativas. Tente de novo em 1 hora.
             </p>
           )}
-          <p className="mt-4 max-w-[560px] text-body text-muted">
-            Com a conta gratuita você publica seus anúncios no ClassiSex (até 3, com 1 foto cada). Assinantes veem todos
-            os anúncios, com contatos, e mandam recados privados entre si.
-          </p>
-          <SignupForm />
+          <p className="mt-4 max-w-[560px] text-body text-muted">{t.cadastroIntro}</p>
+          <SignupForm textos={t} />
         </>
       )}
 
@@ -82,7 +78,7 @@ export default async function CadastroPage({
 
       <p className="mt-8">
         <Link href="/entrar" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-          Já tem conta? Entrar
+          {t.cadastroJaTem}
         </Link>
       </p>
     </section>

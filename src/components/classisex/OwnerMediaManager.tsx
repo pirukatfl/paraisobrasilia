@@ -4,10 +4,8 @@ import { TIER_LIMITS, type Tier } from '@/lib/assinantes/tier'
 import type { OwnerMediaDTO } from '@/lib/classisex/dto'
 import { MAX_AD_PHOTOS } from '@/lib/classisex/media-messages'
 import { definirCapa, removerMidia } from '@/lib/classisex/actions'
-
-export const MEDIA_HINT = 'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 60 segundos.'
-export const MEDIA_HINT_FREE = 'Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.'
-export const GUARDADA = 'Guardada: volta a aparecer quando você assinar'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 /**
  * "Fotos e vídeos" on Editar anúncio (CLAS-03, D-01). Server component: plain forms work without
@@ -15,7 +13,8 @@ export const GUARDADA = 'Guardada: volta a aparecer quando você assinar'
  * Usar como capa are server actions. Thumbnails are plain <img> through the protected route,
  * never the Next image optimizer (T-04-07).
  */
-export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId: number; media: OwnerMediaDTO; tier: Tier; legacy?: boolean }) {
+export async function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId: number; media: OwnerMediaDTO; tier: Tier; legacy?: boolean }) {
+  const t = await getTextos('meusAnuncios')
   const uploadAction = `/area-do-assinante/meus-anuncios/${adId}/midia`
   const limits = TIER_LIMITS[tier]
   // I-1: a free owner never loses stored media by editing, but cannot add a photo while one exists
@@ -27,15 +26,13 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
   return (
     <section aria-labelledby="titulo-midia" className="mt-12 max-w-[680px]">
       <h2 id="titulo-midia" className="type-heading">
-        Fotos e vídeos
+        {t.gerTitulo}
       </h2>
-      <p className="mt-2 text-body text-muted">{tier === 'gratis' ? MEDIA_HINT_FREE : MEDIA_HINT}</p>
-      <p className="mt-1 text-body text-muted">
-        A primeira foto é a capa. Toda mudança manda o anúncio de volta para a análise da equipe.
-      </p>
+      <p className="mt-2 text-body text-muted">{tier === 'gratis' ? t.gerDicaGratis : t.gerDicaAssinante}</p>
+      <p className="mt-1 text-body text-muted">{t.gerCapaNota}</p>
 
       {media.fotos.length === 0 ? (
-        <p className="mt-6 text-body">Nenhuma foto ainda.</p>
+        <p className="mt-6 text-body">{t.gerSemFotos}</p>
       ) : (
         <ul aria-label="Fotos do anúncio" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {media.fotos.map((foto, i) => (
@@ -50,15 +47,15 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
                 decoding="async"
                 className="aspect-square w-full rounded object-cover"
               />
-              {foto.guardada && <p className="type-label text-muted">{GUARDADA}</p>}
+              {foto.guardada && <p className="type-label text-muted">{t.gerGuardada}</p>}
               {foto.capa ? (
-                <p className="type-label text-accent">Capa</p>
+                <p className="type-label text-accent">{t.gerCapa}</p>
               ) : (
                 <form action={definirCapa}>
                   <input type="hidden" name="id" value={foto.id} />
                   <input type="hidden" name="anuncio" value={adId} />
                   <button type="submit" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-                    Usar como capa
+                    {t.gerUsarCapa}
                   </button>
                 </form>
               )}
@@ -66,7 +63,7 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
                 <input type="hidden" name="id" value={foto.id} />
                 <input type="hidden" name="anuncio" value={adId} />
                 <button type="submit" className="type-label text-danger underline underline-offset-4">
-                  Remover
+                  {t.gerRemover}
                 </button>
               </form>
             </li>
@@ -80,14 +77,14 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
           className="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3"
         >
           <p className="text-body">
-            Vídeo {i + 1} · {video.durationLabel}
-            {video.guardada && <span className="type-label block text-muted">{GUARDADA}</span>}
+            {preencher(t.gerVideo, { n: i + 1, duracao: video.durationLabel })}
+            {video.guardada && <span className="type-label block text-muted">{t.gerGuardada}</span>}
           </p>
           <form action={removerMidia}>
             <input type="hidden" name="id" value={video.id} />
             <input type="hidden" name="anuncio" value={adId} />
             <button type="submit" className="type-label text-danger underline underline-offset-4">
-              Remover vídeo {i + 1}
+              {preencher(t.gerRemoverVideo, { n: i + 1 })}
             </button>
           </form>
         </div>
@@ -104,7 +101,7 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
         >
           <input type="hidden" name="tipo" value="foto" />
           <label htmlFor="arquivo-foto" className="type-label">
-            Adicionar foto
+            {t.gerAdicionarFoto}
           </label>
           <input
             id="arquivo-foto"
@@ -115,11 +112,11 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
             className={fileInput}
           />
           <button type="submit" className="btn-primary self-start">
-            Enviar foto
+            {t.gerEnviarFoto}
           </button>
         </form>
         ) : (
-          <p className="text-body text-muted">Conta gratuita: 1 foto por anúncio.</p>
+          <p className="text-body text-muted">{t.gerGratisUmaFoto}</p>
         )}
         {canAddVideo ? (
         <form
@@ -131,7 +128,7 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
         >
           <input type="hidden" name="tipo" value="video" />
           <label htmlFor="arquivo-video" className="type-label">
-            Adicionar vídeo
+            {t.gerAdicionarVideo}
           </label>
           <input
             id="arquivo-video"
@@ -142,14 +139,14 @@ export function OwnerMediaManager({ adId, media, tier, legacy = false }: { adId:
             className={fileInput}
           />
           <button type="submit" className="btn-primary self-start">
-            Enviar vídeo
+            {t.gerEnviarVideo}
           </button>
         </form>
         ) : (
           <div className="flex flex-col gap-2">
-            <p className="text-body">Vídeos só para assinantes</p>
+            <p className="text-body">{t.gerVideosAssinantes}</p>
             <Link href="/assine-ja" className="btn-secondary self-start">
-              Assine Já
+              {t.gerAssineJa}
             </Link>
           </div>
         )}

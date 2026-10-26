@@ -7,6 +7,8 @@ import { AssineJaCta } from '@/components/contos/AssineJaCta'
 import { RichText } from '@/components/RichText'
 import { getPublicConto } from '@/lib/contos/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 // Per request (no database at build); data from the tagged cache ('conto:{slug}').
 export const dynamic = 'force-dynamic'
@@ -17,7 +19,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const conto = await getPublicConto((await params).slug)
-  if (!conto) return { title: 'Conto não encontrado' }
+  if (!conto) return { title: (await getTextos('contos')).googleContoNaoEncontrado }
   // T-05-01: the description comes from the open text only
   return buildPageMetadata({ title: conto.title, description: conto.description, path: `/contos/${conto.slug}` })
 }
@@ -26,15 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ContoPublicPage({ params }: Props) {
   const conto = await getPublicConto((await params).slug)
   if (!conto) notFound()
+  const t = await getTextos('contos')
   return (
     <article aria-labelledby="titulo-conto" className="max-w-[720px]">
-      <p className="type-eyebrow text-muted">Contos</p>
+      <p className="type-eyebrow text-muted">{t.contoEyebrow}</p>
       <h1 id="titulo-conto" className="type-display mt-2">
         {conto.title}
       </h1>
       {(conto.dateLabel || conto.assinadoComo) && (
         <p className="type-label mt-2 text-muted">
-          {[conto.dateLabel, conto.assinadoComo ? `por ${conto.assinadoComo}` : ''].filter(Boolean).join(' · ')}
+          {[conto.dateLabel, conto.assinadoComo ? preencher(t.contoPor, { nome: conto.assinadoComo }) : ''].filter(Boolean).join(' · ')}
         </p>
       )}
       {conto.imagem && (
@@ -53,15 +56,15 @@ export default async function ContoPublicPage({ params }: Props) {
       </div>
       {conto.hasMore && (
         <AssineJaCta
-          title="Quer ler até o fim?"
-          text="Continue lendo: o restante deste conto é só para assinantes."
+          title={t.contoCtaTitulo}
+          text={t.contoCtaTexto}
           membersHref={`/area-do-assinante/contos/${conto.slug}`}
-          membersLabel="Já sou assinante: ler o conto completo"
+          membersLabel={t.contoCtaBotao}
         />
       )}
       <p className="mt-10">
         <Link href="/contos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Voltar para os contos
+          {t.contoVoltar}
         </Link>
       </p>
     </article>

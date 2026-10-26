@@ -7,15 +7,15 @@ import { ContoCard } from '@/components/contos/ContoCard'
 import { EmptyState } from '@/components/EmptyState'
 import { getPublicContos } from '@/lib/contos/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { getTextos } from '@/lib/textos/queries'
 
 // Per request (query string, no database at build); data from the tagged cache 'contos'.
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = buildPageMetadata({
-  title: 'Contos',
-  description: 'Contos eróticos do Paraíso Brasília. Leia o começo de cada um; o restante é para assinantes.',
-  path: '/contos',
-})
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('contos')
+  return buildPageMetadata({ title: t.googleLista, description: t.googleListaDescricao, path: '/contos' })
+}
 
 /** Open list of contos (PREV-03). Public read model only: open blocks, never the full text (T-05-01). */
 export default async function ContosPage({
@@ -26,30 +26,31 @@ export default async function ContosPage({
   const raw = (await searchParams).pagina
   const page = Math.max(1, Number.parseInt(Array.isArray(raw) ? (raw[0] ?? '1') : (raw ?? '1'), 10) || 1)
   const result = await getPublicContos(page)
+  const t = await getTextos('contos')
   return (
     <section aria-labelledby="titulo-contos">
-      <p className="type-eyebrow text-muted">Leitura</p>
+      <p className="type-eyebrow text-muted">{t.listaEyebrow}</p>
       <h1 id="titulo-contos" className="type-display mt-2">
-        Contos
+        {t.listaTitulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Leia o começo de cada conto. O restante é só para assinantes. Qualquer pessoa pode enviar o seu: ele aparece depois que a equipe aprovar.
+        {t.listaIntro}
       </p>
       <p className="mt-4">
         <Link href="/area-do-assinante/contos" className="type-label font-semibold text-accent underline underline-offset-4">
-          Já é assinante? Ler os contos completos
+          {t.listaLinkAssinante}
         </Link>
       </p>
       <p className="mt-2">
         <Link href="/contos/enviar" className="type-label font-semibold text-accent underline underline-offset-4">
-          Enviar um conto
+          {t.listaLinkEnviar}
         </Link>
       </p>
       {result.items.length === 0 ? (
         <EmptyState
-          heading="Nenhum conto publicado ainda."
-          body="Em breve novos contos. Assinantes leem tudo na área do assinante."
-          actions={[{ href: '/assine-ja', label: 'Assine Já', variant: 'primary' }]}
+          heading={t.listaVazioTitulo}
+          body={t.listaVazioTexto}
+          actions={[{ href: '/assine-ja', label: t.listaVazioBotao, variant: 'primary' }]}
         />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -60,8 +61,8 @@ export default async function ContosPage({
       )}
       <Pagination basePath="/contos" page={result.page} totalPages={result.totalPages} params={{}} />
       <AssineJaCta
-        title="Contos completos para assinantes"
-        text="Assine para ler cada conto do começo ao fim, ver o ClassiSex e trocar mensagens."
+        title={t.listaCtaTitulo}
+        text={t.listaCtaTexto}
         membersHref="/area-do-assinante/contos"
       />
     </section>

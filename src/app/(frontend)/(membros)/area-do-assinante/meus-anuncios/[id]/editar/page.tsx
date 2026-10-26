@@ -7,14 +7,15 @@ import { OwnerMediaManager } from '@/components/classisex/OwnerMediaManager'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { tierOf } from '@/lib/assinantes/tier'
 import { salvarAnuncio } from '@/lib/classisex/actions'
-import { MEDIA_OK_MESSAGES, uploadErrorMessage, batchNotice } from '@/lib/classisex/media-messages'
+import { uploadErrorMessage, batchNotice } from '@/lib/classisex/media-messages'
 import { getActiveAdCategories, getOwnAdForEdit } from '@/lib/classisex/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Editar anúncio',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('meusAnuncios')
+  return { title: t.editarGoogleTitulo, robots: { index: false, follow: false } }
 }
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
@@ -27,11 +28,18 @@ export default async function EditarAnuncioPage({
   searchParams: Promise<{ midia?: string | string[]; codigo?: string | string[]; ok?: string | string[]; falhas?: string | string[] }>
 }) {
   const [{ id }, query] = await Promise.all([params, searchParams])
+  const t = await getTextos('meusAnuncios')
+  const mediaOk: Record<string, string> = {
+    'foto-ok': t.midiaFotoOk,
+    'video-ok': t.midiaVideoOk,
+    capa: t.midiaCapaOk,
+    removida: t.midiaRemovidaOk,
+  }
   const midia = one(query.midia)
   // Only fixed texts are shown: the URL carries a code, never a message
   const lote = midia === 'lote' ? batchNotice(one(query.ok), one(query.falhas), one(query.codigo)) : undefined
   const isError = midia === 'erro' || lote?.error === true
-  const notice = lote ? lote.text : midia === 'erro' ? uploadErrorMessage(one(query.codigo)) : midia ? MEDIA_OK_MESSAGES[midia] : undefined
+  const notice = lote ? lote.text : midia === 'erro' ? uploadErrorMessage(one(query.codigo)) : midia ? mediaOk[midia] : undefined
   const check = await requireActiveSubscription(`/area-do-assinante/meus-anuncios/${encodeURIComponent(id)}/editar`)
   const header = (
     <>
@@ -44,9 +52,9 @@ export default async function EditarAnuncioPage({
           {notice}
         </p>
       )}
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.topo}</p>
       <h1 id="titulo-editar-anuncio" className="type-display mt-2">
-        Editar anúncio
+        {t.editarTitulo}
       </h1>
     </>
   )
@@ -60,26 +68,23 @@ export default async function EditarAnuncioPage({
       {header}
       {ad.legacy && (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          Este anúncio veio do site antigo. Não há limite de texto nem é preciso preencher WhatsApp ou Telegram.
-          Quem não é assinante vê o texto sem telefones, links e @.
+          {t.editarAvisoAntigo}
         </p>
       )}
       {ad.status === 'rascunho' && (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          Este anúncio veio do site antigo. Os contatos que estavam no texto não aparecem para ninguém enquanto for
-          rascunho; coloque WhatsApp ou Telegram nos campos e tire-os do texto.
+          {t.editarAvisoRascunho}
         </p>
       )}
       {ad.status === 'aprovado' ? (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          Ao salvar, o anúncio sai do ar até a equipe aprovar de novo.
+          {t.editarAvisoPublicado}
         </p>
       ) : (
-        <p className="mt-4 max-w-[680px] text-body text-muted">
-          Ao salvar, o anúncio vai para a análise da equipe.
-        </p>
+        <p className="mt-4 max-w-[680px] text-body text-muted">{t.editarAvisoSalvar}</p>
       )}
       <AdForm
+        textos={t}
         action={salvarAnuncio}
         categories={categories}
         adId={ad.id}

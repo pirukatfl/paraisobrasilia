@@ -1,9 +1,12 @@
 import Link from 'next/link'
 
 import { pathForKey, SECTION_TABS } from '@/lib/pages/keys'
+import { getTextos } from '@/lib/textos/queries'
 
 /** Quem somos sub-tabs (UI-SPEC S6): horizontal list, scrolls on mobile, active = accent underline. */
-export function SubNav({ activeKey }: { activeKey: (typeof SECTION_TABS)[number]['key'] }) {
+export async function SubNav({ activeKey }: { activeKey: (typeof SECTION_TABS)[number]['key'] }) {
+  const t = await getTextos('institucional')
+  const labels = { 'quem-somos': t.abaQuemSomos, normas: t.abaNormas, regras: t.abaRegras, dicas: t.abaDicas }
   return (
     <nav aria-label="Quem somos" className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:px-0">
       <ul className="flex min-w-max gap-6 border-b border-line">
@@ -18,7 +21,7 @@ export function SubNav({ activeKey }: { activeKey: (typeof SECTION_TABS)[number]
                   active ? 'border-accent text-text' : 'border-transparent text-muted'
                 }`}
               >
-                {tab.label}
+                {labels[tab.key]}
               </Link>
             </li>
           )

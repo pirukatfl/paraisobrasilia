@@ -3,12 +3,13 @@ import type { Metadata } from 'next'
 import { ContoEnvioForm } from '@/components/contos/ContoEnvioForm'
 import { uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { CONTO_ENVIO_MESSAGES } from '@/lib/contos/envio-rules'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Enviar um conto',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('enviarConto')
+  return { title: t.googleTitulo, robots: { index: false, follow: false } }
 }
 
 /** Messages for ?erro=<codigo> (answer of the no-JavaScript fallback of the form). */
@@ -29,19 +30,19 @@ export default async function EnviarContoPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const t = await getTextos('enviarConto')
   const raw = (await searchParams).erro
   const erro = erroMessage(typeof raw === 'string' ? raw.slice(0, 40) : undefined)
   return (
     <section aria-labelledby="titulo-enviar-conto">
-      <p className="type-eyebrow text-muted">Contos</p>
+      <p className="type-eyebrow text-muted">{t.topo}</p>
       <h1 id="titulo-enviar-conto" className="type-display mt-2">
-        Enviar um conto
+        {t.titulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Qualquer pessoa pode enviar, sem cadastro. O conto aparece depois da análise da equipe: todo mundo lê o começo; o
-        conto completo é só para assinantes. Telefone, e-mail, @ e links não são aceitos.
+        {t.intro}
       </p>
-      <ContoEnvioForm erro={erro} />
+      <ContoEnvioForm erro={erro} textos={t} />
     </section>
   )
 }

@@ -11,6 +11,8 @@ import {
   VIDEO_MIME_TYPES,
 } from '@/lib/classisex/media-messages'
 import { MAX_VIDEO_SECONDS } from '@/lib/classisex/mp4'
+import type { Textos } from '@/lib/textos/areas'
+import { preencher } from '@/lib/textos/mesclar'
 
 const EXTENSION_TYPES: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -52,7 +54,19 @@ function readDuration(file: File): Promise<number | null> {
   })
 }
 
-function Preview({ file, kind, onRemove, index }: { file: File; kind: 'foto' | 'video'; onRemove: () => void; index: number }) {
+function Preview({
+  file,
+  kind,
+  onRemove,
+  index,
+  removeLabel,
+}: {
+  file: File
+  kind: 'foto' | 'video'
+  onRemove: () => void
+  index: number
+  removeLabel: string
+}) {
   const url = useMemo(() => URL.createObjectURL(file), [file])
   useEffect(() => () => URL.revokeObjectURL(url), [url])
   return (
@@ -65,7 +79,7 @@ function Preview({ file, kind, onRemove, index }: { file: File; kind: 'foto' | '
       )}
       <p className="type-label truncate text-muted">{file.name}</p>
       <button type="button" onClick={onRemove} className="type-label self-start text-danger underline underline-offset-4">
-        {kind === 'foto' ? `Tirar foto ${index + 1}` : `Tirar vídeo ${index + 1}`}
+        {removeLabel}
       </button>
     </li>
   )
@@ -81,6 +95,7 @@ const fileInput =
  * on the server (route handler + collection hooks).
  */
 export function AdMediaPicker({
+  textos: t,
   photos,
   videos,
   onPhotos,
@@ -88,6 +103,8 @@ export function AdMediaPicker({
   disabled,
   limits = TIER_LIMITS.assinante,
 }: {
+  /** Texts of the Meus anúncios area (from the server page) */
+  textos: Textos<'meusAnuncios'>
   photos: File[]
   videos: File[]
   onPhotos: (files: File[]) => void
@@ -133,17 +150,13 @@ export function AdMediaPicker({
 
   return (
     <fieldset className="flex flex-col gap-4" disabled={disabled}>
-      <legend className="type-label text-text">Fotos e vídeos (opcional)</legend>
+      <legend className="type-label text-text">{t.midiaLegenda}</legend>
       {MAX_AD_VIDEOS > 0 ? (
         <p className="type-label text-muted">
-          Até {MAX_AD_PHOTOS} fotos JPG, PNG ou WebP (15 MB cada) e até {MAX_AD_VIDEOS} vídeos MP4 ou MOV (100 MB e {MAX_VIDEO_SECONDS} segundos
-          cada). A primeira foto é a capa. Na área aberta, só a foto de capa aparece. Você também pode adicionar depois, editando o anúncio.
+          {preencher(t.midiaAjudaComVideo, { fotos: MAX_AD_PHOTOS, videos: MAX_AD_VIDEOS, segundos: MAX_VIDEO_SECONDS })}
         </p>
       ) : (
-        <p className="type-label text-muted">
-          {MAX_AD_PHOTOS} foto JPG, PNG ou WebP (15 MB). Ela é a capa. Na área aberta, só a foto de capa aparece. Você também pode
-          trocar depois, editando o anúncio.
-        </p>
+        <p className="type-label text-muted">{preencher(t.midiaAjudaSoFoto, { fotos: MAX_AD_PHOTOS })}</p>
       )}
       {notes.length > 0 && (
         <ul role="alert" className="flex flex-col gap-1 rounded-lg border border-danger px-4 py-2 text-body text-text">
@@ -155,7 +168,7 @@ export function AdMediaPicker({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="escolher-fotos" className="type-label text-text">
-          Escolher fotos ({photos.length} de {MAX_AD_PHOTOS})
+          {preencher(t.midiaEscolherFotos, { n: photos.length, max: MAX_AD_PHOTOS })}
         </label>
         <input
           id="escolher-fotos"
@@ -171,7 +184,7 @@ export function AdMediaPicker({
         {photos.length > 0 && (
           <ul aria-label="Fotos escolhidas" className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {photos.map((f, i) => (
-              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="foto" index={i} onRemove={() => onPhotos(photos.filter((_, j) => j !== i))} />
+              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="foto" index={i} removeLabel={preencher(t.midiaTirarFoto, { n: i + 1 })} onRemove={() => onPhotos(photos.filter((_, j) => j !== i))} />
             ))}
           </ul>
         )}
@@ -180,7 +193,7 @@ export function AdMediaPicker({
       {MAX_AD_VIDEOS > 0 && (
       <div className="flex flex-col gap-2">
         <label htmlFor="escolher-videos" className="type-label text-text">
-          Escolher vídeos ({videos.length} de {MAX_AD_VIDEOS})
+          {preencher(t.midiaEscolherVideos, { n: videos.length, max: MAX_AD_VIDEOS })}
         </label>
         <input
           id="escolher-videos"
@@ -196,7 +209,7 @@ export function AdMediaPicker({
         {videos.length > 0 && (
           <ul aria-label="Vídeos escolhidos" className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {videos.map((f, i) => (
-              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="video" index={i} onRemove={() => onVideos(videos.filter((_, j) => j !== i))} />
+              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="video" index={i} removeLabel={preencher(t.midiaTirarVideo, { n: i + 1 })} onRemove={() => onVideos(videos.filter((_, j) => j !== i))} />
             ))}
           </ul>
         )}

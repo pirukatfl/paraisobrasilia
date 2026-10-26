@@ -12,13 +12,17 @@ import { getAssinante } from '@/lib/assinantes/session'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 // Reads the session cookie: rendered per request, never cached (T-03-05)
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  ...buildPageMetadata({ title: 'Entrar', description: 'Entrada da área de assinantes do Paraíso Brasília.', path: '/entrar' }),
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('conta')
+  return {
+    ...buildPageMetadata({ title: t.entrarGoogleTitulo, description: t.entrarGoogleDescricao, path: '/entrar' }),
+    robots: { index: false, follow: false },
+  }
 }
 
 const ERRORS: Record<string, string> = {
@@ -40,17 +44,17 @@ export default async function EntrarPage({
   const erro = typeof params.erro === 'string' ? ERRORS[params.erro] : undefined
   const naoConfirmado = params.erro === 'nao-confirmado' && emailEnabled()
   const confirmado = params.confirmado === '1'
-  const contact = await getContact()
+  const [contact, t] = await Promise.all([getContact(), getTextos('conta')])
 
   return (
     <section aria-labelledby="titulo-entrar" className="max-w-[440px]">
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.etiqueta}</p>
       <h1 id="titulo-entrar" className="type-display mt-2">
-        Entrar
+        {t.entrarTitulo}
       </h1>
       {confirmado && (
         <p role="status" className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 text-body text-text">
-          E-mail confirmado. Entre com seu e-mail e senha.
+          {t.entrarConfirmado}
         </p>
       )}
       {erro && (
@@ -62,10 +66,10 @@ export default async function EntrarPage({
       {/* Plain form + server action: works without client JS */}
       <form action={entrar} className="mt-6 flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />
-        <FormField id="email" name="email" type="email" label="E-mail" autoComplete="username" />
-        <FormField id="password" name="password" type="password" label="Senha" autoComplete="current-password" />
+        <FormField id="email" name="email" type="email" label={t.campoEmail} autoComplete="username" />
+        <FormField id="password" name="password" type="password" label={t.entrarCampoSenha} autoComplete="current-password" />
         <button type="submit" className="btn-primary mt-2">
-          Entrar
+          {t.entrarBotao}
         </button>
       </form>
       <p className="mt-6 text-body text-muted">
@@ -75,33 +79,33 @@ export default async function EntrarPage({
               href="/esqueci-senha"
               className="type-label inline-flex min-h-11 items-center text-accent underline underline-offset-4"
             >
-              Esqueci minha senha
+              {t.entrarEsqueci}
             </Link>
             <br />
-            Se não receber o e-mail, fale com a equipe pelo WhatsApp:{' '}
+            {t.entrarSemEmail}{' '}
           </>
         ) : (
-          <>Esqueceu a senha? Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova. </>
+          <>{t.entrarEsqueciSemEmail} </>
         )}
         {contact.whatsapp && (
           <ExternalLink
             href={whatsappUrl(contact.whatsapp)}
             className="text-accent underline underline-offset-4"
           >
-            Chamar no WhatsApp
+            {t.botaoWhatsapp}
           </ExternalLink>
         )}
       </p>
       {emailEnabled() && (
         <p className="mt-4">
           <Link href="/cadastro" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-            Criar conta grátis
+            {t.entrarCriarConta}
           </Link>
         </p>
       )}
       <p className="mt-2">
         <Link href="/assine-ja" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-          Ainda não é assinante? Assine Já
+          {t.entrarAssine}
         </Link>
       </p>
     </section>

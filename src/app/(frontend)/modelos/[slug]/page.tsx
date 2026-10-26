@@ -6,6 +6,8 @@ import { Gallery } from '@/components/Gallery'
 import { countLabel } from '@/components/ModelGrid'
 import { getPublishedModel } from '@/lib/gallery/queries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 // Per request (no database at build); data from the tagged cache ('models').
 export const dynamic = 'force-dynamic'
@@ -19,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!model) return { title: 'Modelo não encontrada' }
   return buildPageMetadata({
     title: model.name,
-    description: model.description ?? `${model.name}, modelo do Paraíso Brasília: fotos e vídeos.`,
+    description: model.description ?? preencher((await getTextos('modelos')).descricaoReserva, { nome: model.name }),
     path: `/modelos/${model.slug}`,
     image: model.ogImage ?? undefined,
   })
@@ -29,24 +31,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ModelPage({ params }: Props) {
   const model = await getPublishedModel((await params).slug)
   if (!model) notFound()
+  const t = await getTextos('modelos')
   return (
     <article aria-labelledby="titulo-modelo">
       <p className="type-eyebrow text-muted">
         <Link href="/modelos" className="hover:text-accent">
-          Modelos
+          {t.linkLista}
         </Link>
       </p>
       <h1 id="titulo-modelo" className="type-display mt-2">
         {model.name}
       </h1>
-      <p className="type-label mt-2 text-muted">{countLabel(model.photoCount, model.videoCount)}</p>
+      <p className="type-label mt-2 text-muted">{countLabel(model.photoCount, model.videoCount, t)}</p>
       {model.description && (
         <p className="mt-4 max-w-[680px] whitespace-pre-line text-body text-muted">{model.description}</p>
       )}
       <Gallery items={model.items} />
       <p className="mt-12">
         <Link href="/modelos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Ver todas as modelos
+          {t.linkVerTodas}
         </Link>
       </p>
     </article>

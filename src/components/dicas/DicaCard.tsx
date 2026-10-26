@@ -2,9 +2,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { DicaCardDTO } from '@/lib/dicas/dto'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 /** One dica in a list: optional confirmed cover, title, date and resumo. */
-export function DicaCard({ dica, href, showImage = false }: { dica: DicaCardDTO; href: string; showImage?: boolean }) {
+export async function DicaCard({ dica, href, showImage = false }: { dica: DicaCardDTO; href: string; showImage?: boolean }) {
+  const t = await getTextos('dicasHot')
   const titleId = `dica-${dica.slug}`
   return (
     <article aria-labelledby={titleId} className="flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
@@ -30,7 +33,7 @@ export function DicaCard({ dica, href, showImage = false }: { dica: DicaCardDTO;
         <p className="mt-3 flex-1 text-body text-muted">{dica.resumo}</p>
         <p className="mt-4">
           <Link href={href} className="type-label font-semibold text-accent underline underline-offset-4">
-            Ler: {dica.title}
+            {preencher(t.cardLer, { titulo: dica.title })}
           </Link>
         </p>
       </div>

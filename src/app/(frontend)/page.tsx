@@ -8,6 +8,7 @@ import { getSpacePhotos } from '@/lib/gallery/queries'
 import { getPageIntro } from '@/lib/pages/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
 import { getContact } from '@/lib/site/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 // Rendered per request, never at build time: the Docker/CI build has no database.
 // The data itself stays in the Next data cache (unstable_cache, tags 'parties', 'space',
@@ -24,12 +25,13 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
 }
 
 export default async function HomePage() {
-  const [parties, photos, intro, contact, dicas] = await Promise.all([
+  const [parties, photos, intro, contact, dicas, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
     optional(() => getSpacePhotos(6)),
     optional(() => getPageIntro('quem-somos')),
     optional(() => getContact()),
     optional(() => getLatestDicas(3)),
+    getTextos('inicio'),
   ])
   const hasParties = parties.length > 0
 
@@ -37,24 +39,22 @@ export default async function HomePage() {
     <>
       {hasParties ? (
         <section aria-labelledby="titulo-proximas-festas">
-          <p className="type-eyebrow text-muted">Casa de festas liberais em Brasília</p>
+          <p className="type-eyebrow text-muted">{t.chamadaTopo}</p>
           <h1 id="titulo-proximas-festas" className="type-display mt-2">
-            Próximas festas
+            {t.tituloProximasFestas}
           </h1>
           <PartyGrid parties={parties} />
         </section>
       ) : (
         <>
-          <p className="type-eyebrow text-muted">Casa de festas liberais em Brasília</p>
-          <h1 className="type-display mt-2">Paraíso Brasília</h1>
+          <p className="type-eyebrow text-muted">{t.chamadaTopo}</p>
+          <h1 className="type-display mt-2">{t.tituloSemFestas}</h1>
           <section aria-labelledby="titulo-proximas-festas" className="mt-8 max-w-[480px]">
             <h2 id="titulo-proximas-festas" className="type-heading">
-              Próximas festas
+              {t.tituloProximasFestas}
             </h2>
-            <p className="type-label mt-4 text-text">Nenhuma festa agendada no momento</p>
-            <p className="mt-2 text-body text-muted">
-              A próxima programação será publicada aqui em breve. Volte nos próximos dias.
-            </p>
+            <p className="type-label mt-4 text-text">{t.semFestasTitulo}</p>
+            <p className="mt-2 text-body text-muted">{t.semFestasTexto}</p>
           </section>
         </>
       )}

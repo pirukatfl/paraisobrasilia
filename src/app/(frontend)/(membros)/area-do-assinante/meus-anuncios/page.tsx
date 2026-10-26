@@ -7,19 +7,14 @@ import { OwnerAdCard } from '@/components/classisex/OwnerAdCard'
 import { getAccessStatus } from '@/lib/assinantes/access'
 import { requireAssinante } from '@/lib/assinantes/session'
 import { tierOf } from '@/lib/assinantes/tier'
-import { SITE_ANTIGO_AVISO } from '@/lib/classisex/dto'
 import { getOwnAds } from '@/lib/classisex/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Meus anúncios',
-  robots: { index: false, follow: false },
-}
-
-const OK: Record<string, string> = {
-  enviado: 'Anúncio enviado. Ele aparece no ClassiSex depois que a equipe aprovar.',
-  apagado: 'Anúncio apagado.',
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('meusAnuncios')
+  return { title: t.listaGoogleTitulo, robots: { index: false, follow: false } }
 }
 
 /**
@@ -32,6 +27,8 @@ export default async function MeusAnunciosPage({
   searchParams: Promise<{ ok?: string | string[]; erro?: string | string[] }>
 }) {
   const assinante = await requireAssinante('/area-do-assinante/meus-anuncios')
+  const t = await getTextos('meusAnuncios')
+  const OK: Record<string, string> = { enviado: t.listaOkEnviado, apagado: t.listaOkApagado }
   const [ads, access, params] = await Promise.all([getOwnAds(assinante.id), getAccessStatus(assinante.id), searchParams])
   const tier = tierOf(access)
   const hasOldAds = ads.some((ad) => ad.antigo)
@@ -54,24 +51,23 @@ export default async function MeusAnunciosPage({
           Não foi possível apagar o anúncio por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.
         </p>
       )}
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.topo}</p>
       <h1 id="titulo-meus-anuncios" className="type-display mt-2">
-        Meus anúncios
+        {t.listaTitulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Você pode ter até 3 anúncios ativos (em análise ou publicados). Todo anúncio novo ou editado passa pela
-        equipe antes de aparecer no ClassiSex.
+        {t.listaIntro}
       </p>
       {hasOldAds && (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          {SITE_ANTIGO_AVISO}
+          {t.listaAvisoAntigo}
         </p>
       )}
       <Link href="/area-do-assinante/meus-anuncios/novo" className="btn-primary mt-6">
-        Novo anúncio
+        {t.listaBotaoNovo}
       </Link>
       {ads.length === 0 ? (
-        <p className="mt-8 text-body">Você ainda não tem anúncios.</p>
+        <p className="mt-8 text-body">{t.listaVazio}</p>
       ) : (
         <div className="mt-8 flex max-w-[720px] flex-col gap-4">
           {ads.map((ad) => (

@@ -17,17 +17,24 @@ const typeOf = (file: File) => file.type || EXTENSION_TYPES[file.name.split('.')
  */
 export function VisitorPhotoPicker({
   error,
-  label = 'Foto (opcional)',
+  label,
   name = 'foto',
   noun = 'foto',
-  help = '1 foto JPG, PNG ou WebP, até 15 MB, sem vídeo. No iPhone, a foto em HEIC é convertida para JPG ao escolher. Assinantes enviam até 10 fotos e 2 vídeos.',
+  help,
+  choose,
+  change,
+  remove,
 }: {
   error?: string
-  label?: string
+  label: string
   name?: string
-  /** Word on the buttons: 'foto' or 'imagem' */
+  /** Word used only in the preview alt text: 'foto' or 'imagem' */
   noun?: string
-  help?: string
+  help: string
+  /** Button texts (editable in the panel) */
+  choose: string
+  change: string
+  remove: string
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)
@@ -75,11 +82,11 @@ export function VisitorPhotoPicker({
           htmlFor={name}
           className="btn-secondary cursor-pointer peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent"
         >
-          {file ? `Trocar ${noun}` : `Escolher ${noun}`}
+          {file ? change : choose}
         </label>
         {file && (
           <button type="button" onClick={clear} className="type-label text-danger underline underline-offset-4">
-            Tirar {noun}
+            {remove}
           </button>
         )}
       </div>
