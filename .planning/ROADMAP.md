@@ -124,6 +124,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
   5. Toda ação da equipe sobre assinantes aparece em um registro com quem, quando e o quê
 
 **Plans**: 7 plans
+
 - [x] 03-01-PLAN.md — Acesso só da equipe, coleção assinantes, /entrar e área do assinante
 - [x] 03-02-PLAN.md — Planos e página Assine Já
 - [x] 03-03-PLAN.md — Períodos de assinatura e validade por data
@@ -131,6 +132,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 03-05-PLAN.md — Troca de senha, senha provisória e link de nova senha
 - [x] 03-06-PLAN.md — Vencem em 7 dias e testes de vazamento
 - [x] 03-07-PLAN.md — Guias, deploy e conferência do cliente
+
 **UI hint**: yes
 
 ### Phase 4: ClassiSex e prévias de perfis
@@ -150,6 +152,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 > Nesta fase "perfis" = **anúncios** (04-CONTEXT D-01: o ClassiSex continua um mural de anúncios curtos).
 
 **Plans**: 10 plans
+
 - [x] 04-01-PLAN.md — Regras puras: tirar contatos do texto e ler/limpar vídeos MP4/MOV (wave 1)
 - [x] 04-02-PLAN.md — Anúncios do assinante: opções "Eu sou", coleção ads, Meus anúncios, tudo em análise (wave 1)
 - [x] 04-03-PLAN.md — Fila de moderação da equipe: aprovar, recusar, despublicar e registro (wave 2)
@@ -160,6 +163,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 04-08-PLAN.md — Denúncias: assinante denuncia, equipe resolve ou despublica (wave 7)
 - [x] 04-09-PLAN.md — Matriz de vazamento: mídia, contatos, APIs e cabeçalhos (wave 8)
 - [x] 04-10-PLAN.md — Guia, runbook, smoke, deploy, volume na VPS e conferência do cliente (wave 9)
+
 **UI hint**: yes
 
 ### Phase 5: Recados, mensagens e contos
@@ -177,6 +181,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
   5. Equipe publica contos e define o trecho aberto sem ajuda técnica
 
 **Plans**: 12 plans
+
 - [x] 05-01-PLAN.md — Importação dos contos (núcleo): leitor do dump do WP e HTML/Elementor → Lexical, só com dados sintéticos (wave 1)
 - [x] 05-02-PLAN.md — Contos no painel: coleção com rascunho, "Parágrafos abertos" e prévia do trecho aberto (wave 1)
 - [x] 05-03-PLAN.md — Leitura dos contos: início aberto com Assine Já, texto completo para assinantes, menu e sitemap (wave 2)
@@ -189,6 +194,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 05-10-PLAN.md — Bloquear e denunciar mensagens; equipe resolve e suspende envio (wave 9)
 - [x] 05-11-PLAN.md — Matriz de vazamento da Fase 5: recados, mensagens, bloqueio e contos (wave 10)
 - [x] 05-12-PLAN.md — Guia, runbook, smoke, deploy e conferência do cliente (wave 11)
+
 **UI hint**: yes
 
 ### Phase 6: Migração do WordPress
@@ -204,6 +210,7 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
   3. Links antigos importantes redirecionam para as páginas novas, sem 404 para o Google
 
 **Plans**: 10 plans
+
 - [x] 06-01-PLAN.md — Verificador das senhas do WordPress ($wp$ bcrypt+HMAC-SHA384 e $P$ phpass), com vetores do PHP (wave 1)
 - [x] 06-02-PLAN.md — Leitura do dump (só dados sintéticos): contas, assinatura, anúncios antigos, --inspect e relatório só com contagens (wave 1)
 - [x] 06-03-PLAN.md — Mapa de links antigos (301) gerado e versionado, ligado ao next.config, com e2e (wave 1)
@@ -214,6 +221,29 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
 - [x] 06-08-PLAN.md — CLI import:wordpress (--inspect, --dry-run, gravação, --uploads), saída só com contagens (wave 6)
 - [x] 06-09-PLAN.md — Guia da equipe, runbook 7.6 (importação na VPS) e smoke de staging (wave 7)
 - [x] 06-10-PLAN.md — Orquestrador no dump real, ensaio no staging pelo cliente e conferência do cliente (wave 8)
+
+### Phase 06.2: Textos do site editáveis pelo painel (INSERTED)
+
+**Goal**: A equipe troca pelo painel qualquer texto fixo das páginas do site (títulos, chamadas, botões, rótulos, menu, rodapé, confirmação 18+, títulos do Google), sem ajuda técnica; apagar um campo volta ao texto original
+**Depends on**: Phase 6
+**Requirements**: PAINEL-10
+**Success Criteria** (what must be TRUE):
+
+  1. No painel, o grupo "Textos do site" tem um item por área do site, com os textos atuais já preenchidos e separados por seção
+  2. Salvar um texto muda o site no próximo acesso; apagar o campo e salvar volta ao texto original
+  3. Com o banco sem nenhum texto salvo, o site mostra exatamente os textos de antes
+  4. Mensagens de erro, e-mails automáticos e o próprio painel continuam no código (fora do escopo)
+
+**Plans:** 6 plans
+
+Plans:
+
+- [ ] 06.2-01-PLAN.md — Registro de textos, globals no painel, leitura com fallback e área "geral" (wave 1)
+- [ ] 06.2-02-PLAN.md — Vitrine: início, festas, espaço, modelos, institucional, contato (wave 2)
+- [ ] 06.2-03-PLAN.md — Assine Já, conta e área do assinante (wave 2)
+- [ ] 06.2-04-PLAN.md — ClassiSex, Meus anúncios e Enviar conto (wave 2)
+- [ ] 06.2-05-PLAN.md — Contos, Dicas Hot e Recados (wave 2)
+- [ ] 06.2-06-PLAN.md — Migração, testes, verificação completa e guia (wave 3)
 
 ### Phase 06.1: Galeria de modelos com página por modelo (INSERTED)
 
@@ -229,10 +259,12 @@ Cross-cutting constraints: schema-changing plans run in sequential waves (Payloa
   4. Nenhuma página de modelo mostra contato, e links antigos e o sitemap continuam corretos
 
 **Plans**: 4 plans
+
 - [x] 06.1-01-PLAN.md — Página por modelo: card → /modelos/<slug> com nome, descrição curta e até 30 fotos; slug + descrição sem contato; migração que só adiciona campos e preenche o slug das modelos existentes (wave 1)
 - [x] 06.1-02-PLAN.md — Até 3 vídeos por modelo (coleção videos, lightbox), contagem "fotos · vídeos" e orçamento de peso no celular com 30 fotos (wave 2)
 - [x] 06.1-03-PLAN.md — Sitemap com cada página de modelo publicada, prévia de compartilhamento com a capa e link antigo /galeria-hot/ (wave 3)
 - [ ] 06.1-04-PLAN.md — Guia da equipe (Modelos), smoke de staging, deploy com as migrações e conferência do cliente (wave 4)
+
 **UI hint**: yes
 
 ### Phase 7: Lançamento e desempenho
