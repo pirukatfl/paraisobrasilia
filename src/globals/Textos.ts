@@ -48,6 +48,7 @@ export function criarGlobalDeTextos(area: AreaTextos, chave: string = chaveDoSlu
     label: area.rotulo,
     admin: {
       group: 'Textos do site',
+      hidden: area.ocultaNoPainel ?? false,
       description: `${area.descricao} Para voltar ao texto original, apague o campo e salve.`,
     },
     access: {

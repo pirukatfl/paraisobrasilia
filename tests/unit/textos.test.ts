@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { criarGlobalDeTextos } from '../../src/globals/Textos'
 import { AREAS } from '../../src/lib/textos/areas'
 import { geral } from '../../src/lib/textos/areas/geral'
+import { mensagens } from '../../src/lib/textos/areas/mensagens'
 import { mesclarTextos, padroesDaArea, preencher } from '../../src/lib/textos/mesclar'
 import type { CampoTexto } from '../../src/lib/textos/tipos'
 
@@ -81,5 +82,10 @@ describe('criarGlobalDeTextos', () => {
       expect('required' in f && f.required).toBeFalsy()
     }
     expect(global.fields.every((f) => f.type === 'collapsible')).toBe(true)
+    expect(global.admin?.hidden).toBe(false)
+  })
+
+  it('hides the Recados area from the admin menu (2026-10-26)', () => {
+    expect(criarGlobalDeTextos(mensagens).admin?.hidden).toBe(true)
   })
 })

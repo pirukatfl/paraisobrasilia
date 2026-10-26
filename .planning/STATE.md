@@ -162,6 +162,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-23 | menu-modelos | Modelos always in header, mobile menu and footer; /modelos shows an empty state instead of 404 until a model is published; sitemap still lists it only with a published model (see .planning/quick/2026-10-23-menu-modelos/) |
 | 2026-10-23 | modelos-so-fotos | Modelos: videos desligados por enquanto (flag `MODEL_VIDEOS_ENABLED`, campo `videos` escondido no painel, sem migracao); site mostra so fotos (see .planning/quick/2026-10-23-modelos-so-fotos/) |
 | 2026-10-23 | flyer-ampliado | Home: clicar no flyer abre o flyer grande no lightbox (todas as proximas festas, link "Ver detalhes da festa"); titulo/data seguem linkando a /festas/<slug> (see .planning/quick/2026-10-23-flyer-ampliado/) |
+| 2026-10-26 | recados-fora-do-painel | Area "Recados" de Textos do site oculta no painel (`ocultaNoPainel`), sem migracao; guia atualizado (see .planning/quick/2026-10-26-recados-fora-do-painel/) |
 
 ## Deferred Items
 
