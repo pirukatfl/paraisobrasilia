@@ -6,6 +6,8 @@ import { Lightbox } from '@/components/Lightbox'
 import type { MemberPhotoDTO, MemberVideoDTO } from '@/lib/classisex/dto'
 import type { LightboxSlide } from '@/lib/gallery/types'
 import { useHydrated } from '@/lib/gallery/use-hydrated'
+import type { Textos } from '@/lib/textos/areas'
+import { preencher } from '@/lib/textos/mesclar'
 
 /**
  * Photos and video of a full ad (CLAS-02). Every URL is the protected route
@@ -13,7 +15,15 @@ import { useHydrated } from '@/lib/gallery/use-hydrated'
  * fetch and cache private media without the viewer's session (T-04-07).
  * Without JavaScript each tile is a link to the large photo; afterwards it opens the lightbox.
  */
-export function MediaGallery({ fotos, videos }: { fotos: MemberPhotoDTO[]; videos: MemberVideoDTO[] }) {
+export function MediaGallery({
+  fotos,
+  videos,
+  textos: t,
+}: {
+  fotos: MemberPhotoDTO[]
+  videos: MemberVideoDTO[]
+  textos: Pick<Textos<'classisex'>, 'galeriaVideoVarios' | 'galeriaVideoUm'>
+}) {
   const hydrated = useHydrated()
   const [index, setIndex] = useState<number | null>(null)
   const openers = useRef<(HTMLElement | null)[]>([])
@@ -97,7 +107,10 @@ export function MediaGallery({ fotos, videos }: { fotos: MemberPhotoDTO[]; video
             src={video.src}
             className="aspect-video w-full rounded-lg border border-line bg-surface"
           />
-          <figcaption className="type-label mt-2 text-muted">Vídeo {videos.length > 1 ? `${i + 1} · ` : '· '}{video.durationLabel}</figcaption>
+          <figcaption className="type-label mt-2 text-muted">{videos.length > 1
+              ? preencher(t.galeriaVideoVarios, { n: i + 1, duracao: video.durationLabel })
+              : preencher(t.galeriaVideoUm, { duracao: video.durationLabel })}
+          </figcaption>
         </figure>
       ))}
       <Lightbox

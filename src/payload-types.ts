@@ -139,9 +139,41 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     contact: Contact;
+    'textos-geral': TextosGeral;
+    'textos-inicio': TextosInicio;
+    'textos-festas': TextosFesta;
+    'textos-espaco': TextosEspaco;
+    'textos-modelos': TextosModelo;
+    'textos-institucional': TextosInstitucional;
+    'textos-contato': TextosContato;
+    'textos-assine': TextosAssine;
+    'textos-conta': TextosConta;
+    'textos-area-assinante': TextosAreaAssinante;
+    'textos-classisex': TextosClassisex;
+    'textos-meus-anuncios': TextosMeusAnuncio;
+    'textos-enviar-conto': TextosEnviarConto;
+    'textos-contos': TextosConto;
+    'textos-dicas-hot': TextosDicasHot;
+    'textos-mensagens': TextosMensagen;
   };
   globalsSelect: {
     contact: ContactSelect<false> | ContactSelect<true>;
+    'textos-geral': TextosGeralSelect<false> | TextosGeralSelect<true>;
+    'textos-inicio': TextosInicioSelect<false> | TextosInicioSelect<true>;
+    'textos-festas': TextosFestasSelect<false> | TextosFestasSelect<true>;
+    'textos-espaco': TextosEspacoSelect<false> | TextosEspacoSelect<true>;
+    'textos-modelos': TextosModelosSelect<false> | TextosModelosSelect<true>;
+    'textos-institucional': TextosInstitucionalSelect<false> | TextosInstitucionalSelect<true>;
+    'textos-contato': TextosContatoSelect<false> | TextosContatoSelect<true>;
+    'textos-assine': TextosAssineSelect<false> | TextosAssineSelect<true>;
+    'textos-conta': TextosContaSelect<false> | TextosContaSelect<true>;
+    'textos-area-assinante': TextosAreaAssinanteSelect<false> | TextosAreaAssinanteSelect<true>;
+    'textos-classisex': TextosClassisexSelect<false> | TextosClassisexSelect<true>;
+    'textos-meus-anuncios': TextosMeusAnunciosSelect<false> | TextosMeusAnunciosSelect<true>;
+    'textos-enviar-conto': TextosEnviarContoSelect<false> | TextosEnviarContoSelect<true>;
+    'textos-contos': TextosContosSelect<false> | TextosContosSelect<true>;
+    'textos-dicas-hot': TextosDicasHotSelect<false> | TextosDicasHotSelect<true>;
+    'textos-mensagens': TextosMensagensSelect<false> | TextosMensagensSelect<true>;
   };
   locale: null;
   widgets: {
@@ -698,7 +730,7 @@ export interface Block {
   createdAt: string;
 }
 /**
- * Denúncias de conversas privadas. As urgentes (pessoa menor de idade) aparecem primeiro.
+ * Denúncias de conversas privadas (oculta do painel desde 24/10/2026, dados mantidos). As urgentes (pessoa menor de idade) aparecem primeiro.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "message-reports".
@@ -1991,6 +2023,991 @@ export interface Contact {
   createdAt?: string | null;
 }
 /**
+ * Menu do topo, rodapé, confirmação de maioridade (18+), página não encontrada, página de erro, galeria e paginação. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-geral".
+ */
+export interface TextosGeral {
+  id: number;
+  /**
+   * Aparece na aba do navegador e no Google quando a página não tem título próprio.
+   */
+  googleTitulo?: string | null;
+  /**
+   * Texto que aparece abaixo do título nos resultados do Google.
+   */
+  googleDescricao?: string | null;
+  /**
+   * Só aparece para quem navega pelo teclado.
+   */
+  pularConteudo?: string | null;
+  menuBotao?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuFestas?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuQuemSomos?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuNormas?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuRegras?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuDicas?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuEspaco?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuModelos?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuClassisex?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuContos?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuDicasHot?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuContato?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuAssineJa?: string | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuAreaAssinante?: string | null;
+  /**
+   * Só aparece para quem está logado.
+   */
+  menuMeusAnuncios?: string | null;
+  /**
+   * Só aparece para quem está logado.
+   */
+  menuMinhaAssinatura?: string | null;
+  /**
+   * Só aparece para quem está logado.
+   */
+  menuTrocarSenha?: string | null;
+  /**
+   * Só aparece para quem está logado.
+   */
+  menuSair?: string | null;
+  rodapeContatoTitulo?: string | null;
+  rodapeWhatsapp?: string | null;
+  /**
+   * Use {usuario} para o nome do perfil.
+   */
+  rodapeInstagram?: string | null;
+  rodapeNavegueTitulo?: string | null;
+  rodapeLegalTitulo?: string | null;
+  rodapeTermos?: string | null;
+  rodapePrivacidade?: string | null;
+  /**
+   * Use {ano} para o ano atual (muda sozinho).
+   */
+  rodapeCopyright?: string | null;
+  idadeTitulo?: string | null;
+  idadeTexto?: string | null;
+  idadeBotaoEntrar?: string | null;
+  idadeBotaoSair?: string | null;
+  naoEncontradaTitulo?: string | null;
+  naoEncontradaTexto?: string | null;
+  naoEncontradaBotao?: string | null;
+  erroTitulo?: string | null;
+  erroTexto?: string | null;
+  /**
+   * Use {codigo} para o código que a equipe técnica precisa.
+   */
+  erroCodigo?: string | null;
+  erroBotao?: string | null;
+  erroVoltar?: string | null;
+  galeriaVideo?: string | null;
+  /**
+   * Use {n} para a posição da foto e {total} para o total de fotos.
+   */
+  galeriaContador?: string | null;
+  galeriaVerFesta?: string | null;
+  paginacaoAnteriores?: string | null;
+  /**
+   * Use {pagina} para a página atual e {total} para o total de páginas.
+   */
+  paginacaoPagina?: string | null;
+  paginacaoProximos?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da página inicial: próximas festas, espaço, quem somos, dicas e como chegar. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-inicio".
+ */
+export interface TextosInicio {
+  id: number;
+  chamadaTopo?: string | null;
+  tituloProximasFestas?: string | null;
+  /**
+   * Aparece no lugar da lista de festas quando nenhuma festa está agendada.
+   */
+  tituloSemFestas?: string | null;
+  semFestasTitulo?: string | null;
+  semFestasTexto?: string | null;
+  espacoTitulo?: string | null;
+  espacoBotao?: string | null;
+  quemSomosTitulo?: string | null;
+  /**
+   * Só aparece se a página Quem somos estiver sem texto de abertura.
+   */
+  quemSomosTextoReserva?: string | null;
+  quemSomosBotao?: string | null;
+  dicasTitulo?: string | null;
+  dicasBotao?: string | null;
+  comoChegarTitulo?: string | null;
+  comoChegarBotao?: string | null;
+  comoChegarWhatsapp?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da página de cada festa (o conteúdo da festa em si é editado em Festas). Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-festas".
+ */
+export interface TextosFesta {
+  id: number;
+  voltar?: string | null;
+  /**
+   * Use {hora} para o horário de início da festa.
+   */
+  horario?: string | null;
+  jaAconteceu?: string | null;
+  tituloValores?: string | null;
+  tituloDressCode?: string | null;
+  tituloAtracoes?: string | null;
+  tituloSobre?: string | null;
+  atracaoDj?: string | null;
+  atracaoShow?: string | null;
+  atracaoModelo?: string | null;
+  atracaoOutro?: string | null;
+  botaoProximas?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da página do espaço (as fotos são editadas em Galeria do espaço). Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-espaco".
+ */
+export interface TextosEspaco {
+  id: number;
+  chamadaTopo?: string | null;
+  /**
+   * Também é o título que aparece no Google.
+   */
+  titulo?: string | null;
+  /**
+   * Também é a descrição que aparece no Google.
+   */
+  intro?: string | null;
+  vazioTitulo?: string | null;
+  vazioTexto?: string | null;
+  vazioBotaoComoChegar?: string | null;
+  vazioBotaoFestas?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da lista de modelos e da página de cada modelo (as modelos em si são editadas em Modelos). Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-modelos".
+ */
+export interface TextosModelo {
+  id: number;
+  chamadaTopo?: string | null;
+  /**
+   * Também é o título que aparece no Google.
+   */
+  titulo?: string | null;
+  /**
+   * Também é a descrição que aparece no Google.
+   */
+  intro?: string | null;
+  vazioTitulo?: string | null;
+  vazioTexto?: string | null;
+  vazioBotaoFestas?: string | null;
+  vazioBotaoEspaco?: string | null;
+  umaFoto?: string | null;
+  /**
+   * Use {n} para o número de fotos.
+   */
+  variasFotos?: string | null;
+  umVideo?: string | null;
+  /**
+   * Use {n} para o número de vídeos.
+   */
+  variosVideos?: string | null;
+  linkLista?: string | null;
+  /**
+   * Use {nome} para o nome da modelo. Só vale quando a modelo não tem descrição própria.
+   */
+  descricaoReserva?: string | null;
+  linkVerTodas?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Abas de Quem somos, botões do fim da página e "Atualizado em". Os títulos e textos das páginas são editados em Páginas. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-institucional".
+ */
+export interface TextosInstitucional {
+  id: number;
+  abaQuemSomos?: string | null;
+  abaNormas?: string | null;
+  abaRegras?: string | null;
+  abaDicas?: string | null;
+  /**
+   * Use {aba} para o nome da próxima aba.
+   */
+  botaoProximo?: string | null;
+  botaoFestas?: string | null;
+  /**
+   * A data aparece logo depois deste texto.
+   */
+  atualizadoEm?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da página de contato (endereço, telefone e horário são editados em Contato e endereço). Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-contato".
+ */
+export interface TextosContato {
+  id: number;
+  /**
+   * Também é o título que aparece no Google.
+   */
+  titulo?: string | null;
+  intro?: string | null;
+  descricaoGoogle?: string | null;
+  /**
+   * Use {cep} para o número do CEP.
+   */
+  cep?: string | null;
+  botaoGoogleMaps?: string | null;
+  botaoWaze?: string | null;
+  botaoWhatsapp?: string | null;
+  /**
+   * Use {usuario} para o nome de usuário do Instagram.
+   */
+  instagram?: string | null;
+  mapaAmpliado?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da página Assine Já, da tabela Grátis × Assinante e da chamada "Assine Já" dos contos e do ClassiSex. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-assine".
+ */
+export interface TextosAssine {
+  id: number;
+  /**
+   * Aparece na aba do navegador e no Google.
+   */
+  googleTitulo?: string | null;
+  googleDescricao?: string | null;
+  topoEtiqueta?: string | null;
+  topoTitulo?: string | null;
+  topoTexto?: string | null;
+  comparativoTitulo?: string | null;
+  comparativoColunaItem?: string | null;
+  comparativoColunaGratis?: string | null;
+  comparativoColunaAssinante?: string | null;
+  comparativoFotosItem?: string | null;
+  comparativoFotosGratis?: string | null;
+  /**
+   * Use {fotos} para o número máximo de fotos.
+   */
+  comparativoFotosAssinante?: string | null;
+  comparativoVideosItem?: string | null;
+  comparativoVideosGratis?: string | null;
+  /**
+   * Use {videos} para o número máximo de vídeos.
+   */
+  comparativoVideosAssinante?: string | null;
+  comparativoAnunciosItem?: string | null;
+  comparativoAnunciosGratis?: string | null;
+  comparativoAnunciosAssinante?: string | null;
+  comparativoContosItem?: string | null;
+  comparativoContosGratis?: string | null;
+  comparativoContosAssinante?: string | null;
+  comparativoBotaoAssine?: string | null;
+  comparativoBotaoCadastro?: string | null;
+  semPlanosTitulo?: string | null;
+  semPlanosTexto?: string | null;
+  semPlanosBotao?: string | null;
+  /**
+   * Use {preco} para o valor.
+   */
+  cartaoDe?: string | null;
+  /**
+   * Use {preco} para o valor.
+   */
+  cartaoPor?: string | null;
+  cartaoPagar?: string | null;
+  cartaoWhatsapp?: string | null;
+  /**
+   * Use {plano} para o nome do plano.
+   */
+  cartaoWhatsappMensagem?: string | null;
+  comoTitulo?: string | null;
+  comoPasso1Antes?: string | null;
+  comoPasso1Link?: string | null;
+  comoPasso1Depois?: string | null;
+  comoPasso1SemCadastro?: string | null;
+  comoPasso2?: string | null;
+  comoPasso3?: string | null;
+  comoPasso4?: string | null;
+  comoBotaoComprovante?: string | null;
+  comprovanteMensagem?: string | null;
+  comoBotaoEntrar?: string | null;
+  /**
+   * O título e o texto de cada chamada ficam na área da própria página.
+   */
+  ctaBotao?: string | null;
+  ctaJaSouAssinante?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos das telas de entrar, cadastro, confirmação de e-mail e recuperação de senha. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-conta".
+ */
+export interface TextosConta {
+  id: number;
+  etiqueta?: string | null;
+  campoEmail?: string | null;
+  botaoWhatsapp?: string | null;
+  entrarGoogleTitulo?: string | null;
+  entrarGoogleDescricao?: string | null;
+  entrarTitulo?: string | null;
+  entrarConfirmado?: string | null;
+  entrarCampoSenha?: string | null;
+  entrarBotao?: string | null;
+  entrarEsqueci?: string | null;
+  entrarSemEmail?: string | null;
+  entrarEsqueciSemEmail?: string | null;
+  entrarCriarConta?: string | null;
+  entrarAssine?: string | null;
+  cadastroGoogleTitulo?: string | null;
+  cadastroGoogleDescricao?: string | null;
+  cadastroTitulo?: string | null;
+  cadastroFechado?: string | null;
+  cadastroEnviado?: string | null;
+  cadastroNaoRecebeu?: string | null;
+  cadastroIntro?: string | null;
+  cadastroJaTem?: string | null;
+  formSenha?: string | null;
+  formSenhaDica?: string | null;
+  formApelido?: string | null;
+  formApelidoDica?: string | null;
+  formMaior18?: string | null;
+  formTermosAntes?: string | null;
+  formTermosLink?: string | null;
+  formTermosMeio?: string | null;
+  formPoliticaLink?: string | null;
+  formBotao?: string | null;
+  formEnviando?: string | null;
+  confirmarGoogleTitulo?: string | null;
+  confirmarTitulo?: string | null;
+  confirmarLinkNovo?: string | null;
+  confirmarFalta?: string | null;
+  confirmarBotao?: string | null;
+  confirmarIrEntrar?: string | null;
+  reenviarCampo?: string | null;
+  reenviarBotao?: string | null;
+  esqueciGoogleTitulo?: string | null;
+  esqueciGoogleDescricao?: string | null;
+  esqueciTitulo?: string | null;
+  esqueciSemEmail?: string | null;
+  esqueciEnviado?: string | null;
+  esqueciIntro?: string | null;
+  esqueciBotao?: string | null;
+  esqueciVoltar?: string | null;
+  novaGoogleTitulo?: string | null;
+  novaTitulo?: string | null;
+  novaAvisoCurta?: string | null;
+  novaCampoNova?: string | null;
+  novaCampoRepita?: string | null;
+  novaDica?: string | null;
+  novaBotao?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Textos fixos da área do assinante: início, minha assinatura, trocar senha e avisos de renovação. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-area-assinante".
+ */
+export interface TextosAreaAssinante {
+  id: number;
+  googleTitulo?: string | null;
+  etiqueta?: string | null;
+  senhaAlterada?: string | null;
+  /**
+   * Use {nome} para o nome do assinante.
+   */
+  saudacao?: string | null;
+  minhaTitulo?: string | null;
+  /**
+   * Use {tipo} para o tipo da conta (veja o campo abaixo).
+   */
+  contaTitulo?: string | null;
+  contaTipoGratuita?: string | null;
+  contaTexto?: string | null;
+  contaBotaoAnuncios?: string | null;
+  dadosTitulo?: string | null;
+  /**
+   * Use {email} para o e-mail do assinante.
+   */
+  dadosEmail?: string | null;
+  senhaGoogleTitulo?: string | null;
+  senhaTitulo?: string | null;
+  senhaCampoAtual?: string | null;
+  senhaCampoNova?: string | null;
+  senhaCampoRepita?: string | null;
+  senhaDica?: string | null;
+  senhaBotao?: string | null;
+  provisoriaTexto?: string | null;
+  provisoriaLink?: string | null;
+  assAtivaAntes?: string | null;
+  assAtivaSelo?: string | null;
+  /**
+   * Use {data} para a data de validade.
+   */
+  assValidaAte?: string | null;
+  assFalta1?: string | null;
+  /**
+   * Use {dias} para o número de dias.
+   */
+  assFaltam?: string | null;
+  /**
+   * Use {data} para a data em que venceu.
+   */
+  assVenceu?: string | null;
+  assRenovar?: string | null;
+  assSemAssinatura?: string | null;
+  assVerPlanos?: string | null;
+  assEncerrada?: string | null;
+  assWhatsapp?: string | null;
+  /**
+   * Use {data} para a data em que venceu.
+   */
+  renovVenceu?: string | null;
+  /**
+   * Use {data} para a data e {quando} para "último dia" ou "faltam N dias".
+   */
+  renovVence?: string | null;
+  renovUltimoDia?: string | null;
+  /**
+   * Use {dias} para o número de dias.
+   */
+  renovFaltam?: string | null;
+  renovBotao?: string | null;
+  inativoTitulo?: string | null;
+  inativoTexto?: string | null;
+  inativoAssine?: string | null;
+  inativoAnuncios?: string | null;
+  inativoNaoAtiva?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões e denúncia. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-classisex".
+ */
+export interface TextosClassisex {
+  id: number;
+  publicoGoogleTitulo?: string | null;
+  publicoGoogleDescricao?: string | null;
+  publicoTopo?: string | null;
+  publicoTitulo?: string | null;
+  publicoIntro?: string | null;
+  publicoBotaoAnunciar?: string | null;
+  publicoLinkAssinante?: string | null;
+  publicoAssineTitulo?: string | null;
+  publicoAssineTexto?: string | null;
+  filtroEuSou?: string | null;
+  filtroTodos?: string | null;
+  filtroCidade?: string | null;
+  filtroBotao?: string | null;
+  filtroLimpar?: string | null;
+  vazioFiltroTitulo?: string | null;
+  vazioFiltroPublicoTexto?: string | null;
+  vazioFiltroMembrosTexto?: string | null;
+  vazioVerTodos?: string | null;
+  vazioTitulo?: string | null;
+  vazioPublicoTexto?: string | null;
+  vazioPublicoBotao?: string | null;
+  vazioMembrosTexto?: string | null;
+  vazioMembrosBotao?: string | null;
+  cardSemFoto?: string | null;
+  cardPublicoAssine?: string | null;
+  cardEnviarRecado?: string | null;
+  cardRecadosNota?: string | null;
+  /**
+   * Use {data} para a data.
+   */
+  cardPublicadoEm?: string | null;
+  cardVerAnuncio?: string | null;
+  cardUmaFoto?: string | null;
+  /**
+   * Use {n} para a quantidade.
+   */
+  cardFotos?: string | null;
+  cardUmVideo?: string | null;
+  /**
+   * Use {n} para a quantidade.
+   */
+  cardVideos?: string | null;
+  carregando?: string | null;
+  carregarMais?: string | null;
+  fimDaLista?: string | null;
+  membrosGoogleTitulo?: string | null;
+  membrosTopo?: string | null;
+  membrosTitulo?: string | null;
+  membrosIntro?: string | null;
+  membrosDenunciaEnviada?: string | null;
+  membrosPublicadosTitulo?: string | null;
+  membrosGratisTexto?: string | null;
+  anuncioGoogleTitulo?: string | null;
+  anuncioTopo?: string | null;
+  /**
+   * Use {data} para a data.
+   */
+  anuncioPublicadoEm?: string | null;
+  /**
+   * Use {duracao} para a duração.
+   */
+  galeriaVideoUm?: string | null;
+  /**
+   * Use {n} para o número do vídeo e {duracao} para a duração.
+   */
+  galeriaVideoVarios?: string | null;
+  anuncioContato?: string | null;
+  contatoWhatsapp?: string | null;
+  /**
+   * Use {contato} para o usuário do Telegram.
+   */
+  contatoTelegram?: string | null;
+  anuncioRecadoGratuito?: string | null;
+  anuncioVoltar?: string | null;
+  denunciarResumo?: string | null;
+  denunciarMotivo?: string | null;
+  motivoContatoFalso?: string | null;
+  motivoGolpe?: string | null;
+  motivoOfensivo?: string | null;
+  motivoMenor?: string | null;
+  motivoSemAutorizacao?: string | null;
+  motivoOutro?: string | null;
+  denunciarDetalhes?: string | null;
+  denunciarBotao?: string | null;
+  anunciarGoogleTitulo?: string | null;
+  anunciarTopo?: string | null;
+  anunciarTitulo?: string | null;
+  anunciarIntro?: string | null;
+  visitanteEmailRotulo?: string | null;
+  visitanteEmailAjuda?: string | null;
+  fotoRotulo?: string | null;
+  fotoAjuda?: string | null;
+  fotoEscolher?: string | null;
+  fotoTrocar?: string | null;
+  fotoTirar?: string | null;
+  visitanteTermosAntes?: string | null;
+  visitanteTermosLink?: string | null;
+  visitanteTermosE?: string | null;
+  visitanteTermosPolitica?: string | null;
+  visitanteObrigatorio?: string | null;
+  visitanteAvisoAntes?: string | null;
+  visitanteAvisoLink?: string | null;
+  visitanteAvisoDepois?: string | null;
+  visitanteBotao?: string | null;
+  visitanteBotaoEnviando?: string | null;
+  recebidoGoogleTitulo?: string | null;
+  recebidoTopo?: string | null;
+  recebidoTitulo?: string | null;
+  recebidoTexto?: string | null;
+  recebidoBotaoVer?: string | null;
+  recebidoBotaoConta?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Lista dos anúncios do assinante, Novo anúncio, Editar anúncio, os campos do formulário e o envio de fotos e vídeos. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-meus-anuncios".
+ */
+export interface TextosMeusAnuncio {
+  id: number;
+  listaGoogleTitulo?: string | null;
+  /**
+   * Também usada em Novo anúncio e Editar anúncio.
+   */
+  topo?: string | null;
+  listaTitulo?: string | null;
+  listaIntro?: string | null;
+  listaAvisoAntigo?: string | null;
+  listaBotaoNovo?: string | null;
+  listaVazio?: string | null;
+  listaOkEnviado?: string | null;
+  listaOkApagado?: string | null;
+  /**
+   * Use {data} para a data.
+   */
+  donoAtualizadoEm?: string | null;
+  donoRascunho?: string | null;
+  donoCorrigir?: string | null;
+  donoSemFotos?: string | null;
+  donoUmaFoto?: string | null;
+  /**
+   * Use {n} para a quantidade.
+   */
+  donoFotos?: string | null;
+  donoUmVideo?: string | null;
+  /**
+   * Use {n} para a quantidade.
+   */
+  donoVideos?: string | null;
+  donoWhatsapp?: string | null;
+  donoTelegram?: string | null;
+  donoRevisar?: string | null;
+  donoEditar?: string | null;
+  donoApagar?: string | null;
+  donoApagarConfirma?: string | null;
+  donoApagarSim?: string | null;
+  novoGoogleTitulo?: string | null;
+  novoTitulo?: string | null;
+  novoIntro?: string | null;
+  novoAvisoGratis?: string | null;
+  editarGoogleTitulo?: string | null;
+  editarTitulo?: string | null;
+  editarAvisoAntigo?: string | null;
+  editarAvisoRascunho?: string | null;
+  editarAvisoPublicado?: string | null;
+  editarAvisoSalvar?: string | null;
+  midiaFotoOk?: string | null;
+  midiaVideoOk?: string | null;
+  midiaCapaOk?: string | null;
+  midiaRemovidaOk?: string | null;
+  campoObrigatorio?: string | null;
+  apelidoRotulo?: string | null;
+  apelidoAjuda?: string | null;
+  euSouRotulo?: string | null;
+  cidadeRotulo?: string | null;
+  textoRotulo?: string | null;
+  textoAjuda?: string | null;
+  textoAjudaAntigo?: string | null;
+  contatoLegenda?: string | null;
+  whatsappRotulo?: string | null;
+  telegramRotulo?: string | null;
+  declaracao?: string | null;
+  formBotao?: string | null;
+  formBotaoEnviando?: string | null;
+  formBotaoArquivos?: string | null;
+  /**
+   * Use {atual}, {total} e {percentual}.
+   */
+  formProgresso?: string | null;
+  midiaLegenda?: string | null;
+  /**
+   * Use {fotos}, {videos} e {segundos} para os limites.
+   */
+  midiaAjudaComVideo?: string | null;
+  /**
+   * Use {fotos} para o limite de fotos.
+   */
+  midiaAjudaSoFoto?: string | null;
+  /**
+   * Use {n} para quantas já foram escolhidas e {max} para o limite.
+   */
+  midiaEscolherFotos?: string | null;
+  /**
+   * Use {n} para quantos já foram escolhidos e {max} para o limite.
+   */
+  midiaEscolherVideos?: string | null;
+  /**
+   * Use {n} para o número da foto.
+   */
+  midiaTirarFoto?: string | null;
+  /**
+   * Use {n} para o número do vídeo.
+   */
+  midiaTirarVideo?: string | null;
+  gerTitulo?: string | null;
+  gerDicaAssinante?: string | null;
+  gerDicaGratis?: string | null;
+  gerCapaNota?: string | null;
+  gerSemFotos?: string | null;
+  gerGuardada?: string | null;
+  gerCapa?: string | null;
+  gerUsarCapa?: string | null;
+  gerRemover?: string | null;
+  /**
+   * Use {n} para o número do vídeo e {duracao} para a duração.
+   */
+  gerVideo?: string | null;
+  /**
+   * Use {n} para o número do vídeo.
+   */
+  gerRemoverVideo?: string | null;
+  gerAdicionarFoto?: string | null;
+  gerEnviarFoto?: string | null;
+  gerGratisUmaFoto?: string | null;
+  gerAdicionarVideo?: string | null;
+  gerEnviarVideo?: string | null;
+  gerVideosAssinantes?: string | null;
+  gerAssineJa?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Página e formulário para qualquer pessoa enviar um conto, e a confirmação de envio. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-enviar-conto".
+ */
+export interface TextosEnviarConto {
+  id: number;
+  googleTitulo?: string | null;
+  topo?: string | null;
+  titulo?: string | null;
+  intro?: string | null;
+  obrigatorio?: string | null;
+  tituloRotulo?: string | null;
+  assinadoRotulo?: string | null;
+  assinadoAjuda?: string | null;
+  contoRotulo?: string | null;
+  /**
+   * Use {min} e {max} para o mínimo e o máximo de caracteres.
+   */
+  contoAjuda?: string | null;
+  emailRotulo?: string | null;
+  emailAjuda?: string | null;
+  imagemRotulo?: string | null;
+  imagemAjuda?: string | null;
+  imagemEscolher?: string | null;
+  imagemTrocar?: string | null;
+  imagemTirar?: string | null;
+  consentimento?: string | null;
+  termosAntes?: string | null;
+  termosLink?: string | null;
+  termosE?: string | null;
+  termosPolitica?: string | null;
+  aviso?: string | null;
+  botao?: string | null;
+  botaoEnviando?: string | null;
+  enviadoGoogleTitulo?: string | null;
+  enviadoTopo?: string | null;
+  enviadoTitulo?: string | null;
+  enviadoTexto?: string | null;
+  enviadoBotaoContos?: string | null;
+  enviadoBotaoConta?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Lista de contos, página de cada conto e a área de contos dos assinantes. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-contos".
+ */
+export interface TextosConto {
+  id: number;
+  googleLista?: string | null;
+  googleListaDescricao?: string | null;
+  listaEyebrow?: string | null;
+  listaTitulo?: string | null;
+  listaIntro?: string | null;
+  listaLinkAssinante?: string | null;
+  listaLinkEnviar?: string | null;
+  listaVazioTitulo?: string | null;
+  listaVazioTexto?: string | null;
+  listaVazioBotao?: string | null;
+  listaCtaTitulo?: string | null;
+  listaCtaTexto?: string | null;
+  googleContoNaoEncontrado?: string | null;
+  /**
+   * Também usada na página do conto completo para assinantes.
+   */
+  contoEyebrow?: string | null;
+  /**
+   * Use {nome} para o apelido de quem escreveu. Também usada nos cartões da lista.
+   */
+  contoPor?: string | null;
+  contoCtaTitulo?: string | null;
+  contoCtaTexto?: string | null;
+  contoCtaBotao?: string | null;
+  /**
+   * Também usado na página do conto completo para assinantes.
+   */
+  contoVoltar?: string | null;
+  /**
+   * Use {titulo} para o título do conto.
+   */
+  cardLer?: string | null;
+  membrosEyebrow?: string | null;
+  membrosGoogleLista?: string | null;
+  membrosTitulo?: string | null;
+  membrosIntro?: string | null;
+  membrosVazioTitulo?: string | null;
+  membrosVazioTexto?: string | null;
+  membrosGoogleConto?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Lista de Dicas Hot, página de cada dica e a área de dicas dos assinantes. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-dicas-hot".
+ */
+export interface TextosDicasHot {
+  id: number;
+  googleLista?: string | null;
+  googleListaDescricao?: string | null;
+  listaEyebrow?: string | null;
+  listaTitulo?: string | null;
+  listaIntro?: string | null;
+  listaLinkAssinante?: string | null;
+  listaVazioTitulo?: string | null;
+  listaVazioTexto?: string | null;
+  listaVazioBotao?: string | null;
+  listaCtaTitulo?: string | null;
+  listaCtaTexto?: string | null;
+  googleDicaNaoEncontrada?: string | null;
+  /**
+   * Também usado na página da dica completa para assinantes.
+   */
+  dicaEyebrow?: string | null;
+  dicaCtaTitulo?: string | null;
+  dicaCtaTexto?: string | null;
+  dicaCtaBotao?: string | null;
+  leiaTambem?: string | null;
+  /**
+   * Também usado na página da dica completa para assinantes.
+   */
+  dicaVoltar?: string | null;
+  /**
+   * Use {titulo} para o título da dica.
+   */
+  cardLer?: string | null;
+  membrosEyebrow?: string | null;
+  membrosGoogleLista?: string | null;
+  membrosTitulo?: string | null;
+  membrosIntro?: string | null;
+  membrosVazioTitulo?: string | null;
+  membrosVazioTexto?: string | null;
+  membrosGoogleDica?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Caixa de recados dos assinantes: lista, novo recado, conversa, bloquear e denunciar. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-mensagens".
+ */
+export interface TextosMensagen {
+  id: number;
+  googleLista?: string | null;
+  eyebrow?: string | null;
+  /**
+   * Também usado na página da conversa.
+   */
+  titulo?: string | null;
+  intro?: string | null;
+  vazioTitulo?: string | null;
+  vazioTexto?: string | null;
+  vazioBotao?: string | null;
+  novaMarca?: string | null;
+  /**
+   * Aparece nos anúncios do ClassiSex.
+   */
+  enviarRecadoLink?: string | null;
+  googleNovo?: string | null;
+  /**
+   * Também usada na conversa.
+   */
+  novoEyebrow?: string | null;
+  novoTitulo?: string | null;
+  /**
+   * Use {nome} para o apelido de quem vai receber.
+   */
+  novoTituloPara?: string | null;
+  /**
+   * Também usado na conversa.
+   */
+  voltar?: string | null;
+  formApelido?: string | null;
+  formApelidoAjuda?: string | null;
+  formRecado?: string | null;
+  formEnviar?: string | null;
+  formEnviando?: string | null;
+  googleConversa?: string | null;
+  /**
+   * Use {nome} para o apelido da outra pessoa.
+   */
+  conversaTitulo?: string | null;
+  anteriores?: string | null;
+  voce?: string | null;
+  responderTitulo?: string | null;
+  bloqueado?: string | null;
+  desbloquear?: string | null;
+  bloquearResumo?: string | null;
+  bloquearAviso?: string | null;
+  bloquearConfirmar?: string | null;
+  denunciarResumo?: string | null;
+  denunciarMotivo?: string | null;
+  denunciarDetalhes?: string | null;
+  denunciarTambemBloquear?: string | null;
+  denunciarEnviar?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contact_select".
  */
@@ -2006,6 +3023,689 @@ export interface ContactSelect<T extends boolean = true> {
   avisoNovoCadastroEmail?: T;
   instagram?: T;
   hours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-geral_select".
+ */
+export interface TextosGeralSelect<T extends boolean = true> {
+  googleTitulo?: T;
+  googleDescricao?: T;
+  pularConteudo?: T;
+  menuBotao?: T;
+  menuFestas?: T;
+  menuQuemSomos?: T;
+  menuNormas?: T;
+  menuRegras?: T;
+  menuDicas?: T;
+  menuEspaco?: T;
+  menuModelos?: T;
+  menuClassisex?: T;
+  menuContos?: T;
+  menuDicasHot?: T;
+  menuContato?: T;
+  menuAssineJa?: T;
+  menuAreaAssinante?: T;
+  menuMeusAnuncios?: T;
+  menuMinhaAssinatura?: T;
+  menuTrocarSenha?: T;
+  menuSair?: T;
+  rodapeContatoTitulo?: T;
+  rodapeWhatsapp?: T;
+  rodapeInstagram?: T;
+  rodapeNavegueTitulo?: T;
+  rodapeLegalTitulo?: T;
+  rodapeTermos?: T;
+  rodapePrivacidade?: T;
+  rodapeCopyright?: T;
+  idadeTitulo?: T;
+  idadeTexto?: T;
+  idadeBotaoEntrar?: T;
+  idadeBotaoSair?: T;
+  naoEncontradaTitulo?: T;
+  naoEncontradaTexto?: T;
+  naoEncontradaBotao?: T;
+  erroTitulo?: T;
+  erroTexto?: T;
+  erroCodigo?: T;
+  erroBotao?: T;
+  erroVoltar?: T;
+  galeriaVideo?: T;
+  galeriaContador?: T;
+  galeriaVerFesta?: T;
+  paginacaoAnteriores?: T;
+  paginacaoPagina?: T;
+  paginacaoProximos?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-inicio_select".
+ */
+export interface TextosInicioSelect<T extends boolean = true> {
+  chamadaTopo?: T;
+  tituloProximasFestas?: T;
+  tituloSemFestas?: T;
+  semFestasTitulo?: T;
+  semFestasTexto?: T;
+  espacoTitulo?: T;
+  espacoBotao?: T;
+  quemSomosTitulo?: T;
+  quemSomosTextoReserva?: T;
+  quemSomosBotao?: T;
+  dicasTitulo?: T;
+  dicasBotao?: T;
+  comoChegarTitulo?: T;
+  comoChegarBotao?: T;
+  comoChegarWhatsapp?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-festas_select".
+ */
+export interface TextosFestasSelect<T extends boolean = true> {
+  voltar?: T;
+  horario?: T;
+  jaAconteceu?: T;
+  tituloValores?: T;
+  tituloDressCode?: T;
+  tituloAtracoes?: T;
+  tituloSobre?: T;
+  atracaoDj?: T;
+  atracaoShow?: T;
+  atracaoModelo?: T;
+  atracaoOutro?: T;
+  botaoProximas?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-espaco_select".
+ */
+export interface TextosEspacoSelect<T extends boolean = true> {
+  chamadaTopo?: T;
+  titulo?: T;
+  intro?: T;
+  vazioTitulo?: T;
+  vazioTexto?: T;
+  vazioBotaoComoChegar?: T;
+  vazioBotaoFestas?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-modelos_select".
+ */
+export interface TextosModelosSelect<T extends boolean = true> {
+  chamadaTopo?: T;
+  titulo?: T;
+  intro?: T;
+  vazioTitulo?: T;
+  vazioTexto?: T;
+  vazioBotaoFestas?: T;
+  vazioBotaoEspaco?: T;
+  umaFoto?: T;
+  variasFotos?: T;
+  umVideo?: T;
+  variosVideos?: T;
+  linkLista?: T;
+  descricaoReserva?: T;
+  linkVerTodas?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-institucional_select".
+ */
+export interface TextosInstitucionalSelect<T extends boolean = true> {
+  abaQuemSomos?: T;
+  abaNormas?: T;
+  abaRegras?: T;
+  abaDicas?: T;
+  botaoProximo?: T;
+  botaoFestas?: T;
+  atualizadoEm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-contato_select".
+ */
+export interface TextosContatoSelect<T extends boolean = true> {
+  titulo?: T;
+  intro?: T;
+  descricaoGoogle?: T;
+  cep?: T;
+  botaoGoogleMaps?: T;
+  botaoWaze?: T;
+  botaoWhatsapp?: T;
+  instagram?: T;
+  mapaAmpliado?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-assine_select".
+ */
+export interface TextosAssineSelect<T extends boolean = true> {
+  googleTitulo?: T;
+  googleDescricao?: T;
+  topoEtiqueta?: T;
+  topoTitulo?: T;
+  topoTexto?: T;
+  comparativoTitulo?: T;
+  comparativoColunaItem?: T;
+  comparativoColunaGratis?: T;
+  comparativoColunaAssinante?: T;
+  comparativoFotosItem?: T;
+  comparativoFotosGratis?: T;
+  comparativoFotosAssinante?: T;
+  comparativoVideosItem?: T;
+  comparativoVideosGratis?: T;
+  comparativoVideosAssinante?: T;
+  comparativoAnunciosItem?: T;
+  comparativoAnunciosGratis?: T;
+  comparativoAnunciosAssinante?: T;
+  comparativoContosItem?: T;
+  comparativoContosGratis?: T;
+  comparativoContosAssinante?: T;
+  comparativoBotaoAssine?: T;
+  comparativoBotaoCadastro?: T;
+  semPlanosTitulo?: T;
+  semPlanosTexto?: T;
+  semPlanosBotao?: T;
+  cartaoDe?: T;
+  cartaoPor?: T;
+  cartaoPagar?: T;
+  cartaoWhatsapp?: T;
+  cartaoWhatsappMensagem?: T;
+  comoTitulo?: T;
+  comoPasso1Antes?: T;
+  comoPasso1Link?: T;
+  comoPasso1Depois?: T;
+  comoPasso1SemCadastro?: T;
+  comoPasso2?: T;
+  comoPasso3?: T;
+  comoPasso4?: T;
+  comoBotaoComprovante?: T;
+  comprovanteMensagem?: T;
+  comoBotaoEntrar?: T;
+  ctaBotao?: T;
+  ctaJaSouAssinante?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-conta_select".
+ */
+export interface TextosContaSelect<T extends boolean = true> {
+  etiqueta?: T;
+  campoEmail?: T;
+  botaoWhatsapp?: T;
+  entrarGoogleTitulo?: T;
+  entrarGoogleDescricao?: T;
+  entrarTitulo?: T;
+  entrarConfirmado?: T;
+  entrarCampoSenha?: T;
+  entrarBotao?: T;
+  entrarEsqueci?: T;
+  entrarSemEmail?: T;
+  entrarEsqueciSemEmail?: T;
+  entrarCriarConta?: T;
+  entrarAssine?: T;
+  cadastroGoogleTitulo?: T;
+  cadastroGoogleDescricao?: T;
+  cadastroTitulo?: T;
+  cadastroFechado?: T;
+  cadastroEnviado?: T;
+  cadastroNaoRecebeu?: T;
+  cadastroIntro?: T;
+  cadastroJaTem?: T;
+  formSenha?: T;
+  formSenhaDica?: T;
+  formApelido?: T;
+  formApelidoDica?: T;
+  formMaior18?: T;
+  formTermosAntes?: T;
+  formTermosLink?: T;
+  formTermosMeio?: T;
+  formPoliticaLink?: T;
+  formBotao?: T;
+  formEnviando?: T;
+  confirmarGoogleTitulo?: T;
+  confirmarTitulo?: T;
+  confirmarLinkNovo?: T;
+  confirmarFalta?: T;
+  confirmarBotao?: T;
+  confirmarIrEntrar?: T;
+  reenviarCampo?: T;
+  reenviarBotao?: T;
+  esqueciGoogleTitulo?: T;
+  esqueciGoogleDescricao?: T;
+  esqueciTitulo?: T;
+  esqueciSemEmail?: T;
+  esqueciEnviado?: T;
+  esqueciIntro?: T;
+  esqueciBotao?: T;
+  esqueciVoltar?: T;
+  novaGoogleTitulo?: T;
+  novaTitulo?: T;
+  novaAvisoCurta?: T;
+  novaCampoNova?: T;
+  novaCampoRepita?: T;
+  novaDica?: T;
+  novaBotao?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-area-assinante_select".
+ */
+export interface TextosAreaAssinanteSelect<T extends boolean = true> {
+  googleTitulo?: T;
+  etiqueta?: T;
+  senhaAlterada?: T;
+  saudacao?: T;
+  minhaTitulo?: T;
+  contaTitulo?: T;
+  contaTipoGratuita?: T;
+  contaTexto?: T;
+  contaBotaoAnuncios?: T;
+  dadosTitulo?: T;
+  dadosEmail?: T;
+  senhaGoogleTitulo?: T;
+  senhaTitulo?: T;
+  senhaCampoAtual?: T;
+  senhaCampoNova?: T;
+  senhaCampoRepita?: T;
+  senhaDica?: T;
+  senhaBotao?: T;
+  provisoriaTexto?: T;
+  provisoriaLink?: T;
+  assAtivaAntes?: T;
+  assAtivaSelo?: T;
+  assValidaAte?: T;
+  assFalta1?: T;
+  assFaltam?: T;
+  assVenceu?: T;
+  assRenovar?: T;
+  assSemAssinatura?: T;
+  assVerPlanos?: T;
+  assEncerrada?: T;
+  assWhatsapp?: T;
+  renovVenceu?: T;
+  renovVence?: T;
+  renovUltimoDia?: T;
+  renovFaltam?: T;
+  renovBotao?: T;
+  inativoTitulo?: T;
+  inativoTexto?: T;
+  inativoAssine?: T;
+  inativoAnuncios?: T;
+  inativoNaoAtiva?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-classisex_select".
+ */
+export interface TextosClassisexSelect<T extends boolean = true> {
+  publicoGoogleTitulo?: T;
+  publicoGoogleDescricao?: T;
+  publicoTopo?: T;
+  publicoTitulo?: T;
+  publicoIntro?: T;
+  publicoBotaoAnunciar?: T;
+  publicoLinkAssinante?: T;
+  publicoAssineTitulo?: T;
+  publicoAssineTexto?: T;
+  filtroEuSou?: T;
+  filtroTodos?: T;
+  filtroCidade?: T;
+  filtroBotao?: T;
+  filtroLimpar?: T;
+  vazioFiltroTitulo?: T;
+  vazioFiltroPublicoTexto?: T;
+  vazioFiltroMembrosTexto?: T;
+  vazioVerTodos?: T;
+  vazioTitulo?: T;
+  vazioPublicoTexto?: T;
+  vazioPublicoBotao?: T;
+  vazioMembrosTexto?: T;
+  vazioMembrosBotao?: T;
+  cardSemFoto?: T;
+  cardPublicoAssine?: T;
+  cardEnviarRecado?: T;
+  cardRecadosNota?: T;
+  cardPublicadoEm?: T;
+  cardVerAnuncio?: T;
+  cardUmaFoto?: T;
+  cardFotos?: T;
+  cardUmVideo?: T;
+  cardVideos?: T;
+  carregando?: T;
+  carregarMais?: T;
+  fimDaLista?: T;
+  membrosGoogleTitulo?: T;
+  membrosTopo?: T;
+  membrosTitulo?: T;
+  membrosIntro?: T;
+  membrosDenunciaEnviada?: T;
+  membrosPublicadosTitulo?: T;
+  membrosGratisTexto?: T;
+  anuncioGoogleTitulo?: T;
+  anuncioTopo?: T;
+  anuncioPublicadoEm?: T;
+  galeriaVideoUm?: T;
+  galeriaVideoVarios?: T;
+  anuncioContato?: T;
+  contatoWhatsapp?: T;
+  contatoTelegram?: T;
+  anuncioRecadoGratuito?: T;
+  anuncioVoltar?: T;
+  denunciarResumo?: T;
+  denunciarMotivo?: T;
+  motivoContatoFalso?: T;
+  motivoGolpe?: T;
+  motivoOfensivo?: T;
+  motivoMenor?: T;
+  motivoSemAutorizacao?: T;
+  motivoOutro?: T;
+  denunciarDetalhes?: T;
+  denunciarBotao?: T;
+  anunciarGoogleTitulo?: T;
+  anunciarTopo?: T;
+  anunciarTitulo?: T;
+  anunciarIntro?: T;
+  visitanteEmailRotulo?: T;
+  visitanteEmailAjuda?: T;
+  fotoRotulo?: T;
+  fotoAjuda?: T;
+  fotoEscolher?: T;
+  fotoTrocar?: T;
+  fotoTirar?: T;
+  visitanteTermosAntes?: T;
+  visitanteTermosLink?: T;
+  visitanteTermosE?: T;
+  visitanteTermosPolitica?: T;
+  visitanteObrigatorio?: T;
+  visitanteAvisoAntes?: T;
+  visitanteAvisoLink?: T;
+  visitanteAvisoDepois?: T;
+  visitanteBotao?: T;
+  visitanteBotaoEnviando?: T;
+  recebidoGoogleTitulo?: T;
+  recebidoTopo?: T;
+  recebidoTitulo?: T;
+  recebidoTexto?: T;
+  recebidoBotaoVer?: T;
+  recebidoBotaoConta?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-meus-anuncios_select".
+ */
+export interface TextosMeusAnunciosSelect<T extends boolean = true> {
+  listaGoogleTitulo?: T;
+  topo?: T;
+  listaTitulo?: T;
+  listaIntro?: T;
+  listaAvisoAntigo?: T;
+  listaBotaoNovo?: T;
+  listaVazio?: T;
+  listaOkEnviado?: T;
+  listaOkApagado?: T;
+  donoAtualizadoEm?: T;
+  donoRascunho?: T;
+  donoCorrigir?: T;
+  donoSemFotos?: T;
+  donoUmaFoto?: T;
+  donoFotos?: T;
+  donoUmVideo?: T;
+  donoVideos?: T;
+  donoWhatsapp?: T;
+  donoTelegram?: T;
+  donoRevisar?: T;
+  donoEditar?: T;
+  donoApagar?: T;
+  donoApagarConfirma?: T;
+  donoApagarSim?: T;
+  novoGoogleTitulo?: T;
+  novoTitulo?: T;
+  novoIntro?: T;
+  novoAvisoGratis?: T;
+  editarGoogleTitulo?: T;
+  editarTitulo?: T;
+  editarAvisoAntigo?: T;
+  editarAvisoRascunho?: T;
+  editarAvisoPublicado?: T;
+  editarAvisoSalvar?: T;
+  midiaFotoOk?: T;
+  midiaVideoOk?: T;
+  midiaCapaOk?: T;
+  midiaRemovidaOk?: T;
+  campoObrigatorio?: T;
+  apelidoRotulo?: T;
+  apelidoAjuda?: T;
+  euSouRotulo?: T;
+  cidadeRotulo?: T;
+  textoRotulo?: T;
+  textoAjuda?: T;
+  textoAjudaAntigo?: T;
+  contatoLegenda?: T;
+  whatsappRotulo?: T;
+  telegramRotulo?: T;
+  declaracao?: T;
+  formBotao?: T;
+  formBotaoEnviando?: T;
+  formBotaoArquivos?: T;
+  formProgresso?: T;
+  midiaLegenda?: T;
+  midiaAjudaComVideo?: T;
+  midiaAjudaSoFoto?: T;
+  midiaEscolherFotos?: T;
+  midiaEscolherVideos?: T;
+  midiaTirarFoto?: T;
+  midiaTirarVideo?: T;
+  gerTitulo?: T;
+  gerDicaAssinante?: T;
+  gerDicaGratis?: T;
+  gerCapaNota?: T;
+  gerSemFotos?: T;
+  gerGuardada?: T;
+  gerCapa?: T;
+  gerUsarCapa?: T;
+  gerRemover?: T;
+  gerVideo?: T;
+  gerRemoverVideo?: T;
+  gerAdicionarFoto?: T;
+  gerEnviarFoto?: T;
+  gerGratisUmaFoto?: T;
+  gerAdicionarVideo?: T;
+  gerEnviarVideo?: T;
+  gerVideosAssinantes?: T;
+  gerAssineJa?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-enviar-conto_select".
+ */
+export interface TextosEnviarContoSelect<T extends boolean = true> {
+  googleTitulo?: T;
+  topo?: T;
+  titulo?: T;
+  intro?: T;
+  obrigatorio?: T;
+  tituloRotulo?: T;
+  assinadoRotulo?: T;
+  assinadoAjuda?: T;
+  contoRotulo?: T;
+  contoAjuda?: T;
+  emailRotulo?: T;
+  emailAjuda?: T;
+  imagemRotulo?: T;
+  imagemAjuda?: T;
+  imagemEscolher?: T;
+  imagemTrocar?: T;
+  imagemTirar?: T;
+  consentimento?: T;
+  termosAntes?: T;
+  termosLink?: T;
+  termosE?: T;
+  termosPolitica?: T;
+  aviso?: T;
+  botao?: T;
+  botaoEnviando?: T;
+  enviadoGoogleTitulo?: T;
+  enviadoTopo?: T;
+  enviadoTitulo?: T;
+  enviadoTexto?: T;
+  enviadoBotaoContos?: T;
+  enviadoBotaoConta?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-contos_select".
+ */
+export interface TextosContosSelect<T extends boolean = true> {
+  googleLista?: T;
+  googleListaDescricao?: T;
+  listaEyebrow?: T;
+  listaTitulo?: T;
+  listaIntro?: T;
+  listaLinkAssinante?: T;
+  listaLinkEnviar?: T;
+  listaVazioTitulo?: T;
+  listaVazioTexto?: T;
+  listaVazioBotao?: T;
+  listaCtaTitulo?: T;
+  listaCtaTexto?: T;
+  googleContoNaoEncontrado?: T;
+  contoEyebrow?: T;
+  contoPor?: T;
+  contoCtaTitulo?: T;
+  contoCtaTexto?: T;
+  contoCtaBotao?: T;
+  contoVoltar?: T;
+  cardLer?: T;
+  membrosEyebrow?: T;
+  membrosGoogleLista?: T;
+  membrosTitulo?: T;
+  membrosIntro?: T;
+  membrosVazioTitulo?: T;
+  membrosVazioTexto?: T;
+  membrosGoogleConto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-dicas-hot_select".
+ */
+export interface TextosDicasHotSelect<T extends boolean = true> {
+  googleLista?: T;
+  googleListaDescricao?: T;
+  listaEyebrow?: T;
+  listaTitulo?: T;
+  listaIntro?: T;
+  listaLinkAssinante?: T;
+  listaVazioTitulo?: T;
+  listaVazioTexto?: T;
+  listaVazioBotao?: T;
+  listaCtaTitulo?: T;
+  listaCtaTexto?: T;
+  googleDicaNaoEncontrada?: T;
+  dicaEyebrow?: T;
+  dicaCtaTitulo?: T;
+  dicaCtaTexto?: T;
+  dicaCtaBotao?: T;
+  leiaTambem?: T;
+  dicaVoltar?: T;
+  cardLer?: T;
+  membrosEyebrow?: T;
+  membrosGoogleLista?: T;
+  membrosTitulo?: T;
+  membrosIntro?: T;
+  membrosVazioTitulo?: T;
+  membrosVazioTexto?: T;
+  membrosGoogleDica?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-mensagens_select".
+ */
+export interface TextosMensagensSelect<T extends boolean = true> {
+  googleLista?: T;
+  eyebrow?: T;
+  titulo?: T;
+  intro?: T;
+  vazioTitulo?: T;
+  vazioTexto?: T;
+  vazioBotao?: T;
+  novaMarca?: T;
+  enviarRecadoLink?: T;
+  googleNovo?: T;
+  novoEyebrow?: T;
+  novoTitulo?: T;
+  novoTituloPara?: T;
+  voltar?: T;
+  formApelido?: T;
+  formApelidoAjuda?: T;
+  formRecado?: T;
+  formEnviar?: T;
+  formEnviando?: T;
+  googleConversa?: T;
+  conversaTitulo?: T;
+  anteriores?: T;
+  voce?: T;
+  responderTitulo?: T;
+  bloqueado?: T;
+  desbloquear?: T;
+  bloquearResumo?: T;
+  bloquearAviso?: T;
+  bloquearConfirmar?: T;
+  denunciarResumo?: T;
+  denunciarMotivo?: T;
+  denunciarDetalhes?: T;
+  denunciarTambemBloquear?: T;
+  denunciarEnviar?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

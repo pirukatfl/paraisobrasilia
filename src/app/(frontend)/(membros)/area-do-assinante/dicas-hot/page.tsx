@@ -7,12 +7,13 @@ import { DicaCard } from '@/components/dicas/DicaCard'
 import { EmptyState } from '@/components/EmptyState'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { listMemberDicas } from '@/lib/dicas/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Dicas Hot',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('dicasHot')
+  return { title: t.membrosGoogleLista, robots: { index: false, follow: false } }
 }
 
 const PATH = '/area-do-assinante/dicas-hot'
@@ -24,12 +25,13 @@ export default async function MembrosDicasHotPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const check = await requireActiveSubscription(PATH)
+  const t = await getTextos('dicasHot')
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.membrosEyebrow}</p>
       <h1 id="titulo-dicas" className="type-display mt-2">
-        Dicas Hot
+        {t.membrosTitulo}
       </h1>
     </>
   )
@@ -47,9 +49,9 @@ export default async function MembrosDicasHotPage({
   return (
     <section aria-labelledby="titulo-dicas">
       {header}
-      <p className="mt-4 max-w-[680px] text-body text-muted">Todas as dicas, do começo ao fim.</p>
+      <p className="mt-4 max-w-[680px] text-body text-muted">{t.membrosIntro}</p>
       {result.items.length === 0 ? (
-        <EmptyState heading="Nenhuma dica publicada ainda." body="Volte em breve: a equipe publica dicas novas." actions={[]} />
+        <EmptyState heading={t.membrosVazioTitulo} body={t.membrosVazioTexto} actions={[]} />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {result.items.map((c) => (

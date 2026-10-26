@@ -1,14 +1,12 @@
 import type { AdFormValues } from '@/lib/classisex/actions'
-
-export const DECLARACAO =
-  'Declaro que tenho 18 anos ou mais, que as informações são verdadeiras e que todas as pessoas das fotos e do vídeo são maiores de idade e autorizaram a publicação.'
+import type { Textos } from '@/lib/textos/areas'
 
 export const inputClass =
   'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent'
 
 /** Visual marker of the few required fields (client 2026-10-23) */
-export function Required() {
-  return <span className="text-accent">(obrigatório)</span>
+export function Required({ texto }: { texto: string }) {
+  return <span className="text-accent">{texto}</span>
 }
 
 export function FieldError({ id, message }: { id: string; message?: string }) {
@@ -26,11 +24,14 @@ export function FieldError({ id, message }: { id: string; message?: string }) {
  * never drift apart. Same ids, names and aria as before the extraction.
  */
 export function AdFormFields({
+  textos: t,
   categories,
   values,
   errors,
   legacy = false,
 }: {
+  /** Texts of the Meus anúncios area (the visitor form shares these fields) */
+  textos: Textos<'meusAnuncios'>
   categories: { id: number; name: string }[]
   values: AdFormValues
   errors: Record<string, string>
@@ -42,7 +43,7 @@ export function AdFormFields({
     <>
       <div className="flex flex-col gap-2">
         <label htmlFor="apelido" className="type-label text-text">
-          Apelido <Required />
+          {t.apelidoRotulo} <Required texto={t.campoObrigatorio} />
         </label>
         <input
           id="apelido"
@@ -55,13 +56,15 @@ export function AdFormFields({
           className={inputClass}
         />
         <p id="ajuda-apelido" className="type-label text-muted">
-          Aparece para todo mundo. Até 40 caracteres, sem telefone, e-mail, @ ou link.
+          {t.apelidoAjuda}
         </p>
         <FieldError id="erro-apelido" message={errors.apelido} />
       </div>
 
       <fieldset className="flex flex-col gap-2" aria-describedby={described('euSou')}>
-        <legend className="type-label text-text">Eu sou <Required /></legend>
+        <legend className="type-label text-text">
+          {t.euSouRotulo} <Required texto={t.campoObrigatorio} />
+        </legend>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           {categories.map((c) => (
             <label key={c.id} className="inline-flex min-h-11 items-center gap-2 text-body">
@@ -81,7 +84,7 @@ export function AdFormFields({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="cidade" className="type-label text-text">
-          Cidade (opcional, só assinantes veem)
+          {t.cidadeRotulo}
         </label>
         <input
           id="cidade"
@@ -98,7 +101,7 @@ export function AdFormFields({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
-          Texto do anúncio <Required />
+          {t.textoRotulo} <Required texto={t.campoObrigatorio} />
         </label>
         <textarea
           id="texto"
@@ -110,19 +113,17 @@ export function AdFormFields({
           className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text focus:border-accent"
         />
         <p id="ajuda-texto" className="type-label text-muted">
-          {legacy
-            ? 'Anúncio do site antigo: sem limite de 600 caracteres. Se quiser, coloque o contato nos campos abaixo: só assinantes veem.'
-            : 'Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.'}
+          {legacy ? t.textoAjudaAntigo : t.textoAjuda}
         </p>
         <FieldError id="erro-texto" message={errors.texto} />
       </div>
 
       <fieldset className="flex flex-col gap-4" aria-describedby={described('contato')}>
-        <legend className="type-label text-text">Contato (WhatsApp ou Telegram, opcional; só assinantes veem)</legend>
+        <legend className="type-label text-text">{t.contatoLegenda}</legend>
         <FieldError id="erro-contato" message={errors.contato} />
         <div className="flex flex-col gap-2">
           <label htmlFor="whatsapp" className="type-label text-text">
-            WhatsApp
+            {t.whatsappRotulo}
           </label>
           <input
             id="whatsapp"
@@ -139,7 +140,7 @@ export function AdFormFields({
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="telegram" className="type-label text-text">
-            Telegram
+            {t.telegramRotulo}
           </label>
           <input
             id="telegram"
@@ -165,7 +166,7 @@ export function AdFormFields({
             className="mt-1 size-5 shrink-0 accent-accent"
           />
           <span>
-            {DECLARACAO} <Required />
+            {t.declaracao} <Required texto={t.campoObrigatorio} />
           </span>
         </label>
         <FieldError id="erro-consent" message={errors.consent} />

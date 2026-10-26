@@ -1,9 +1,9 @@
 'use client'
 
-import type { AgeVerifier } from './index'
+import type { AgeGateTextos, AgeVerifier } from './index'
 
 /** Click-through 18+ confirmation (no sign-up, no form). Copy from UI-SPEC S1. */
-function SelfDeclarationPrompt({ onVerified }: { onVerified: () => void }) {
+function SelfDeclarationPrompt({ onVerified, textos }: { onVerified: () => void; textos: AgeGateTextos }) {
   return (
     <div
       role="dialog"
@@ -23,21 +23,20 @@ function SelfDeclarationPrompt({ onVerified }: { onVerified: () => void }) {
         className="mx-auto h-auto w-40 mix-blend-lighten"
       />
       <h2 id="age-gate-titulo" className="type-heading mt-6">
-        Conteúdo para maiores de 18 anos
+        {textos.titulo}
       </h2>
       <p id="age-gate-texto" className="mt-4 text-body text-muted">
-        O Paraíso Brasília é uma casa de festas liberais para adultos. Para continuar, confirme que
-        você tem 18 anos ou mais.
+        {textos.texto}
       </p>
       <button type="button" data-age-primary onClick={onVerified} className="btn-primary mt-8 w-full">
-        Tenho 18 anos ou mais — Entrar
+        {textos.botaoEntrar}
       </button>
       <button
         type="button"
         onClick={() => window.location.assign('https://www.google.com')}
         className="type-label mt-4 inline-flex min-h-11 min-w-11 items-center justify-center px-6 text-muted underline-offset-4 hover:underline"
       >
-        Sair do site
+        {textos.botaoSair}
       </button>
     </div>
   )

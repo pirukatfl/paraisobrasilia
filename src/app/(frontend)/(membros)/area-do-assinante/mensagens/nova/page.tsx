@@ -9,12 +9,14 @@ import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { iniciarConversa } from '@/lib/mensagens/actions'
 import { getComposeTarget } from '@/lib/mensagens/queries'
 import { MENSAGEM_MESSAGES } from '@/lib/mensagens/rules'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Novo recado',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('mensagens')
+  return { title: t.googleNovo, robots: { index: false, follow: false } }
 }
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
@@ -29,13 +31,14 @@ export default async function NovaMensagemPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const params = await searchParams
+  const t = await getTextos('mensagens')
   const alvo = first(params.anuncio) ?? ''
   const here = `/area-do-assinante/mensagens/nova?anuncio=${encodeURIComponent(alvo)}`
   const check = await requireActiveSubscription(here)
   const head = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Recados</p>
+      <p className="type-eyebrow text-muted">{t.novoEyebrow}</p>
     </>
   )
   if (check.inactive) {
@@ -43,7 +46,7 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          Novo recado
+          {t.novoTitulo}
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -59,7 +62,7 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          Novo recado
+          {t.novoTitulo}
         </h1>
         <p role="alert" className="mt-4 max-w-[560px] rounded-lg border border-line bg-surface px-4 py-2 text-body">
           {MENSAGEM_MESSAGES.propria}
@@ -72,14 +75,14 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          Novo recado
+          {t.novoTitulo}
         </h1>
         <p role="alert" className="mt-4 max-w-[560px] rounded-lg border border-line bg-surface px-4 py-2 text-body">
           {target.message}
         </p>
         <p className="mt-8">
           <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-            Voltar para Recados
+            {t.voltar}
           </Link>
         </p>
       </section>
@@ -89,7 +92,7 @@ export default async function NovaMensagemPage({
     <section aria-labelledby="titulo-nova">
       {head}
       <h1 id="titulo-nova" className="type-display mt-2">
-        Recado para {target.recipientApelido}
+        {preencher(t.novoTituloPara, { nome: target.recipientApelido })}
       </h1>
       <p className="type-label mt-2 text-muted">{target.assunto}</p>
       <MessageForm
@@ -97,11 +100,12 @@ export default async function NovaMensagemPage({
         hidden={{ alvo }}
         askApelido={!target.apelido}
         initialApelido={target.apelido}
-        submitLabel="Enviar"
+        submitLabel={t.formEnviar}
+        textos={t}
       />
       <p className="mt-8">
         <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Voltar para Recados
+          {t.voltar}
         </Link>
       </p>
     </section>

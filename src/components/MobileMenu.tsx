@@ -7,6 +7,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { CloseIcon, MenuIcon } from '@/components/icons'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
+import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 
 // Without JavaScript the panel is shown inline (UI-SPEC: no-JS fallback).
 const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:static!important}[data-mobile-menu-button]{display:none!important}'
@@ -14,6 +15,7 @@ const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:
 /** Disclosure menu for < 1024px (UI-SPEC Global — Header navigation). */
 export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
   const pathname = usePathname() ?? '/'
+  const t = useTextosGerais()
   // Open state is tied to the path it was opened on: navigating closes the menu by itself.
   const [openOn, setOpenOn] = useState<string | null>(null)
   const open = openOn === pathname
@@ -58,7 +60,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
         className="type-label inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-2 text-text"
       >
         {open ? <CloseIcon /> : <MenuIcon />}
-        <span aria-hidden="true">Menu</span>
+        <span aria-hidden="true">{t.menuBotao}</span>
       </button>
       <div
         id={panelId}
@@ -105,7 +107,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                     type="submit"
                     className="type-eyebrow flex min-h-11 w-full cursor-pointer items-center text-left text-text hover:text-accent"
                   >
-                    Sair
+                    {t.menuSair}
                   </button>
                 </form>
               </li>

@@ -6,7 +6,9 @@ import { useRouter } from 'next/navigation'
 
 import { FieldError, Required, inputClass } from '@/components/classisex/AdFormFields'
 import { VisitorPhotoPicker } from '@/components/classisex/VisitorPhotoPicker'
-import { ASSINADO_MAX, CONSENT_LABEL, TEXTO_MAX, TEXTO_MIN, TITLE_MAX } from '@/lib/contos/envio-rules'
+import { ASSINADO_MAX, TEXTO_MAX, TEXTO_MIN, TITLE_MAX } from '@/lib/contos/envio-rules'
+import type { Textos } from '@/lib/textos/areas'
+import { preencher } from '@/lib/textos/mesclar'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
@@ -23,7 +25,7 @@ const field = (form: FormData, name: string) => {
  * (303 back with ?erro=); with JavaScript it posts with fetch and keeps what was typed when the server
  * refuses. The server decides every rule again.
  */
-export function ContoEnvioForm({ erro }: { erro?: string }) {
+export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Textos<'enviarConto'> }) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<Record<string, string>>(erro ? { form: erro } : {})
@@ -93,7 +95,7 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
       <div key={key} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <label htmlFor="title" className="type-label text-text">
-            Título <Required />
+            {t.tituloRotulo} <Required texto={t.obrigatorio} />
           </label>
           <input
             id="title"
@@ -110,7 +112,7 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
 
         <div className="flex flex-col gap-2">
           <label htmlFor="assinadoComo" className="type-label text-text">
-            Assinado como (opcional)
+            {t.assinadoRotulo}
           </label>
           <input
             id="assinadoComo"
@@ -123,14 +125,14 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
             className={inputClass}
           />
           <p id="ajuda-assinado" className="type-label text-muted">
-            Aparece como &ldquo;por …&rdquo; quando o conto for publicado. Sem telefone, e-mail, @ ou link.
+            {t.assinadoAjuda}
           </p>
           <FieldError id="erro-assinadoComo" message={errors.assinadoComo} />
         </div>
 
         <div className="flex flex-col gap-2">
           <label htmlFor="texto" className="type-label text-text">
-            Conto <Required />
+            {t.contoRotulo} <Required texto={t.obrigatorio} />
           </label>
           <textarea
             id="texto"
@@ -143,15 +145,14 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
             className="min-h-60 rounded-lg border border-line bg-surface px-4 py-3 text-body text-text focus:border-accent"
           />
           <p id="ajuda-texto" className="type-label text-muted">
-            De {TEXTO_MIN} a {TEXTO_MAX.toLocaleString('pt-BR')} caracteres. Deixe uma linha em branco entre os parágrafos. Telefone, e-mail,
-            @ e links são recusados.
+            {preencher(t.contoAjuda, { min: TEXTO_MIN, max: TEXTO_MAX.toLocaleString('pt-BR') })}
           </p>
           <FieldError id="erro-texto" message={errors.texto} />
         </div>
 
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="type-label text-text">
-            Seu e-mail (opcional)
+            {t.emailRotulo}
           </label>
           <input
             id="email"
@@ -163,7 +164,7 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
             className={inputClass}
           />
           <p id="ajuda-email" className="type-label text-muted">
-            Opcional, para a equipe falar com você se precisar. Só a equipe vê.
+            {t.emailAjuda}
           </p>
           <FieldError id="erro-email" message={errors.email} />
         </div>
@@ -173,8 +174,11 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
         name="imagem"
         noun="imagem"
         error={errors.imagem}
-        label="Imagem (opcional)"
-        help="1 imagem JPG, PNG ou WebP, até 15 MB. Aparece na lista e no conto, para todo mundo: sem nudez explícita e sem contatos. Só é mostrada depois da aprovação."
+        label={t.imagemRotulo}
+        help={t.imagemAjuda}
+        choose={t.imagemEscolher}
+        change={t.imagemTrocar}
+        remove={t.imagemTirar}
       />
 
       {/* Honeypot: people never see or fill it */}
@@ -187,7 +191,7 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="consent" value="sim" className={checkbox} aria-describedby={errors.consent ? 'erro-consent' : undefined} />
           <span>
-            {CONSENT_LABEL} <Required />
+            {t.consentimento} <Required texto={t.obrigatorio} />
           </span>
         </label>
         <FieldError id="erro-consent" message={errors.consent} />
@@ -197,26 +201,26 @@ export function ContoEnvioForm({ erro }: { erro?: string }) {
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="termos" value="sim" className={checkbox} aria-describedby={errors.termos ? 'erro-termos' : undefined} />
           <span>
-            Li e aceito os{' '}
+            {t.termosAntes}{' '}
             <Link href="/termos-de-uso" className="text-accent underline underline-offset-4">
-              Termos de Uso
+              {t.termosLink}
             </Link>{' '}
-            e a{' '}
+            {t.termosE}{' '}
             <Link href="/politica-de-privacidade" className="text-accent underline underline-offset-4">
-              Política de Privacidade
+              {t.termosPolitica}
             </Link>{' '}
-            <Required />
+            <Required texto={t.obrigatorio} />
           </span>
         </label>
         <FieldError id="erro-termos" message={errors.termos} />
       </div>
 
       <p role="note" className="rounded-lg border border-line px-4 py-2 text-body">
-        Depois de enviar, não dá para editar nem apagar o conto. Ele só aparece no site depois que a equipe aprovar.
+        {t.aviso}
       </p>
 
       <button type="submit" className="btn-primary" disabled={pending}>
-        {pending ? 'Enviando…' : 'Enviar para aprovação'}
+        {pending ? t.botaoEnviando : t.botao}
       </button>
     </form>
   )

@@ -9,18 +9,18 @@ import { Pagination } from '@/components/classisex/Pagination'
 import { EmptyState } from '@/components/EmptyState'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { parseBoardFilters } from '@/lib/classisex/board'
-import { REPORT_MESSAGES } from '@/lib/classisex/report-rules'
 import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { getActiveAdCategories, listMemberAds } from '@/lib/classisex/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'ClassiSex',
-  robots: { index: false, follow: false },
-}
-
 const PATH = '/area-do-assinante/classisex'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('classisex')
+  return { title: t.membrosGoogleTitulo, robots: { index: false, follow: false } }
+}
 
 /** Members board (CLAS-01, D-05, D-07): visible ads, newest first, filters, 20 per page. */
 export default async function ClassisexPage({
@@ -29,12 +29,13 @@ export default async function ClassisexPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const check = await requireActiveSubscription(PATH)
+  const t = await getTextos('classisex')
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.membrosTopo}</p>
       <h1 id="titulo-classisex" className="type-display mt-2">
-        ClassiSex
+        {t.membrosTitulo}
       </h1>
     </>
   )
@@ -50,9 +51,9 @@ export default async function ClassisexPage({
         {header}
         <InactivePanel access={check.access} />
         <div className="mt-10" data-open-board>
-          <h2 className="type-heading">Anúncios publicados</h2>
+          <h2 className="type-heading">{t.membrosPublicadosTitulo}</h2>
           <p className="mt-2 max-w-[680px] text-body text-muted">
-            Você lê os recados na íntegra. Os contatos, as demais fotos e os vídeos aparecem para assinantes.
+            {t.membrosGratisTexto}
           </p>
           <PublicBoard basePath={PATH} result={publicResult} categories={publicCategories} filters={publicFilters} signedIn />
         </div>
@@ -69,31 +70,32 @@ export default async function ClassisexPage({
       {header}
       {reported && (
         <p role="status" className="mt-4 rounded-lg border border-line px-4 py-2 text-body text-text">
-          {REPORT_MESSAGES.enviada}
+          {t.membrosDenunciaEnviada}
         </p>
       )}
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Anúncios publicados pelos assinantes do Paraíso. Os contatos aparecem ao abrir o anúncio.
+        {t.membrosIntro}
       </p>
       <AdFilters action={PATH} categories={categories} euSou={filters.euSou} cidade={filters.cidade} />
       {result.items.length === 0 ? (
         filtered ? (
           <EmptyState
-            heading="Nenhum anúncio encontrado."
-            body="Tente outra opção em Eu sou ou outra cidade."
-            actions={[{ href: PATH, label: 'Ver todos os anúncios', variant: 'secondary' }]}
+            heading={t.vazioFiltroTitulo}
+            body={t.vazioFiltroMembrosTexto}
+            actions={[{ href: PATH, label: t.vazioVerTodos, variant: 'secondary' }]}
           />
         ) : (
           <EmptyState
-            heading="Ainda não há anúncios publicados."
-            body="Seja o primeiro: o seu anúncio aparece aqui depois que a equipe aprovar."
-            actions={[{ href: '/area-do-assinante/meus-anuncios/novo', label: 'Novo anúncio', variant: 'primary' }]}
+            heading={t.vazioTitulo}
+            body={t.vazioMembrosTexto}
+            actions={[{ href: '/area-do-assinante/meus-anuncios/novo', label: t.vazioMembrosBotao, variant: 'primary' }]}
           />
         )
       ) : (
         <InfiniteAds
           key={`${filters.euSou ?? ''}:${filters.cidade ?? ''}:${result.page}`}
           scope="membros"
+          textos={t}
           initialItems={result.items}
           initialPage={result.page}
           totalPages={result.totalPages}

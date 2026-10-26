@@ -1,14 +1,16 @@
 import Link from 'next/link'
 
 import type { DicaCardDTO } from '@/lib/dicas/dto'
+import { getTextos } from '@/lib/textos/queries'
 
 /** Home "Dicas Hot": the newest few, text only (keeps the home light). Hidden when none are published. */
-export function DicasTeaser({ dicas }: { dicas: DicaCardDTO[] }) {
+export async function DicasTeaser({ dicas }: { dicas: DicaCardDTO[] }) {
   if (dicas.length === 0) return null
+  const t = await getTextos('inicio')
   return (
     <section aria-labelledby="titulo-dicas-home" className="mt-12 rounded-xl border border-line bg-surface p-4 lg:p-6">
       <h2 id="titulo-dicas-home" className="type-heading">
-        Dicas Hot
+        {t.dicasTitulo}
       </h2>
       <ul className="mt-4 flex max-w-[680px] flex-col gap-3">
         {dicas.slice(0, 3).map((d) => (
@@ -21,7 +23,7 @@ export function DicasTeaser({ dicas }: { dicas: DicaCardDTO[] }) {
         ))}
       </ul>
       <Link href="/dicas-hot" className="btn-secondary mt-6">
-        Ver todas as Dicas Hot
+        {t.dicasBotao}
       </Link>
     </section>
   )

@@ -4,11 +4,15 @@ import { RichText } from '@/components/RichText'
 import { SubNav } from '@/components/SubNav'
 import { pathForKey, SECTION_TABS } from '@/lib/pages/keys'
 import type { PageDTO } from '@/lib/pages/queries'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 type SectionTabKey = (typeof SECTION_TABS)[number]['key']
 
 /** Quem somos and its sub-pages (UI-SPEC S6): tabs, H1 + intro, text, link to the next sub-page. */
-export function InstitutionalPage({ page, activeKey }: { page: PageDTO; activeKey: SectionTabKey }) {
+export async function InstitutionalPage({ page, activeKey }: { page: PageDTO; activeKey: SectionTabKey }) {
+  const t = await getTextos('institucional')
+  const labels = { 'quem-somos': t.abaQuemSomos, normas: t.abaNormas, regras: t.abaRegras, dicas: t.abaDicas }
   const index = SECTION_TABS.findIndex((t) => t.key === activeKey)
   const next = SECTION_TABS[index + 1]
   return (
@@ -25,11 +29,11 @@ export function InstitutionalPage({ page, activeKey }: { page: PageDTO; activeKe
       <div className="mt-12">
         {next ? (
           <Link href={pathForKey(next.key)} className="btn-secondary">
-            Próximo: {next.label} →
+            {preencher(t.botaoProximo, { aba: labels[next.key] })}
           </Link>
         ) : (
           <Link href="/" className="btn-primary">
-            Ver próximas festas
+            {t.botaoFestas}
           </Link>
         )}
       </div>

@@ -7,6 +7,7 @@ import { DicaCard } from '@/components/dicas/DicaCard'
 import { EmptyState } from '@/components/EmptyState'
 import { getPublicDicas } from '@/lib/dicas/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { getTextos } from '@/lib/textos/queries'
 
 // Per request (query string, no database at build); data from the tagged cache 'dicas'.
 export const dynamic = 'force-dynamic'
@@ -20,9 +21,10 @@ const pageOf = async (searchParams: SearchParams) => {
 
 export async function generateMetadata({ searchParams }: { searchParams: SearchParams }): Promise<Metadata> {
   const page = await pageOf(searchParams)
+  const t = await getTextos('dicasHot')
   return buildPageMetadata({
-    title: 'Dicas Hot',
-    description: 'Dicas Hot do Paraíso Brasília: swing, casais liberais, fetiches e prazer a dois, com respeito e sem tabu.',
+    title: t.googleLista,
+    description: t.googleListaDescricao,
     path: page > 1 ? `/dicas-hot?pagina=${page}` : '/dicas-hot',
   })
 }
@@ -30,22 +32,23 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 /** Open list of Dicas Hot: cover, title and the first lines; the full text is for subscribers. Drafts never reach this render. */
 export default async function DicasHotPage({ searchParams }: { searchParams: SearchParams }) {
   const result = await getPublicDicas(await pageOf(searchParams))
+  const t = await getTextos('dicasHot')
   return (
     <section aria-labelledby="titulo-dicas">
-      <p className="type-eyebrow text-muted">Leitura</p>
+      <p className="type-eyebrow text-muted">{t.listaEyebrow}</p>
       <h1 id="titulo-dicas" className="type-display mt-2">
-        Dicas Hot
+        {t.listaTitulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Textos sobre swing, casais liberais, fetiches e prazer a dois, com respeito e sem tabu.
+        {t.listaIntro}
       </p>
       <p className="mt-4">
         <Link href="/area-do-assinante/dicas-hot" className="type-label font-semibold text-accent underline underline-offset-4">
-          Já é assinante? Ler as Dicas Hot completas
+          {t.listaLinkAssinante}
         </Link>
       </p>
       {result.items.length === 0 ? (
-        <EmptyState heading="Nenhuma dica publicada ainda." body="Em breve novas dicas por aqui." actions={[{ href: '/', label: 'Voltar para a home', variant: 'secondary' }]} />
+        <EmptyState heading={t.listaVazioTitulo} body={t.listaVazioTexto} actions={[{ href: '/', label: t.listaVazioBotao, variant: 'secondary' }]} />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {result.items.map((d) => (
@@ -55,8 +58,8 @@ export default async function DicasHotPage({ searchParams }: { searchParams: Sea
       )}
       <Pagination basePath="/dicas-hot" page={result.page} totalPages={result.totalPages} params={{}} />
       <AssineJaCta
-        title="Dicas Hot completas para assinantes"
-        text="Assine para ler cada dica do começo ao fim, ver o ClassiSex e trocar mensagens."
+        title={t.listaCtaTitulo}
+        text={t.listaCtaTexto}
         membersHref="/area-do-assinante/dicas-hot"
       />
     </section>

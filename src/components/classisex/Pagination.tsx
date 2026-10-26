@@ -1,7 +1,10 @@
 import Link from 'next/link'
 
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
+
 /** Previous/next links that keep the current filters (D-07). */
-export function Pagination({
+export async function Pagination({
   basePath,
   page,
   totalPages,
@@ -13,6 +16,7 @@ export function Pagination({
   params: Record<string, string | undefined>
 }) {
   if (totalPages <= 1) return null
+  const t = await getTextos('geral')
   const href = (p: number) => {
     const q = new URLSearchParams()
     for (const [k, v] of Object.entries(params)) if (v) q.set(k, v)
@@ -24,15 +28,15 @@ export function Pagination({
     <nav aria-label="Paginação" className="mt-8 flex flex-wrap items-center gap-4">
       {page > 1 && (
         <Link href={href(page - 1)} className="btn-secondary">
-          Anteriores
+          {t.paginacaoAnteriores}
         </Link>
       )}
       <p className="type-label text-muted">
-        Página {Math.min(page, totalPages)} de {totalPages}
+        {preencher(t.paginacaoPagina, { pagina: Math.min(page, totalPages), total: totalPages })}
       </p>
       {page < totalPages && (
         <Link href={href(page + 1)} className="btn-secondary">
-          Próximos
+          {t.paginacaoProximos}
         </Link>
       )}
     </nav>

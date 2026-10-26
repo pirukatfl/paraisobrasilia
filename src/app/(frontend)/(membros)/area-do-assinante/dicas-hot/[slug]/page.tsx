@@ -8,25 +8,27 @@ import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { RichText } from '@/components/RichText'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberDica } from '@/lib/dicas/queries'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Dica Hot',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('dicasHot')
+  return { title: t.membrosGoogleDica, robots: { index: false, follow: false } }
 }
 
 /** Full dica for active subscribers (PREV-03). Unknown or unpublished slugs are a plain 404. */
 export default async function MembrosDicaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const t = await getTextos('dicasHot')
   const check = await requireActiveSubscription(`/area-do-assinante/dicas-hot/${encodeURIComponent(slug)}`)
   if (check.inactive) {
     return (
       <section aria-labelledby="titulo-dica">
         <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-        <p className="type-eyebrow text-muted">Área do assinante</p>
+        <p className="type-eyebrow text-muted">{t.membrosEyebrow}</p>
         <h1 id="titulo-dica" className="type-display mt-2">
-          Dicas Hot
+          {t.membrosTitulo}
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -37,7 +39,7 @@ export default async function MembrosDicaPage({ params }: { params: Promise<{ sl
   return (
     <article aria-labelledby="titulo-dica" className="max-w-[720px]">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Dicas Hot</p>
+      <p className="type-eyebrow text-muted">{t.dicaEyebrow}</p>
       <h1 id="titulo-dica" className="type-display mt-2">
         {dica.title}
       </h1>
@@ -57,7 +59,7 @@ export default async function MembrosDicaPage({ params }: { params: Promise<{ sl
       </div>
       <p className="mt-10">
         <Link href="/area-do-assinante/dicas-hot" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Voltar para as Dicas Hot
+          {t.dicaVoltar}
         </Link>
       </p>
     </article>

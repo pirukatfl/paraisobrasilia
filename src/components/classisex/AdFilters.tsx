@@ -1,7 +1,9 @@
 import Link from 'next/link'
 
+import { getTextos } from '@/lib/textos/queries'
+
 /** Plain GET form (no client JS): Eu sou (+ cidade for members) (D-07). */
-export function AdFilters({
+export async function AdFilters({
   action,
   categories,
   euSou,
@@ -15,11 +17,12 @@ export function AdFilters({
   /** The open area filters by tipo only: the city is never shown there. */
   showCidade?: boolean
 }) {
+  const t = await getTextos('classisex')
   return (
     <form method="get" action={action} role="search" aria-label="Filtrar anúncios" className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end">
       <div className="flex flex-col gap-2">
         <label htmlFor="filtro-eu-sou" className="type-label text-text">
-          Eu sou
+          {t.filtroEuSou}
         </label>
         <select
           id="filtro-eu-sou"
@@ -27,7 +30,7 @@ export function AdFilters({
           defaultValue={euSou ? String(euSou) : ''}
           className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
         >
-          <option value="">Todos</option>
+          <option value="">{t.filtroTodos}</option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -38,7 +41,7 @@ export function AdFilters({
       {showCidade && (
       <div className="flex flex-col gap-2">
         <label htmlFor="filtro-cidade" className="type-label text-text">
-          Cidade
+          {t.filtroCidade}
         </label>
         <input
           id="filtro-cidade"
@@ -52,10 +55,10 @@ export function AdFilters({
       )}
       <div className="flex items-center gap-4">
         <button type="submit" className="btn-primary">
-          Filtrar
+          {t.filtroBotao}
         </button>
         <Link href={action} className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          Limpar filtros
+          {t.filtroLimpar}
         </Link>
       </div>
     </form>

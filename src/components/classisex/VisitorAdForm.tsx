@@ -9,6 +9,7 @@ import { VisitorPhotoPicker } from './VisitorPhotoPicker'
 
 import type { AdFormValues } from '@/lib/classisex/actions'
 import { mensagemDaResposta, mensagemDeFalhaDeRede } from '@/lib/errors'
+import type { Textos } from '@/lib/textos/areas'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
@@ -26,9 +27,15 @@ const field = (form: FormData, name: string) => {
  * fetch and keeps what was typed when the server refuses. The server decides every limit again.
  */
 export function VisitorAdForm({
+  textos: t,
+  campos,
   categories,
   erro,
 }: {
+  /** Texts of the ClassiSex area (from the server page) */
+  textos: Textos<'classisex'>
+  /** Texts of the shared ad fields (Meus anúncios area) */
+  campos: Textos<'meusAnuncios'>
   categories: { id: number; name: string }[]
   /** Form-level message from the no-JavaScript fallback (?erro=…) */
   erro?: string
@@ -103,11 +110,11 @@ export function VisitorAdForm({
       )}
 
       {/* The key re-mounts the uncontrolled fields with the values the server just refused; the photo picker sits outside it so the chosen photo survives a refusal */}
-      <AdFormFields key={fieldsKey} categories={categories} values={values} errors={errors} />
+      <AdFormFields key={fieldsKey} textos={campos} categories={categories} values={values} errors={errors} />
 
       <div key={fieldsKey} className="flex flex-col gap-2">
         <label htmlFor="email" className="type-label text-text">
-          Seu e-mail (opcional)
+          {t.visitanteEmailRotulo}
         </label>
         <input
           id="email"
@@ -119,12 +126,19 @@ export function VisitorAdForm({
           className={inputClass}
         />
         <p id="ajuda-email" className="type-label text-muted">
-          Opcional, para avisarmos quando o anúncio for publicado ou recusado. Só a equipe vê.
+          {t.visitanteEmailAjuda}
         </p>
         <FieldError id="erro-email" message={errors.email} />
       </div>
 
-      <VisitorPhotoPicker error={errors.foto} />
+      <VisitorPhotoPicker
+        error={errors.foto}
+        label={t.fotoRotulo}
+        help={t.fotoAjuda}
+        choose={t.fotoEscolher}
+        change={t.fotoTrocar}
+        remove={t.fotoTirar}
+      />
 
       {/* Honeypot: people never see or fill it */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
@@ -136,30 +150,30 @@ export function VisitorAdForm({
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="termos" value="sim" className={checkbox} aria-describedby={errors.termos ? 'erro-termos' : undefined} />
           <span>
-            Li e aceito os{' '}
+            {t.visitanteTermosAntes}{' '}
             <Link href="/termos-de-uso" className="text-accent underline underline-offset-4">
-              Termos de Uso
+              {t.visitanteTermosLink}
             </Link>{' '}
-            e a{' '}
+            {t.visitanteTermosE}{' '}
             <Link href="/politica-de-privacidade" className="text-accent underline underline-offset-4">
-              Política de Privacidade
+              {t.visitanteTermosPolitica}
             </Link>{' '}
-            <Required />
+            <Required texto={t.visitanteObrigatorio} />
           </span>
         </label>
         <FieldError id="erro-termos" message={errors.termos} />
       </div>
 
       <p role="note" className="rounded-lg border border-line px-4 py-2 text-body">
-        Depois de enviar, não dá para editar nem apagar este anúncio.{' '}
+        {t.visitanteAvisoAntes}{' '}
         <Link href="/cadastro" className="text-accent underline underline-offset-4">
-          Crie uma conta gratuita
+          {t.visitanteAvisoLink}
         </Link>{' '}
-        para editar e apagar seus anúncios.
+        {t.visitanteAvisoDepois}
       </p>
 
       <button type="submit" className="btn-primary" disabled={pending}>
-        {pending ? 'Enviando…' : 'Enviar para aprovação'}
+        {pending ? t.visitanteBotaoEnviando : t.visitanteBotao}
       </button>
     </form>
   )

@@ -99,6 +99,60 @@ Os seis textos já vêm escritos. A equipe pode mudar quando quiser.
 
 ---
 
+## Textos do site (títulos, botões, menu e avisos)
+
+Além das seis páginas acima, **todos os outros textos fixos do site** também podem ser trocados pelo painel: títulos,
+chamadas, botões, rótulos, o menu e o rodapé, os avisos de "nenhum resultado", a confirmação de 18+ e o título e a
+descrição que aparecem no Google.
+
+**Onde fica:** no menu da esquerda, no grupo **Textos do site**. Há uma área por página (ou conjunto de páginas):
+
+| Área | O que tem |
+|---|---|
+| Menu, rodapé e avisos gerais | menu do topo, rodapé, confirmação de 18+, página não encontrada, página de erro, galeria, paginação |
+| Página inicial | próximas festas, espaço, quem somos, dicas, como chegar |
+| Festas | página de cada festa |
+| Espaço | página do espaço |
+| Profissionais e amadoras | lista e página de cada uma |
+| Quem somos e páginas legais | abas e rodapé dessas páginas |
+| Contato | título e frases da página de contato |
+| Assine Já e planos | tabela Grátis × Assinante, planos, como assinar |
+| Entrar, cadastro e senha | entrar, criar conta grátis, confirmar e-mail, esqueci a senha |
+| Área do assinante | início da área, trocar senha, painel da assinatura, aviso de renovação |
+| ClassiSex | página aberta, filtros, cartões, anúncio completo, denúncia, anunciar sem conta |
+| Meus anúncios | lista, novo anúncio, editar, fotos e vídeos |
+| Enviar conto | formulário e página de conto recebido |
+| Contos | lista e página de cada conto |
+| Dicas Hot | lista e página de cada dica |
+| Recados | caixa de entrada, nova conversa, bloquear e denunciar |
+
+**Como trocar um texto:**
+
+1. Abra a área (ex.: **Página inicial**). Os campos estão em blocos, um por seção da página; clique no bloco para abrir.
+2. Cada campo já vem preenchido com o texto que está no ar. Mude o que quiser.
+3. Clique em **Salvar**. **Salvar publica na hora** — não existe rascunho nessas áreas. Recarregue a página do site para ver.
+
+**Para voltar ao texto original:** apague tudo o que está no campo (deixe vazio) e salve. O site volta a mostrar o texto
+que veio de fábrica. Por isso nenhum texto "some": campo vazio nunca deixa um buraco na página.
+
+**Palavras entre chaves, como `{plano}` ou `{nome}`:** são pedaços que o site preenche sozinho (o nome do plano, o nome
+da pessoa, uma data, uma quantidade). Escreva o texto ao redor como quiser, mas **mantenha a palavra entre chaves** onde
+ela deve aparecer. O texto de ajuda abaixo do campo lista as palavras que ele aceita. Se apagar a palavra entre chaves,
+a informação simplesmente não aparece.
+
+**O que não está nessas áreas:**
+
+- **Mensagens de erro e de validação de formulário** (ex.: "e-mail inválido", "senha incorreta", "muitas tentativas").
+- **E-mails automáticos** enviados pelo site (confirmação de cadastro, senha, aviso de vencimento).
+- **Textos das seis páginas** (Quem somos, Normas, Regras, Dicas, Termos, Privacidade): ficam em **Site → Páginas**.
+- **Endereço, telefone, WhatsApp, e-mail e horário**: ficam em **Contato e endereço**.
+- Festas, planos, profissionais e amadoras, contos, dicas e anúncios: cada um tem a sua própria lista no painel.
+- O próprio painel e os textos lidos só por leitores de tela (descrições de botões e imagens).
+
+Para mudar algum desses, peça ajuda à equipe técnica.
+
+---
+
 ## Contato e endereço
 
 Endereço, telefone, WhatsApp, e-mail, Instagram e horário aparecem na página **Contato**, no rodapé e na página inicial.

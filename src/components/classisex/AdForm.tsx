@@ -3,12 +3,12 @@
 import { useRouter } from 'next/navigation'
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 
-import { AdFormFields, DECLARACAO } from './AdFormFields'
+import { AdFormFields } from './AdFormFields'
 import { AdMediaPicker } from './AdMediaPicker'
 
 import type { AdFormState, AdFormValues } from '@/lib/classisex/actions'
-
-export { DECLARACAO }
+import { preencher } from '@/lib/textos/mesclar'
+import type { Textos } from '@/lib/textos/areas'
 
 const subscribe = () => () => {}
 
@@ -45,6 +45,7 @@ function uploadOne(adId: number, item: Item, onProgress: (fraction: number) => v
  * come back in the action state so nothing is lost on an error.
  */
 export function AdForm({
+  textos: t,
   action,
   categories,
   initial,
@@ -53,6 +54,8 @@ export function AdForm({
   limits,
   legacy = false,
 }: {
+  /** Texts of the Meus anúncios area (from the server page) */
+  textos: Textos<'meusAnuncios'>
   action: (state: AdFormState, formData: FormData) => Promise<AdFormState>
   categories: { id: number; name: string }[]
   initial: AdFormValues
@@ -110,26 +113,30 @@ export function AdForm({
         </p>
       )}
 
-      <AdFormFields categories={categories} values={values} errors={errors} legacy={legacy} />
+      <AdFormFields textos={t} categories={categories} values={values} errors={errors} legacy={legacy} />
 
       {withMedia && hydrated && (
         <>
           <input type="hidden" name="comMidia" value={hasFiles ? 'sim' : ''} />
-          <AdMediaPicker photos={photos} videos={videos} onPhotos={setPhotos} onVideos={setVideos} disabled={busy} limits={limits} />
+          <AdMediaPicker textos={t} photos={photos} videos={videos} onPhotos={setPhotos} onVideos={setVideos} disabled={busy} limits={limits} />
         </>
       )}
 
       {progress && (
         <div role="status" className="flex flex-col gap-2">
           <p className="text-body">
-            Enviando arquivo {progress.index} de {progress.total} ({Math.round(progress.fraction * 100)}%). Não feche esta página.
+            {preencher(t.formProgresso, {
+              atual: progress.index,
+              total: progress.total,
+              percentual: Math.round(progress.fraction * 100),
+            })}
           </p>
           <progress max={1} value={progress.fraction} aria-label="Progresso do envio" className="w-full" />
         </div>
       )}
 
       <button type="submit" className="btn-primary" disabled={busy}>
-        {progress ? 'Enviando arquivos…' : pending ? 'Enviando…' : 'Enviar para aprovação'}
+        {progress ? t.formBotaoArquivos : pending ? t.formBotaoEnviando : t.formBotao}
       </button>
     </form>
   )

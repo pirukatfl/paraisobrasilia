@@ -2,9 +2,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { ContoCardDTO } from '@/lib/contos/dto'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 /** One conto in a list: optional image, title, date, author nickname and the first lines (open part only). */
-export function ContoCard({ conto, href }: { conto: ContoCardDTO; href: string }) {
+export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: string }) {
+  const t = await getTextos('contos')
   const titleId = `conto-${conto.slug}`
   return (
     <article aria-labelledby={titleId} className="flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
@@ -28,13 +31,13 @@ export function ContoCard({ conto, href }: { conto: ContoCardDTO; href: string }
         </h2>
         {(conto.dateLabel || conto.assinadoComo) && (
           <p className="type-label mt-1 text-muted">
-            {[conto.dateLabel, conto.assinadoComo ? `por ${conto.assinadoComo}` : ''].filter(Boolean).join(' · ')}
+            {[conto.dateLabel, conto.assinadoComo ? preencher(t.contoPor, { nome: conto.assinadoComo }) : ''].filter(Boolean).join(' · ')}
           </p>
         )}
         <p className="mt-3 flex-1 text-body text-muted">{conto.chamada}</p>
         <p className="mt-4">
           <Link href={href} className="type-label font-semibold text-accent underline underline-offset-4">
-            Ler: {conto.title}
+            {preencher(t.cardLer, { titulo: conto.title })}
           </Link>
         </p>
       </div>

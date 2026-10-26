@@ -6,6 +6,7 @@ import { MemberAdCard } from '@/components/classisex/MemberAdCard'
 import { PublicAdCard } from '@/components/classisex/PublicAdCard'
 import type { MemberAdDTO, PublicAdDTO } from '@/lib/classisex/dto'
 import { loadMoreClassisex } from '@/lib/classisex/more-actions'
+import type { Textos } from '@/lib/textos/areas'
 
 type AnyAd = MemberAdDTO | PublicAdDTO
 
@@ -15,6 +16,7 @@ type AnyAd = MemberAdDTO | PublicAdDTO
  * with a "Carregar mais" button as the fallback. The plain Pagination links live in <noscript>.
  */
 export function InfiniteAds({
+  textos: t,
   scope,
   initialItems,
   initialPage,
@@ -24,6 +26,8 @@ export function InfiniteAds({
   gridClassName,
   noscriptPagination,
 }: {
+  /** Texts of the ClassiSex area (from the server page) */
+  textos: Textos<'classisex'>
   scope: 'publico' | 'membros'
   initialItems: AnyAd[]
   initialPage: number
@@ -81,9 +85,9 @@ export function InfiniteAds({
       <div className={gridClassName}>
         {items.map((ad) =>
           'contato' in ad ? (
-            <MemberAdCard key={ad.id} ad={ad as MemberAdDTO} />
+            <MemberAdCard key={ad.id} ad={ad as MemberAdDTO} textos={t} />
           ) : (
-            <PublicAdCard key={ad.id} ad={ad as PublicAdDTO} />
+            <PublicAdCard key={ad.id} ad={ad as PublicAdDTO} textos={t} />
           ),
         )}
       </div>
@@ -92,7 +96,7 @@ export function InfiniteAds({
       <div className="mt-8 flex flex-col items-center gap-3" data-infinite-status>
         {loading && (
           <p role="status" className="type-label text-muted">
-            Carregando mais anúncios…
+            {t.carregando}
           </p>
         )}
         {failed && (
@@ -102,10 +106,10 @@ export function InfiniteAds({
         )}
         {!done && !loading && (
           <button type="button" className="btn-secondary" onClick={() => void loadNext()}>
-            Carregar mais
+            {t.carregarMais}
           </button>
         )}
-        {done && pages > 1 && <p className="type-label text-muted">Você chegou ao fim dos anúncios.</p>}
+        {done && pages > 1 && <p className="type-label text-muted">{t.fimDaLista}</p>}
       </div>
     </>
   )

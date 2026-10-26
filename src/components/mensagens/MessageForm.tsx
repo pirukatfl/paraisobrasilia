@@ -4,6 +4,7 @@ import { useActionState, useState } from 'react'
 
 import type { MessageFormState } from '@/lib/mensagens/actions'
 import { MESSAGE_MAX } from '@/lib/mensagens/rules'
+import type { Textos } from '@/lib/textos/areas'
 
 const inputClass =
   'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent'
@@ -16,6 +17,7 @@ export function MessageForm({
   initialApelido = '',
   submitLabel,
   rows = 4,
+  textos,
 }: {
   action: (state: MessageFormState, formData: FormData) => Promise<MessageFormState>
   hidden: Record<string, string>
@@ -23,6 +25,7 @@ export function MessageForm({
   initialApelido?: string
   submitLabel: string
   rows?: number
+  textos: Pick<Textos<'mensagens'>, 'formApelido' | 'formApelidoAjuda' | 'formRecado' | 'formEnviando'>
 }) {
   const [state, formAction, pending] = useActionState(action, null)
   const texto = state?.values.texto ?? ''
@@ -42,7 +45,7 @@ export function MessageForm({
       {askApelido && (
         <div className="flex flex-col gap-2">
           <label htmlFor="apelido" className="type-label text-text">
-            Seu apelido
+            {textos.formApelido}
           </label>
           <input
             id="apelido"
@@ -56,13 +59,13 @@ export function MessageForm({
             className={inputClass}
           />
           <p id="ajuda-apelido" className="type-label text-muted">
-            É o nome que a outra pessoa vê. Até 40 caracteres, sem telefone, e-mail, @ ou link.
+            {textos.formApelidoAjuda}
           </p>
         </div>
       )}
       <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
-          Recado
+          {textos.formRecado}
         </label>
         <textarea
           id="texto"
@@ -78,7 +81,7 @@ export function MessageForm({
         </p>
       </div>
       <button type="submit" className="btn-primary self-start" disabled={pending}>
-        {pending ? 'Enviando…' : submitLabel}
+        {pending ? textos.formEnviando : submitLabel}
       </button>
     </form>
   )

@@ -70,6 +70,7 @@
 - [x] **PAINEL-06**: Equipe vê a lista de assinaturas que vencem nos próximos 7 dias
 - [x] **PAINEL-07**: Equipe aprova ou recusa perfis e recados na fila de moderação
 - [x] **PAINEL-08**: Toda ação da equipe sobre assinantes fica registrada (quem, quando, o quê)
+- [x] **PAINEL-10**: A equipe troca pelo painel qualquer texto fixo das páginas do site (área aberta e área do assinante); apagar o campo volta ao texto original
 - [x] **PAINEL-09**: Só a equipe cadastra modelos (nome, descrição, capa, até 30 fotos e 3 vídeos), ordena, publica e despublica pelo painel
 
 ### Conta gratuita (CONTA)
@@ -161,6 +162,7 @@ Pedido do cliente em 2026-10-20 (quick task `2026-10-20-conta-gratuita`, decisõ
 | MIDIA-06 | Fase 06.1 | Complete |
 | MIDIA-07 | Fase 06.1 | Complete |
 | PAINEL-09 | Fase 06.1 | Complete |
+| PAINEL-10 | Fase 06.2 | Complete |
 | CONTA-01 | Quick 2026-10-20-conta-gratuita | Complete |
 | CONTA-02 | Quick 2026-10-20-conta-gratuita; texto revisado em Quick 2026-10-20-recados-privados | Complete |
 | CONTA-03 | Quick 2026-10-20-conta-gratuita | Complete |

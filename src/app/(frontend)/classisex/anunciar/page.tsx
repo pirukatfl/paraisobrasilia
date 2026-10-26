@@ -5,12 +5,13 @@ import { VisitorAdForm } from '@/components/classisex/VisitorAdForm'
 import { getAssinante } from '@/lib/assinantes/session'
 import { getActiveAdCategories } from '@/lib/classisex/queries'
 import { uploadErrorMessage } from '@/lib/classisex/media-messages'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Anunciar no ClassiSex',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('classisex')
+  return { title: t.anunciarGoogleTitulo, robots: { index: false, follow: false } }
 }
 
 /** Messages for ?erro=<codigo> (answer of the no-JavaScript fallback of the form). */
@@ -39,17 +40,21 @@ export default async function AnunciarPage({
   if (await getAssinante()) redirect('/area-do-assinante/meus-anuncios/novo')
   const raw = (await searchParams).erro
   const erro = erroMessage(typeof raw === 'string' ? raw.slice(0, 40) : undefined)
-  const categories = await getActiveAdCategories()
+  const [categories, t, campos] = await Promise.all([
+    getActiveAdCategories(),
+    getTextos('classisex'),
+    getTextos('meusAnuncios'),
+  ])
   return (
     <section aria-labelledby="titulo-anunciar">
-      <p className="type-eyebrow text-muted">ClassiSex</p>
+      <p className="type-eyebrow text-muted">{t.anunciarTopo}</p>
       <h1 id="titulo-anunciar" className="type-display mt-2">
-        Anunciar no ClassiSex
+        {t.anunciarTitulo}
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        Qualquer pessoa pode anunciar, sem cadastro. O anúncio aparece depois da análise da equipe: todo mundo vê o texto e a foto; o contato (WhatsApp ou Telegram) só os assinantes veem.
+        {t.anunciarIntro}
       </p>
-      <VisitorAdForm categories={categories} erro={erro} />
+      <VisitorAdForm textos={t} campos={campos} categories={categories} erro={erro} />
     </section>
   )
 }

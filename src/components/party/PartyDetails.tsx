@@ -1,13 +1,7 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 
-import type { Attraction, PartyDetailDTO } from '@/lib/parties/types'
-
-const KIND_LABEL: Record<Attraction['kind'], string> = {
-  dj: 'DJ',
-  show: 'Show',
-  modelo: 'Modelo',
-  outro: 'Outro',
-}
+import type { PartyDetailDTO } from '@/lib/parties/types'
+import { getTextos } from '@/lib/textos/queries'
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
@@ -21,11 +15,13 @@ function Section({ id, title, children }: { id: string; title: string; children:
 }
 
 /** Party sections from D-05; each hidden when empty. Rich text is rendered by React (escaped, T-01-18). */
-export function PartyDetails({ party }: { party: PartyDetailDTO }) {
+export async function PartyDetails({ party }: { party: PartyDetailDTO }) {
+  const t = await getTextos('festas')
+  const kindLabel = { dj: t.atracaoDj, show: t.atracaoShow, modelo: t.atracaoModelo, outro: t.atracaoOutro }
   return (
     <>
       {party.prices.length > 0 && (
-        <Section id="secao-valores" title="Valores">
+        <Section id="secao-valores" title={t.tituloValores}>
           <ul aria-labelledby="secao-valores" className="divide-y divide-line rounded-lg border border-line bg-surface">
             {party.prices.map((row, i) => (
               <li key={`${row.label}-${i}`} className="flex items-center justify-between gap-2 px-4 py-4">
@@ -38,17 +34,17 @@ export function PartyDetails({ party }: { party: PartyDetailDTO }) {
       )}
 
       {party.dressCode && (
-        <Section id="secao-dress-code" title="Dress code">
+        <Section id="secao-dress-code" title={t.tituloDressCode}>
           <p className="text-body">{party.dressCode}</p>
         </Section>
       )}
 
       {party.attractions.length > 0 && (
-        <Section id="secao-atracoes" title="Atrações">
+        <Section id="secao-atracoes" title={t.tituloAtracoes}>
           <ul aria-labelledby="secao-atracoes" className="flex flex-col gap-2">
             {party.attractions.map((a, i) => (
               <li key={`${a.kind}-${a.name}-${i}`} className="text-body">
-                <span className="type-label text-muted">{KIND_LABEL[a.kind]}</span>
+                <span className="type-label text-muted">{kindLabel[a.kind]}</span>
                 <span aria-hidden="true" className="text-muted">
                   {' · '}
                 </span>
@@ -60,7 +56,7 @@ export function PartyDetails({ party }: { party: PartyDetailDTO }) {
       )}
 
       {party.details && (
-        <Section id="secao-sobre" title="Sobre a festa">
+        <Section id="secao-sobre" title={t.tituloSobre}>
           <RichText
             data={party.details}
             disableContainer

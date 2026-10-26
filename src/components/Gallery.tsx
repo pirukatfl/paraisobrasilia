@@ -7,6 +7,7 @@ import { PlayIcon } from '@/components/icons'
 import { Lightbox } from '@/components/Lightbox'
 import type { LightboxSlide, SpaceItemDTO } from '@/lib/gallery/types'
 import { useHydrated } from '@/lib/gallery/use-hydrated'
+import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 
 const TILE_SIZES = '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
 
@@ -16,6 +17,7 @@ const TILE_SIZES = '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
  */
 export function Gallery({ items }: { items: SpaceItemDTO[] }) {
   const hydrated = useHydrated()
+  const t = useTextosGerais()
   const [index, setIndex] = useState<number | null>(null)
   const openers = useRef<(HTMLElement | null)[]>([])
   const openedFrom = useRef<number | null>(null)
@@ -54,7 +56,7 @@ export function Gallery({ items }: { items: SpaceItemDTO[] }) {
               {item.kind === 'video' && (
                 <>
                   <span className="type-label absolute left-2 top-2 rounded bg-surface px-2 py-0.5 text-text">
-                    Vídeo
+                    {t.galeriaVideo}
                   </span>
                   <span className="absolute inset-0 flex items-center justify-center">
                     <span className="flex h-12 w-12 items-center justify-center rounded-full bg-bg/70 text-text">

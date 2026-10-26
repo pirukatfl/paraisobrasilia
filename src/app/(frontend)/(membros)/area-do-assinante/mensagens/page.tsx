@@ -8,12 +8,13 @@ import { InboxList } from '@/components/mensagens/InboxList'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getInbox } from '@/lib/mensagens/queries'
 import { parsePage } from '@/lib/mensagens/rules'
+import { getTextos } from '@/lib/textos/queries'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Recados',
-  robots: { index: false, follow: false },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTextos('mensagens')
+  return { title: t.googleLista, robots: { index: false, follow: false } }
 }
 
 const PATH = '/area-do-assinante/mensagens'
@@ -25,14 +26,15 @@ export default async function MensagensPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const check = await requireActiveSubscription(PATH)
+  const t = await getTextos('mensagens')
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">Área do assinante</p>
+      <p className="type-eyebrow text-muted">{t.eyebrow}</p>
       <h1 id="titulo-mensagens" className="type-display mt-2">
-        Recados
+        {t.titulo}
       </h1>
-      <p className="mt-2 max-w-[560px] text-body text-muted">Só você e a outra pessoa veem cada conversa.</p>
+      <p className="mt-2 max-w-[560px] text-body text-muted">{t.intro}</p>
     </>
   )
   if (check.inactive) {
@@ -50,10 +52,10 @@ export default async function MensagensPage({
       {header}
       {inbox.items.length === 0 ? (
         <EmptyState
-          heading="Nenhum recado ainda."
-          body="Para mandar um recado, abra um anúncio do ClassiSex e toque em Enviar recado. Aqui aparecem só os recados que você mandou ou recebeu."
+          heading={t.vazioTitulo}
+          body={t.vazioTexto}
           actions={[
-            { href: '/area-do-assinante/classisex', label: 'Ver ClassiSex', variant: 'secondary' },
+            { href: '/area-do-assinante/classisex', label: t.vazioBotao, variant: 'secondary' },
           ]}
         />
       ) : (

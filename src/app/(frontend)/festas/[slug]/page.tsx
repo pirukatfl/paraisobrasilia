@@ -7,6 +7,8 @@ import { PartyDetails } from '@/components/party/PartyDetails'
 import { formatPartyDate, formatPartyTime } from '@/lib/format/date'
 import { getPartyBySlug } from '@/lib/parties/queries'
 import { buildPartyMetadata } from '@/lib/seo/metadata'
+import { preencher } from '@/lib/textos/mesclar'
+import { getTextos } from '@/lib/textos/queries'
 
 // Rendered per request, like every other public page: the root layout reads the session
 // cookie (logged-in menu, renewal banner), so ISR here failed at runtime with
@@ -29,6 +31,7 @@ export default async function PartyPage({ params }: Props) {
   const { slug } = await params
   const party = await getPartyBySlug(slug)
   if (!party) notFound()
+  const t = await getTextos('festas')
 
   return (
     <article className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -45,17 +48,17 @@ export default async function PartyPage({ params }: Props) {
 
       <div className="max-w-[680px] lg:col-span-7">
         <Link href="/" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-          ← Ver todas as festas
+          {t.voltar}
         </Link>
 
         <p className="type-label mt-4 flex flex-col gap-2 text-gold">
           <span>{formatPartyDate(party.startsAt)}</span>
-          <span>A partir das {formatPartyTime(party.startsAt)}</span>
+          <span>{preencher(t.horario, { hora: formatPartyTime(party.startsAt) })}</span>
         </p>
 
         {party.isPast && (
           <p className="type-label mt-4 inline-block rounded border border-danger px-2 py-1 text-danger">
-            Esta festa já aconteceu
+            {t.jaAconteceu}
           </p>
         )}
 
@@ -67,7 +70,7 @@ export default async function PartyPage({ params }: Props) {
 
         {party.isPast && (
           <Link href="/" className="btn-primary mt-12">
-            Ver próximas festas
+            {t.botaoProximas}
           </Link>
         )}
       </div>
