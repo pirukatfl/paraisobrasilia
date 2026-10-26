@@ -7,9 +7,16 @@ import { selfDeclaration } from './self-declaration'
  * self-declaration by registering it here and setting NEXT_PUBLIC_AGE_GATE_PROVIDER.
  * Pages never know which provider is active; the gate never redirects or hides HTML.
  */
+export type AgeGateTextos = {
+  titulo: string
+  texto: string
+  botaoEntrar: string
+  botaoSair: string
+}
+
 export interface AgeVerifier {
   id: string
-  Prompt: React.ComponentType<{ onVerified: () => void }>
+  Prompt: React.ComponentType<{ onVerified: () => void; textos: AgeGateTextos }>
 }
 
 const registry: Record<string, AgeVerifier> = {

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { buildAgeCookie, isAgeCookieValid, readAgeCookie } from './cookie'
-import { getActiveVerifier } from './index'
+import { type AgeGateTextos, getActiveVerifier } from './index'
 
 const { Prompt } = getActiveVerifier()
 
@@ -17,7 +17,7 @@ const GATE_CSS = `html[data-age-ok] [data-age-gate]{display:none}`
  * 18+ overlay over the fully rendered page (INST-04). No redirect and no browser sniffing:
  * crawlers and link previews receive the same complete HTML as everyone else.
  */
-export function AgeGate() {
+export function AgeGate({ textos }: { textos: AgeGateTextos }) {
   const [state, setState] = useState<'open' | 'closing' | 'closed'>('open')
   const ref = useRef<HTMLDivElement>(null)
 
@@ -87,7 +87,7 @@ export function AgeGate() {
           state === 'closing' ? 'opacity-0' : 'opacity-100'
         }`}
       >
-        <Prompt onVerified={onVerified} />
+        <Prompt onVerified={onVerified} textos={textos} />
       </div>
     </>
   )

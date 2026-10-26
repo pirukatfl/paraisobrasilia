@@ -5,6 +5,8 @@ import { WhatsAppIcon } from '@/components/icons'
 import { pathForKey } from '@/lib/pages/keys'
 import { type ContactDTO, instagramUrl, telUrl, whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
+import { getTextos } from '@/lib/textos/queries'
+import { preencher } from '@/lib/textos/mesclar'
 
 const linkClass = 'type-label inline-flex min-h-11 items-center text-muted hover:text-text'
 
@@ -48,32 +50,33 @@ function LinkList({ links }: { links: FooterLink[] }) {
 export async function Footer() {
   const year = new Date().getFullYear()
   const contact = await loadContact()
+  const t = await getTextos('geral')
   const instagram = instagramUrl(contact?.instagram)
   const navigate: FooterLink[] = [
-    { href: '/', label: 'Festas' },
-    { href: pathForKey('quem-somos'), label: 'Quem somos' },
-    { href: pathForKey('normas'), label: 'Normas' },
-    { href: pathForKey('regras'), label: 'Regras' },
-    { href: pathForKey('dicas'), label: 'Dicas' },
-    { href: '/espaco', label: 'Espaço' },
-    { href: '/modelos', label: 'Profissionais e amadoras' },
-    { href: '/classisex', label: 'ClassiSex' },
-    { href: '/contos', label: 'Contos' },
-    { href: '/dicas-hot', label: 'Dicas Hot' },
-    { href: '/contato', label: 'Contato' },
-    { href: '/assine-ja', label: 'Assine Já' },
-    { href: '/area-do-assinante', label: 'Área do assinante' },
+    { href: '/', label: t.menuFestas },
+    { href: pathForKey('quem-somos'), label: t.menuQuemSomos },
+    { href: pathForKey('normas'), label: t.menuNormas },
+    { href: pathForKey('regras'), label: t.menuRegras },
+    { href: pathForKey('dicas'), label: t.menuDicas },
+    { href: '/espaco', label: t.menuEspaco },
+    { href: '/modelos', label: t.menuModelos },
+    { href: '/classisex', label: t.menuClassisex },
+    { href: '/contos', label: t.menuContos },
+    { href: '/dicas-hot', label: t.menuDicasHot },
+    { href: '/contato', label: t.menuContato },
+    { href: '/assine-ja', label: t.menuAssineJa },
+    { href: '/area-do-assinante', label: t.menuAreaAssinante },
   ]
   const legal: FooterLink[] = [
-    { href: pathForKey('termos'), label: 'Termos de Uso' },
-    { href: pathForKey('privacidade'), label: 'Política de Privacidade' },
+    { href: pathForKey('termos'), label: t.rodapeTermos },
+    { href: pathForKey('privacidade'), label: t.rodapePrivacidade },
   ]
 
   return (
     <footer className="mt-16 border-t border-line bg-bg">
       <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-4 pt-8 lg:grid-cols-3 lg:px-8">
         {contact && (
-          <Group id="rodape-contato" title="Contato">
+          <Group id="rodape-contato" title={t.rodapeContatoTitulo}>
             <address className="type-label not-italic text-muted">
               <span className="block">{contact.addressLine}</span>
               <span className="block">{contact.addressDetail}</span>
@@ -85,7 +88,7 @@ export async function Footer() {
                   className="type-label inline-flex min-h-11 items-center gap-2 text-accent underline-offset-4 hover:underline"
                 >
                   <WhatsAppIcon />
-                  Chamar no WhatsApp
+                  {t.rodapeWhatsapp}
                 </ExternalLink>
               </li>
               {contact.phone && (
@@ -107,7 +110,7 @@ export async function Footer() {
               {instagram && (
                 <li>
                   <ExternalLink href={instagram} className={linkClass}>
-                    Instagram @{contact.instagram}
+                    {preencher(t.rodapeInstagram, { usuario: contact.instagram ?? '' })}
                   </ExternalLink>
                 </li>
               )}
@@ -115,16 +118,16 @@ export async function Footer() {
           </Group>
         )}
         <nav aria-label="Rodapé" className="contents">
-          <Group id="rodape-navegue" title="Navegue">
+          <Group id="rodape-navegue" title={t.rodapeNavegueTitulo}>
             <LinkList links={navigate} />
           </Group>
-          <Group id="rodape-legal" title="Legal">
+          <Group id="rodape-legal" title={t.rodapeLegalTitulo}>
             <LinkList links={legal} />
           </Group>
         </nav>
       </div>
       <p className="type-label mx-auto max-w-[1200px] px-4 py-8 text-muted lg:px-8">
-        © {year} Paraíso Brasília · Proibido para menores de 18 anos
+        {preencher(t.rodapeCopyright, { ano: year })}
       </p>
     </footer>
   )

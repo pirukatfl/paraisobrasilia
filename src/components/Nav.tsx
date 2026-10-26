@@ -5,10 +5,12 @@ import { usePathname } from 'next/navigation'
 
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
+import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 
 /** Desktop inline navigation (≥ 1024px). Active item: accent underline + aria-current. */
 export function Nav({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
   const pathname = usePathname() ?? '/'
+  const t = useTextosGerais()
   return (
     <nav aria-label="Principal" className="hidden xl:block">
       <ul
@@ -39,7 +41,7 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
                 type="submit"
                 className="type-eyebrow inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-muted hover:text-accent"
               >
-                Sair
+                {t.menuSair}
               </button>
             </form>
           </li>

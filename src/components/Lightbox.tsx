@@ -6,6 +6,8 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '@/components/icons'
 import type { LightboxSlide } from '@/lib/gallery/types'
+import { preencher } from '@/lib/textos/mesclar'
+import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 
 const SWIPE_THRESHOLD = 48
 
@@ -34,6 +36,7 @@ export function Lightbox({
   plainImages?: boolean
   fitScreen?: boolean
 }) {
+  const t = useTextosGerais()
   const ref = useRef<HTMLDialogElement>(null)
   const pointerStart = useRef<number | null>(null)
   const open = index !== null
@@ -75,7 +78,7 @@ export function Lightbox({
   }
 
   const slide = index !== null ? slides[index] : null
-  const counter = index !== null ? `${index + 1} de ${total}` : ''
+  const counter = index !== null ? preencher(t.galeriaContador, { n: index + 1, total }) : ''
   const iconButton =
     'inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-surface text-text hover:text-accent'
 
@@ -172,7 +175,7 @@ export function Lightbox({
                 href={slide.href}
                 className="type-label inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent"
               >
-                Ver detalhes da festa
+                {t.galeriaVerFesta}
               </Link>
             )}
           </div>

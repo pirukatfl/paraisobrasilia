@@ -8,6 +8,7 @@ import { revalidateTag } from 'next/cache.js'
  * Eu sou options, ad media and subscription changes.
  * 'contos' (lists, sitemap) and 'conto:{slug}' (one conto) — 05-02/05-03.
  * 'dicas' (lists, home, sitemap) and 'dica:{slug}' (quick dicas-hot).
+ * 'textos:{area}' (and 'textos') — editable site texts of one area, expired by the textos-* globals (06.2).
  * `{ expire: 0 }` expires immediately, so the next visitor gets fresh HTML instead of a
  * stale-while-revalidate copy.
  */
