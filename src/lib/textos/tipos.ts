@@ -19,6 +19,8 @@ export type AreaTextos = {
   slug: string
   rotulo: string
   descricao: string
+  /** Hidden from the admin menu; the site keeps reading the stored or original texts. */
+  ocultaNoPainel?: boolean
   campos: Record<string, CampoTexto>
 }
 
@@ -27,6 +29,7 @@ export function definirArea<const C extends Record<string, CampoTexto>>(area: {
   slug: string
   rotulo: string
   descricao: string
+  ocultaNoPainel?: boolean
   campos: C
 }) {
   return area

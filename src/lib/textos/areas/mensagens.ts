@@ -4,6 +4,8 @@ export const mensagens = definirArea({
   slug: 'textos-mensagens',
   rotulo: 'Recados',
   descricao: 'Caixa de recados dos assinantes: lista, novo recado, conversa, bloquear e denunciar.',
+  // Client request 2026-10-26: Recados left the site menu, so the area leaves the admin too
+  ocultaNoPainel: true,
   campos: {
     // Lista
     googleLista: { rotulo: 'Título no Google (lista)', padrao: 'Recados', secao: 'Lista de recados' },

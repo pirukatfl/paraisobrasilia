@@ -124,7 +124,8 @@ descrição que aparecem no Google.
 | Enviar conto | formulário e página de conto recebido |
 | Contos | lista e página de cada conto |
 | Dicas Hot | lista e página de cada dica |
-| Recados | caixa de entrada, nova conversa, bloquear e denunciar |
+
+Desde 26/10/2026 a área **Recados** não aparece mais no painel (saiu do menu do site). Os textos da caixa de recados ficam como estão.
 
 **Como trocar um texto:**
 
@@ -510,7 +511,7 @@ painel.
 - **Endereços antigos:** `/recados` leva ao Assine Já e `/area-do-assinante/recados` leva à página Recados.
 - **Recados do mural antigo:** os textos já guardados continuam no banco, sem tela e sem aparecer em lugar nenhum do site.
   São apagados junto com a conta da pessoa.
-- **Número de novos:** o item **Recados** do menu da área do assinante mostra quantos recados novos a pessoa tem.
+- **Menu:** desde 24/10/2026 **Recados** não aparece no menu do site; a caixa continua no endereço `/area-do-assinante/mensagens`.
 
 ### Privacidade dos recados
 
