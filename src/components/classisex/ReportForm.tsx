@@ -19,7 +19,12 @@ const REASON_FIELD = {
  * "Denunciar este anúncio" on the full ad (CLAS-05, D-08). Shown only to viewers who are not the
  * owner; the server decides that and the reporter always comes from the session.
  */
-export function ReportForm({ adId, textos: t }: { adId: number; textos: Textos<'classisex'> }) {
+type ReportFormTextos = Pick<
+  Textos<'classisex'>,
+  'denunciarResumo' | 'denunciarMotivo' | 'denunciarDetalhes' | 'denunciarBotao' | (typeof REASON_FIELD)[keyof typeof REASON_FIELD]
+>
+
+export function ReportForm({ adId, textos: t }: { adId: number; textos: ReportFormTextos }) {
   const [state, formAction, pending] = useActionState(denunciarAnuncio, null)
   return (
     <details className="mt-10 max-w-[560px] rounded-lg border border-line px-4 py-3">

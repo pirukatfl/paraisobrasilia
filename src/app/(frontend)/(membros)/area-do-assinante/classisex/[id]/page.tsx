@@ -50,7 +50,11 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </h1>
       <p className="type-label mt-2 text-muted">{preencher(t.anuncioPublicadoEm, { data: ad.publishedLabel })}</p>
-      <MediaGallery fotos={ad.fotos} videos={ad.videos} textos={t} />
+      <MediaGallery
+        fotos={ad.fotos}
+        videos={ad.videos}
+        textos={{ galeriaVideoVarios: t.galeriaVideoVarios, galeriaVideoUm: t.galeriaVideoUm }}
+      />
       <p className="mt-6 whitespace-pre-line text-body">{ad.texto}</p>
       <section aria-labelledby="titulo-contato" className="mt-8">
         <h2 id="titulo-contato" className="type-heading mb-4">
@@ -64,7 +68,23 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
             <EnviarRecadoLink id={ad.id} />
           ))}
       </section>
-      {canReport && <ReportForm adId={ad.id} textos={t} />}
+      {canReport && (
+        <ReportForm
+          adId={ad.id}
+          textos={{
+            denunciarResumo: t.denunciarResumo,
+            denunciarMotivo: t.denunciarMotivo,
+            denunciarDetalhes: t.denunciarDetalhes,
+            denunciarBotao: t.denunciarBotao,
+            motivoContatoFalso: t.motivoContatoFalso,
+            motivoGolpe: t.motivoGolpe,
+            motivoOfensivo: t.motivoOfensivo,
+            motivoMenor: t.motivoMenor,
+            motivoSemAutorizacao: t.motivoSemAutorizacao,
+            motivoOutro: t.motivoOutro,
+          }}
+        />
+      )}
       <p className="mt-10">
         <Link href="/area-do-assinante/classisex" className="type-label text-muted underline underline-offset-4 hover:text-accent">
           {t.anuncioVoltar}

@@ -22,7 +22,7 @@ export function MediaGallery({
 }: {
   fotos: MemberPhotoDTO[]
   videos: MemberVideoDTO[]
-  textos: Textos<'classisex'>
+  textos: Pick<Textos<'classisex'>, 'galeriaVideoVarios' | 'galeriaVideoUm'>
 }) {
   const hydrated = useHydrated()
   const [index, setIndex] = useState<number | null>(null)
