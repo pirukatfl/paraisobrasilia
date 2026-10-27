@@ -224,7 +224,7 @@ export async function staffApi(request: APIRequestContext) {
       euSou?: number
       cidade?: string
       texto?: string
-      contato?: { whatsapp?: string; telegram?: string }
+      contato?: { whatsapp?: string; telegram?: string; email?: string; links?: { url: string }[]; observacao?: string }
       status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
       publishedAt?: string
     }) {

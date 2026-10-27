@@ -21,6 +21,8 @@ const TEXTO_ELI = 'Anúncio de quem venceu ontem.'
 const TEXTO_PENDENTE = 'Anúncio ainda em análise.'
 const DUDA_WHATS = '5561977776666'
 const DUDA_EMAIL = 'duda.contato@exemplo.com'
+const DUDA_LINK = 'https://instagram.com/duda_perfil'
+const DUDA_OBS = 'Só mensagem, depois das 18h'
 
 let dudaId = 0
 let casalAd = 0
@@ -44,7 +46,7 @@ test.beforeAll(async ({ request }) => {
       cidade: 'Brasília',
       status: 'aprovado',
       publishedAt: new Date(Date.now() - 2 * DAY).toISOString(),
-      contato: { whatsapp: DUDA_WHATS },
+      contato: { whatsapp: DUDA_WHATS, email: DUDA_EMAIL, links: [{ url: DUDA_LINK }], observacao: DUDA_OBS },
     })
   ).id
   solteiraAd = (
@@ -145,8 +147,13 @@ test('full ad shows contacts; hidden ads answer 404', async ({ browser, baseURL 
   await expect(main).toContainText('Casal · Brasília')
   await expect(main).toContainText(TEXTO_CASAL)
   await expect(main.getByRole('link', { name: /^WhatsApp/ })).toHaveAttribute('href', new RegExp(`^https://wa\\.me/${DUDA_WHATS}`))
-  // Revisão 2026-10-20: WhatsApp and Telegram only, no e-mail button
-  await expect(main.getByRole('link', { name: /^E-mail/ })).toHaveCount(0)
+  // Client 2026-10-27: e-mail, links to other platforms and the contact note (members only)
+  await expect(main.getByRole('link', { name: /^E-mail/ })).toHaveAttribute('href', `mailto:${DUDA_EMAIL}`)
+  const instagram = main.getByRole('link', { name: /^Instagram/ })
+  await expect(instagram).toHaveAttribute('href', DUDA_LINK)
+  await expect(instagram).toHaveAttribute('rel', /nofollow/)
+  await expect(instagram).toHaveAttribute('target', '_blank')
+  await expect(main).toContainText(DUDA_OBS)
   await expect(main).toContainText('Anúncio Teste · Casal · Brasília')
   await expect(main.getByRole('link', { name: /^Telegram/ })).toHaveCount(0)
   await expect(main.getByRole('link', { name: 'Voltar para o ClassiSex' })).toHaveAttribute('href', '/area-do-assinante/classisex')
@@ -175,7 +182,7 @@ test('inactive viewer gets the status panel and the open board: texts yes, conta
   await page.goto(`/area-do-assinante/classisex/${casalAd}`)
   await expect(page.locator('main')).toContainText('Sua assinatura não está ativa')
   const detail = await page.content()
-  for (const secret of [TEXTO_CASAL, TEXTO_SOLTEIRA, ...contacts.slice(0, 4)]) expect(detail).not.toContain(secret)
+  for (const secret of [TEXTO_CASAL, TEXTO_SOLTEIRA, ...contacts.slice(0, 4), 'duda_perfil', DUDA_OBS]) expect(detail).not.toContain(secret)
   // board: the same open board as visitors (texts with contacts removed, sharp covers, "Assine ...")
   await page.goto('/area-do-assinante/classisex')
   const main = page.locator('main')
@@ -185,7 +192,7 @@ test('inactive viewer gets the status panel and the open board: texts yes, conta
   await expect(main.getByRole('link', { name: 'Assine para ver o contato, todas as fotos e os vídeos' }).first()).toHaveAttribute('href', '/assine-ja')
   await expect(main.getByRole('link', { name: 'Enviar recado: só para assinantes' }).first()).toBeVisible()
   const board = await page.content()
-  for (const secret of contacts.slice(0, 4)) expect(board).not.toContain(secret)
+  for (const secret of [...contacts.slice(0, 4), 'duda_perfil', DUDA_OBS]) expect(board).not.toContain(secret)
   expect(board).not.toContain('/area-do-assinante/midia/')
   await context.close()
 })
