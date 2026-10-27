@@ -504,7 +504,7 @@ export interface Ad {
    */
   texto: string;
   /**
-   * WhatsApp ou Telegram, pelo menos um. Nunca aparece na área aberta.
+   * Opcional: WhatsApp, Telegram, e-mail e links. Só assinantes veem; nunca aparece na área aberta.
    */
   contato?: {
     /**
@@ -515,6 +515,23 @@ export interface Ad {
      * Usuário sem o @.
      */
     telegram?: string | null;
+    /**
+     * O e-mail que a pessoa quer mostrar aos assinantes. Não é o e-mail da conta.
+     */
+    email?: string | null;
+    /**
+     * Instagram, X, OnlyFans, Privacy… Até 5 links (http ou https).
+     */
+    links?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Uma linha. Ex.: só mensagem, depois das 18h.
+     */
+    observacao?: string | null;
   };
   midias?: {
     docs?: (number | AdMedia)[];
@@ -1532,6 +1549,14 @@ export interface AdsSelect<T extends boolean = true> {
     | {
         whatsapp?: T;
         telegram?: T;
+        email?: T;
+        links?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
+        observacao?: T;
       };
   midias?: T;
   denuncias?: T;

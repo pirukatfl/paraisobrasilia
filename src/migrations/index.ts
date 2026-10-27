@@ -36,6 +36,7 @@ import * as migration_20261023_042900_models_videos from './20261023_042900_mode
 import * as migration_20261024_114938_contos_enviados from './20261024_114938_contos_enviados';
 import * as migration_20261025_000000_anunciante_opcional from './20261025_000000_anunciante_opcional';
 import * as migration_20261026_032443_textos_do_site from './20261026_032443_textos_do_site';
+import * as migration_20261027_190955_classisex_mais_contatos from './20261027_190955_classisex_mais_contatos';
 
 export const migrations = [
   {
@@ -226,6 +227,11 @@ export const migrations = [
   {
     up: migration_20261026_032443_textos_do_site.up,
     down: migration_20261026_032443_textos_do_site.down,
-    name: '20261026_032443_textos_do_site'
+    name: '20261026_032443_textos_do_site',
+  },
+  {
+    up: migration_20261027_190955_classisex_mais_contatos.up,
+    down: migration_20261027_190955_classisex_mais_contatos.down,
+    name: '20261027_190955_classisex_mais_contatos'
   },
 ];
