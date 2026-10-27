@@ -22,6 +22,9 @@ export type AdFormValues = {
   texto: string
   whatsapp: string
   telegram: string
+  emailContato: string
+  links: string[]
+  observacao: string
 }
 
 /** `createdId` is set only when the ad was created and the browser will now upload the chosen files. */
@@ -41,6 +44,9 @@ function readInput(formData: FormData): { input: AdInput; values: AdFormValues }
     texto: field(formData, 'texto'),
     whatsapp: field(formData, 'whatsapp'),
     telegram: field(formData, 'telegram'),
+    emailContato: field(formData, 'emailContato'),
+    links: formData.getAll('links').filter((v): v is string => typeof v === 'string'),
+    observacao: field(formData, 'observacao'),
   }
   const euSou = Number.parseInt(values.euSou, 10)
   return {
@@ -52,6 +58,9 @@ function readInput(formData: FormData): { input: AdInput; values: AdFormValues }
       texto: values.texto,
       whatsapp: values.whatsapp,
       telegram: values.telegram,
+      emailContato: values.emailContato,
+      links: values.links,
+      observacao: values.observacao,
       consent: field(formData, 'consent') === 'sim',
     },
   }

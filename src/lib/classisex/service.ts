@@ -43,6 +43,7 @@ import {
   ACTIVE_STATUSES,
   AD_MESSAGES,
   DRAFT_STATUS,
+  contatoData,
   validateAdInput,
   type AdInput,
   type AdStatus,
@@ -144,7 +145,7 @@ export async function createAd(
       euSou: value.euSou,
       cidade: value.cidade,
       texto: value.texto,
-      contato: value.contato,
+      contato: contatoData(value.contato),
       status: 'pendente',
       submittedAt: now.toISOString(),
       consentAt: now.toISOString(),
@@ -178,7 +179,7 @@ export async function updateAd(
       euSou: value.euSou,
       cidade: value.cidade,
       texto: value.texto,
-      contato: value.contato,
+      contato: contatoData(value.contato),
       status: 'pendente',
       submittedAt: now.toISOString(),
       consentAt: now.toISOString(),
@@ -402,6 +403,9 @@ export type OwnAdFormValues = {
   texto: string
   whatsapp: string
   telegram: string
+  emailContato: string
+  links: string[]
+  observacao: string
   /** Came from the old site: no 600-character cap and no required contact in the form. */
   legacy: boolean
 }
@@ -423,6 +427,9 @@ export async function getOwnAdFormValues(
       texto: ad.texto,
       whatsapp: ad.contato?.whatsapp ?? '',
       telegram: ad.contato?.telegram ? `@${ad.contato.telegram}` : '',
+      emailContato: ad.contato?.email ?? '',
+      links: (ad.contato?.links ?? []).flatMap((l) => (l.url ? [l.url] : [])),
+      observacao: ad.contato?.observacao ?? '',
       legacy: isLegacyAd(ad),
     }
   } catch (err) {

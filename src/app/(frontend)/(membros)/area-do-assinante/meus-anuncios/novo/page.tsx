@@ -55,6 +55,9 @@ export default async function NovoAnuncioPage() {
           texto: '',
           whatsapp: check.assinante.whatsapp ?? '',
           telegram: '',
+          emailContato: '',
+          links: [],
+          observacao: '',
         }}
       />
       {tier === 'gratis' && <PlanComparison id="comparativo-novo-anuncio" />}

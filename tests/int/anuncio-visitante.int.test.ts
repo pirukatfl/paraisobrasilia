@@ -55,6 +55,9 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     texto: 'Casal simpático procura amigos para a festa. Ligue 61 99988-9772.',
     whatsapp: '5561999889772',
     telegram: '',
+    emailContato: '',
+    links: [],
+    observacao: '',
     consent: true,
     ...over,
   })

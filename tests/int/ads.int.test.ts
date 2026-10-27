@@ -148,6 +148,9 @@ describe('owner service (CLAS-03, CLAS-04, D-02, D-03, T-04-04)', () => {
     texto: 'Casal simpático procura amigos.',
     whatsapp: '5561988887777',
     telegram: '',
+    emailContato: '',
+    links: [],
+    observacao: '',
     consent: true,
     ...over,
   })
@@ -273,6 +276,9 @@ describe('free accounts create and edit ads (G-02, G-05)', () => {
     texto: 'Casal simpático procura amigos.',
     whatsapp: '5561999990000',
     telegram: '',
+    emailContato: '',
+    links: [],
+    observacao: '',
     consent: true,
     ...over,
   })

@@ -67,6 +67,9 @@ export type AdContato = {
   observacao: string | null
 }
 
+/** The `contato` group as Payload stores it: links are rows of `{ url }`. */
+export const contatoData = (c: AdContato) => ({ ...c, links: c.links.map((url) => ({ url })) })
+
 export type NormalisedAd = {
   apelido: string
   euSou: number

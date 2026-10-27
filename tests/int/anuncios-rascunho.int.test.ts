@@ -156,7 +156,7 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
     it('the owner submits an old draft to the queue; the 600-character cap and the contact do not apply to it', async () => {
       const a = await paying('a@teste.local')
       const d = await draft(a.id)
-      const input = { apelido: 'Casal Teste', euSou: cats[0]!.id, cidade: 'Brasília', texto: LONG_TEXT, whatsapp: '5561999990000', telegram: '', consent: true }
+      const input = { apelido: 'Casal Teste', euSou: cats[0]!.id, cidade: 'Brasília', texto: LONG_TEXT, whatsapp: '5561999990000', telegram: '', emailContato: '', links: [], observacao: '', consent: true }
       // 2026-10-22: only the generous ceiling applies to an old ad
       await expect(
         updateAd(payload, { assinanteId: a.id, id: d.id, input: { ...input, texto: 'a'.repeat(5001) }, now: NOW }),
@@ -178,7 +178,7 @@ describe('anúncios do site antigo como rascunho (06-06, M-04)', () => {
       for (let i = 0; i < 3; i++) await seedAd(payload, { author: a.id, status: i === 0 ? 'aprovado' : 'pendente' })
       const d1 = await draft(a.id, 201)
       const d2 = await draft(a.id, 202)
-      const input = { apelido: 'Casal Teste', euSou: cats[0]!.id, cidade: '', texto: 'Texto curto.', whatsapp: '5561999990000', telegram: '', consent: true }
+      const input = { apelido: 'Casal Teste', euSou: cats[0]!.id, cidade: '', texto: 'Texto curto.', whatsapp: '5561999990000', telegram: '', emailContato: '', links: [], observacao: '', consent: true }
       await updateAd(payload, { assinanteId: a.id, id: d1.id, input, now: NOW })
       await updateAd(payload, { assinanteId: a.id, id: d2.id, input, now: NOW })
       expect((await payload.findByID({ collection: 'ads', id: d1.id, depth: 0, overrideAccess: true })).status).toBe('pendente')
