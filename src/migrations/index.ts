@@ -37,6 +37,7 @@ import * as migration_20261024_114938_contos_enviados from './20261024_114938_co
 import * as migration_20261025_000000_anunciante_opcional from './20261025_000000_anunciante_opcional';
 import * as migration_20261026_032443_textos_do_site from './20261026_032443_textos_do_site';
 import * as migration_20261027_190955_classisex_mais_contatos from './20261027_190955_classisex_mais_contatos';
+import * as migration_20261027_191302_classisex_mais_contatos_textos from './20261027_191302_classisex_mais_contatos_textos';
 
 export const migrations = [
   {
@@ -232,6 +233,11 @@ export const migrations = [
   {
     up: migration_20261027_190955_classisex_mais_contatos.up,
     down: migration_20261027_190955_classisex_mais_contatos.down,
-    name: '20261027_190955_classisex_mais_contatos'
+    name: '20261027_190955_classisex_mais_contatos',
+  },
+  {
+    up: migration_20261027_191302_classisex_mais_contatos_textos.up,
+    down: migration_20261027_191302_classisex_mais_contatos_textos.down,
+    name: '20261027_191302_classisex_mais_contatos_textos'
   },
 ];

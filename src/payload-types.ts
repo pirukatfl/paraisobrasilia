@@ -2653,6 +2653,9 @@ export interface TextosClassisex {
   galeriaVideoVarios?: string | null;
   anuncioContato?: string | null;
   contatoWhatsapp?: string | null;
+  contatoEmail?: string | null;
+  contatoLinksTitulo?: string | null;
+  contatoObservacao?: string | null;
   /**
    * Use {contato} para o usuário do Telegram.
    */
@@ -2738,6 +2741,9 @@ export interface TextosMeusAnuncio {
   donoVideos?: string | null;
   donoWhatsapp?: string | null;
   donoTelegram?: string | null;
+  donoEmail?: string | null;
+  donoLinks?: string | null;
+  donoObservacao?: string | null;
   donoRevisar?: string | null;
   donoEditar?: string | null;
   donoApagar?: string | null;
@@ -2768,6 +2774,12 @@ export interface TextosMeusAnuncio {
   contatoLegenda?: string | null;
   whatsappRotulo?: string | null;
   telegramRotulo?: string | null;
+  emailContatoRotulo?: string | null;
+  linksRotulo?: string | null;
+  linksAjuda?: string | null;
+  linksMais?: string | null;
+  observacaoRotulo?: string | null;
+  observacaoAjuda?: string | null;
   declaracao?: string | null;
   formBotao?: string | null;
   formBotaoEnviando?: string | null;
@@ -3449,6 +3461,9 @@ export interface TextosClassisexSelect<T extends boolean = true> {
   galeriaVideoVarios?: T;
   anuncioContato?: T;
   contatoWhatsapp?: T;
+  contatoEmail?: T;
+  contatoLinksTitulo?: T;
+  contatoObservacao?: T;
   contatoTelegram?: T;
   anuncioRecadoGratuito?: T;
   anuncioVoltar?: T;
@@ -3517,6 +3532,9 @@ export interface TextosMeusAnunciosSelect<T extends boolean = true> {
   donoVideos?: T;
   donoWhatsapp?: T;
   donoTelegram?: T;
+  donoEmail?: T;
+  donoLinks?: T;
+  donoObservacao?: T;
   donoRevisar?: T;
   donoEditar?: T;
   donoApagar?: T;
@@ -3547,6 +3565,12 @@ export interface TextosMeusAnunciosSelect<T extends boolean = true> {
   contatoLegenda?: T;
   whatsappRotulo?: T;
   telegramRotulo?: T;
+  emailContatoRotulo?: T;
+  linksRotulo?: T;
+  linksAjuda?: T;
+  linksMais?: T;
+  observacaoRotulo?: T;
+  observacaoAjuda?: T;
   declaracao?: T;
   formBotao?: T;
   formBotaoEnviando?: T;
