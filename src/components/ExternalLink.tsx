@@ -4,14 +4,17 @@ import type { ReactNode } from 'react'
 export function ExternalLink({
   href,
   className,
+  rel = 'noopener noreferrer',
   children,
 }: {
   href: string
   className?: string
+  /** Replaces the default rel (keep noopener noreferrer in it) */
+  rel?: string
   children: ReactNode
 }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
+    <a href={href} target="_blank" rel={rel} className={className}>
       {children}
       <span className="sr-only"> (abre em nova aba)</span>
     </a>

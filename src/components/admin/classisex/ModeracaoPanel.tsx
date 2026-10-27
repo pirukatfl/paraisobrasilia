@@ -26,7 +26,13 @@ type View = {
   rascunhoDaEquipe: boolean
   removed: number
   removedApelido: number
-  contato: { whatsapp: string | null; telegram: string | null }
+  contato: {
+    whatsapp: string | null
+    telegram: string | null
+    email: string | null
+    links: string[]
+    observacao: string | null
+  }
   fields: Record<string, unknown>
 }
 
@@ -193,6 +199,20 @@ export function ModeracaoPanel() {
             <ul style={{ margin: 'calc(var(--base) * 0.25) 0 0', paddingLeft: '1.25rem' }}>
               {view.contato.whatsapp && <li>WhatsApp: {view.contato.whatsapp}</li>}
               {view.contato.telegram && <li>Telegram: @{view.contato.telegram}</li>}
+              {view.contato.email && <li>E-mail: {view.contato.email}</li>}
+              {view.contato.links.map((url) => (
+                <li key={url}>
+                  Link:{' '}
+                  {/^https?:\/\//i.test(url) ? (
+                    <a href={url} target="_blank" rel="noopener noreferrer nofollow ugc">
+                      {url}
+                    </a>
+                  ) : (
+                    url
+                  )}
+                </li>
+              ))}
+              {view.contato.observacao && <li>Como prefere o contato: {view.contato.observacao}</li>}
             </ul>
           </div>
 
