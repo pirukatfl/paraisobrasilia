@@ -25,6 +25,9 @@ describe('anúncios antigos publicados: isenções e redação (decisão do clie
     texto: 'Anúncio novo e curto.',
     whatsapp: '5561988887777',
     telegram: '',
+    emailContato: '',
+    links: [],
+    observacao: '',
     consent: true,
     ...over,
   })

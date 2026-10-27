@@ -89,7 +89,10 @@ test('new ad: fields, contact error keeps the text, valid submit waits for appro
   await expect(main.getByLabel('Texto do anúncio')).toHaveAttribute('maxlength', '600')
   await expect(main.getByLabel('WhatsApp')).toHaveValue(BIA.whatsapp)
   await expect(main.getByLabel('Telegram')).toBeVisible()
-  await expect(main.getByLabel('E-mail')).toHaveCount(0)
+  // Client 2026-10-27: e-mail, links to other platforms and how the person prefers to be contacted
+  await expect(main.getByLabel('E-mail')).toHaveAttribute('name', 'emailContato')
+  await expect(main.locator('input[name="links"]')).toHaveCount(5)
+  await expect(main.getByLabel('Como prefere o contato')).toHaveAttribute('maxlength', '120')
   await expect(main.getByLabel('Apelido')).toHaveAttribute('maxlength', '40')
 
   await main.getByLabel('Apelido').fill('Bia e Léo')
@@ -103,6 +106,16 @@ test('new ad: fields, contact error keeps the text, valid submit waits for appro
   await expect(main.getByLabel('Texto do anúncio')).toHaveValue(TEXTO)
 
   await main.getByLabel('WhatsApp').fill(BIA.whatsapp)
+  await main.getByLabel('E-mail').fill('bia.contato@exemplo.com')
+  await main.getByLabel('Como prefere o contato').fill('Só mensagem, depois das 18h')
+  // A link that is not http(s) is refused and what was typed stays
+  await main.locator('#links-0').fill('javascript:alert(1)')
+  await main.getByLabel(DECLARACAO).check()
+  await main.getByRole('button', { name: 'Enviar para aprovação' }).click()
+  await expect(main.getByRole('alert').filter({ hasText: 'Link inválido' })).toBeVisible()
+  await expect(main.getByLabel('Texto do anúncio')).toHaveValue(TEXTO)
+  await expect(main.getByLabel('E-mail')).toHaveValue('bia.contato@exemplo.com')
+  await main.locator('#links-0').fill('instagram.com/bia_leo')
   await main.getByLabel(DECLARACAO).check()
   await main.getByRole('button', { name: 'Enviar para aprovação' }).click()
   await page.waitForURL(/\/meus-anuncios\?ok=enviado/)
@@ -111,6 +124,10 @@ test('new ad: fields, contact error keeps the text, valid submit waits for appro
   await expect(card).toContainText('Em análise pela equipe')
   await expect(card).toContainText('Bia e Léo · Casal · Brasília')
   await expect(card).toContainText(TEXTO)
+  // The owner sees the new contacts, normalised (https:// added)
+  await expect(card).toContainText('bia.contato@exemplo.com')
+  await expect(card).toContainText('https://instagram.com/bia_leo')
+  await expect(card).toContainText('Só mensagem, depois das 18h')
   await context.close()
 })
 

@@ -96,6 +96,9 @@ export default async function EditarAnuncioPage({
           texto: ad.texto,
           whatsapp: ad.whatsapp,
           telegram: ad.telegram,
+          emailContato: ad.emailContato,
+          links: ad.links,
+          observacao: ad.observacao,
         }}
       />
       <OwnerMediaManager adId={ad.id} media={ad.media} tier={tier} legacy={ad.legacy} />

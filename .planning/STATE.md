@@ -163,6 +163,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-23 | modelos-so-fotos | Modelos: videos desligados por enquanto (flag `MODEL_VIDEOS_ENABLED`, campo `videos` escondido no painel, sem migracao); site mostra so fotos (see .planning/quick/2026-10-23-modelos-so-fotos/) |
 | 2026-10-23 | flyer-ampliado | Home: clicar no flyer abre o flyer grande no lightbox (todas as proximas festas, link "Ver detalhes da festa"); titulo/data seguem linkando a /festas/<slug> (see .planning/quick/2026-10-23-flyer-ampliado/) |
 | 2026-10-26 | recados-fora-do-painel | Area "Recados" de Textos do site oculta no painel (`ocultaNoPainel`), sem migracao; guia atualizado (see .planning/quick/2026-10-26-recados-fora-do-painel/) |
+| 2026-10-27 | classisex-mais-contatos | ClassiSex: e-mail, links de outras plataformas (ate 5) e observacao no contato do anuncio, so assinantes veem; migracoes 20261027_190955_classisex_mais_contatos e 20261027_191302_classisex_mais_contatos_textos; gate: Vitest unit 499 + int 402, Playwright 122 passed (see .planning/quick/2026-10-27-classisex-mais-contatos/) |
 
 ## Deferred Items
 

@@ -13,7 +13,7 @@ import type { Textos } from '@/lib/textos/areas'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
-const EMPTY: AdFormValues = { apelido: '', euSou: '', cidade: '', texto: '', whatsapp: '', telegram: '' }
+const EMPTY: AdFormValues = { apelido: '', euSou: '', cidade: '', texto: '', whatsapp: '', telegram: '', emailContato: '', links: [], observacao: '' }
 
 const field = (form: FormData, name: string) => {
   const value = form.get(name)
@@ -74,6 +74,9 @@ export function VisitorAdForm({
         texto: field(data, 'texto'),
         whatsapp: field(data, 'whatsapp'),
         telegram: field(data, 'telegram'),
+        emailContato: field(data, 'emailContato'),
+        links: data.getAll('links').filter((x): x is string => typeof x === 'string'),
+        observacao: field(data, 'observacao'),
       })
       setEmail(field(data, 'email'))
       const next = json?.errors ?? { form: `Não foi possível enviar o anúncio: ${mensagemDaResposta(response.status, json)}` }

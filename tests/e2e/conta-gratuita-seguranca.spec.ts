@@ -8,6 +8,7 @@ import {
   ALL_PLANTED,
   buildTierScenario,
   CONTACTS,
+  extraSecrets,
   EXPIRADO,
   GRATIS,
   LIVRE,
@@ -59,7 +60,7 @@ const othersSentinels = () => [
   'sentinela-abacate',
   'sentinela-jabuticaba',
   'sentinela-pitanga',
-  ...Object.values(CONTACTS).flatMap((c) => [c.whatsapp, c.telegram]),
+  ...Object.values(CONTACTS).flatMap((c) => [c.whatsapp, c.telegram, ...extraSecrets(c)]),
   'Casal Abacate',
   'Casal Jabuticaba',
   'Casal Pitanga',
@@ -290,6 +291,10 @@ test.describe('paying viewer', () => {
     expect(mediaIdsIn(detail.body)).toEqual([s.media.gratis[0]!.id])
     expect(detail.body).toContain(CONTACTS.gratis.whatsapp)
     expect(detail.body).toContain(CONTACTS.gratis.telegram)
+    // E-mail, links and observation (2026-10-27) reach paying viewers: mailto button, one button per link, the note
+    expect(detail.body).toContain(`mailto:${CONTACTS.gratis.email}`)
+    expect(detail.body).toContain(CONTACTS.gratis.links[0]!.url)
+    expect(detail.body).toContain(CONTACTS.gratis.observacao)
     expect(detail.body).not.toContain('Enviar recado')
     expect(detail.body).toContain('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.')
     // control: a paying advertiser's ad does offer the button

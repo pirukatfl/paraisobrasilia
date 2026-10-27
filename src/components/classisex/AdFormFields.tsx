@@ -18,6 +18,25 @@ export function FieldError({ id, message }: { id: string; message?: string }) {
   )
 }
 
+/** One of the link inputs (all share `name="links"`; the server reads them with getAll). */
+function LinkInput({ index, value, describedBy }: { index: number; value?: string; describedBy: (string | undefined)[] }) {
+  return (
+    <input
+      id={`links-${index}`}
+      name="links"
+      type="url"
+      inputMode="url"
+      maxLength={300}
+      autoComplete="off"
+      placeholder="https://instagram.com/seuperfil"
+      defaultValue={value ?? ''}
+      aria-label={`Link ${index + 1}`}
+      aria-describedby={describedBy.filter(Boolean).join(' ')}
+      className={inputClass}
+    />
+  )
+}
+
 /**
  * The ad fields themselves (apelido, Eu sou, cidade, texto, contato, declaração), shared by the
  * subscriber form (AdForm) and the open form for people without an account (VisitorAdForm) so the two
@@ -153,6 +172,62 @@ export function AdFormFields({
             className={inputClass}
           />
           <FieldError id="erro-telegram" message={errors.telegram} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="emailContato" className="type-label text-text">
+            {t.emailContatoRotulo}
+          </label>
+          <input
+            id="emailContato"
+            name="emailContato"
+            type="email"
+            maxLength={254}
+            autoComplete="email"
+            placeholder="nome@exemplo.com"
+            defaultValue={values.emailContato}
+            aria-describedby={described('emailContato')}
+            className={inputClass}
+          />
+          <FieldError id="erro-emailContato" message={errors.emailContato} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="links-0" className="type-label text-text">
+            {t.linksRotulo}
+          </label>
+          <p id="ajuda-links" className="type-label text-muted">
+            {t.linksAjuda}
+          </p>
+          <FieldError id="erro-links" message={errors.links} />
+          {[0, 1, 2].map((i) => (
+            <LinkInput key={i} index={i} value={values.links[i]} describedBy={['ajuda-links', described('links')]} />
+          ))}
+          <details open={Boolean(values.links[3] || values.links[4])} className="flex flex-col gap-2">
+            <summary className="type-label cursor-pointer text-accent">{t.linksMais}</summary>
+            <div className="mt-2 flex flex-col gap-2">
+              {[3, 4].map((i) => (
+                <LinkInput key={i} index={i} value={values.links[i]} describedBy={['ajuda-links', described('links')]} />
+              ))}
+            </div>
+          </details>
+        </div>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="observacao" className="type-label text-text">
+            {t.observacaoRotulo}
+          </label>
+          <input
+            id="observacao"
+            name="observacao"
+            type="text"
+            maxLength={120}
+            autoComplete="off"
+            defaultValue={values.observacao}
+            aria-describedby={['ajuda-observacao', described('observacao')].filter(Boolean).join(' ')}
+            className={inputClass}
+          />
+          <p id="ajuda-observacao" className="type-label text-muted">
+            {t.observacaoAjuda}
+          </p>
+          <FieldError id="erro-observacao" message={errors.observacao} />
         </div>
       </fieldset>
 

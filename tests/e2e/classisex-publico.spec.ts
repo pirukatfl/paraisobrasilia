@@ -57,7 +57,13 @@ test.beforeAll(async ({ request }) => {
       cidade: 'Taguatinga',
       texto: TEXTO_NINA,
       status: 'aprovado',
-      contato: { whatsapp: '5561977776666', telegram: 'nina_bsb' },
+      contato: {
+        whatsapp: '5561977776666',
+        telegram: 'nina_bsb',
+        email: 'nina.perfil@exemplo.net',
+        links: [{ url: 'https://onlyfans.com/nina_link_unico' }],
+        observacao: 'nina-obs so mensagem',
+      },
     })
   ).id
   photoIds = [(await api.uploadAdMedia(ninaAd, 'flyer-square.jpg', 0)).id, (await api.uploadAdMedia(ninaAd, 'flyer-portrait.jpg', 1)).id]
@@ -134,7 +140,7 @@ test('visitors read the whole text without contacts, with one sharp cover photo 
 
 test('REST, HTML and RSC give visitors no contact, planted or structured', async ({ playwright, baseURL }) => {
   const anon = await playwright.request.newContext({ baseURL })
-  const planted = ['98877', '6655', 'nina@exemplo.com', '@nina_texto', '5561977776666', 'nina_bsb', 'nina.contato@exemplo.com', 'nina-casal.com']
+  const planted = ['98877', '6655', 'nina@exemplo.com', '@nina_texto', '5561977776666', 'nina_bsb', 'nina.contato@exemplo.com', 'nina-casal.com', 'nina.perfil@exemplo.net', 'nina_link_unico', 'onlyfans.com', 'nina-obs']
   for (const path of ['/api/ads?depth=2&limit=100', '/api/ads?where[status][equals]=aprovado&depth=2', '/api/ad-media?limit=100', `/api/ads/${ninaAd}?depth=2`]) {
     const res = await anon.get(path)
     const body = await res.text()

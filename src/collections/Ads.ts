@@ -15,12 +15,21 @@ import {
   APELIDO_MAX,
   CIDADE_MAX,
   DRAFT_STATUS,
+  LINKS_MAX,
+  LINK_MAX,
+  OBSERVACAO_MAX,
   TEXT_MAX,
   apelidoError,
   cidadeError,
+  isValidEmailContato,
+  isValidLink,
   isValidTelegram,
   isValidWhatsapp,
   normaliseCidade,
+  normaliseEmailContato,
+  normaliseLink,
+  normaliseLinks,
+  normaliseObservacao,
   normaliseTelegram,
   normaliseWhatsapp,
   resumoOf,
@@ -46,7 +55,13 @@ const relId = (value: unknown): number | string | null => {
   return value as number | string
 }
 
-type Contato = { whatsapp?: string | null; telegram?: string | null }
+type Contato = {
+  whatsapp?: string | null
+  telegram?: string | null
+  email?: string | null
+  links?: { url?: string | null }[] | null
+  observacao?: string | null
+}
 
 /**
  * Same normalisation as the members form (src/lib/classisex/rules.ts) for staff edits in the
@@ -60,6 +75,10 @@ const normaliseAndCheckContacts: CollectionBeforeValidateHook = ({ data, origina
       ...c,
       ...('whatsapp' in c ? { whatsapp: normaliseWhatsapp(c.whatsapp) } : {}),
       ...('telegram' in c ? { telegram: normaliseTelegram(c.telegram) } : {}),
+      ...('email' in c ? { email: normaliseEmailContato(c.email) } : {}),
+      ...('observacao' in c ? { observacao: normaliseObservacao(c.observacao) } : {}),
+      // Empty and repeated links are dropped; the rest are validated (field validate + the limit below)
+      ...(Array.isArray(c.links) ? { links: normaliseLinks(c.links.map((l) => l?.url)).map((url) => ({ url })) } : {}),
     }
   }
   if (typeof data.apelido === 'string') data.apelido = data.apelido.replace(/\s+/g, ' ').trim()
@@ -294,7 +313,7 @@ export const Ads: CollectionConfig = {
       name: 'contato',
       type: 'group',
       label: 'Contato (só assinantes veem)',
-      admin: { description: 'WhatsApp ou Telegram, pelo menos um. Nunca aparece na área aberta.' },
+      admin: { description: 'Opcional: WhatsApp, Telegram, e-mail e links. Só assinantes veem; nunca aparece na área aberta.' },
       fields: [
         {
           name: 'whatsapp',
@@ -309,6 +328,44 @@ export const Ads: CollectionConfig = {
           label: 'Telegram',
           admin: { description: 'Usuário sem o @.' },
           validate: optionalText(isValidTelegram, AD_MESSAGES.telegram),
+        },
+        {
+          name: 'email',
+          type: 'text',
+          label: 'E-mail de contato',
+          admin: { description: 'O e-mail que a pessoa quer mostrar aos assinantes. Não é o e-mail da conta.' },
+          validate: optionalText(
+            (v) => isValidEmailContato(normaliseEmailContato(v) ?? ''),
+            AD_MESSAGES.emailContato,
+          ),
+        },
+        {
+          name: 'links',
+          type: 'array',
+          label: 'Links de outras plataformas',
+          labels: { singular: 'Link', plural: 'Links' },
+          maxRows: LINKS_MAX,
+          admin: { description: `Instagram, X, OnlyFans, Privacy… Até ${LINKS_MAX} links (http ou https).` },
+          fields: [
+            {
+              name: 'url',
+              type: 'text',
+              required: true,
+              label: 'Endereço do link',
+              maxLength: LINK_MAX,
+              validate: (value: unknown) => {
+                const link = normaliseLink(String(value ?? ''))
+                return link && isValidLink(link) ? true : AD_MESSAGES.link
+              },
+            },
+          ],
+        },
+        {
+          name: 'observacao',
+          type: 'text',
+          label: 'Como prefere o contato',
+          maxLength: OBSERVACAO_MAX,
+          admin: { description: 'Uma linha. Ex.: só mensagem, depois das 18h.' },
         },
       ],
     },

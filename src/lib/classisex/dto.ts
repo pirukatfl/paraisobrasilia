@@ -6,9 +6,15 @@ import { coverOf, visibleMediaFor, type Tier } from '../assinantes/tier'
 import { formatShortDate } from '../format/date'
 import { whatsappUrl } from '../site/contact'
 import { redactContacts } from './redact'
-import type { AdStatus } from './rules'
+import { platformLabel, type AdStatus } from './rules'
 
-export type AdContatoDTO = { whatsapp: string | null; telegram: string | null }
+export type AdContatoDTO = {
+  whatsapp: string | null
+  telegram: string | null
+  email: string | null
+  links: string[]
+  observacao: string | null
+}
 
 /** Structural shape of an `ads` document as read with depth 0 (euSou resolved by the caller). */
 export type AdDocLike = {
@@ -17,7 +23,13 @@ export type AdDocLike = {
   euSou?: unknown
   cidade?: string | null
   texto: string
-  contato?: { whatsapp?: string | null; telegram?: string | null } | null
+  contato?: {
+    whatsapp?: string | null
+    telegram?: string | null
+    email?: string | null
+    links?: { url?: string | null }[] | null
+    observacao?: string | null
+  } | null
   status: AdStatus
   motivo?: string | null
   updatedAt: string
@@ -132,6 +144,9 @@ export function contatoOf(doc: Pick<AdDocLike, 'contato'>): AdContatoDTO {
   return {
     whatsapp: doc.contato?.whatsapp || null,
     telegram: doc.contato?.telegram || null,
+    email: doc.contato?.email || null,
+    links: (doc.contato?.links ?? []).map((l) => l?.url ?? '').filter(Boolean),
+    observacao: doc.contato?.observacao || null,
   }
 }
 
@@ -185,7 +200,14 @@ export type MemberAdDTO = {
   cidade: string | null
   texto: string
   publishedLabel: string
-  contato: { whatsapp: ContactLinkDTO | null; telegram: ContactLinkDTO | null }
+  contato: {
+    whatsapp: ContactLinkDTO | null
+    telegram: ContactLinkDTO | null
+    email: ContactLinkDTO | null
+    /** One button per link; the label comes from the domain (platformLabel) */
+    links: ContactLinkDTO[]
+    observacao: string | null
+  }
   fotos: MemberPhotoDTO[]
   videos: MemberVideoDTO[]
   /** Author is a free account: no "Enviar recado" (G-02). No author identity here. */
@@ -223,6 +245,9 @@ export function toMemberAdDTO(
     contato: {
       whatsapp: c.whatsapp ? { label: c.whatsapp, href: whatsappUrl(c.whatsapp, WHATSAPP_GREETING) } : null,
       telegram: c.telegram ? { label: `@${c.telegram}`, href: `https://t.me/${encodeURIComponent(c.telegram)}` } : null,
+      email: c.email ? { label: c.email, href: `mailto:${c.email}` } : null,
+      links: c.links.map((url) => ({ label: platformLabel(url), href: url })),
+      observacao: c.observacao,
     },
     fotos,
     videos,

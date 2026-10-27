@@ -60,6 +60,15 @@ export async function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: bo
         {ad.contato.telegram && <li>
             {t.donoTelegram}: @{ad.contato.telegram}
           </li>}
+        {ad.contato.email && <li>
+            {t.donoEmail}: {ad.contato.email}
+          </li>}
+        {ad.contato.links.length > 0 && <li className="break-all">
+            {t.donoLinks}: {ad.contato.links.join(', ')}
+          </li>}
+        {ad.contato.observacao && <li>
+            {t.donoObservacao}: {ad.contato.observacao}
+          </li>}
       </ul>
       <div className="mt-4 flex flex-wrap items-start gap-4">
         {canEdit && (

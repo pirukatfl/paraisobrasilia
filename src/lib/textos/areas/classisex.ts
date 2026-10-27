@@ -163,6 +163,9 @@ export const classisex = definirArea({
     },
     anuncioContato: { rotulo: 'Título dos contatos', padrao: 'Contato', secao: 'Anúncio completo' },
     contatoWhatsapp: { rotulo: 'Botão WhatsApp', padrao: 'WhatsApp', secao: 'Anúncio completo' },
+    contatoEmail: { rotulo: 'Botão e-mail', padrao: 'E-mail', secao: 'Anúncio completo' },
+    contatoLinksTitulo: { rotulo: 'Título dos links de outras plataformas', padrao: 'Outras plataformas', secao: 'Anúncio completo' },
+    contatoObservacao: { rotulo: 'Título de como prefere o contato', padrao: 'Como prefere o contato', secao: 'Anúncio completo' },
     contatoTelegram: {
       rotulo: 'Botão Telegram',
       padrao: 'Telegram {contato}',
@@ -199,7 +202,7 @@ export const classisex = definirArea({
     anunciarIntro: {
       rotulo: 'Texto de abertura',
       padrao:
-        'Qualquer pessoa pode anunciar, sem cadastro. O anúncio aparece depois da análise da equipe: todo mundo vê o texto e a foto; o contato (WhatsApp ou Telegram) só os assinantes veem.',
+        'Qualquer pessoa pode anunciar, sem cadastro. O anúncio aparece depois da análise da equipe: todo mundo vê o texto e a foto; o contato (WhatsApp, Telegram, e-mail e links) só os assinantes veem.',
       secao: 'Anunciar sem conta',
     },
     visitanteEmailRotulo: { rotulo: 'Campo e-mail', padrao: 'Seu e-mail (opcional)', secao: 'Anunciar sem conta' },

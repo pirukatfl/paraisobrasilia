@@ -65,6 +65,9 @@ export const meusAnuncios = definirArea({
     donoVideos: { rotulo: 'Cartão: vários vídeos', padrao: '{n} vídeos', secao: LISTA, ajuda: 'Use {n} para a quantidade.' },
     donoWhatsapp: { rotulo: 'Cartão: rótulo do WhatsApp', padrao: 'WhatsApp', secao: LISTA },
     donoTelegram: { rotulo: 'Cartão: rótulo do Telegram', padrao: 'Telegram', secao: LISTA },
+    donoEmail: { rotulo: 'Cartão: rótulo do e-mail de contato', padrao: 'E-mail', secao: LISTA },
+    donoLinks: { rotulo: 'Cartão: rótulo dos links', padrao: 'Links', secao: LISTA },
+    donoObservacao: { rotulo: 'Cartão: rótulo de como prefere o contato', padrao: 'Como prefere o contato', secao: LISTA },
     donoRevisar: { rotulo: 'Cartão: botão Revisar e enviar', padrao: 'Revisar e enviar', secao: LISTA },
     donoEditar: { rotulo: 'Cartão: botão Editar', padrao: 'Editar', secao: LISTA },
     donoApagar: { rotulo: 'Cartão: botão Apagar', padrao: 'Apagar', secao: LISTA },
@@ -160,11 +163,21 @@ export const meusAnuncios = definirArea({
     },
     contatoLegenda: {
       rotulo: 'Título do grupo de contatos',
-      padrao: 'Contato (WhatsApp ou Telegram, opcional; só assinantes veem)',
+      padrao: 'Contato (opcional; só assinantes veem)',
       secao: CAMPOS,
     },
     whatsappRotulo: { rotulo: 'Campo: WhatsApp', padrao: 'WhatsApp', secao: CAMPOS },
     telegramRotulo: { rotulo: 'Campo: Telegram', padrao: 'Telegram', secao: CAMPOS },
+    emailContatoRotulo: { rotulo: 'Campo: e-mail de contato', padrao: 'E-mail', secao: CAMPOS },
+    linksRotulo: { rotulo: 'Campo: links de outras plataformas', padrao: 'Links de outras plataformas', secao: CAMPOS },
+    linksAjuda: {
+      rotulo: 'Ajuda dos links',
+      padrao: 'Instagram, X, OnlyFans, Privacy, Linktree… Até 5 links. Só assinantes veem.',
+      secao: CAMPOS,
+    },
+    linksMais: { rotulo: 'Links: botão para mostrar mais campos', padrao: 'Adicionar mais links', secao: CAMPOS },
+    observacaoRotulo: { rotulo: 'Campo: como prefere o contato', padrao: 'Como prefere o contato', secao: CAMPOS },
+    observacaoAjuda: { rotulo: 'Ajuda de como prefere o contato', padrao: 'Ex.: só mensagem, depois das 18h.', secao: CAMPOS },
     declaracao: {
       rotulo: 'Declaração (caixa de marcar)',
       padrao:

@@ -41,12 +41,30 @@ export const PLANTED_IN_TEXT = {
 }
 export const ALL_PLANTED = Object.values(PLANTED_IN_TEXT).flatMap((p) => p.secrets)
 
-export const CONTACTS = {
-  pago: { whatsapp: '5561982220001', telegram: 'tg_pago_unico' },
-  pago2: { whatsapp: '5561982220002', telegram: 'tg_pago2_unico' },
-  gratis: { whatsapp: '5561982220003', telegram: 'tg_gratis_unico' },
-  expirado: { whatsapp: '5561982220004', telegram: 'tg_expirado_unico' },
+export type Contato = {
+  whatsapp: string
+  telegram?: string
+  email?: string
+  links?: { url: string }[]
+  observacao?: string
 }
+
+/** Client request 2026-10-27: e-mail, links and how to be contacted follow the WhatsApp/Telegram rule (paying viewers only). */
+const extra = (nome: string) => ({
+  email: `contato.${nome}@exemplo.com`,
+  links: [{ url: `https://instagram.com/perfil_${nome}_unico` }],
+  observacao: `Prefere mensagem ${nome}-obs`,
+})
+
+export const CONTACTS: Record<'pago' | 'pago2' | 'gratis' | 'expirado', Required<Contato>> = {
+  pago: { whatsapp: '5561982220001', telegram: 'tg_pago_unico', ...extra('pago') },
+  pago2: { whatsapp: '5561982220002', telegram: 'tg_pago2_unico', ...extra('pago2') },
+  gratis: { whatsapp: '5561982220003', telegram: 'tg_gratis_unico', ...extra('gratis') },
+  expirado: { whatsapp: '5561982220004', telegram: 'tg_expirado_unico', ...extra('expirado') },
+}
+
+/** Every value of the new fields, as it would appear in a page body (the link label is only the platform name). */
+export const extraSecrets = (c: Required<Contato>) => [c.email, c.links[0]!.url.replace('https://', ''), c.observacao]
 
 export type MediaRef = { id: number; kind: 'foto' | 'video' }
 export type TierScenario = Awaited<ReturnType<typeof buildTierScenario>>
@@ -66,7 +84,7 @@ export async function buildTierScenario(request: APIRequestContext) {
     await api.liberar(ids[key]!, { durationDays: 30, method: 'cortesia', amount: 0 })
   }
 
-  const mk = (author: number, apelido: string, texto: string, status: 'aprovado' | 'pendente', contato: { whatsapp: string; telegram?: string }) =>
+  const mk = (author: number, apelido: string, texto: string, status: 'aprovado' | 'pendente', contato: Contato) =>
     api.createAd({ author, apelido, texto, cidade: 'Brasília', status, contato }).then((d) => d.id)
   const ads = {
     pago: await mk(ids.pago!, 'Casal Abacate', TEXTS.pago + PLANTED_IN_TEXT.pago.tail, 'aprovado', CONTACTS.pago),

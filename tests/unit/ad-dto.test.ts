@@ -29,7 +29,7 @@ describe('toMemberAdDTO (CLAS-02, D-05)', () => {
     )
     expect(dto.contato.whatsapp?.href.startsWith('https://wa.me/5561988887777?text=Ol%C3%A1!')).toBe(true)
     expect(dto.contato.telegram).toEqual({ label: '@casal_bsb', href: 'https://t.me/casal_bsb' })
-    expect(Object.keys(dto.contato).sort()).toEqual(['telegram', 'whatsapp'])
+    expect(Object.keys(dto.contato).sort()).toEqual(['email', 'links', 'observacao', 'telegram', 'whatsapp'])
     expect(dto.fotos).toEqual([])
     expect(dto.videos).toEqual([])
   })
@@ -38,6 +38,27 @@ describe('toMemberAdDTO (CLAS-02, D-05)', () => {
     const dto = toMemberAdDTO({ ...doc, contato: { whatsapp: '', telegram: null } }, { euSouLabel: 'Casal', authorTier: 'assinante' })
     expect(dto.contato.whatsapp).toBeNull()
     expect(dto.contato.telegram).toBeNull()
+  })
+
+  it('builds the e-mail, one labelled button per link and the observation', () => {
+    const dto = toMemberAdDTO(
+      {
+        ...doc,
+        contato: {
+          email: 'casal@exemplo.com',
+          links: [{ url: 'https://instagram.com/casalbsb' }, { url: 'https://www.meusite.com.br/x' }, { url: '' }],
+          observacao: 'Só mensagem, depois das 18h',
+        },
+      },
+      { euSouLabel: 'Casal', authorTier: 'assinante' },
+    )
+    expect(dto.contato.email).toEqual({ label: 'casal@exemplo.com', href: 'mailto:casal@exemplo.com' })
+    expect(dto.contato.links).toEqual([
+      { label: 'Instagram', href: 'https://instagram.com/casalbsb' },
+      { label: 'meusite.com.br', href: 'https://www.meusite.com.br/x' },
+    ])
+    expect(dto.contato.observacao).toBe('Só mensagem, depois das 18h')
+    expect(dto.contato.whatsapp).toBeNull()
   })
 
   it('never serialises author, staff fields, filenames or Payload URLs', () => {

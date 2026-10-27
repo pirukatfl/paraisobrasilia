@@ -50,7 +50,14 @@ export async function buildClassisexScenario(request: APIRequestContext) {
     endsAt: new Date(Date.now() - DAY).toISOString(),
   })
 
-  const contatoOwner = { whatsapp: '5561981112201', telegram: 'tg_otto_unico', email: 'otto.contato@exemplo.com' }
+  const contatoOwner = {
+    whatsapp: '5561981112201',
+    telegram: 'tg_otto_unico',
+    email: 'otto.contato@exemplo.com',
+    // 2026-10-27: links and observation follow the same rule as the other contacts
+    links: [{ url: 'https://onlyfans.com/otto_link_unico' }],
+    observacao: 'So responde depois das 18h otto-obs',
+  }
   const mk = (author: number, texto: string, status: 'pendente' | 'aprovado' | 'recusado' | 'despublicado', contato: object) =>
     api.createAd({ author, texto, cidade: 'Brasília', status, contato }).then((d) => d.id)
 
@@ -59,7 +66,7 @@ export async function buildClassisexScenario(request: APIRequestContext) {
     pendente: await mk(owner.id, TEXTS.pendente, 'pendente', { whatsapp: '5561981112202' }),
     recusado: await mk(owner.id, TEXTS.recusado, 'recusado', { whatsapp: '5561981112203' }),
     despublicado: await mk(owner.id, TEXTS.despublicado, 'despublicado', { whatsapp: '5561981112204' }),
-    expiredAuthor: await mk(expired.id, TEXTS.expiredAuthor, 'aprovado', { whatsapp: '5561981112205', telegram: 'tg_egon_unico' }),
+    expiredAuthor: await mk(expired.id, TEXTS.expiredAuthor, 'aprovado', { whatsapp: '5561981112205', telegram: 'tg_egon_unico', email: 'egon.contato@exemplo.com', links: [{ url: 'https://privacy.com.br/egon_link_unico' }], observacao: 'Egon-obs' }),
     viewerPendente: await mk(viewer.id, TEXTS.viewerPendente, 'pendente', { whatsapp: '5561981112206' }),
   }
 
@@ -86,12 +93,19 @@ export async function buildClassisexScenario(request: APIRequestContext) {
     videoFilename: media.video.filename,
   }
   const contacts = [
-    ...Object.values(contatoOwner),
+    contatoOwner.whatsapp,
+    contatoOwner.telegram,
+    contatoOwner.email,
+    'onlyfans.com/otto_link_unico',
+    contatoOwner.observacao,
     '5561981112202',
     '5561981112203',
     '5561981112204',
     '5561981112205',
     'tg_egon_unico',
+    'egon.contato@exemplo.com',
+    'privacy.com.br/egon_link_unico',
+    'Egon-obs',
     '98877-1122',
     OWNER.email,
     VIEWER.email,
