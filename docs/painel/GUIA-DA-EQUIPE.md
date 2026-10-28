@@ -133,8 +133,23 @@ Desde 26/10/2026 a área **Recados** não aparece mais no painel (saiu do menu d
 2. Cada campo já vem preenchido com o texto que está no ar. Mude o que quiser.
 3. Clique em **Salvar**. **Salvar publica na hora** — não existe rascunho nessas áreas. Recarregue a página do site para ver.
 
-**Para voltar ao texto original:** apague tudo o que está no campo (deixe vazio) e salve. O site volta a mostrar o texto
+**Para voltar ao texto original:** apague tudo o que está no campo (deixe vazio, sem nem um espaço) e salve. O site volta a mostrar o texto
 que veio de fábrica. Por isso nenhum texto "some": campo vazio nunca deixa um buraco na página.
+
+**Negrito, itálico, sublinhado, listas e links (a partir de 28/10/2026):** os textos **longos** (parágrafos, avisos,
+introduções e ajudas) têm um editor com uma barra de botões no topo do campo. Para formatar:
+
+1. Clique dentro do texto e **selecione as palavras** (a barra pequena também aparece em cima da seleção).
+2. Use **B** (negrito), **I** (itálico), **U** (sublinhado) ou o botão de **link** (cole o endereço completo, começando
+   com `https://`). Para uma lista, abra o menu da esquerda da barra e escolha **Lista não ordenada** (com marcadores) ou
+   **Lista ordenada** (numerada); ou digite `- ` no começo da linha.
+3. Salve. O site mostra a formatação do mesmo jeito.
+
+Não há títulos nem imagens nesses campos: o tamanho e a cor continuam sendo os do site. **Títulos, botões, rótulos de
+formulário e o texto que aparece no Google continuam em campo de uma linha, sem formatação** (negrito ali quebraria o
+layout ou não apareceria). Links só funcionam com `https://`, `mailto:`, `tel:` ou um caminho do próprio site (como
+`/contato`); qualquer outro endereço aparece só como texto. Se formatar uma palavra entre chaves (como `{plano}`) pela
+metade, o site pode não conseguir preenchê-la: deixe a palavra inteira com a mesma formatação.
 
 **Palavras entre chaves, como `{plano}` ou `{nome}`:** são pedaços que o site preenche sozinho (o nome do plano, o nome
 da pessoa, uma data, uma quantidade). Escreva o texto ao redor como quiser, mas **mantenha a palavra entre chaves** onde
