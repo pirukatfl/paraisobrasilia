@@ -156,6 +156,7 @@ export const meusAnuncios = definirArea({
     cidadeRotulo: { rotulo: 'Campo: Cidade', padrao: 'Cidade (opcional, só assinantes veem)', secao: CAMPOS },
     textoRotulo: { rotulo: 'Campo: Texto do anúncio', padrao: 'Texto do anúncio', secao: CAMPOS },
     textoAjuda: {
+      formatado: true,
       rotulo: 'Ajuda do texto',
       padrao: 'Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.',
       secao: CAMPOS,
@@ -243,6 +244,7 @@ export const meusAnuncios = definirArea({
       secao: GERENCIAR,
     },
     gerDicaGratis: {
+      formatado: true,
       rotulo: 'Dica (conta gratuita)',
       padrao: 'Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.',
       secao: GERENCIAR,

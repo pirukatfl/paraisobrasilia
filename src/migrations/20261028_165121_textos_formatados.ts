@@ -54,9 +54,9 @@ const COLUNAS: ReadonlyArray<readonly [string, string, string]> = [
   ['textos_dicas_hot', 'membros_vazio_texto', 'Volte em breve: a equipe publica dicas novas.'],
   ['textos_mensagens', 'vazio_texto', 'Para mandar um recado, abra um anúncio do ClassiSex e toque em Enviar recado. Aqui aparecem só os recados que você mandou ou recebeu.'],
   ['textos_mensagens', 'form_apelido_ajuda', 'É o nome que a outra pessoa vê. Até 40 caracteres, sem telefone, e-mail, @ ou link.'],
-  ['textos_mensagens', 'bloquear_aviso', 'A pessoa não poderá mais mandar recados para você. Você pode desbloquear quando quiser.'],,
+  ['textos_mensagens', 'bloquear_aviso', 'A pessoa não poderá mais mandar recados para você. Você pode desbloquear quando quiser.'],
   ['textos_meus_anuncios', 'texto_ajuda', 'Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.'],
-  ['textos_meus_anuncios', 'ger_dica_gratis', 'Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.']
+  ['textos_meus_anuncios', 'ger_dica_gratis', 'Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.'],
 ]
 
 type No = Record<string, unknown>

@@ -3091,7 +3091,21 @@ export interface TextosMeusAnuncio {
   euSouRotulo?: string | null;
   cidadeRotulo?: string | null;
   textoRotulo?: string | null;
-  textoAjuda?: string | null;
+  textoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   textoAjudaAntigo?: {
     root: {
       type: string;
@@ -3193,7 +3207,21 @@ export interface TextosMeusAnuncio {
     };
     [k: string]: unknown;
   } | null;
-  gerDicaGratis?: string | null;
+  gerDicaGratis?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   gerCapaNota?: string | null;
   gerSemFotos?: string | null;
   gerGuardada?: string | null;
