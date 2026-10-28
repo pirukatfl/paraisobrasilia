@@ -4,7 +4,7 @@ slug: textos-formatados
 date: 2026-10-28
 planner: opus
 executor: sonnet
-status: planned
+status: complete
 ---
 
 # Quick: editor de texto formatado nos Textos do site
