@@ -36,6 +36,7 @@ export const conta = definirArea({
       secao: 'Entrar',
     },
     entrarEsqueciSemEmail: {
+      formatado: true,
       rotulo: 'Texto de senha esquecida (envio de e-mail desligado)',
       padrao: 'Esqueceu a senha? Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova.',
       secao: 'Entrar',
@@ -57,6 +58,7 @@ export const conta = definirArea({
       secao: 'Criar conta grátis',
     },
     cadastroEnviado: {
+      formatado: true,
       rotulo: 'Aviso depois de enviar o cadastro',
       padrao:
         'Enviamos um link para o seu e-mail. Abra o link para ativar a conta (vale por 7 dias). Olhe também a caixa de spam.',
@@ -64,6 +66,7 @@ export const conta = definirArea({
     },
     cadastroNaoRecebeu: { rotulo: 'Título "Não recebeu?"', padrao: 'Não recebeu?', secao: 'Criar conta grátis' },
     cadastroIntro: {
+      formatado: true,
       rotulo: 'Texto acima do formulário',
       padrao:
         'Com a conta gratuita você publica seus anúncios no ClassiSex (até 3, com 1 foto cada). Assinantes veem todos os anúncios, com contatos, e mandam recados privados entre si.',
@@ -138,6 +141,7 @@ export const conta = definirArea({
       secao: 'Esqueci minha senha',
     },
     esqueciEnviado: {
+      formatado: true,
       rotulo: 'Aviso depois de pedir o link',
       padrao: 'Se o e-mail existir, enviamos um link para criar uma nova senha. Olhe também a caixa de spam.',
       secao: 'Esqueci minha senha',

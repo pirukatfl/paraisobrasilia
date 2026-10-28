@@ -13,6 +13,7 @@ export const assine = definirArea({
       ajuda: 'Aparece na aba do navegador e no Google.',
     },
     googleDescricao: {
+      formatado: false,
       rotulo: 'Descrição no Google',
       padrao:
         'Planos de assinatura do Paraíso Brasília: acesso à área de assinantes com perfis, fotos e contatos. Pague pelo PagBank e envie o comprovante pelo WhatsApp.',
@@ -23,6 +24,7 @@ export const assine = definirArea({
     topoEtiqueta: { rotulo: 'Frase pequena acima do título', padrao: 'Assinatura', secao: 'Topo da página' },
     topoTitulo: { rotulo: 'Título da página', padrao: 'Assine Já', secao: 'Topo da página' },
     topoTexto: {
+      formatado: true,
       rotulo: 'Texto de apresentação',
       padrao:
         'A assinatura libera a área de assinantes do Paraíso: perfis completos do ClassiSex com fotos, vídeos e contatos, e recados privados entre assinantes.',

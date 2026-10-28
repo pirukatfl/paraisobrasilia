@@ -27,6 +27,7 @@ export const modelos = definirArea({
       secao: 'Quando não há modelos',
     },
     vazioTexto: {
+      formatado: true,
       rotulo: 'Texto quando não há modelos',
       padrao: 'Estamos preparando esta galeria. Enquanto isso, veja as próximas festas ou conheça o espaço.',
       secao: 'Quando não há modelos',

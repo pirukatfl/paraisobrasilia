@@ -18,6 +18,7 @@ export const mensagens = definirArea({
     intro: { rotulo: 'Texto sobre privacidade', padrao: 'Só você e a outra pessoa veem cada conversa.', secao: 'Lista de recados' },
     vazioTitulo: { rotulo: 'Título quando não há recados', padrao: 'Nenhum recado ainda.', secao: 'Lista de recados' },
     vazioTexto: {
+      formatado: true,
       rotulo: 'Texto quando não há recados',
       padrao:
         'Para mandar um recado, abra um anúncio do ClassiSex e toque em Enviar recado. Aqui aparecem só os recados que você mandou ou recebeu.',
@@ -46,6 +47,7 @@ export const mensagens = definirArea({
     voltar: { rotulo: 'Link de voltar', padrao: 'Voltar para Recados', secao: 'Novo recado', ajuda: 'Também usado na conversa.' },
     formApelido: { rotulo: 'Campo: seu apelido', padrao: 'Seu apelido', secao: 'Formulário do recado' },
     formApelidoAjuda: {
+      formatado: true,
       rotulo: 'Ajuda do apelido',
       padrao: 'É o nome que a outra pessoa vê. Até 40 caracteres, sem telefone, e-mail, @ ou link.',
       secao: 'Formulário do recado',
@@ -72,6 +74,7 @@ export const mensagens = definirArea({
     desbloquear: { rotulo: 'Botão desbloquear', padrao: 'Desbloquear', secao: 'Bloquear e denunciar' },
     bloquearResumo: { rotulo: 'Título de bloquear', padrao: 'Bloquear', secao: 'Bloquear e denunciar' },
     bloquearAviso: {
+      formatado: true,
       rotulo: 'Explicação do bloqueio',
       padrao: 'A pessoa não poderá mais mandar recados para você. Você pode desbloquear quando quiser.',
       secao: 'Bloquear e denunciar',

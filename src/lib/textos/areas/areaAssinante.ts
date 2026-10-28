@@ -24,6 +24,7 @@ export const areaAssinante = definirArea({
     },
     contaTipoGratuita: { rotulo: 'Nome da conta grátis', padrao: 'Conta gratuita', secao: 'Início da área' },
     contaTexto: {
+      formatado: true,
       rotulo: 'Texto da conta grátis',
       padrao:
         'Você pode publicar até 3 anúncios com 1 foto cada. Também lê os anúncios dos outros, sem os contatos e só com a foto de capa. Para ver o contato, todas as fotos e os vídeos e para trocar recados, assine.',
@@ -120,6 +121,7 @@ export const areaAssinante = definirArea({
       secao: 'Aviso nas páginas só para assinantes',
     },
     inativoTexto: {
+      formatado: true,
       rotulo: 'Texto do aviso (conta grátis)',
       padrao:
         'Com a conta gratuita você publica seus anúncios em Meus anúncios e lê os anúncios dos outros (sem os contatos e só com a foto de capa). Assine para ver o contato, todas as fotos e os vídeos e para mandar e receber recados.',

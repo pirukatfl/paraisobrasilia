@@ -8,6 +8,7 @@ export const dicasHot = definirArea({
     // Lista pública
     googleLista: { rotulo: 'Título no Google (lista de dicas)', padrao: 'Dicas Hot', secao: 'Lista de dicas (aberta ao público)' },
     googleListaDescricao: {
+      formatado: false,
       rotulo: 'Descrição no Google (lista de dicas)',
       padrao: 'Dicas Hot do Paraíso Brasília: swing, casais liberais, fetiches e prazer a dois, com respeito e sem tabu.',
       secao: 'Lista de dicas (aberta ao público)',
@@ -16,6 +17,7 @@ export const dicasHot = definirArea({
     listaEyebrow: { rotulo: 'Palavrinha acima do título', padrao: 'Leitura', secao: 'Lista de dicas (aberta ao público)' },
     listaTitulo: { rotulo: 'Título da página', padrao: 'Dicas Hot', secao: 'Lista de dicas (aberta ao público)' },
     listaIntro: {
+      formatado: true,
       rotulo: 'Texto de apresentação',
       padrao: 'Textos sobre swing, casais liberais, fetiches e prazer a dois, com respeito e sem tabu.',
       secao: 'Lista de dicas (aberta ao público)',
@@ -32,6 +34,7 @@ export const dicasHot = definirArea({
       secao: 'Lista de dicas (aberta ao público)',
     },
     listaVazioTexto: {
+      formatado: true,
       rotulo: 'Texto quando não há dicas',
       padrao: 'Em breve novas dicas por aqui.',
       secao: 'Lista de dicas (aberta ao público)',
@@ -44,6 +47,7 @@ export const dicasHot = definirArea({
       secao: 'Lista de dicas (aberta ao público)',
     },
     listaCtaTexto: {
+      formatado: true,
       rotulo: 'Chamada para assinar: texto',
       padrao: 'Assine para ler cada dica do começo ao fim, ver o ClassiSex e trocar mensagens.',
       secao: 'Lista de dicas (aberta ao público)',
@@ -68,6 +72,7 @@ export const dicasHot = definirArea({
       secao: 'Página de uma dica (aberta ao público)',
     },
     dicaCtaTexto: {
+      formatado: true,
       rotulo: 'Chamada para continuar lendo: texto',
       padrao: 'Continue lendo: o restante desta dica é só para assinantes.',
       secao: 'Página de uma dica (aberta ao público)',
@@ -105,6 +110,7 @@ export const dicasHot = definirArea({
       secao: 'Dicas Hot para assinantes',
     },
     membrosVazioTexto: {
+      formatado: true,
       rotulo: 'Texto quando não há dicas',
       padrao: 'Volte em breve: a equipe publica dicas novas.',
       secao: 'Dicas Hot para assinantes',

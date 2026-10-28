@@ -12,6 +12,7 @@ export const contos = definirArea({
       secao: 'Lista de contos (aberta ao público)',
     },
     googleListaDescricao: {
+      formatado: false,
       rotulo: 'Descrição no Google (lista de contos)',
       padrao: 'Contos eróticos do Paraíso Brasília. Leia o começo de cada um; o restante é para assinantes.',
       secao: 'Lista de contos (aberta ao público)',
@@ -20,6 +21,7 @@ export const contos = definirArea({
     listaEyebrow: { rotulo: 'Palavrinha acima do título', padrao: 'Leitura', secao: 'Lista de contos (aberta ao público)' },
     listaTitulo: { rotulo: 'Título da página', padrao: 'Contos', secao: 'Lista de contos (aberta ao público)' },
     listaIntro: {
+      formatado: true,
       rotulo: 'Texto de apresentação',
       padrao:
         'Leia o começo de cada conto. O restante é só para assinantes. Qualquer pessoa pode enviar o seu: ele aparece depois que a equipe aprovar.',
@@ -38,6 +40,7 @@ export const contos = definirArea({
       secao: 'Lista de contos (aberta ao público)',
     },
     listaVazioTexto: {
+      formatado: true,
       rotulo: 'Texto quando não há contos',
       padrao: 'Em breve novos contos. Assinantes leem tudo na área do assinante.',
       secao: 'Lista de contos (aberta ao público)',
@@ -50,6 +53,7 @@ export const contos = definirArea({
       secao: 'Lista de contos (aberta ao público)',
     },
     listaCtaTexto: {
+      formatado: true,
       rotulo: 'Chamada para assinar: texto',
       padrao: 'Assine para ler cada conto do começo ao fim, ver o ClassiSex e trocar mensagens.',
       secao: 'Lista de contos (aberta ao público)',
@@ -80,6 +84,7 @@ export const contos = definirArea({
       secao: 'Página de um conto (aberta ao público)',
     },
     contoCtaTexto: {
+      formatado: true,
       rotulo: 'Chamada para continuar lendo: texto',
       padrao: 'Continue lendo: o restante deste conto é só para assinantes.',
       secao: 'Página de um conto (aberta ao público)',
@@ -116,6 +121,7 @@ export const contos = definirArea({
       secao: 'Contos para assinantes',
     },
     membrosVazioTexto: {
+      formatado: true,
       rotulo: 'Texto quando não há contos',
       padrao: 'Volte em breve: a equipe publica contos novos.',
       secao: 'Contos para assinantes',

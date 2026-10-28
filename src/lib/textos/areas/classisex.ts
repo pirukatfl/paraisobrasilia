@@ -9,6 +9,7 @@ export const classisex = definirArea({
     // Página pública /classisex
     publicoGoogleTitulo: { rotulo: 'Título no Google (ClassiSex aberto)', padrao: 'ClassiSex', secao: 'ClassiSex aberto (/classisex)' },
     publicoGoogleDescricao: {
+      formatado: false,
       rotulo: 'Descrição no Google (ClassiSex aberto)',
       padrao:
         'Anúncios de casais, mulheres, homens e trans do Paraíso Brasília. Leia os anúncios; assine para ver os contatos e as fotos.',
@@ -17,6 +18,7 @@ export const classisex = definirArea({
     publicoTopo: { rotulo: 'Linha pequena acima do título', padrao: 'Anúncios', secao: 'ClassiSex aberto (/classisex)' },
     publicoTitulo: { rotulo: 'Título da página', padrao: 'ClassiSex', secao: 'ClassiSex aberto (/classisex)' },
     publicoIntro: {
+      formatado: true,
       rotulo: 'Texto de abertura',
       padrao:
         'Anúncios do Paraíso: qualquer pessoa pode anunciar, com ou sem conta. Leia os recados na íntegra; os contatos (WhatsApp, Telegram, telefone, e-mail e links), as demais fotos e os vídeos ficam para assinantes.',
@@ -34,6 +36,7 @@ export const classisex = definirArea({
       secao: 'ClassiSex aberto (/classisex)',
     },
     publicoAssineTexto: {
+      formatado: true,
       rotulo: 'Chamada para assinar: texto',
       padrao: 'Assinantes veem os contatos, as fotos e os vídeos, mandam recados privados e anunciam também.',
       secao: 'ClassiSex aberto (/classisex)',
@@ -135,6 +138,7 @@ export const classisex = definirArea({
       secao: 'Quadro do assinante',
     },
     membrosGratisTexto: {
+      formatado: true,
       rotulo: 'Conta gratuita: texto da lista',
       padrao: 'Você lê os recados na íntegra. Os contatos, as demais fotos e os vídeos aparecem para assinantes.',
       secao: 'Quadro do assinante',
@@ -200,6 +204,7 @@ export const classisex = definirArea({
     anunciarTopo: { rotulo: 'Linha pequena acima do título', padrao: 'ClassiSex', secao: 'Anunciar sem conta' },
     anunciarTitulo: { rotulo: 'Título da página', padrao: 'Anunciar no ClassiSex', secao: 'Anunciar sem conta' },
     anunciarIntro: {
+      formatado: true,
       rotulo: 'Texto de abertura',
       padrao:
         'Qualquer pessoa pode anunciar, sem cadastro. O anúncio aparece depois da análise da equipe: todo mundo vê o texto e a foto; o contato (WhatsApp, Telegram, e-mail e links) só os assinantes veem.',
@@ -213,6 +218,7 @@ export const classisex = definirArea({
     },
     fotoRotulo: { rotulo: 'Foto: título do campo', padrao: 'Foto (opcional)', secao: 'Anunciar sem conta' },
     fotoAjuda: {
+      formatado: true,
       rotulo: 'Foto: ajuda',
       padrao:
         '1 foto JPG, PNG ou WebP, até 15 MB, sem vídeo. No iPhone, a foto em HEIC é convertida para JPG ao escolher. Assinantes enviam até 10 fotos e 2 vídeos.',
