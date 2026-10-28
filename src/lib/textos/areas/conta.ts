@@ -15,8 +15,9 @@ export const conta = definirArea({
     botaoWhatsapp: { rotulo: 'Botão "Chamar no WhatsApp"', padrao: 'Chamar no WhatsApp', secao: 'Comuns' },
 
     // Entrar
-    entrarGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Entrar', secao: 'Entrar' },
+    entrarGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Entrar', secao: 'Entrar' },
     entrarGoogleDescricao: {
+      soTexto: true,
       rotulo: 'Descrição no Google',
       padrao: 'Entrada da área de assinantes do Paraíso Brasília.',
       secao: 'Entrar',
@@ -36,7 +37,7 @@ export const conta = definirArea({
       secao: 'Entrar',
     },
     entrarEsqueciSemEmail: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto de senha esquecida (envio de e-mail desligado)',
       padrao: 'Esqueceu a senha? Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova.',
       secao: 'Entrar',
@@ -45,8 +46,9 @@ export const conta = definirArea({
     entrarAssine: { rotulo: 'Link de assinar', padrao: 'Ainda não é assinante? Assine Já', secao: 'Entrar' },
 
     // Criar conta grátis
-    cadastroGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Criar conta grátis', secao: 'Criar conta grátis' },
+    cadastroGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Criar conta grátis', secao: 'Criar conta grátis' },
     cadastroGoogleDescricao: {
+      soTexto: true,
       rotulo: 'Descrição no Google',
       padrao: 'Crie uma conta gratuita no Paraíso Brasília e publique seu anúncio no ClassiSex.',
       secao: 'Criar conta grátis',
@@ -58,7 +60,7 @@ export const conta = definirArea({
       secao: 'Criar conta grátis',
     },
     cadastroEnviado: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Aviso depois de enviar o cadastro',
       padrao:
         'Enviamos um link para o seu e-mail. Abra o link para ativar a conta (vale por 7 dias). Olhe também a caixa de spam.',
@@ -66,7 +68,7 @@ export const conta = definirArea({
     },
     cadastroNaoRecebeu: { rotulo: 'Título "Não recebeu?"', padrao: 'Não recebeu?', secao: 'Criar conta grátis' },
     cadastroIntro: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto acima do formulário',
       padrao:
         'Com a conta gratuita você publica seus anúncios no ClassiSex (até 3, com 1 foto cada). Assinantes veem todos os anúncios, com contatos, e mandam recados privados entre si.',
@@ -110,7 +112,7 @@ export const conta = definirArea({
     formEnviando: { rotulo: 'Formulário: botão enquanto envia', padrao: 'Enviando…', secao: 'Criar conta grátis' },
 
     // Confirmar e-mail
-    confirmarGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Confirmar e-mail', secao: 'Confirmar e-mail' },
+    confirmarGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Confirmar e-mail', secao: 'Confirmar e-mail' },
     confirmarTitulo: { rotulo: 'Título da página', padrao: 'Confirmar e-mail', secao: 'Confirmar e-mail' },
     confirmarLinkNovo: {
       rotulo: 'Texto para pedir um link novo',
@@ -128,8 +130,9 @@ export const conta = definirArea({
     reenviarBotao: { rotulo: 'Reenviar link: botão', padrao: 'Reenviar link', secao: 'Confirmar e-mail' },
 
     // Esqueci minha senha
-    esqueciGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Esqueci minha senha', secao: 'Esqueci minha senha' },
+    esqueciGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Esqueci minha senha', secao: 'Esqueci minha senha' },
     esqueciGoogleDescricao: {
+      soTexto: true,
       rotulo: 'Descrição no Google',
       padrao: 'Peça um link para criar uma nova senha da área de assinantes do Paraíso Brasília.',
       secao: 'Esqueci minha senha',
@@ -141,7 +144,7 @@ export const conta = definirArea({
       secao: 'Esqueci minha senha',
     },
     esqueciEnviado: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Aviso depois de pedir o link',
       padrao: 'Se o e-mail existir, enviamos um link para criar uma nova senha. Olhe também a caixa de spam.',
       secao: 'Esqueci minha senha',
@@ -155,7 +158,7 @@ export const conta = definirArea({
     esqueciVoltar: { rotulo: 'Link para voltar', padrao: 'Voltar para Entrar', secao: 'Esqueci minha senha' },
 
     // Criar nova senha
-    novaGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Criar nova senha', secao: 'Criar nova senha' },
+    novaGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Criar nova senha', secao: 'Criar nova senha' },
     novaTitulo: { rotulo: 'Título da página', padrao: 'Criar nova senha', secao: 'Criar nova senha' },
     novaAvisoCurta: {
       rotulo: 'Aviso para quem tinha senha curta',

@@ -11,13 +11,13 @@ export const modelos = definirArea({
       rotulo: 'Título da página',
       padrao: 'Modelos',
       secao: 'Lista de modelos',
-      ajuda: 'Também é o título que aparece no Google.',
+      ajuda: 'Também é o título que aparece no Google (lá, sem formatação).',
     },
     intro: {
       rotulo: 'Texto de abertura',
       padrao: 'As modelos que animam as noites do Paraíso.',
       secao: 'Lista de modelos',
-      ajuda: 'Também é a descrição que aparece no Google.',
+      ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
     },
 
     // Sem modelos
@@ -27,7 +27,7 @@ export const modelos = definirArea({
       secao: 'Quando não há modelos',
     },
     vazioTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto quando não há modelos',
       padrao: 'Estamos preparando esta galeria. Enquanto isso, veja as próximas festas ou conheça o espaço.',
       secao: 'Quando não há modelos',
@@ -54,6 +54,7 @@ export const modelos = definirArea({
     // Página da modelo
     linkLista: { rotulo: 'Link acima do nome', padrao: 'Modelos', secao: 'Página de cada modelo' },
     descricaoReserva: {
+      soTexto: true,
       rotulo: 'Descrição no Google (modelo sem descrição)',
       padrao: '{nome}, modelo do Paraíso Brasília: fotos e vídeos.',
       secao: 'Página de cada modelo',

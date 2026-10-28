@@ -2,7 +2,7 @@ import type { SerializedEditorState, SerializedLexicalNode } from '@payloadcms/r
 
 import { preencher } from './preencher'
 
-/** Lexical editor JSON of a formatted site text (see `CampoTexto.formatado`). */
+/** Lexical editor JSON of a site text (every field of Textos do site). */
 export type TextoRico = SerializedEditorState
 
 /** Loose view of a serialized node: stored JSON is untrusted, every field is narrowed before use. */
@@ -78,4 +78,9 @@ export function preencherRico(valor: TextoRico, vars: Record<string, string | nu
   const copia = structuredClone(valor)
   preencherNos(copia.root, vars)
   return copia
+}
+
+/** One-line plain text for destinations that drop formatting (`<meta>`, attributes, `<option>`, e-mail): line breaks become spaces. */
+export function textoPuro(valor: TextoRico): string {
+  return ricoParaTexto(valor).replace(/\s*\n\s*/g, ' ').trim()
 }

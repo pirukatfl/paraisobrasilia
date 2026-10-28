@@ -7,13 +7,15 @@ export const geral = definirArea({
   campos: {
     // Google (default)
     googleTitulo: {
+      soTexto: true,
       rotulo: 'Título padrão no Google',
       padrao: 'Paraíso Brasília — Casa de festas liberais',
       secao: 'Google (padrão)',
       ajuda: 'Aparece na aba do navegador e no Google quando a página não tem título próprio.',
     },
     googleDescricao: {
-      formatado: false,
+      bloco: true,
+      soTexto: true,
       rotulo: 'Descrição padrão no Google',
       padrao:
         'Festas liberais para casais e solteiros em Brasília. Veja a programação das próximas festas do Paraíso Brasília.',
@@ -104,7 +106,7 @@ export const geral = definirArea({
       secao: 'Confirmação 18+',
     },
     idadeTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto da confirmação',
       padrao:
         'O Paraíso Brasília é uma casa de festas liberais para adultos. Para continuar, confirme que você tem 18 anos ou mais.',
@@ -141,7 +143,7 @@ export const geral = definirArea({
       secao: 'Página de erro',
     },
     erroTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto',
       padrao:
         'Pode ser uma instabilidade momentânea. Tente de novo em alguns instantes. Se continuar, avise a equipe informando o código abaixo.',

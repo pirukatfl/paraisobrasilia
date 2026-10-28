@@ -13,7 +13,7 @@ export const meusAnuncios = definirArea({
   descricao: 'Lista dos anúncios do assinante, Novo anúncio, Editar anúncio, os campos do formulário e o envio de fotos e vídeos.',
   campos: {
     // Lista
-    listaGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Meus anúncios', secao: LISTA },
+    listaGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Meus anúncios', secao: LISTA },
     topo: {
       rotulo: 'Linha pequena acima do título',
       padrao: 'Área do assinante',
@@ -22,14 +22,14 @@ export const meusAnuncios = definirArea({
     },
     listaTitulo: { rotulo: 'Título da página', padrao: 'Meus anúncios', secao: LISTA },
     listaIntro: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto de abertura',
       padrao:
         'Você pode ter até 3 anúncios ativos (em análise ou publicados). Todo anúncio novo ou editado passa pela equipe antes de aparecer no ClassiSex.',
       secao: LISTA,
     },
     listaAvisoAntigo: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Aviso dos anúncios do site antigo',
       padrao: 'Seus anúncios do site antigo já estão publicados. Você pode editar ou apagar cada um aqui em Meus anúncios.',
       secao: LISTA,
@@ -81,10 +81,10 @@ export const meusAnuncios = definirArea({
     donoApagarSim: { rotulo: 'Cartão: botão de confirmar', padrao: 'Sim, apagar', secao: LISTA },
 
     // Novo anúncio
-    novoGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Novo anúncio', secao: NOVO },
+    novoGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Novo anúncio', secao: NOVO },
     novoTitulo: { rotulo: 'Título da página', padrao: 'Novo anúncio', secao: NOVO },
     novoIntro: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto de abertura',
       padrao:
         'O anúncio aparece no ClassiSex depois que a equipe aprovar. Na área aberta, aparecem só o apelido, o tipo, o texto sem contatos e a foto de capa.',
@@ -97,17 +97,17 @@ export const meusAnuncios = definirArea({
     },
 
     // Editar anúncio
-    editarGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Editar anúncio', secao: EDITAR },
+    editarGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Editar anúncio', secao: EDITAR },
     editarTitulo: { rotulo: 'Título da página', padrao: 'Editar anúncio', secao: EDITAR },
     editarAvisoAntigo: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Aviso: anúncio do site antigo',
       padrao:
         'Este anúncio veio do site antigo. Não há limite de texto nem é preciso preencher WhatsApp ou Telegram. Quem não é assinante vê o texto sem telefones, links e @.',
       secao: EDITAR,
     },
     editarAvisoRascunho: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Aviso: rascunho do site antigo',
       padrao:
         'Este anúncio veio do site antigo. Os contatos que estavam no texto não aparecem para ninguém enquanto for rascunho; coloque WhatsApp ou Telegram nos campos e tire-os do texto.',
@@ -156,13 +156,13 @@ export const meusAnuncios = definirArea({
     cidadeRotulo: { rotulo: 'Campo: Cidade', padrao: 'Cidade (opcional, só assinantes veem)', secao: CAMPOS },
     textoRotulo: { rotulo: 'Campo: Texto do anúncio', padrao: 'Texto do anúncio', secao: CAMPOS },
     textoAjuda: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Ajuda do texto',
       padrao: 'Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.',
       secao: CAMPOS,
     },
     textoAjudaAntigo: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Ajuda do texto (anúncio do site antigo)',
       padrao:
         'Anúncio do site antigo: sem limite de 600 caracteres. Se quiser, coloque o contato nos campos abaixo: só assinantes veem.',
@@ -186,7 +186,6 @@ export const meusAnuncios = definirArea({
     observacaoRotulo: { rotulo: 'Campo: como prefere o contato', padrao: 'Como prefere o contato', secao: CAMPOS },
     observacaoAjuda: { rotulo: 'Ajuda de como prefere o contato', padrao: 'Ex.: só mensagem, depois das 18h.', secao: CAMPOS },
     declaracao: {
-      formatado: false,
       rotulo: 'Declaração (caixa de marcar)',
       padrao:
         'Declaro que tenho 18 anos ou mais, que as informações são verdadeiras e que todas as pessoas das fotos e do vídeo são maiores de idade e autorizaram a publicação.',
@@ -205,7 +204,7 @@ export const meusAnuncios = definirArea({
     // Escolher fotos e vídeos (Novo anúncio)
     midiaLegenda: { rotulo: 'Título do grupo', padrao: 'Fotos e vídeos (opcional)', secao: MIDIA },
     midiaAjudaComVideo: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Ajuda (assinante)',
       padrao:
         'Até {fotos} fotos JPG, PNG ou WebP (15 MB cada) e até {videos} vídeos MP4 ou MOV (100 MB e {segundos} segundos cada). A primeira foto é a capa. Na área aberta, só a foto de capa aparece. Você também pode adicionar depois, editando o anúncio.',
@@ -213,7 +212,7 @@ export const meusAnuncios = definirArea({
       ajuda: 'Use {fotos}, {videos} e {segundos} para os limites.',
     },
     midiaAjudaSoFoto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Ajuda (conta gratuita)',
       padrao:
         '{fotos} foto JPG, PNG ou WebP (15 MB). Ela é a capa. Na área aberta, só a foto de capa aparece. Você também pode trocar depois, editando o anúncio.',
@@ -238,13 +237,13 @@ export const meusAnuncios = definirArea({
     // Fotos e vídeos (Editar anúncio)
     gerTitulo: { rotulo: 'Título da seção', padrao: 'Fotos e vídeos', secao: GERENCIAR },
     gerDicaAssinante: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Dica (assinante)',
       padrao: 'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 60 segundos.',
       secao: GERENCIAR,
     },
     gerDicaGratis: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Dica (conta gratuita)',
       padrao: 'Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.',
       secao: GERENCIAR,

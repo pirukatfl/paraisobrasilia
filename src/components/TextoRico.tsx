@@ -28,11 +28,12 @@ function renderTexto(no: No, chave: number): ReactNode {
 }
 
 /**
- * Whitelist: paragraph, text (bold, italic, underline, strikethrough), line break, lists and links.
+ * Whitelist: paragraph, text (bold, italic, underline, strikethrough), line break, lists and links
+ * (`linha`: only text, marks and breaks).
  * Any other node (heading, upload, relationship, block, unknown) is dropped, so stored JSON can never
  * add markup the site did not plan for. No raw HTML is ever injected.
  */
-function renderNos(nos: No[], inline: boolean): ReactNode[] {
+function renderNos(nos: No[], inline: boolean, linha: boolean): ReactNode[] {
   return nos.map((no, i): ReactNode => {
     switch (no.type) {
       case 'text':
@@ -43,10 +44,12 @@ function renderNos(nos: No[], inline: boolean): ReactNode[] {
       case 'autolink': {
         const campos = ehObjeto(no.fields) ? no.fields : {}
         const url = typeof campos.url === 'string' ? campos.url : ''
-        return renderLink(url, renderNos(filhosDe(no), inline), i)
+        const filhos = renderNos(filhosDe(no), inline, linha)
+        // Line texts sit inside links and buttons: a stored link is dropped, its words stay
+        return linha ? <Fragment key={i}>{filhos}</Fragment> : renderLink(url, filhos, i)
       }
       case 'paragraph': {
-        const filhos = renderNos(filhosDe(no), inline)
+        const filhos = renderNos(filhosDe(no), inline, linha)
         // Inline: paragraphs are separated by a line break instead of a block
         return inline ? (
           <Fragment key={i}>
@@ -60,13 +63,14 @@ function renderNos(nos: No[], inline: boolean): ReactNode[] {
       case 'list': {
         const itens = filhosDe(no).filter((item) => item.type === 'listitem')
         if (inline) {
+          // (also line texts: a stored list becomes lines)
           return (
             <Fragment key={i}>
               {i > 0 && <br />}
               {itens.map((item, j) => (
                 <Fragment key={j}>
                   {j > 0 && <br />}
-                  {renderNos(filhosDe(item), inline)}
+                  {renderNos(filhosDe(item), inline, linha)}
                 </Fragment>
               ))}
             </Fragment>
@@ -76,7 +80,7 @@ function renderNos(nos: No[], inline: boolean): ReactNode[] {
         return (
           <Lista key={i}>
             {itens.map((item, j) => (
-              <li key={j}>{renderNos(filhosDe(item), inline)}</li>
+              <li key={j}>{renderNos(filhosDe(item), inline, linha)}</li>
             ))}
           </Lista>
         )
@@ -90,13 +94,15 @@ function renderNos(nos: No[], inline: boolean): ReactNode[] {
 /**
  * Formatted site text (Textos do site). Block by default (`div` with paragraphs and lists, pass the size
  * and colour classes of the old `<p>`); `inline` renders a `span` with no block elements, for parents that
- * only accept phrasing content. `{name}` placeholders are filled from `vars` before rendering.
+ * only accept phrasing content. `linha` is for the line editor's texts (titles, buttons, labels): inline,
+ * and links and lists a stored value might carry are dropped, only text, marks and breaks remain. `{name}` placeholders are filled from `vars` before rendering.
  */
 export function TextoRico({
   valor,
   vars,
   className,
-  inline = false,
+  linha = false,
+  inline = linha,
   id,
   role,
 }: {
@@ -104,11 +110,12 @@ export function TextoRico({
   vars?: Record<string, string | number>
   className?: string
   inline?: boolean
+  linha?: boolean
   id?: string
   role?: 'note' | 'status' | 'alert'
 }) {
   const estado = vars ? preencherRico(valor, vars) : valor
-  const filhos = renderNos(filhosDe(ehObjeto(estado.root) ? estado.root : {}), inline)
+  const filhos = renderNos(filhosDe(ehObjeto(estado.root) ? estado.root : {}), inline, linha)
   const classes = inline ? className : `texto-rico ${className ?? ''}`.trim()
   return inline ? (
     <span id={id} role={role} className={classes}>
@@ -119,4 +126,16 @@ export function TextoRico({
       {filhos}
     </div>
   )
+}
+
+/** Parts separated by " · " (media counts on cards); empty parts are skipped. */
+export function juntarComPonto(partes: ReactNode[]): ReactNode[] {
+  return partes
+    .filter((parte) => parte !== null && parte !== false)
+    .map((parte, i) => (
+      <Fragment key={i}>
+        {i > 0 && ' · '}
+        {parte}
+      </Fragment>
+    ))
 }
