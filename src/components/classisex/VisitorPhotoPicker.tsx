@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { FieldError } from './AdFormFields'
 
@@ -28,15 +28,15 @@ export function VisitorPhotoPicker({
   remove,
 }: {
   error?: string
-  label: string
+  label: ReactNode
   name?: string
   /** Word used only in the preview alt text: 'foto' or 'imagem' */
   noun?: string
   help: EstadoRico
   /** Button texts (editable in the panel) */
-  choose: string
-  change: string
-  remove: string
+  choose: ReactNode
+  change: ReactNode
+  remove: ReactNode
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | null>(null)

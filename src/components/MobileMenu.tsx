@@ -8,6 +8,7 @@ import { CloseIcon, MenuIcon } from '@/components/icons'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
+import { TextoRico } from '@/components/TextoRico'
 
 // Without JavaScript the panel is shown inline (UI-SPEC: no-JS fallback).
 const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:static!important}[data-mobile-menu-button]{display:none!important}'
@@ -60,7 +61,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
         className="type-label inline-flex min-h-11 min-w-11 items-center gap-2 rounded-lg px-2 text-text"
       >
         {open ? <CloseIcon /> : <MenuIcon />}
-        <span aria-hidden="true">{t.menuBotao}</span>
+        <span aria-hidden="true"><TextoRico valor={t.menuBotao} linha /></span>
       </button>
       <div
         id={panelId}
@@ -80,7 +81,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                   className={linkClass(item)}
                   onClick={() => setOpen(false)}
                 >
-                  {item.label}
+                  <TextoRico valor={item.label} linha />
                 </Link>
                 {item.children && (
                   <ul className="pb-2 pl-4">
@@ -92,7 +93,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                           className={`type-label flex min-h-11 items-center ${pathname === child.href ? 'text-accent' : 'text-muted'} hover:text-accent`}
                           onClick={() => setOpen(false)}
                         >
-                          {child.label}
+                          <TextoRico valor={child.label} linha />
                         </Link>
                       </li>
                     ))}
@@ -107,7 +108,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                     type="submit"
                     className="type-eyebrow flex min-h-11 w-full cursor-pointer items-center text-left text-text hover:text-accent"
                   >
-                    {t.menuSair}
+                    <TextoRico valor={t.menuSair} linha />
                   </button>
                 </form>
               </li>

@@ -95,7 +95,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
       <div key={key} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <label htmlFor="title" className="type-label text-text">
-            {t.tituloRotulo} <Required texto={t.obrigatorio} />
+            <TextoRico valor={t.tituloRotulo} linha /> <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
           </label>
           <input
             id="title"
@@ -112,7 +112,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
 
         <div className="flex flex-col gap-2">
           <label htmlFor="assinadoComo" className="type-label text-text">
-            {t.assinadoRotulo}
+            <TextoRico valor={t.assinadoRotulo} linha />
           </label>
           <input
             id="assinadoComo"
@@ -125,14 +125,14 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
             className={inputClass}
           />
           <p id="ajuda-assinado" className="type-label text-muted">
-            {t.assinadoAjuda}
+            <TextoRico valor={t.assinadoAjuda} linha />
           </p>
           <FieldError id="erro-assinadoComo" message={errors.assinadoComo} />
         </div>
 
         <div className="flex flex-col gap-2">
           <label htmlFor="texto" className="type-label text-text">
-            {t.contoRotulo} <Required texto={t.obrigatorio} />
+            <TextoRico valor={t.contoRotulo} linha /> <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
           </label>
           <textarea
             id="texto"
@@ -155,7 +155,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
 
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="type-label text-text">
-            {t.emailRotulo}
+            <TextoRico valor={t.emailRotulo} linha />
           </label>
           <input
             id="email"
@@ -167,7 +167,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
             className={inputClass}
           />
           <p id="ajuda-email" className="type-label text-muted">
-            {t.emailAjuda}
+            <TextoRico valor={t.emailAjuda} linha />
           </p>
           <FieldError id="erro-email" message={errors.email} />
         </div>
@@ -177,11 +177,11 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
         name="imagem"
         noun="imagem"
         error={errors.imagem}
-        label={t.imagemRotulo}
+        label={<TextoRico valor={t.imagemRotulo} linha />}
         help={t.imagemAjuda}
-        choose={t.imagemEscolher}
-        change={t.imagemTrocar}
-        remove={t.imagemTirar}
+        choose={<TextoRico valor={t.imagemEscolher} linha />}
+        change={<TextoRico valor={t.imagemTrocar} linha />}
+        remove={<TextoRico valor={t.imagemTirar} linha />}
       />
 
       {/* Honeypot: people never see or fill it */}
@@ -194,7 +194,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="consent" value="sim" className={checkbox} aria-describedby={errors.consent ? 'erro-consent' : undefined} />
           <span>
-            {t.consentimento} <Required texto={t.obrigatorio} />
+            <TextoRico valor={t.consentimento} linha /> <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
           </span>
         </label>
         <FieldError id="erro-consent" message={errors.consent} />
@@ -204,15 +204,15 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="termos" value="sim" className={checkbox} aria-describedby={errors.termos ? 'erro-termos' : undefined} />
           <span>
-            {t.termosAntes}{' '}
+            <TextoRico valor={t.termosAntes} linha />{' '}
             <Link href="/termos-de-uso" className="text-accent underline underline-offset-4">
-              {t.termosLink}
+              <TextoRico valor={t.termosLink} linha />
             </Link>{' '}
-            {t.termosE}{' '}
+            <TextoRico valor={t.termosE} linha />{' '}
             <Link href="/politica-de-privacidade" className="text-accent underline underline-offset-4">
-              {t.termosPolitica}
+              <TextoRico valor={t.termosPolitica} linha />
             </Link>{' '}
-            <Required texto={t.obrigatorio} />
+            <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
           </span>
         </label>
         <FieldError id="erro-termos" message={errors.termos} />
@@ -221,7 +221,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
       <TextoRico valor={t.aviso} role="note" className="rounded-lg border border-line px-4 py-2 text-body" />
 
       <button type="submit" className="btn-primary" disabled={pending}>
-        {pending ? t.botaoEnviando : t.botao}
+        {pending ? <TextoRico valor={t.botaoEnviando} linha /> : <TextoRico valor={t.botao} linha />}
       </button>
     </form>
   )

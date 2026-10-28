@@ -7,12 +7,13 @@ import { getActiveAdCategories } from '@/lib/classisex/queries'
 import { uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('classisex')
-  return { title: t.anunciarGoogleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.anunciarGoogleTitulo), robots: { index: false, follow: false } }
 }
 
 /** Messages for ?erro=<codigo> (answer of the no-JavaScript fallback of the form). */
@@ -48,9 +49,9 @@ export default async function AnunciarPage({
   ])
   return (
     <section aria-labelledby="titulo-anunciar">
-      <p className="type-eyebrow text-muted">{t.anunciarTopo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.anunciarTopo} linha /></p>
       <h1 id="titulo-anunciar" className="type-display mt-2">
-        {t.anunciarTitulo}
+        <TextoRico valor={t.anunciarTitulo} linha />
       </h1>
       <TextoRico valor={t.anunciarIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <VisitorAdForm textos={t} campos={campos} categories={categories} erro={erro} />

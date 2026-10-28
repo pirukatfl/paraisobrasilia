@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import type { DicaCardDTO } from '@/lib/dicas/dto'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Home "Dicas Hot": the newest few, text only (keeps the home light). Hidden when none are published. */
 export async function DicasTeaser({ dicas }: { dicas: DicaCardDTO[] }) {
@@ -10,7 +11,7 @@ export async function DicasTeaser({ dicas }: { dicas: DicaCardDTO[] }) {
   return (
     <section aria-labelledby="titulo-dicas-home" className="mt-12 rounded-xl border border-line bg-surface p-4 lg:p-6">
       <h2 id="titulo-dicas-home" className="type-heading">
-        {t.dicasTitulo}
+        <TextoRico valor={t.dicasTitulo} linha />
       </h2>
       <ul className="mt-4 flex max-w-[680px] flex-col gap-3">
         {dicas.slice(0, 3).map((d) => (
@@ -23,7 +24,7 @@ export async function DicasTeaser({ dicas }: { dicas: DicaCardDTO[] }) {
         ))}
       </ul>
       <Link href="/dicas-hot" className="btn-secondary mt-6">
-        {t.dicasBotao}
+        <TextoRico valor={t.dicasBotao} linha />
       </Link>
     </section>
   )

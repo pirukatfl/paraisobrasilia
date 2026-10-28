@@ -8,14 +8,15 @@ import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { RichText } from '@/components/RichText'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberConto } from '@/lib/contos/queries'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { juntarComPonto, TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('contos')
-  return { title: t.membrosGoogleConto, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.membrosGoogleConto), robots: { index: false, follow: false } }
 }
 
 /** Full conto for active subscribers (PREV-03). Unknown or unpublished slugs are a plain 404. */
@@ -27,9 +28,9 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
     return (
       <section aria-labelledby="titulo-conto">
         <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-        <p className="type-eyebrow text-muted">{t.membrosEyebrow}</p>
+        <p className="type-eyebrow text-muted"><TextoRico valor={t.membrosEyebrow} linha /></p>
         <h1 id="titulo-conto" className="type-display mt-2">
-          {t.membrosTitulo}
+          <TextoRico valor={t.membrosTitulo} linha />
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -40,13 +41,16 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
   return (
     <article aria-labelledby="titulo-conto" className="max-w-[720px]">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.contoEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.contoEyebrow} linha /></p>
       <h1 id="titulo-conto" className="type-display mt-2">
         {conto.title}
       </h1>
       {(conto.dateLabel || conto.assinadoComo) && (
         <p className="type-label mt-2 text-muted">
-          {[conto.dateLabel, conto.assinadoComo ? preencher(t.contoPor, { nome: conto.assinadoComo }) : ''].filter(Boolean).join(' · ')}
+          {juntarComPonto([
+            conto.dateLabel,
+            conto.assinadoComo ? <TextoRico valor={t.contoPor} vars={{ nome: conto.assinadoComo }} linha /> : null,
+          ])}
         </p>
       )}
       {conto.imagem && (
@@ -65,7 +69,7 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
       </div>
       <p className="mt-10">
         <Link href="/area-do-assinante/contos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.contoVoltar}
+          <TextoRico valor={t.contoVoltar} linha />
         </Link>
       </p>
     </article>

@@ -8,6 +8,8 @@ import { getPublishedModel } from '@/lib/gallery/queries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { textoPuro } from '@/lib/textos/rico'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (no database at build); data from the tagged cache ('models').
 export const dynamic = 'force-dynamic'
@@ -21,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!model) return { title: 'Modelo não encontrada' }
   return buildPageMetadata({
     title: model.name,
-    description: model.description ?? preencher((await getTextos('modelos')).descricaoReserva, { nome: model.name }),
+    description: model.description ?? preencher(textoPuro((await getTextos('modelos')).descricaoReserva), { nome: model.name }),
     path: `/modelos/${model.slug}`,
     image: model.ogImage ?? undefined,
   })
@@ -36,7 +38,7 @@ export default async function ModelPage({ params }: Props) {
     <article aria-labelledby="titulo-modelo">
       <p className="type-eyebrow text-muted">
         <Link href="/modelos" className="hover:text-accent">
-          {t.linkLista}
+          <TextoRico valor={t.linkLista} linha />
         </Link>
       </p>
       <h1 id="titulo-modelo" className="type-display mt-2">
@@ -49,7 +51,7 @@ export default async function ModelPage({ params }: Props) {
       <Gallery items={model.items} />
       <p className="mt-12">
         <Link href="/modelos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.linkVerTodas}
+          <TextoRico valor={t.linkVerTodas} linha />
         </Link>
       </p>
     </article>

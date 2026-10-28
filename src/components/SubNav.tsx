@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { pathForKey, SECTION_TABS } from '@/lib/pages/keys'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Quem somos sub-tabs (UI-SPEC S6): horizontal list, scrolls on mobile, active = accent underline. */
 export async function SubNav({ activeKey }: { activeKey: (typeof SECTION_TABS)[number]['key'] }) {
@@ -21,7 +22,7 @@ export async function SubNav({ activeKey }: { activeKey: (typeof SECTION_TABS)[n
                   active ? 'border-accent text-text' : 'border-transparent text-muted'
                 }`}
               >
-                {labels[tab.key]}
+                <TextoRico valor={labels[tab.key]} linha />
               </Link>
             </li>
           )

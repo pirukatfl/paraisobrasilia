@@ -5,6 +5,7 @@ import { useActionState } from 'react'
 import { denunciarAnuncio } from '@/lib/classisex/actions'
 import { REPORT_REASONS } from '@/lib/classisex/report-rules'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 const REASON_FIELD = {
   'contato-falso': 'motivoContatoFalso',
@@ -28,20 +29,20 @@ export function ReportForm({ adId, textos: t }: { adId: number; textos: ReportFo
   const [state, formAction, pending] = useActionState(denunciarAnuncio, null)
   return (
     <details className="mt-10 max-w-[560px] rounded-lg border border-line px-4 py-3">
-      <summary className="type-label cursor-pointer text-muted">{t.denunciarResumo}</summary>
+      <summary className="type-label cursor-pointer text-muted"><TextoRico valor={t.denunciarResumo} linha /></summary>
       <form action={formAction} className="mt-4 flex flex-col gap-4">
         <input type="hidden" name="anuncio" value={adId} />
         <fieldset className="flex flex-col gap-2">
-          <legend className="type-label mb-1 text-text">{t.denunciarMotivo}</legend>
+          <legend className="type-label mb-1 text-text"><TextoRico valor={t.denunciarMotivo} linha /></legend>
           {REPORT_REASONS.map((r) => (
             <label key={r.value} className="flex min-h-11 items-center gap-3 text-body text-text">
               <input type="radio" name="motivo" value={r.value} required />
-              {t[REASON_FIELD[r.value]]}
+              <TextoRico valor={t[REASON_FIELD[r.value]]} linha />
             </label>
           ))}
         </fieldset>
         <label className="flex flex-col gap-2 type-label text-text">
-          {t.denunciarDetalhes}
+          <TextoRico valor={t.denunciarDetalhes} linha />
           <textarea
             name="detalhes"
             rows={3}
@@ -60,7 +61,7 @@ export function ReportForm({ adId, textos: t }: { adId: number; textos: ReportFo
             disabled={pending}
             className="min-h-11 rounded-lg border border-line px-5 text-body text-text hover:border-accent disabled:opacity-50"
           >
-            {t.denunciarBotao}
+            <TextoRico valor={t.denunciarBotao} linha />
           </button>
         </div>
       </form>

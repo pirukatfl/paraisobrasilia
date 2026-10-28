@@ -7,8 +7,9 @@ import { AssineJaCta } from '@/components/contos/AssineJaCta'
 import { RichText } from '@/components/RichText'
 import { getPublicConto } from '@/lib/contos/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { juntarComPonto, TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 // Per request (no database at build); data from the tagged cache ('conto:{slug}').
 export const dynamic = 'force-dynamic'
@@ -19,7 +20,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const conto = await getPublicConto((await params).slug)
-  if (!conto) return { title: (await getTextos('contos')).googleContoNaoEncontrado }
+  if (!conto) return { title: textoPuro((await getTextos('contos')).googleContoNaoEncontrado) }
   // T-05-01: the description comes from the open text only
   return buildPageMetadata({ title: conto.title, description: conto.description, path: `/contos/${conto.slug}` })
 }
@@ -31,13 +32,16 @@ export default async function ContoPublicPage({ params }: Props) {
   const t = await getTextos('contos')
   return (
     <article aria-labelledby="titulo-conto" className="max-w-[720px]">
-      <p className="type-eyebrow text-muted">{t.contoEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.contoEyebrow} linha /></p>
       <h1 id="titulo-conto" className="type-display mt-2">
         {conto.title}
       </h1>
       {(conto.dateLabel || conto.assinadoComo) && (
         <p className="type-label mt-2 text-muted">
-          {[conto.dateLabel, conto.assinadoComo ? preencher(t.contoPor, { nome: conto.assinadoComo }) : ''].filter(Boolean).join(' · ')}
+          {juntarComPonto([
+            conto.dateLabel,
+            conto.assinadoComo ? <TextoRico valor={t.contoPor} vars={{ nome: conto.assinadoComo }} linha /> : null,
+          ])}
         </p>
       )}
       {conto.imagem && (
@@ -56,15 +60,15 @@ export default async function ContoPublicPage({ params }: Props) {
       </div>
       {conto.hasMore && (
         <AssineJaCta
-          title={t.contoCtaTitulo}
+          title={<TextoRico valor={t.contoCtaTitulo} linha />}
           text={t.contoCtaTexto}
           membersHref={`/area-do-assinante/contos/${conto.slug}`}
-          membersLabel={t.contoCtaBotao}
+          membersLabel={<TextoRico valor={t.contoCtaBotao} linha />}
         />
       )}
       <p className="mt-10">
         <Link href="/contos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.contoVoltar}
+          <TextoRico valor={t.contoVoltar} linha />
         </Link>
       </p>
     </article>

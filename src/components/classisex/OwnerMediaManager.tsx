@@ -4,7 +4,6 @@ import { TIER_LIMITS, type Tier } from '@/lib/assinantes/tier'
 import type { OwnerMediaDTO } from '@/lib/classisex/dto'
 import { MAX_AD_PHOTOS } from '@/lib/classisex/media-messages'
 import { definirCapa, removerMidia } from '@/lib/classisex/actions'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
 
@@ -27,13 +26,13 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
   return (
     <section aria-labelledby="titulo-midia" className="mt-12 max-w-[680px]">
       <h2 id="titulo-midia" className="type-heading">
-        {t.gerTitulo}
+        <TextoRico valor={t.gerTitulo} linha />
       </h2>
       <TextoRico valor={tier === 'gratis' ? t.gerDicaGratis : t.gerDicaAssinante} className="mt-2 text-body text-muted" />
-      <p className="mt-1 text-body text-muted">{t.gerCapaNota}</p>
+      <p className="mt-1 text-body text-muted"><TextoRico valor={t.gerCapaNota} linha /></p>
 
       {media.fotos.length === 0 ? (
-        <p className="mt-6 text-body">{t.gerSemFotos}</p>
+        <p className="mt-6 text-body"><TextoRico valor={t.gerSemFotos} linha /></p>
       ) : (
         <ul aria-label="Fotos do anúncio" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {media.fotos.map((foto, i) => (
@@ -48,15 +47,15 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
                 decoding="async"
                 className="aspect-square w-full rounded object-cover"
               />
-              {foto.guardada && <p className="type-label text-muted">{t.gerGuardada}</p>}
+              {foto.guardada && <p className="type-label text-muted"><TextoRico valor={t.gerGuardada} linha /></p>}
               {foto.capa ? (
-                <p className="type-label text-accent">{t.gerCapa}</p>
+                <p className="type-label text-accent"><TextoRico valor={t.gerCapa} linha /></p>
               ) : (
                 <form action={definirCapa}>
                   <input type="hidden" name="id" value={foto.id} />
                   <input type="hidden" name="anuncio" value={adId} />
                   <button type="submit" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-                    {t.gerUsarCapa}
+                    <TextoRico valor={t.gerUsarCapa} linha />
                   </button>
                 </form>
               )}
@@ -64,7 +63,7 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
                 <input type="hidden" name="id" value={foto.id} />
                 <input type="hidden" name="anuncio" value={adId} />
                 <button type="submit" className="type-label text-danger underline underline-offset-4">
-                  {t.gerRemover}
+                  <TextoRico valor={t.gerRemover} linha />
                 </button>
               </form>
             </li>
@@ -78,14 +77,14 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
           className="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3"
         >
           <p className="text-body">
-            {preencher(t.gerVideo, { n: i + 1, duracao: video.durationLabel })}
-            {video.guardada && <span className="type-label block text-muted">{t.gerGuardada}</span>}
+            <TextoRico valor={t.gerVideo} vars={{ n: i + 1, duracao: video.durationLabel }} linha />
+            {video.guardada && <span className="type-label block text-muted"><TextoRico valor={t.gerGuardada} linha /></span>}
           </p>
           <form action={removerMidia}>
             <input type="hidden" name="id" value={video.id} />
             <input type="hidden" name="anuncio" value={adId} />
             <button type="submit" className="type-label text-danger underline underline-offset-4">
-              {preencher(t.gerRemoverVideo, { n: i + 1 })}
+              <TextoRico valor={t.gerRemoverVideo} vars={{ n: i + 1 }} linha />
             </button>
           </form>
         </div>
@@ -102,7 +101,7 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
         >
           <input type="hidden" name="tipo" value="foto" />
           <label htmlFor="arquivo-foto" className="type-label">
-            {t.gerAdicionarFoto}
+            <TextoRico valor={t.gerAdicionarFoto} linha />
           </label>
           <input
             id="arquivo-foto"
@@ -113,11 +112,11 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
             className={fileInput}
           />
           <button type="submit" className="btn-primary self-start">
-            {t.gerEnviarFoto}
+            <TextoRico valor={t.gerEnviarFoto} linha />
           </button>
         </form>
         ) : (
-          <p className="text-body text-muted">{t.gerGratisUmaFoto}</p>
+          <p className="text-body text-muted"><TextoRico valor={t.gerGratisUmaFoto} linha /></p>
         )}
         {canAddVideo ? (
         <form
@@ -129,7 +128,7 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
         >
           <input type="hidden" name="tipo" value="video" />
           <label htmlFor="arquivo-video" className="type-label">
-            {t.gerAdicionarVideo}
+            <TextoRico valor={t.gerAdicionarVideo} linha />
           </label>
           <input
             id="arquivo-video"
@@ -140,14 +139,14 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
             className={fileInput}
           />
           <button type="submit" className="btn-primary self-start">
-            {t.gerEnviarVideo}
+            <TextoRico valor={t.gerEnviarVideo} linha />
           </button>
         </form>
         ) : (
           <div className="flex flex-col gap-2">
-            <p className="text-body">{t.gerVideosAssinantes}</p>
+            <p className="text-body"><TextoRico valor={t.gerVideosAssinantes} linha /></p>
             <Link href="/assine-ja" className="btn-secondary self-start">
-              {t.gerAssineJa}
+              <TextoRico valor={t.gerAssineJa} linha />
             </Link>
           </div>
         )}

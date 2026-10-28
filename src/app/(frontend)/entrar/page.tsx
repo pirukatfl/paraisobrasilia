@@ -14,6 +14,7 @@ import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 import { TextoRico } from '@/components/TextoRico'
 import { getTextos } from '@/lib/textos/queries'
+import { textoPuro } from '@/lib/textos/rico'
 
 // Reads the session cookie: rendered per request, never cached (T-03-05)
 export const dynamic = 'force-dynamic'
@@ -21,7 +22,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('conta')
   return {
-    ...buildPageMetadata({ title: t.entrarGoogleTitulo, description: t.entrarGoogleDescricao, path: '/entrar' }),
+    ...buildPageMetadata({ title: textoPuro(t.entrarGoogleTitulo), description: textoPuro(t.entrarGoogleDescricao), path: '/entrar' }),
     robots: { index: false, follow: false },
   }
 }
@@ -49,13 +50,13 @@ export default async function EntrarPage({
 
   return (
     <section aria-labelledby="titulo-entrar" className="max-w-[440px]">
-      <p className="type-eyebrow text-muted">{t.etiqueta}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.etiqueta} linha /></p>
       <h1 id="titulo-entrar" className="type-display mt-2">
-        {t.entrarTitulo}
+        <TextoRico valor={t.entrarTitulo} linha />
       </h1>
       {confirmado && (
         <p role="status" className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 text-body text-text">
-          {t.entrarConfirmado}
+          <TextoRico valor={t.entrarConfirmado} linha />
         </p>
       )}
       {erro && (
@@ -67,10 +68,10 @@ export default async function EntrarPage({
       {/* Plain form + server action: works without client JS */}
       <form action={entrar} className="mt-6 flex flex-col gap-4">
         <input type="hidden" name="next" value={next} />
-        <FormField id="email" name="email" type="email" label={t.campoEmail} autoComplete="username" />
-        <FormField id="password" name="password" type="password" label={t.entrarCampoSenha} autoComplete="current-password" />
+        <FormField id="email" name="email" type="email" label={<TextoRico valor={t.campoEmail} linha />} autoComplete="username" />
+        <FormField id="password" name="password" type="password" label={<TextoRico valor={t.entrarCampoSenha} linha />} autoComplete="current-password" />
         <button type="submit" className="btn-primary mt-2">
-          {t.entrarBotao}
+          <TextoRico valor={t.entrarBotao} linha />
         </button>
       </form>
       <p className="mt-6 text-body text-muted">
@@ -80,10 +81,10 @@ export default async function EntrarPage({
               href="/esqueci-senha"
               className="type-label inline-flex min-h-11 items-center text-accent underline underline-offset-4"
             >
-              {t.entrarEsqueci}
+              <TextoRico valor={t.entrarEsqueci} linha />
             </Link>
             <br />
-            {t.entrarSemEmail}{' '}
+            <TextoRico valor={t.entrarSemEmail} linha />{' '}
           </>
         ) : (
           <>
@@ -95,20 +96,20 @@ export default async function EntrarPage({
             href={whatsappUrl(contact.whatsapp)}
             className="text-accent underline underline-offset-4"
           >
-            {t.botaoWhatsapp}
+            <TextoRico valor={t.botaoWhatsapp} linha />
           </ExternalLink>
         )}
       </p>
       {emailEnabled() && (
         <p className="mt-4">
           <Link href="/cadastro" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-            {t.entrarCriarConta}
+            <TextoRico valor={t.entrarCriarConta} linha />
           </Link>
         </p>
       )}
       <p className="mt-2">
         <Link href="/assine-ja" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-          {t.entrarAssine}
+          <TextoRico valor={t.entrarAssine} linha />
         </Link>
       </p>
     </section>

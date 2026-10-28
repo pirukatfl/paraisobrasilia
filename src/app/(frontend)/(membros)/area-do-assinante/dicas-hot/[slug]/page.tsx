@@ -9,12 +9,14 @@ import { RichText } from '@/components/RichText'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberDica } from '@/lib/dicas/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('dicasHot')
-  return { title: t.membrosGoogleDica, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.membrosGoogleDica), robots: { index: false, follow: false } }
 }
 
 /** Full dica for active subscribers (PREV-03). Unknown or unpublished slugs are a plain 404. */
@@ -26,9 +28,9 @@ export default async function MembrosDicaPage({ params }: { params: Promise<{ sl
     return (
       <section aria-labelledby="titulo-dica">
         <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-        <p className="type-eyebrow text-muted">{t.membrosEyebrow}</p>
+        <p className="type-eyebrow text-muted"><TextoRico valor={t.membrosEyebrow} linha /></p>
         <h1 id="titulo-dica" className="type-display mt-2">
-          {t.membrosTitulo}
+          <TextoRico valor={t.membrosTitulo} linha />
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -39,7 +41,7 @@ export default async function MembrosDicaPage({ params }: { params: Promise<{ sl
   return (
     <article aria-labelledby="titulo-dica" className="max-w-[720px]">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.dicaEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.dicaEyebrow} linha /></p>
       <h1 id="titulo-dica" className="type-display mt-2">
         {dica.title}
       </h1>
@@ -59,7 +61,7 @@ export default async function MembrosDicaPage({ params }: { params: Promise<{ sl
       </div>
       <p className="mt-10">
         <Link href="/area-do-assinante/dicas-hot" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.dicaVoltar}
+          <TextoRico valor={t.dicaVoltar} linha />
         </Link>
       </p>
     </article>

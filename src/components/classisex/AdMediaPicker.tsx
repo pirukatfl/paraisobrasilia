@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 
 import { TIER_LIMITS } from '@/lib/assinantes/tier'
 import {
@@ -12,7 +12,6 @@ import {
 } from '@/lib/classisex/media-messages'
 import { MAX_VIDEO_SECONDS } from '@/lib/classisex/mp4'
 import type { Textos } from '@/lib/textos/areas'
-import { preencher } from '@/lib/textos/mesclar'
 import { TextoRico } from '@/components/TextoRico'
 
 const EXTENSION_TYPES: Record<string, string> = {
@@ -66,7 +65,7 @@ function Preview({
   kind: 'foto' | 'video'
   onRemove: () => void
   index: number
-  removeLabel: string
+  removeLabel: ReactNode
 }) {
   const url = useMemo(() => URL.createObjectURL(file), [file])
   useEffect(() => () => URL.revokeObjectURL(url), [url])
@@ -151,7 +150,7 @@ export function AdMediaPicker({
 
   return (
     <fieldset className="flex flex-col gap-4" disabled={disabled}>
-      <legend className="type-label text-text">{t.midiaLegenda}</legend>
+      <legend className="type-label text-text"><TextoRico valor={t.midiaLegenda} linha /></legend>
       {MAX_AD_VIDEOS > 0 ? (
         <TextoRico
           valor={t.midiaAjudaComVideo}
@@ -171,7 +170,7 @@ export function AdMediaPicker({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="escolher-fotos" className="type-label text-text">
-          {preencher(t.midiaEscolherFotos, { n: photos.length, max: MAX_AD_PHOTOS })}
+          <TextoRico valor={t.midiaEscolherFotos} vars={{ n: photos.length, max: MAX_AD_PHOTOS }} linha />
         </label>
         <input
           id="escolher-fotos"
@@ -187,7 +186,7 @@ export function AdMediaPicker({
         {photos.length > 0 && (
           <ul aria-label="Fotos escolhidas" className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {photos.map((f, i) => (
-              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="foto" index={i} removeLabel={preencher(t.midiaTirarFoto, { n: i + 1 })} onRemove={() => onPhotos(photos.filter((_, j) => j !== i))} />
+              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="foto" index={i} removeLabel={<TextoRico valor={t.midiaTirarFoto} vars={{ n: i + 1 }} linha />} onRemove={() => onPhotos(photos.filter((_, j) => j !== i))} />
             ))}
           </ul>
         )}
@@ -196,7 +195,7 @@ export function AdMediaPicker({
       {MAX_AD_VIDEOS > 0 && (
       <div className="flex flex-col gap-2">
         <label htmlFor="escolher-videos" className="type-label text-text">
-          {preencher(t.midiaEscolherVideos, { n: videos.length, max: MAX_AD_VIDEOS })}
+          <TextoRico valor={t.midiaEscolherVideos} vars={{ n: videos.length, max: MAX_AD_VIDEOS }} linha />
         </label>
         <input
           id="escolher-videos"
@@ -212,7 +211,7 @@ export function AdMediaPicker({
         {videos.length > 0 && (
           <ul aria-label="Vídeos escolhidos" className="mt-2 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {videos.map((f, i) => (
-              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="video" index={i} removeLabel={preencher(t.midiaTirarVideo, { n: i + 1 })} onRemove={() => onVideos(videos.filter((_, j) => j !== i))} />
+              <Preview key={`${f.name}-${f.size}-${f.lastModified}-${i}`} file={f} kind="video" index={i} removeLabel={<TextoRico valor={t.midiaTirarVideo} vars={{ n: i + 1 }} linha />} onRemove={() => onVideos(videos.filter((_, j) => j !== i))} />
             ))}
           </ul>
         )}

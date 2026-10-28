@@ -8,12 +8,14 @@ import { EmptyState } from '@/components/EmptyState'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { listMemberContos } from '@/lib/contos/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('contos')
-  return { title: t.membrosGoogleLista, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.membrosGoogleLista), robots: { index: false, follow: false } }
 }
 
 const PATH = '/area-do-assinante/contos'
@@ -29,9 +31,9 @@ export default async function MembrosContosPage({
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.membrosEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.membrosEyebrow} linha /></p>
       <h1 id="titulo-contos" className="type-display mt-2">
-        {t.membrosTitulo}
+        <TextoRico valor={t.membrosTitulo} linha />
       </h1>
     </>
   )
@@ -49,9 +51,9 @@ export default async function MembrosContosPage({
   return (
     <section aria-labelledby="titulo-contos">
       {header}
-      <p className="mt-4 max-w-[680px] text-body text-muted">{t.membrosIntro}</p>
+      <p className="mt-4 max-w-[680px] text-body text-muted"><TextoRico valor={t.membrosIntro} linha /></p>
       {result.items.length === 0 ? (
-        <EmptyState heading={t.membrosVazioTitulo} body={t.membrosVazioTexto} actions={[]} />
+        <EmptyState heading={<TextoRico valor={t.membrosVazioTitulo} linha />} body={t.membrosVazioTexto} actions={[]} />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {result.items.map((c) => (

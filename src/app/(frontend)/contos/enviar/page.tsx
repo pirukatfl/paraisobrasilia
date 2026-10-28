@@ -5,12 +5,13 @@ import { uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { CONTO_ENVIO_MESSAGES } from '@/lib/contos/envio-rules'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('enviarConto')
-  return { title: t.googleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.googleTitulo), robots: { index: false, follow: false } }
 }
 
 /** Messages for ?erro=<codigo> (answer of the no-JavaScript fallback of the form). */
@@ -36,9 +37,9 @@ export default async function EnviarContoPage({
   const erro = erroMessage(typeof raw === 'string' ? raw.slice(0, 40) : undefined)
   return (
     <section aria-labelledby="titulo-enviar-conto">
-      <p className="type-eyebrow text-muted">{t.topo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.topo} linha /></p>
       <h1 id="titulo-enviar-conto" className="type-display mt-2">
-        {t.titulo}
+        <TextoRico valor={t.titulo} linha />
       </h1>
       <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
       <ContoEnvioForm erro={erro} textos={t} />

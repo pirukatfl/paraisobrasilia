@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import type { AdFormValues } from '@/lib/classisex/actions'
 import type { Textos } from '@/lib/textos/areas'
 import { TextoRico } from '@/components/TextoRico'
@@ -6,7 +8,7 @@ export const inputClass =
   'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent'
 
 /** Visual marker of the few required fields (client 2026-10-23) */
-export function Required({ texto }: { texto: string }) {
+export function Required({ texto }: { texto: ReactNode }) {
   return <span className="text-accent">{texto}</span>
 }
 
@@ -63,7 +65,7 @@ export function AdFormFields({
     <>
       <div className="flex flex-col gap-2">
         <label htmlFor="apelido" className="type-label text-text">
-          {t.apelidoRotulo} <Required texto={t.campoObrigatorio} />
+          <TextoRico valor={t.apelidoRotulo} linha /> <Required texto={<TextoRico valor={t.campoObrigatorio} linha />} />
         </label>
         <input
           id="apelido"
@@ -76,14 +78,14 @@ export function AdFormFields({
           className={inputClass}
         />
         <p id="ajuda-apelido" className="type-label text-muted">
-          {t.apelidoAjuda}
+          <TextoRico valor={t.apelidoAjuda} linha />
         </p>
         <FieldError id="erro-apelido" message={errors.apelido} />
       </div>
 
       <fieldset className="flex flex-col gap-2" aria-describedby={described('euSou')}>
         <legend className="type-label text-text">
-          {t.euSouRotulo} <Required texto={t.campoObrigatorio} />
+          <TextoRico valor={t.euSouRotulo} linha /> <Required texto={<TextoRico valor={t.campoObrigatorio} linha />} />
         </legend>
         <div className="flex flex-wrap gap-x-6 gap-y-2">
           {categories.map((c) => (
@@ -104,7 +106,7 @@ export function AdFormFields({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="cidade" className="type-label text-text">
-          {t.cidadeRotulo}
+          <TextoRico valor={t.cidadeRotulo} linha />
         </label>
         <input
           id="cidade"
@@ -121,7 +123,7 @@ export function AdFormFields({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
-          {t.textoRotulo} <Required texto={t.campoObrigatorio} />
+          <TextoRico valor={t.textoRotulo} linha /> <Required texto={<TextoRico valor={t.campoObrigatorio} linha />} />
         </label>
         <textarea
           id="texto"
@@ -137,11 +139,11 @@ export function AdFormFields({
       </div>
 
       <fieldset className="flex flex-col gap-4" aria-describedby={described('contato')}>
-        <legend className="type-label text-text">{t.contatoLegenda}</legend>
+        <legend className="type-label text-text"><TextoRico valor={t.contatoLegenda} linha /></legend>
         <FieldError id="erro-contato" message={errors.contato} />
         <div className="flex flex-col gap-2">
           <label htmlFor="whatsapp" className="type-label text-text">
-            {t.whatsappRotulo}
+            <TextoRico valor={t.whatsappRotulo} linha />
           </label>
           <input
             id="whatsapp"
@@ -158,7 +160,7 @@ export function AdFormFields({
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="telegram" className="type-label text-text">
-            {t.telegramRotulo}
+            <TextoRico valor={t.telegramRotulo} linha />
           </label>
           <input
             id="telegram"
@@ -174,7 +176,7 @@ export function AdFormFields({
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="emailContato" className="type-label text-text">
-            {t.emailContatoRotulo}
+            <TextoRico valor={t.emailContatoRotulo} linha />
           </label>
           <input
             id="emailContato"
@@ -191,17 +193,17 @@ export function AdFormFields({
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="links-0" className="type-label text-text">
-            {t.linksRotulo}
+            <TextoRico valor={t.linksRotulo} linha />
           </label>
           <p id="ajuda-links" className="type-label text-muted">
-            {t.linksAjuda}
+            <TextoRico valor={t.linksAjuda} linha />
           </p>
           <FieldError id="erro-links" message={errors.links} />
           {[0, 1, 2].map((i) => (
             <LinkInput key={i} index={i} value={values.links[i]} describedBy={['ajuda-links', described('links')]} />
           ))}
           <details open={Boolean(values.links[3] || values.links[4])} className="flex flex-col gap-2">
-            <summary className="type-label cursor-pointer text-accent">{t.linksMais}</summary>
+            <summary className="type-label cursor-pointer text-accent"><TextoRico valor={t.linksMais} linha /></summary>
             <div className="mt-2 flex flex-col gap-2">
               {[3, 4].map((i) => (
                 <LinkInput key={i} index={i} value={values.links[i]} describedBy={['ajuda-links', described('links')]} />
@@ -211,7 +213,7 @@ export function AdFormFields({
         </div>
         <div className="flex flex-col gap-2">
           <label htmlFor="observacao" className="type-label text-text">
-            {t.observacaoRotulo}
+            <TextoRico valor={t.observacaoRotulo} linha />
           </label>
           <input
             id="observacao"
@@ -224,7 +226,7 @@ export function AdFormFields({
             className={inputClass}
           />
           <p id="ajuda-observacao" className="type-label text-muted">
-            {t.observacaoAjuda}
+            <TextoRico valor={t.observacaoAjuda} linha />
           </p>
           <FieldError id="erro-observacao" message={errors.observacao} />
         </div>
@@ -240,7 +242,7 @@ export function AdFormFields({
             className="mt-1 size-5 shrink-0 accent-accent"
           />
           <span>
-            {t.declaracao} <Required texto={t.campoObrigatorio} />
+            <TextoRico valor={t.declaracao} linha /> <Required texto={<TextoRico valor={t.campoObrigatorio} linha />} />
           </span>
         </label>
         <FieldError id="erro-consent" message={errors.consent} />

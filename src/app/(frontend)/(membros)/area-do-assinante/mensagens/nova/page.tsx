@@ -9,14 +9,15 @@ import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { iniciarConversa } from '@/lib/mensagens/actions'
 import { getComposeTarget } from '@/lib/mensagens/queries'
 import { MENSAGEM_MESSAGES } from '@/lib/mensagens/rules'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('mensagens')
-  return { title: t.googleNovo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.googleNovo), robots: { index: false, follow: false } }
 }
 
 const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)
@@ -38,7 +39,7 @@ export default async function NovaMensagemPage({
   const head = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.novoEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.novoEyebrow} linha /></p>
     </>
   )
   if (check.inactive) {
@@ -46,7 +47,7 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          {t.novoTitulo}
+          <TextoRico valor={t.novoTitulo} linha />
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -62,7 +63,7 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          {t.novoTitulo}
+          <TextoRico valor={t.novoTitulo} linha />
         </h1>
         <p role="alert" className="mt-4 max-w-[560px] rounded-lg border border-line bg-surface px-4 py-2 text-body">
           {MENSAGEM_MESSAGES.propria}
@@ -75,14 +76,14 @@ export default async function NovaMensagemPage({
       <section aria-labelledby="titulo-nova">
         {head}
         <h1 id="titulo-nova" className="type-display mt-2">
-          {t.novoTitulo}
+          <TextoRico valor={t.novoTitulo} linha />
         </h1>
         <p role="alert" className="mt-4 max-w-[560px] rounded-lg border border-line bg-surface px-4 py-2 text-body">
           {target.message}
         </p>
         <p className="mt-8">
           <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-            {t.voltar}
+            <TextoRico valor={t.voltar} linha />
           </Link>
         </p>
       </section>
@@ -92,7 +93,7 @@ export default async function NovaMensagemPage({
     <section aria-labelledby="titulo-nova">
       {head}
       <h1 id="titulo-nova" className="type-display mt-2">
-        {preencher(t.novoTituloPara, { nome: target.recipientApelido })}
+        <TextoRico valor={t.novoTituloPara} vars={{ nome: target.recipientApelido }} linha />
       </h1>
       <p className="type-label mt-2 text-muted">{target.assunto}</p>
       <MessageForm
@@ -100,12 +101,12 @@ export default async function NovaMensagemPage({
         hidden={{ alvo }}
         askApelido={!target.apelido}
         initialApelido={target.apelido}
-        submitLabel={t.formEnviar}
+        submitLabel={<TextoRico valor={t.formEnviar} linha />}
         textos={t}
       />
       <p className="mt-8">
         <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.voltar}
+          <TextoRico valor={t.voltar} linha />
         </Link>
       </p>
     </section>

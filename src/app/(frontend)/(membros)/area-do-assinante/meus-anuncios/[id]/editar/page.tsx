@@ -11,12 +11,14 @@ import { uploadErrorMessage, batchNotice } from '@/lib/classisex/media-messages'
 import { getActiveAdCategories, getOwnAdForEdit } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
+import type { ReactNode } from 'react'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('meusAnuncios')
-  return { title: t.editarGoogleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.editarGoogleTitulo), robots: { index: false, follow: false } }
 }
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
@@ -30,11 +32,11 @@ export default async function EditarAnuncioPage({
 }) {
   const [{ id }, query] = await Promise.all([params, searchParams])
   const t = await getTextos('meusAnuncios')
-  const mediaOk: Record<string, string> = {
-    'foto-ok': t.midiaFotoOk,
-    'video-ok': t.midiaVideoOk,
-    capa: t.midiaCapaOk,
-    removida: t.midiaRemovidaOk,
+  const mediaOk: Record<string, ReactNode> = {
+    'foto-ok': <TextoRico valor={t.midiaFotoOk} linha />,
+    'video-ok': <TextoRico valor={t.midiaVideoOk} linha />,
+    capa: <TextoRico valor={t.midiaCapaOk} linha />,
+    removida: <TextoRico valor={t.midiaRemovidaOk} linha />,
   }
   const midia = one(query.midia)
   // Only fixed texts are shown: the URL carries a code, never a message
@@ -53,9 +55,9 @@ export default async function EditarAnuncioPage({
           {notice}
         </p>
       )}
-      <p className="type-eyebrow text-muted">{t.topo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.topo} linha /></p>
       <h1 id="titulo-editar-anuncio" className="type-display mt-2">
-        {t.editarTitulo}
+        <TextoRico valor={t.editarTitulo} linha />
       </h1>
     </>
   )
@@ -75,10 +77,10 @@ export default async function EditarAnuncioPage({
       )}
       {ad.status === 'aprovado' ? (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          {t.editarAvisoPublicado}
+          <TextoRico valor={t.editarAvisoPublicado} linha />
         </p>
       ) : (
-        <p className="mt-4 max-w-[680px] text-body text-muted">{t.editarAvisoSalvar}</p>
+        <p className="mt-4 max-w-[680px] text-body text-muted"><TextoRico valor={t.editarAvisoSalvar} linha /></p>
       )}
       <AdForm
         textos={t}

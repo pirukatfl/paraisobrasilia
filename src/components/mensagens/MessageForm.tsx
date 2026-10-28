@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useState, type ReactNode } from 'react'
 
 import type { MessageFormState } from '@/lib/mensagens/actions'
 import { MESSAGE_MAX } from '@/lib/mensagens/rules'
@@ -24,7 +24,7 @@ export function MessageForm({
   hidden: Record<string, string>
   askApelido?: boolean
   initialApelido?: string
-  submitLabel: string
+  submitLabel: ReactNode
   rows?: number
   textos: Pick<Textos<'mensagens'>, 'formApelido' | 'formApelidoAjuda' | 'formRecado' | 'formEnviando'>
 }) {
@@ -46,7 +46,7 @@ export function MessageForm({
       {askApelido && (
         <div className="flex flex-col gap-2">
           <label htmlFor="apelido" className="type-label text-text">
-            {textos.formApelido}
+            <TextoRico valor={textos.formApelido} linha />
           </label>
           <input
             id="apelido"
@@ -64,7 +64,7 @@ export function MessageForm({
       )}
       <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
-          {textos.formRecado}
+          <TextoRico valor={textos.formRecado} linha />
         </label>
         <textarea
           id="texto"
@@ -80,7 +80,7 @@ export function MessageForm({
         </p>
       </div>
       <button type="submit" className="btn-primary self-start" disabled={pending}>
-        {pending ? textos.formEnviando : submitLabel}
+        {pending ? <TextoRico valor={textos.formEnviando} linha /> : submitLabel}
       </button>
     </form>
   )

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { PasswordInput } from '@/components/assinantes/PasswordInput'
 
 /** Labelled input for the subscriber forms (/entrar, senha pages).  */
@@ -15,7 +17,7 @@ export function FormField({
   hint,
 }: {
   id: string
-  label: string
+  label: ReactNode
   name: string
   type: 'email' | 'password' | 'text'
   autoComplete: string
@@ -25,7 +27,7 @@ export function FormField({
   defaultValue?: string
   /** Field-level message (rendered under the input, linked with aria-describedby) */
   error?: string
-  hint?: string
+  hint?: ReactNode
 }) {
   const inputProps = {
     id,

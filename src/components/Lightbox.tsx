@@ -6,8 +6,8 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '@/components/icons'
 import type { LightboxSlide } from '@/lib/gallery/types'
-import { preencher } from '@/lib/textos/mesclar'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
+import { TextoRico } from '@/components/TextoRico'
 
 const SWIPE_THRESHOLD = 48
 
@@ -78,7 +78,7 @@ export function Lightbox({
   }
 
   const slide = index !== null ? slides[index] : null
-  const counter = index !== null ? preencher(t.galeriaContador, { n: index + 1, total }) : ''
+  const counter = index !== null ? <TextoRico valor={t.galeriaContador} vars={{ n: index + 1, total }} linha /> : null
   const iconButton =
     'inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-surface text-text hover:text-accent'
 
@@ -175,7 +175,7 @@ export function Lightbox({
                 href={slide.href}
                 className="type-label inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent"
               >
-                {t.galeriaVerFesta}
+                <TextoRico valor={t.galeriaVerFesta} linha />
               </Link>
             )}
           </div>

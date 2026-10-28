@@ -2,17 +2,15 @@ import Link from 'next/link'
 
 import type { MemberAdDTO } from '@/lib/classisex/dto'
 import type { Textos } from '@/lib/textos/areas'
-import { preencher } from '@/lib/textos/mesclar'
+import { juntarComPonto, TextoRico } from '@/components/TextoRico'
 
 const EXCERPT = 180
 
 const mediaBadge = (t: Textos<'classisex'>, fotos: number, videos: number) =>
-  [
-    fotos === 1 ? t.cardUmaFoto : fotos > 1 ? preencher(t.cardFotos, { n: fotos }) : null,
-    videos === 1 ? t.cardUmVideo : videos > 1 ? preencher(t.cardVideos, { n: videos }) : null,
-  ]
-    .filter(Boolean)
-    .join(' · ')
+  juntarComPonto([
+    fotos === 1 ? <TextoRico valor={t.cardUmaFoto} linha /> : fotos > 1 ? <TextoRico valor={t.cardFotos} vars={{ n: fotos }} linha /> : null,
+    videos === 1 ? <TextoRico valor={t.cardUmVideo} linha /> : videos > 1 ? <TextoRico valor={t.cardVideos} vars={{ n: videos }} linha /> : null,
+  ])
 
 /**
  * One ad in the members list (CLAS-01): cover photo (plain <img> through the protected route,
@@ -38,19 +36,19 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
         />
       ) : (
         <div className="type-label mb-4 flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-line text-muted">
-          {t.cardSemFoto}
+          <TextoRico valor={t.cardSemFoto} linha />
         </div>
       )}
       <h2 id={titleId} className="type-heading">
         {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </h2>
-      {badge && <p className="type-label mt-1 text-muted">{badge}</p>}
+      {badge.length > 0 && <p className="type-label mt-1 text-muted">{badge}</p>}
       <p className="mt-2 whitespace-pre-line text-body">{excerpt}</p>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        <p className="type-label text-muted">{preencher(t.cardPublicadoEm, { data: ad.publishedLabel })}</p>
+        <p className="type-label text-muted"><TextoRico valor={t.cardPublicadoEm} vars={{ data: ad.publishedLabel }} linha /></p>
         <Link href={`/area-do-assinante/classisex/${ad.id}`} className="btn-secondary">
-          {t.cardVerAnuncio}
+          <TextoRico valor={t.cardVerAnuncio} linha />
         </Link>
       </div>
     </article>

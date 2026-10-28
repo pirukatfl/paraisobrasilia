@@ -9,13 +9,14 @@ import { getPublicContos } from '@/lib/contos/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 // Per request (query string, no database at build); data from the tagged cache 'contos'.
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('contos')
-  return buildPageMetadata({ title: t.googleLista, description: t.googleListaDescricao, path: '/contos' })
+  return buildPageMetadata({ title: textoPuro(t.googleLista), description: textoPuro(t.googleListaDescricao), path: '/contos' })
 }
 
 /** Open list of contos (PREV-03). Public read model only: open blocks, never the full text (T-05-01). */
@@ -30,26 +31,26 @@ export default async function ContosPage({
   const t = await getTextos('contos')
   return (
     <section aria-labelledby="titulo-contos">
-      <p className="type-eyebrow text-muted">{t.listaEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.listaEyebrow} linha /></p>
       <h1 id="titulo-contos" className="type-display mt-2">
-        {t.listaTitulo}
+        <TextoRico valor={t.listaTitulo} linha />
       </h1>
       <TextoRico valor={t.listaIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <p className="mt-4">
         <Link href="/area-do-assinante/contos" className="type-label font-semibold text-accent underline underline-offset-4">
-          {t.listaLinkAssinante}
+          <TextoRico valor={t.listaLinkAssinante} linha />
         </Link>
       </p>
       <p className="mt-2">
         <Link href="/contos/enviar" className="type-label font-semibold text-accent underline underline-offset-4">
-          {t.listaLinkEnviar}
+          <TextoRico valor={t.listaLinkEnviar} linha />
         </Link>
       </p>
       {result.items.length === 0 ? (
         <EmptyState
-          heading={t.listaVazioTitulo}
+          heading={<TextoRico valor={t.listaVazioTitulo} linha />}
           body={t.listaVazioTexto}
-          actions={[{ href: '/assine-ja', label: t.listaVazioBotao, variant: 'primary' }]}
+          actions={[{ href: '/assine-ja', label: <TextoRico valor={t.listaVazioBotao} linha />, variant: 'primary' }]}
         />
       ) : (
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -60,7 +61,7 @@ export default async function ContosPage({
       )}
       <Pagination basePath="/contos" page={result.page} totalPages={result.totalPages} params={{}} />
       <AssineJaCta
-        title={t.listaCtaTitulo}
+        title={<TextoRico valor={t.listaCtaTitulo} linha />}
         text={t.listaCtaTexto}
         membersHref="/area-do-assinante/contos"
       />

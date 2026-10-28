@@ -11,10 +11,11 @@
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
 import type { Textos } from '../textos/areas'
+import type { TextoRico } from '../textos/rico'
 import { pathForKey } from '../pages/keys'
 
 /** `exact`: active only on the exact path (e.g. /area-do-assinante). */
-export type NavItem = { href: string; label: string; children?: NavItem[]; exact?: boolean }
+export type NavItem = { href: string; label: TextoRico; children?: NavItem[]; exact?: boolean }
 
 export function getNavItems(t: Textos<'geral'>): NavItem[] {
   return [

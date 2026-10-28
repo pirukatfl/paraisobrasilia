@@ -4,8 +4,9 @@ import { RichText } from '@/components/RichText'
 import { SubNav } from '@/components/SubNav'
 import { pathForKey, SECTION_TABS } from '@/lib/pages/keys'
 import type { PageDTO } from '@/lib/pages/queries'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { textoPuro } from '@/lib/textos/rico'
+import { TextoRico } from '@/components/TextoRico'
 
 type SectionTabKey = (typeof SECTION_TABS)[number]['key']
 
@@ -29,11 +30,11 @@ export async function InstitutionalPage({ page, activeKey }: { page: PageDTO; ac
       <div className="mt-12">
         {next ? (
           <Link href={pathForKey(next.key)} className="btn-secondary">
-            {preencher(t.botaoProximo, { aba: labels[next.key] })}
+            <TextoRico valor={t.botaoProximo} vars={{ aba: textoPuro(labels[next.key]) }} linha />
           </Link>
         ) : (
           <Link href="/" className="btn-primary">
-            {t.botaoFestas}
+            <TextoRico valor={t.botaoFestas} linha />
           </Link>
         )}
       </div>

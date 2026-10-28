@@ -8,8 +8,8 @@ import {
   wazeUrl,
   whatsappUrl,
 } from '@/lib/site/contact'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Address card with "Como chegar" and WhatsApp buttons (UI-SPEC S8). */
 export async function ContactBlock({ contact }: { contact: ContactDTO }) {
@@ -24,21 +24,21 @@ export async function ContactBlock({ contact }: { contact: ContactDTO }) {
         <span className="flex flex-col">
           <span className="text-body">{contact.addressLine}</span>
           <span className="text-body">{contact.addressDetail}</span>
-          {contact.postalCode && <span className="text-body text-muted">{preencher(t.cep, { cep: contact.postalCode })}</span>}
+          {contact.postalCode && <span className="text-body text-muted"><TextoRico valor={t.cep} vars={{ cep: contact.postalCode }} linha /></span>}
         </span>
       </address>
       {contact.hours && <p className="type-label mt-4 text-gold">{contact.hours}</p>}
 
       <div className="mt-6 flex flex-col gap-2">
         <ExternalLink href={googleMapsUrl(contact)} className="btn-primary w-full">
-          {t.botaoGoogleMaps}
+          <TextoRico valor={t.botaoGoogleMaps} linha />
         </ExternalLink>
         <ExternalLink href={wazeUrl(contact)} className="btn-primary w-full">
-          {t.botaoWaze}
+          <TextoRico valor={t.botaoWaze} linha />
         </ExternalLink>
         <ExternalLink href={whatsappUrl(contact.whatsapp)} className="btn-primary w-full gap-2">
           <WhatsAppIcon />
-          {t.botaoWhatsapp}
+          <TextoRico valor={t.botaoWhatsapp} linha />
         </ExternalLink>
       </div>
 
@@ -69,7 +69,7 @@ export async function ContactBlock({ contact }: { contact: ContactDTO }) {
           <li>
             <ExternalLink href={instagram} className={textLink}>
               <InstagramIcon className="text-muted" />
-              {preencher(t.instagram, { usuario: contact.instagram ?? '' })}
+              <TextoRico valor={t.instagram} vars={{ usuario: contact.instagram ?? '' }} linha />
             </ExternalLink>
           </li>
         )}

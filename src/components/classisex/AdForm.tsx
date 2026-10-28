@@ -7,8 +7,8 @@ import { AdFormFields } from './AdFormFields'
 import { AdMediaPicker } from './AdMediaPicker'
 
 import type { AdFormState, AdFormValues } from '@/lib/classisex/actions'
-import { preencher } from '@/lib/textos/mesclar'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 const subscribe = () => () => {}
 
@@ -125,18 +125,18 @@ export function AdForm({
       {progress && (
         <div role="status" className="flex flex-col gap-2">
           <p className="text-body">
-            {preencher(t.formProgresso, {
+            <TextoRico valor={t.formProgresso} vars={{
               atual: progress.index,
               total: progress.total,
               percentual: Math.round(progress.fraction * 100),
-            })}
+            }} linha />
           </p>
           <progress max={1} value={progress.fraction} aria-label="Progresso do envio" className="w-full" />
         </div>
       )}
 
       <button type="submit" className="btn-primary" disabled={busy}>
-        {progress ? t.formBotaoArquivos : pending ? t.formBotaoEnviando : t.formBotao}
+        {progress ? <TextoRico valor={t.formBotaoArquivos} linha /> : pending ? <TextoRico valor={t.formBotaoEnviando} linha /> : <TextoRico valor={t.formBotao} linha />}
       </button>
     </form>
   )

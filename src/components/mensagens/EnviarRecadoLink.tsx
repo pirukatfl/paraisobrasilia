@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * "Enviar recado" on the ad of a paying member (R-02). The target id is public; the recipient is
@@ -10,7 +11,7 @@ export async function EnviarRecadoLink({ id }: { id: number }) {
   const t = await getTextos('mensagens')
   return (
     <Link href={`/area-do-assinante/mensagens/nova?anuncio=${id}`} className="btn-secondary mt-4 inline-flex self-start">
-      {t.enviarRecadoLink}
+      <TextoRico valor={t.enviarRecadoLink} linha />
     </Link>
   )
 }

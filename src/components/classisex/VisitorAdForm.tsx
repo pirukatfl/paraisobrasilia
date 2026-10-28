@@ -10,6 +10,7 @@ import { VisitorPhotoPicker } from './VisitorPhotoPicker'
 import type { AdFormValues } from '@/lib/classisex/actions'
 import { mensagemDaResposta, mensagemDeFalhaDeRede } from '@/lib/errors'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
@@ -117,7 +118,7 @@ export function VisitorAdForm({
 
       <div key={fieldsKey} className="flex flex-col gap-2">
         <label htmlFor="email" className="type-label text-text">
-          {t.visitanteEmailRotulo}
+          <TextoRico valor={t.visitanteEmailRotulo} linha />
         </label>
         <input
           id="email"
@@ -129,18 +130,18 @@ export function VisitorAdForm({
           className={inputClass}
         />
         <p id="ajuda-email" className="type-label text-muted">
-          {t.visitanteEmailAjuda}
+          <TextoRico valor={t.visitanteEmailAjuda} linha />
         </p>
         <FieldError id="erro-email" message={errors.email} />
       </div>
 
       <VisitorPhotoPicker
         error={errors.foto}
-        label={t.fotoRotulo}
+        label={<TextoRico valor={t.fotoRotulo} linha />}
         help={t.fotoAjuda}
-        choose={t.fotoEscolher}
-        change={t.fotoTrocar}
-        remove={t.fotoTirar}
+        choose={<TextoRico valor={t.fotoEscolher} linha />}
+        change={<TextoRico valor={t.fotoTrocar} linha />}
+        remove={<TextoRico valor={t.fotoTirar} linha />}
       />
 
       {/* Honeypot: people never see or fill it */}
@@ -153,30 +154,30 @@ export function VisitorAdForm({
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="termos" value="sim" className={checkbox} aria-describedby={errors.termos ? 'erro-termos' : undefined} />
           <span>
-            {t.visitanteTermosAntes}{' '}
+            <TextoRico valor={t.visitanteTermosAntes} linha />{' '}
             <Link href="/termos-de-uso" className="text-accent underline underline-offset-4">
-              {t.visitanteTermosLink}
+              <TextoRico valor={t.visitanteTermosLink} linha />
             </Link>{' '}
-            {t.visitanteTermosE}{' '}
+            <TextoRico valor={t.visitanteTermosE} linha />{' '}
             <Link href="/politica-de-privacidade" className="text-accent underline underline-offset-4">
-              {t.visitanteTermosPolitica}
+              <TextoRico valor={t.visitanteTermosPolitica} linha />
             </Link>{' '}
-            <Required texto={t.visitanteObrigatorio} />
+            <Required texto={<TextoRico valor={t.visitanteObrigatorio} linha />} />
           </span>
         </label>
         <FieldError id="erro-termos" message={errors.termos} />
       </div>
 
       <p role="note" className="rounded-lg border border-line px-4 py-2 text-body">
-        {t.visitanteAvisoAntes}{' '}
+        <TextoRico valor={t.visitanteAvisoAntes} linha />{' '}
         <Link href="/cadastro" className="text-accent underline underline-offset-4">
-          {t.visitanteAvisoLink}
+          <TextoRico valor={t.visitanteAvisoLink} linha />
         </Link>{' '}
-        {t.visitanteAvisoDepois}
+        <TextoRico valor={t.visitanteAvisoDepois} linha />
       </p>
 
       <button type="submit" className="btn-primary" disabled={pending}>
-        {pending ? t.visitanteBotaoEnviando : t.visitanteBotao}
+        {pending ? <TextoRico valor={t.visitanteBotaoEnviando} linha /> : <TextoRico valor={t.visitanteBotao} linha />}
       </button>
     </form>
   )

@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import type { PublicAdDTO } from '@/lib/classisex/dto'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * One ad in the open view (visitors and free accounts; PREV-01, revisão 2026-10-22): apelido, tipo,
@@ -26,7 +27,7 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
         />
       ) : (
         <div className="type-label flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-line text-muted">
-          {t.cardSemFoto}
+          <TextoRico valor={t.cardSemFoto} linha />
         </div>
       )}
       <h2 id={titleId} className="type-heading mt-4">
@@ -39,7 +40,7 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
       {ad.texto && <p className="mt-3 whitespace-pre-line break-words text-body">{ad.texto}</p>}
       <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
         <Link href="/assine-ja" className="btn-primary text-center">
-          {t.cardPublicoAssine}
+          <TextoRico valor={t.cardPublicoAssine} linha />
         </Link>
         {/* Locked on EVERY card, whoever pays: nothing here says which advertisers are subscribers (I-1, T-RP-05) */}
         <Link
@@ -51,9 +52,9 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
             <rect x="5" y="11" width="14" height="9" rx="2" />
             <path d="M8 11V8a4 4 0 0 1 8 0v3" />
           </svg>
-          {t.cardEnviarRecado}
+          <TextoRico valor={t.cardEnviarRecado} linha />
         </Link>
-        <p className="type-label text-muted">{t.cardRecadosNota}</p>
+        <p className="type-label text-muted"><TextoRico valor={t.cardRecadosNota} linha /></p>
       </div>
     </article>
   )

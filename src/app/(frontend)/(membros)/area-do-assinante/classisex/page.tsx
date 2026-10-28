@@ -13,6 +13,7 @@ import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { getActiveAdCategories, listMemberAds } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,7 +21,7 @@ const PATH = '/area-do-assinante/classisex'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('classisex')
-  return { title: t.membrosGoogleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.membrosGoogleTitulo), robots: { index: false, follow: false } }
 }
 
 /** Members board (CLAS-01, D-05, D-07): visible ads, newest first, filters, 20 per page. */
@@ -34,9 +35,9 @@ export default async function ClassisexPage({
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.membrosTopo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.membrosTopo} linha /></p>
       <h1 id="titulo-classisex" className="type-display mt-2">
-        {t.membrosTitulo}
+        <TextoRico valor={t.membrosTitulo} linha />
       </h1>
     </>
   )
@@ -52,7 +53,7 @@ export default async function ClassisexPage({
         {header}
         <InactivePanel access={check.access} />
         <div className="mt-10" data-open-board>
-          <h2 className="type-heading">{t.membrosPublicadosTitulo}</h2>
+          <h2 className="type-heading"><TextoRico valor={t.membrosPublicadosTitulo} linha /></h2>
           <TextoRico valor={t.membrosGratisTexto} className="mt-2 max-w-[680px] text-body text-muted" />
           <PublicBoard basePath={PATH} result={publicResult} categories={publicCategories} filters={publicFilters} signedIn />
         </div>
@@ -69,25 +70,25 @@ export default async function ClassisexPage({
       {header}
       {reported && (
         <p role="status" className="mt-4 rounded-lg border border-line px-4 py-2 text-body text-text">
-          {t.membrosDenunciaEnviada}
+          <TextoRico valor={t.membrosDenunciaEnviada} linha />
         </p>
       )}
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.membrosIntro}
+        <TextoRico valor={t.membrosIntro} linha />
       </p>
       <AdFilters action={PATH} categories={categories} euSou={filters.euSou} cidade={filters.cidade} />
       {result.items.length === 0 ? (
         filtered ? (
           <EmptyState
-            heading={t.vazioFiltroTitulo}
+            heading={<TextoRico valor={t.vazioFiltroTitulo} linha />}
             body={t.vazioFiltroMembrosTexto}
-            actions={[{ href: PATH, label: t.vazioVerTodos, variant: 'secondary' }]}
+            actions={[{ href: PATH, label: <TextoRico valor={t.vazioVerTodos} linha />, variant: 'secondary' }]}
           />
         ) : (
           <EmptyState
-            heading={t.vazioTitulo}
+            heading={<TextoRico valor={t.vazioTitulo} linha />}
             body={t.vazioMembrosTexto}
-            actions={[{ href: '/area-do-assinante/meus-anuncios/novo', label: t.vazioMembrosBotao, variant: 'primary' }]}
+            actions={[{ href: '/area-do-assinante/meus-anuncios/novo', label: <TextoRico valor={t.vazioMembrosBotao} linha />, variant: 'primary' }]}
           />
         )
       ) : (

@@ -1,10 +1,12 @@
+import type { ReactNode } from 'react'
+
 import Link from 'next/link'
 
 import { ExternalLink } from '@/components/ExternalLink'
 import type { AccessStatus } from '@/lib/assinantes/access'
 import { validUntilLabel } from '@/lib/assinantes/periods'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * "Minha assinatura" panel (ASS-03): situation, valid-until date and the next step.
@@ -17,12 +19,12 @@ export async function SubscriptionStatus({
 }: {
   access: AccessStatus
   whatsappHref: string | null
-  title?: string
+  title?: ReactNode
 }) {
   const t = await getTextos('areaAssinante')
   const whatsapp = whatsappHref && (
     <ExternalLink href={whatsappHref} className="btn-secondary">
-      {t.assWhatsapp}
+      <TextoRico valor={t.assWhatsapp} linha />
     </ExternalLink>
   )
   return (
@@ -31,22 +33,26 @@ export async function SubscriptionStatus({
       {access.state === 'ativa' && (
         <>
           <p className="text-body">
-            {t.assAtivaAntes} <span className="font-semibold text-accent">{t.assAtivaSelo}</span>
+            <TextoRico valor={t.assAtivaAntes} linha /> <span className="font-semibold text-accent"><TextoRico valor={t.assAtivaSelo} linha /></span>
           </p>
-          <p className="mt-2 text-body">{preencher(t.assValidaAte, { data: access.validUntilLabel ?? '' })}</p>
+          <p className="mt-2 text-body"><TextoRico valor={t.assValidaAte} vars={{ data: access.validUntilLabel ?? '' }} linha /></p>
           <p className="type-label mt-2 text-muted">
-            {access.daysLeft === 1 ? t.assFalta1 : preencher(t.assFaltam, { dias: access.daysLeft ?? 0 })}
+            {access.daysLeft === 1 ? (
+              <TextoRico valor={t.assFalta1} linha />
+            ) : (
+              <TextoRico valor={t.assFaltam} vars={{ dias: access.daysLeft ?? 0 }} linha />
+            )}
           </p>
         </>
       )}
       {access.state === 'vencida' && (
         <>
           <p className="text-body">
-            {preencher(t.assVenceu, { data: access.lastEndedAt ? validUntilLabel(access.lastEndedAt) : '' })}
+            <TextoRico valor={t.assVenceu} vars={{ data: access.lastEndedAt ? validUntilLabel(access.lastEndedAt) : '' }} linha />
           </p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link href="/assine-ja" className="btn-primary">
-              {t.assRenovar}
+              <TextoRico valor={t.assRenovar} linha />
             </Link>
             {whatsapp}
           </div>
@@ -54,10 +60,10 @@ export async function SubscriptionStatus({
       )}
       {access.state === 'sem-assinatura' && (
         <>
-          <p className="text-body">{t.assSemAssinatura}</p>
+          <p className="text-body"><TextoRico valor={t.assSemAssinatura} linha /></p>
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link href="/assine-ja" className="btn-primary">
-              {t.assVerPlanos}
+              <TextoRico valor={t.assVerPlanos} linha />
             </Link>
             {whatsapp}
           </div>
@@ -65,7 +71,7 @@ export async function SubscriptionStatus({
       )}
       {access.state === 'encerrada' && (
         <>
-          <p className="text-body">{t.assEncerrada}</p>
+          <p className="text-body"><TextoRico valor={t.assEncerrada} linha /></p>
           {whatsapp && <div className="mt-6 flex">{whatsapp}</div>}
         </>
       )}

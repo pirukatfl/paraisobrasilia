@@ -26,35 +26,35 @@ export function BlockReportPanel({
       {euBloqueei ? (
         <div className="flex flex-col gap-3">
           <p role="status" className="text-body">
-            {textos.bloqueado}
+            <TextoRico valor={textos.bloqueado} linha />
           </p>
           <form action={desbloquear}>
             <input type="hidden" name="conversa" value={conversaId} />
             <button type="submit" className="min-h-11 rounded-lg border border-line px-5 text-body text-text hover:border-accent">
-              {textos.desbloquear}
+              <TextoRico valor={textos.desbloquear} linha />
             </button>
           </form>
         </div>
       ) : (
         <details className="rounded-lg border border-line px-4 py-3">
-          <summary className="type-label cursor-pointer text-muted">{textos.bloquearResumo}</summary>
+          <summary className="type-label cursor-pointer text-muted"><TextoRico valor={textos.bloquearResumo} linha /></summary>
           <form action={bloquear} className="mt-4 flex flex-col gap-3">
             <input type="hidden" name="conversa" value={conversaId} />
             <TextoRico valor={textos.bloquearAviso} className="text-body text-muted" />
             <div>
               <button type="submit" className="min-h-11 rounded-lg border border-line px-5 text-body text-text hover:border-accent">
-                {textos.bloquearConfirmar}
+                <TextoRico valor={textos.bloquearConfirmar} linha />
               </button>
             </div>
           </form>
         </details>
       )}
       <details className="rounded-lg border border-line px-4 py-3">
-        <summary className="type-label cursor-pointer text-muted">{textos.denunciarResumo}</summary>
+        <summary className="type-label cursor-pointer text-muted"><TextoRico valor={textos.denunciarResumo} linha /></summary>
         <form action={formAction} className="mt-4 flex flex-col gap-4">
           <input type="hidden" name="conversa" value={conversaId} />
           <fieldset className="flex flex-col gap-2">
-            <legend className="type-label mb-1 text-text">{textos.denunciarMotivo}</legend>
+            <legend className="type-label mb-1 text-text"><TextoRico valor={textos.denunciarMotivo} linha /></legend>
             {MESSAGE_REPORT_REASONS.map((r) => (
               <label key={r.value} className="flex min-h-11 items-center gap-3 text-body text-text">
                 <input type="radio" name="motivo" value={r.value} required />
@@ -63,7 +63,7 @@ export function BlockReportPanel({
             ))}
           </fieldset>
           <label className="flex flex-col gap-2 type-label text-text">
-            {textos.denunciarDetalhes}
+            <TextoRico valor={textos.denunciarDetalhes} linha />
             <textarea
               name="detalhes"
               rows={3}
@@ -74,7 +74,7 @@ export function BlockReportPanel({
           {!euBloqueei && (
             <label className="flex min-h-11 items-center gap-3 text-body text-text">
               <input type="checkbox" name="bloquear" defaultChecked />
-              {textos.denunciarTambemBloquear}
+              <TextoRico valor={textos.denunciarTambemBloquear} linha />
             </label>
           )}
           {state && (
@@ -88,7 +88,7 @@ export function BlockReportPanel({
               disabled={pending}
               className="min-h-11 rounded-lg border border-line px-5 text-body text-text hover:border-accent disabled:opacity-50"
             >
-              {textos.denunciarEnviar}
+              <TextoRico valor={textos.denunciarEnviar} linha />
             </button>
           </div>
         </form>

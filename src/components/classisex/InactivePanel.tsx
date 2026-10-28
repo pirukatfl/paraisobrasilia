@@ -21,19 +21,19 @@ export async function InactivePanel({ access }: { access: AccessStatus }) {
     <div className="mt-8">
       {never ? (
         <div className="max-w-[560px] rounded-xl border border-line bg-surface p-6">
-          <h2 className="type-heading mb-4">{t.inativoTitulo}</h2>
+          <h2 className="type-heading mb-4"><TextoRico valor={t.inativoTitulo} linha /></h2>
           <TextoRico valor={t.inativoTexto} className="text-body" />
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link href="/assine-ja" className="btn-primary">
-              {t.inativoAssine}
+              <TextoRico valor={t.inativoAssine} linha />
             </Link>
             <Link href="/area-do-assinante/meus-anuncios" className="btn-secondary">
-              {t.inativoAnuncios}
+              <TextoRico valor={t.inativoAnuncios} linha />
             </Link>
           </div>
         </div>
       ) : (
-        <SubscriptionStatus access={access} whatsappHref={whatsappHref} title={t.inativoNaoAtiva} />
+        <SubscriptionStatus access={access} whatsappHref={whatsappHref} title={<TextoRico valor={t.inativoNaoAtiva} linha />} />
       )}
       <PlanComparison assineLink={false} id="comparativo-painel" />
     </div>
