@@ -13,6 +13,7 @@ import {
 import { MAX_VIDEO_SECONDS } from '@/lib/classisex/mp4'
 import type { Textos } from '@/lib/textos/areas'
 import { preencher } from '@/lib/textos/mesclar'
+import { TextoRico } from '@/components/TextoRico'
 
 const EXTENSION_TYPES: Record<string, string> = {
   jpg: 'image/jpeg',
@@ -152,11 +153,13 @@ export function AdMediaPicker({
     <fieldset className="flex flex-col gap-4" disabled={disabled}>
       <legend className="type-label text-text">{t.midiaLegenda}</legend>
       {MAX_AD_VIDEOS > 0 ? (
-        <p className="type-label text-muted">
-          {preencher(t.midiaAjudaComVideo, { fotos: MAX_AD_PHOTOS, videos: MAX_AD_VIDEOS, segundos: MAX_VIDEO_SECONDS })}
-        </p>
+        <TextoRico
+          valor={t.midiaAjudaComVideo}
+          vars={{ fotos: MAX_AD_PHOTOS, videos: MAX_AD_VIDEOS, segundos: MAX_VIDEO_SECONDS }}
+          className="type-label text-muted"
+        />
       ) : (
-        <p className="type-label text-muted">{preencher(t.midiaAjudaSoFoto, { fotos: MAX_AD_PHOTOS })}</p>
+        <TextoRico valor={t.midiaAjudaSoFoto} vars={{ fotos: MAX_AD_PHOTOS }} className="type-label text-muted" />
       )}
       {notes.length > 0 && (
         <ul role="alert" className="flex flex-col gap-1 rounded-lg border border-danger px-4 py-2 text-body text-text">

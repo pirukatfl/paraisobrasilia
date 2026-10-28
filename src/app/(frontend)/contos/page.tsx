@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { getPublicContos } from '@/lib/contos/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (query string, no database at build); data from the tagged cache 'contos'.
 export const dynamic = 'force-dynamic'
@@ -33,9 +34,7 @@ export default async function ContosPage({
       <h1 id="titulo-contos" className="type-display mt-2">
         {t.listaTitulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.listaIntro}
-      </p>
+      <TextoRico valor={t.listaIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <p className="mt-4">
         <Link href="/area-do-assinante/contos" className="type-label font-semibold text-accent underline underline-offset-4">
           {t.listaLinkAssinante}

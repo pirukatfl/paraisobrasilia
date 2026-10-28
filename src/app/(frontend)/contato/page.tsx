@@ -5,6 +5,7 @@ import { MapEmbed } from '@/components/MapEmbed'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (no database at build); data from the tagged cache ('contact').
 export const dynamic = 'force-dynamic'
@@ -21,7 +22,7 @@ export default async function ContactPage() {
       <h1 id="titulo-contato" className="type-display">
         {t.titulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">{t.intro}</p>
+      <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
       <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <ContactBlock contact={contact} />

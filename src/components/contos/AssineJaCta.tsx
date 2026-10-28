@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { TextoRico } from '@/components/TextoRico'
+import type { TextoRico as EstadoRico } from '@/lib/textos/rico'
 import { getTextos } from '@/lib/textos/queries'
 
 /**
@@ -13,7 +15,7 @@ export async function AssineJaCta({
   membersLabel,
 }: {
   title: string
-  text: string
+  text: string | EstadoRico
   membersHref: string
   membersLabel?: string
 }) {
@@ -21,7 +23,11 @@ export async function AssineJaCta({
   return (
     <aside aria-label={title} className="mt-8 max-w-[680px] rounded-xl border border-line bg-surface p-6">
       <h2 className="type-heading">{title}</h2>
-      <p className="mt-3 text-body text-muted">{text}</p>
+      {typeof text === 'string' ? (
+        <p className="mt-3 text-body text-muted">{text}</p>
+      ) : (
+        <TextoRico valor={text} className="mt-3 text-body text-muted" />
+      )}
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
         <Link href="/assine-ja" className="btn-primary">
           {t.ctaBotao}

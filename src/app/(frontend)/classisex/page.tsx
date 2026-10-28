@@ -7,6 +7,7 @@ import { parseBoardFilters } from '@/lib/classisex/board'
 import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (query string, no database at build); data from the tagged cache 'ads'.
 export const dynamic = 'force-dynamic'
@@ -37,9 +38,7 @@ export default async function ClassisexPublicPage({
       <h1 id="titulo-classisex" className="type-display mt-2">
         {t.publicoTitulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.publicoIntro}
-      </p>
+      <TextoRico valor={t.publicoIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
         <Link href="/classisex/anunciar" className="btn-primary">
           {t.publicoBotaoAnunciar}

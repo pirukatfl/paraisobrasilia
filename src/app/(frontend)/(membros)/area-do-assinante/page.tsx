@@ -12,6 +12,7 @@ import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,7 +53,7 @@ export default async function AreaDoAssinantePage({
           <h2 id="titulo-tipo-conta" className="type-heading mb-2">
             {preencher(t.contaTitulo, { tipo: t.contaTipoGratuita })}
           </h2>
-          <p className="text-body">{t.contaTexto}</p>
+          <TextoRico valor={t.contaTexto} className="text-body" />
           <div className="mt-4 flex flex-col gap-2 sm:flex-row">
             <Link href="/area-do-assinante/meus-anuncios" className="btn-primary">
               {t.contaBotaoAnuncios}

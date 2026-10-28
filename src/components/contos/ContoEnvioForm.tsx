@@ -8,7 +8,7 @@ import { FieldError, Required, inputClass } from '@/components/classisex/AdFormF
 import { VisitorPhotoPicker } from '@/components/classisex/VisitorPhotoPicker'
 import { ASSINADO_MAX, TEXTO_MAX, TEXTO_MIN, TITLE_MAX } from '@/lib/contos/envio-rules'
 import type { Textos } from '@/lib/textos/areas'
-import { preencher } from '@/lib/textos/mesclar'
+import { TextoRico } from '@/components/TextoRico'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
@@ -144,9 +144,12 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
             aria-describedby={described('texto', 'ajuda-texto')}
             className="min-h-60 rounded-lg border border-line bg-surface px-4 py-3 text-body text-text focus:border-accent"
           />
-          <p id="ajuda-texto" className="type-label text-muted">
-            {preencher(t.contoAjuda, { min: TEXTO_MIN, max: TEXTO_MAX.toLocaleString('pt-BR') })}
-          </p>
+          <TextoRico
+            id="ajuda-texto"
+            valor={t.contoAjuda}
+            vars={{ min: TEXTO_MIN, max: TEXTO_MAX.toLocaleString('pt-BR') }}
+            className="type-label text-muted"
+          />
           <FieldError id="erro-texto" message={errors.texto} />
         </div>
 
@@ -215,9 +218,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
         <FieldError id="erro-termos" message={errors.termos} />
       </div>
 
-      <p role="note" className="rounded-lg border border-line px-4 py-2 text-body">
-        {t.aviso}
-      </p>
+      <TextoRico valor={t.aviso} role="note" className="rounded-lg border border-line px-4 py-2 text-body" />
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? t.botaoEnviando : t.botao}

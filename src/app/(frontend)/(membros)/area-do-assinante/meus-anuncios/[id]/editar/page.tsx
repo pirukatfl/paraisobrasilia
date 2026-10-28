@@ -10,6 +10,7 @@ import { salvarAnuncio } from '@/lib/classisex/actions'
 import { uploadErrorMessage, batchNotice } from '@/lib/classisex/media-messages'
 import { getActiveAdCategories, getOwnAdForEdit } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,14 +68,10 @@ export default async function EditarAnuncioPage({
     <section aria-labelledby="titulo-editar-anuncio">
       {header}
       {ad.legacy && (
-        <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          {t.editarAvisoAntigo}
-        </p>
+        <TextoRico valor={t.editarAvisoAntigo} role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body" />
       )}
       {ad.status === 'rascunho' && (
-        <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          {t.editarAvisoRascunho}
-        </p>
+        <TextoRico valor={t.editarAvisoRascunho} role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body" />
       )}
       {ad.status === 'aprovado' ? (
         <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">

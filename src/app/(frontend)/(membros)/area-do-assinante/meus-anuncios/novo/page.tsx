@@ -8,6 +8,7 @@ import { TIER_LIMITS, tierOf } from '@/lib/assinantes/tier'
 import { criarAnuncio } from '@/lib/classisex/actions'
 import { getActiveAdCategories } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,9 +35,7 @@ export default async function NovoAnuncioPage() {
   return (
     <section aria-labelledby="titulo-novo-anuncio">
       {header}
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.novoIntro}
-      </p>
+      <TextoRico valor={t.novoIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       {tier === 'gratis' && (
         <p role="note" className="mt-4 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
           {t.novoAvisoGratis}

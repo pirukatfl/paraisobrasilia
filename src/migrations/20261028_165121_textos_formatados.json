@@ -12188,10 +12188,10 @@
         },
         "texto_ajuda": {
           "name": "texto_ajuda",
-          "type": "varchar",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.'"
+          "default": "'{\"root\":{\"type\":\"root\",\"version\":1,\"children\":[{\"type\":\"paragraph\",\"version\":1,\"children\":[{\"type\":\"text\",\"version\":1,\"text\":\"Até 600 caracteres. Coloque o contato nos campos abaixo: só assinantes veem.\",\"format\":0,\"detail\":0,\"mode\":\"normal\",\"style\":\"\"}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0,\"textFormat\":0,\"textStyle\":\"\"}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0}}'::jsonb"
         },
         "texto_ajuda_antigo": {
           "name": "texto_ajuda_antigo",
@@ -12363,10 +12363,10 @@
         },
         "ger_dica_gratis": {
           "name": "ger_dica_gratis",
-          "type": "varchar",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false,
-          "default": "'Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.'"
+          "default": "'{\"root\":{\"type\":\"root\",\"version\":1,\"children\":[{\"type\":\"paragraph\",\"version\":1,\"children\":[{\"type\":\"text\",\"version\":1,\"text\":\"Conta gratuita: 1 foto JPG, PNG ou WebP até 15 MB e nenhum vídeo.\",\"format\":0,\"detail\":0,\"mode\":\"normal\",\"style\":\"\"}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0,\"textFormat\":0,\"textStyle\":\"\"}],\"direction\":\"ltr\",\"format\":\"\",\"indent\":0}}'::jsonb"
         },
         "ger_capa_nota": {
           "name": "ger_capa_nota",
@@ -13781,6 +13781,6 @@
     "tables": {},
     "columns": {}
   },
-  "id": "975406eb-a569-4557-a541-37500c4dc473",
+  "id": "b45833cf-1c48-4d8b-a993-8c86405eaf88",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

@@ -5,6 +5,7 @@ import { useActionState, useState } from 'react'
 import type { MessageFormState } from '@/lib/mensagens/actions'
 import { MESSAGE_MAX } from '@/lib/mensagens/rules'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 const inputClass =
   'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent'
@@ -58,9 +59,7 @@ export function MessageForm({
             aria-describedby="ajuda-apelido"
             className={inputClass}
           />
-          <p id="ajuda-apelido" className="type-label text-muted">
-            {textos.formApelidoAjuda}
-          </p>
+          <TextoRico id="ajuda-apelido" valor={textos.formApelidoAjuda} className="type-label text-muted" />
         </div>
       )}
       <div className="flex flex-col gap-2">

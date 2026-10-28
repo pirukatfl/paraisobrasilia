@@ -9,6 +9,7 @@ import { requireAssinante } from '@/lib/assinantes/session'
 import { tierOf } from '@/lib/assinantes/tier'
 import { getOwnAds } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -55,13 +56,9 @@ export default async function MeusAnunciosPage({
       <h1 id="titulo-meus-anuncios" className="type-display mt-2">
         {t.listaTitulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.listaIntro}
-      </p>
+      <TextoRico valor={t.listaIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       {hasOldAds && (
-        <p role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          {t.listaAvisoAntigo}
-        </p>
+        <TextoRico valor={t.listaAvisoAntigo} role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body" />
       )}
       <Link href="/area-do-assinante/meus-anuncios/novo" className="btn-primary mt-6">
         {t.listaBotaoNovo}

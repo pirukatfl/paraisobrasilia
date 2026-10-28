@@ -4,6 +4,7 @@ import { ContoEnvioForm } from '@/components/contos/ContoEnvioForm'
 import { uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { CONTO_ENVIO_MESSAGES } from '@/lib/contos/envio-rules'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,9 +40,7 @@ export default async function EnviarContoPage({
       <h1 id="titulo-enviar-conto" className="type-display mt-2">
         {t.titulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.intro}
-      </p>
+      <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
       <ContoEnvioForm erro={erro} textos={t} />
     </section>
   )

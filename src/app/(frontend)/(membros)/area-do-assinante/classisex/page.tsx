@@ -12,6 +12,7 @@ import { parseBoardFilters } from '@/lib/classisex/board'
 import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { getActiveAdCategories, listMemberAds } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,9 +53,7 @@ export default async function ClassisexPage({
         <InactivePanel access={check.access} />
         <div className="mt-10" data-open-board>
           <h2 className="type-heading">{t.membrosPublicadosTitulo}</h2>
-          <p className="mt-2 max-w-[680px] text-body text-muted">
-            {t.membrosGratisTexto}
-          </p>
+          <TextoRico valor={t.membrosGratisTexto} className="mt-2 max-w-[680px] text-body text-muted" />
           <PublicBoard basePath={PATH} result={publicResult} categories={publicCategories} filters={publicFilters} signedIn />
         </div>
       </section>

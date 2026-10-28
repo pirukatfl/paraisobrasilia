@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { FieldError } from './AdFormFields'
 
+import type { TextoRico as EstadoRico } from '@/lib/textos/rico'
 import { CLIENT_MESSAGES, MAX_AD_PHOTO_BYTES, PHOTO_MIME_TYPES } from '@/lib/classisex/media-messages'
+import { TextoRico } from '@/components/TextoRico'
 
 const EXTENSION_TYPES: Record<string, string> = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }
 
@@ -30,7 +32,7 @@ export function VisitorPhotoPicker({
   name?: string
   /** Word used only in the preview alt text: 'foto' or 'imagem' */
   noun?: string
-  help: string
+  help: EstadoRico
   /** Button texts (editable in the panel) */
   choose: string
   change: string
@@ -97,9 +99,7 @@ export function VisitorPhotoPicker({
           <p className="type-label min-w-0 break-all text-muted">{file.name}</p>
         </div>
       )}
-      <p id="ajuda-foto" className="type-label text-muted">
-        {help}
-      </p>
+      <TextoRico id="ajuda-foto" valor={help} className="type-label text-muted" />
       <FieldError id="erro-foto" message={shown ?? undefined} />
     </div>
   )

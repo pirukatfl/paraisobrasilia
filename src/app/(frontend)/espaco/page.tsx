@@ -4,14 +4,16 @@ import { EmptyState } from '@/components/EmptyState'
 import { Gallery } from '@/components/Gallery'
 import { getSpaceItems } from '@/lib/gallery/queries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
+import { ricoParaTexto } from '@/lib/textos/rico'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (no database at build); data from the tagged cache ('space').
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('espaco')
-  return buildPageMetadata({ title: t.titulo, description: t.intro, path: '/espaco' })
+  return buildPageMetadata({ title: t.titulo, description: ricoParaTexto(t.intro), path: '/espaco' })
 }
 
 export default async function SpacePage() {
@@ -22,7 +24,7 @@ export default async function SpacePage() {
       <h1 id="titulo-espaco" className="type-display mt-2">
         {t.titulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">{t.intro}</p>
+      <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
       {items.length > 0 ? (
         <Gallery items={items} />
       ) : (
