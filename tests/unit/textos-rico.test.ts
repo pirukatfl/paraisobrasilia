@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import { TextoRico } from '../../src/components/TextoRico'
-import { preencherRico, ricoParaTexto, ricoTemTexto, type TextoRico as Estado, textoParaRico } from '../../src/lib/textos/rico'
+import { preencherRico, ricoParaTexto, ricoTemTexto, type TextoRico as Estado, textoParaRico, textoPuro } from '../../src/lib/textos/rico'
 
 type No = Record<string, unknown>
 
@@ -38,6 +38,22 @@ describe('textoParaRico / ricoParaTexto', () => {
   it('reads lists as one item per line and ignores unknown nodes', () => {
     const rico = estado(paragrafo(texto('Antes')), lista('bullet', 'um', 'dois'), { type: 'upload', version: 1 })
     expect(ricoParaTexto(rico)).toBe('Antes\n\num\ndois')
+  })
+})
+
+describe('textoPuro (soTexto destinations)', () => {
+  it('drops marks and joins paragraphs and line breaks into one line', () => {
+    const rico = estado(paragrafo(texto('Festas ', 1), texto('liberais', 2)), paragrafo(texto('em'), { type: 'linebreak', version: 1 }, texto('Brasília')))
+    expect(textoPuro(rico)).toBe('Festas liberais em Brasília')
+  })
+
+  it('keeps list items as words and trims', () => {
+    expect(textoPuro(estado(paragrafo(texto('  Antes  ')), lista('bullet', 'um', 'dois')))).toBe('Antes um dois')
+  })
+
+  it('is empty for an empty editor and works on the converted original', () => {
+    expect(textoPuro(estado(paragrafo()))).toBe('')
+    expect(textoPuro(textoParaRico('Casa de festas\n\nem Brasília'))).toBe('Casa de festas em Brasília')
   })
 })
 
@@ -149,5 +165,30 @@ describe('TextoRico render (whitelist, T-02-04b)', () => {
     expect(out).not.toMatch(/<(p|ul|ol|li|div)[ >]/)
     expect(out.startsWith('<span>')).toBe(true)
     expect(out).toContain('<strong>Um</strong><br/>Dois<br/>a<br/>b<br/><a href="/x">ver</a>')
+  })
+})
+
+describe('TextoRico linha (line editor texts)', () => {
+  it('keeps bold, italic, underline and strikethrough inline in a span', () => {
+    const out = html(estado(paragrafo(texto('a', 1), texto('b', 2), texto('c', 8), texto('d', 4))), { linha: true })
+    expect(out).toBe('<span><strong>a</strong><em>b</em><u>c</u><s>d</s></span>')
+  })
+
+  it('drops a stored link (words stay) and flattens a stored list to lines', () => {
+    const out = html(estado(paragrafo(texto('Ver '), link('https://exemplo.com', texto('aqui'))), lista('bullet', 'um', 'dois')), { linha: true })
+    expect(out).not.toContain('<a')
+    expect(out).not.toContain('<ul')
+    expect(out).not.toContain('<li')
+    expect(out).toContain('Ver aqui')
+    expect(out).toContain('um<br/>dois')
+  })
+
+  it('separates paragraphs with a line break and fills {vars}', () => {
+    const out = html(estado(paragrafo(texto('Oi {nome}')), paragrafo(texto('Fim'))), { linha: true, vars: { nome: 'Ana' } })
+    expect(out).toBe('<span>Oi Ana<br/>Fim</span>')
+  })
+
+  it('still renders links in the block mode (unchanged)', () => {
+    expect(html(estado(paragrafo(link('https://exemplo.com', texto('aqui')))))).toContain('<a ')
   })
 })

@@ -6,7 +6,7 @@ import { geral } from '../../src/lib/textos/areas/geral'
 import { mensagens } from '../../src/lib/textos/areas/mensagens'
 import { mesclarTextos, padroesDaArea, preencher } from '../../src/lib/textos/mesclar'
 import { textoParaRico } from '../../src/lib/textos/rico'
-import { type CampoTexto, campoEhFormatado, campoEhLongo } from '../../src/lib/textos/tipos'
+import { ajudaDoCampo, AVISO_SO_TEXTO, type CampoTexto } from '../../src/lib/textos/tipos'
 
 const area = {
   slug: 'textos-teste',
@@ -18,26 +18,34 @@ const area = {
   },
 }
 
+const salvoNegrito = {
+  root: {
+    type: 'root',
+    version: 1,
+    children: [{ type: 'paragraph', version: 1, children: [{ type: 'text', version: 1, text: 'Novo', format: 1 }] }],
+  },
+}
+
 describe('mesclarTextos (PAINEL-10)', () => {
   it('falls back to the original for empty, blank, null and missing values', () => {
-    expect(mesclarTextos(area, { titulo: '', chamada: '   ' })).toEqual({ titulo: 'Original', chamada: 'Texto {nome}' })
-    expect(mesclarTextos(area, { titulo: null, chamada: 42 })).toEqual({ titulo: 'Original', chamada: 'Texto {nome}' })
+    expect(mesclarTextos(area, { titulo: '', chamada: '   ' })).toEqual(padroesDaArea(area))
+    expect(mesclarTextos(area, { titulo: null, chamada: 42 })).toEqual(padroesDaArea(area))
     expect(mesclarTextos(area, null)).toEqual(padroesDaArea(area))
     expect(mesclarTextos(area, undefined)).toEqual(padroesDaArea(area))
   })
 
   it('uses the saved value and ignores extra keys', () => {
-    const out = mesclarTextos(area, { titulo: 'Novo', id: 1, globalType: 'x', outro: 'y' })
-    expect(out).toEqual({ titulo: 'Novo', chamada: 'Texto {nome}' })
+    const out = mesclarTextos(area, { titulo: salvoNegrito, id: 1, globalType: 'x', outro: 'y' })
+    expect(out).toEqual({ titulo: salvoNegrito, chamada: textoParaRico('Texto {nome}') })
   })
 })
 
-describe('mesclarTextos with formatted fields', () => {
+describe('mesclarTextos with block fields', () => {
   const comEditor = {
     ...area,
     campos: {
       ...area.campos,
-      paragrafo: { rotulo: 'Parágrafo', padrao: 'Linha um\nLinha dois\n\nOutro {nome}', formatado: true, ajuda: 'Use {nome}.' },
+      paragrafo: { rotulo: 'Parágrafo', padrao: 'Linha um\nLinha dois\n\nOutro {nome}', bloco: true as const, ajuda: 'Use {nome}.' },
     },
   }
   const salvo = {
@@ -51,10 +59,10 @@ describe('mesclarTextos with formatted fields', () => {
     root: { type: 'root', version: 1, children: [{ type: 'paragraph', version: 1, children: [] }] },
   }
 
-  it('turns the original of a formatted field into editor state', () => {
+  it('turns the original of every field into editor state', () => {
     const out = padroesDaArea(comEditor)
     expect(out.paragrafo).toEqual(textoParaRico('Linha um\nLinha dois\n\nOutro {nome}'))
-    expect(out.titulo).toBe('Original')
+    expect(out.titulo).toEqual(textoParaRico('Original'))
   })
 
   it('uses saved editor state, falls back to the original for an emptied editor', () => {
@@ -64,10 +72,11 @@ describe('mesclarTextos with formatted fields', () => {
     }
   })
 
-  it('converts a plain string still stored in a formatted field (before the migration ran)', () => {
+  it('converts a plain string still stored in any field (before the migration ran)', () => {
     expect(mesclarTextos(comEditor, { paragrafo: 'Texto antigo\n\nSegundo' }).paragrafo).toEqual(
       textoParaRico('Texto antigo\n\nSegundo'),
     )
+    expect(mesclarTextos(comEditor, { titulo: 'Título antigo' }).titulo).toEqual(textoParaRico('Título antigo'))
   })
 })
 
@@ -84,11 +93,20 @@ describe('preencher', () => {
 describe('registry sanity (all areas)', () => {
   const areas = Object.values(AREAS)
 
-  it('marks every long text as formatted or plain explicitly, and never meta/Google texts as formatted', () => {
+  it('warns in the admin help of every plain-text-only field, and only of those', () => {
     for (const a of areas) {
       for (const [nome, campo] of Object.entries(a.campos as Record<string, CampoTexto>)) {
-        if (campoEhLongo(campo)) expect(typeof campo.formatado, `${a.slug}.${nome}`).toBe('boolean')
-        if (/google/i.test(nome)) expect(campoEhFormatado(campo), `${a.slug}.${nome}`).toBe(false)
+        const ajuda = ajudaDoCampo(campo) ?? ''
+        expect(ajuda.includes(AVISO_SO_TEXTO), `${a.slug}.${nome}`).toBe(campo.soTexto === true)
+      }
+    }
+  })
+
+  it('marks every Google/meta/WhatsApp-message text as plain-text-only', () => {
+    for (const a of areas) {
+      for (const [nome, campo] of Object.entries(a.campos as Record<string, CampoTexto>)) {
+        // Fields that also render on the page (title/intro of a page) keep their formatting there
+        if ((/google/i.test(nome) && !/^botao/.test(nome)) || /^descricaoReserva$|Mensagem$/.test(nome)) expect(campo.soTexto, `${a.slug}.${nome}`).toBe(true)
       }
     }
   })
@@ -118,24 +136,24 @@ describe('registry sanity (all areas)', () => {
 })
 
 describe('criarGlobalDeTextos', () => {
-  it('builds optional fields prefilled with the original text, grouped in collapsibles', () => {
+  it('builds optional editors prefilled with the original text, grouped in collapsibles', () => {
     const global = criarGlobalDeTextos(geral)
     expect(global.slug).toBe('textos-geral')
     expect(global.admin?.group).toBe('Textos do site')
     const flat = global.fields.flatMap((f) => ('fields' in f && f.type === 'collapsible' ? f.fields : [f]))
     expect(flat).toHaveLength(Object.keys(geral.campos).length)
+    const editores = new Set<unknown>()
     for (const f of flat) {
-      if (f.type !== 'text' && f.type !== 'textarea' && f.type !== 'richText') throw new Error('unexpected field type')
+      if (f.type !== 'richText') throw new Error('every field must be an editor')
       const campo = (geral.campos as Record<string, CampoTexto>)[f.name]
-      if (campoEhFormatado(campo)) {
-        expect(f.type).toBe('richText')
-        expect(f.defaultValue).toEqual(textoParaRico(campo.padrao))
-      } else {
-        expect(f.type).toBe(campoEhLongo(campo) ? 'textarea' : 'text')
-        expect(f.defaultValue).toBe(campo.padrao)
-      }
+      expect(f.defaultValue).toEqual(textoParaRico(campo.padrao))
+      editores.add(f.editor)
       expect('required' in f && f.required).toBeFalsy()
+      const descricao = (f.admin as { description?: string } | undefined)?.description ?? ''
+      expect(descricao.includes(AVISO_SO_TEXTO), f.name).toBe(campo.soTexto === true)
     }
+    // Block editor and line editor
+    expect(editores.size).toBe(2)
     expect(global.fields.every((f) => f.type === 'collapsible')).toBe(true)
     expect(global.admin?.hidden).toBe(false)
   })
