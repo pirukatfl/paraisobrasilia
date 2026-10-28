@@ -103,7 +103,7 @@ Os seis textos já vêm escritos. A equipe pode mudar quando quiser.
 
 Além das seis páginas acima, **todos os outros textos fixos do site** também podem ser trocados pelo painel: títulos,
 chamadas, botões, rótulos, o menu e o rodapé, os avisos de "nenhum resultado", a confirmação de 18+ e o título e a
-descrição que aparecem no Google.
+descrição que aparecem no Google (estes dois, sem formatação).
 
 **Onde fica:** no menu da esquerda, no grupo **Textos do site**. Há uma área por página (ou conjunto de páginas):
 
@@ -136,20 +136,29 @@ Desde 26/10/2026 a área **Recados** não aparece mais no painel (saiu do menu d
 **Para voltar ao texto original:** apague tudo o que está no campo (deixe vazio, sem nem um espaço) e salve. O site volta a mostrar o texto
 que veio de fábrica. Por isso nenhum texto "some": campo vazio nunca deixa um buraco na página.
 
-**Negrito, itálico, sublinhado, listas e links (a partir de 28/10/2026):** os textos **longos** (parágrafos, avisos,
-introduções e ajudas) têm um editor com uma barra de botões no topo do campo. Para formatar:
+**Negrito, itálico, sublinhado, riscado, listas e links (a partir de 28/10/2026):** **todos** os campos de Textos do site
+têm um editor com uma barra de botões no topo do campo, e o site mostra a formatação do mesmo jeito. Para formatar:
 
 1. Clique dentro do texto e **selecione as palavras** (a barra pequena também aparece em cima da seleção).
-2. Use **B** (negrito), **I** (itálico), **U** (sublinhado) ou o botão de **link** (cole o endereço completo, começando
-   com `https://`). Para uma lista, abra o menu da esquerda da barra e escolha **Lista não ordenada** (com marcadores) ou
-   **Lista ordenada** (numerada); ou digite `- ` no começo da linha.
-3. Salve. O site mostra a formatação do mesmo jeito.
+2. Use **B** (negrito), **I** (itálico), **U** (sublinhado) ou **S** (riscado).
+3. Nos textos **longos** (parágrafos, avisos, introduções e ajudas) há também o botão de **link** (cole o endereço completo,
+   começando com `https://`) e as **listas**: abra o menu da esquerda da barra e escolha **Lista não ordenada** (com
+   marcadores) ou **Lista ordenada** (numerada); ou digite `- ` no começo da linha.
+4. Salve.
 
-Não há títulos nem imagens nesses campos: o tamanho e a cor continuam sendo os do site. **Títulos, botões, rótulos de
-formulário e o texto que aparece no Google continuam em campo de uma linha, sem formatação** (negrito ali quebraria o
-layout ou não apareceria). Links só funcionam com `https://`, `mailto:`, `tel:` ou um caminho do próprio site (como
-`/contato`); qualquer outro endereço aparece só como texto. Se formatar uma palavra entre chaves (como `{plano}`) pela
-metade, o site pode não conseguir preenchê-la: deixe a palavra inteira com a mesma formatação.
+**Títulos, botões, menu, rótulos de formulário e avisos curtos** só aceitam negrito, itálico, sublinhado e riscado: não
+têm link nem lista, porque ficam dentro de botões, links e títulos. Se apertar Enter num deles, o site mostra uma quebra
+de linha. Não há títulos de seção nem imagens em nenhum campo: o tamanho e a cor continuam sendo os do site.
+
+**Campos com o aviso "Aqui a formatação não aparece":** alguns textos são usados onde o navegador só aceita texto simples:
+o título e a descrição que aparecem no Google e na aba do navegador, o texto que vai pronto dentro de uma mensagem do
+WhatsApp, e frases que entram dentro de outra frase (como o "Grátis" do título da conta). Eles também têm o editor, mas
+a formatação não aparece ali: vale só o texto. Alguns campos de página (como o título e o texto de abertura de Espaço,
+Modelos e Contato) mostram a formatação na página e só o texto no Google.
+
+Links só funcionam com `https://`, `mailto:`, `tel:` ou um caminho do próprio site (como `/contato`); qualquer outro
+endereço aparece só como texto. Se formatar uma palavra entre chaves (como `{plano}`) pela metade, o site pode não
+conseguir preenchê-la: deixe a palavra inteira com a mesma formatação.
 
 **Palavras entre chaves, como `{plano}` ou `{nome}`:** são pedaços que o site preenche sozinho (o nome do plano, o nome
 da pessoa, uma data, uma quantidade). Escreva o texto ao redor como quiser, mas **mantenha a palavra entre chaves** onde
