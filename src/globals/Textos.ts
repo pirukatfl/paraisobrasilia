@@ -3,7 +3,9 @@ import type { Field, GlobalAfterChangeHook, GlobalConfig } from 'payload'
 import { isStaff } from '../access/roles'
 import { expire } from '../lib/cache/expire'
 import { AREAS } from '../lib/textos/areas'
-import { type AreaTextos, campoEhLongo } from '../lib/textos/tipos'
+import { editorDosTextos } from '../lib/textos/editor'
+import { textoParaRico } from '../lib/textos/rico'
+import { type AreaTextos, campoEhFormatado, campoEhLongo } from '../lib/textos/tipos'
 
 /**
  * One global per area of editable site texts (PAINEL-10, 06.2). Fields are never required and start
@@ -26,10 +28,14 @@ export function criarGlobalDeTextos(area: AreaTextos, chave: string = chaveDoSlu
     const base = {
       name,
       label: campo.rotulo,
-      defaultValue: campo.padrao,
       admin: campo.ajuda ? { description: campo.ajuda } : {},
     }
-    const field: Field = campoEhLongo(campo) ? { ...base, type: 'textarea' } : { ...base, type: 'text' }
+    // Formatted texts are Lexical JSON; the default is the original text so the editor shows what the site says
+    const field: Field = campoEhFormatado(campo)
+      ? { ...base, type: 'richText', editor: editorDosTextos, defaultValue: textoParaRico(campo.padrao) }
+      : campoEhLongo(campo)
+        ? { ...base, type: 'textarea', defaultValue: campo.padrao }
+        : { ...base, type: 'text', defaultValue: campo.padrao }
     if (!campo.secao) {
       fields.push(field)
       continue
@@ -43,13 +49,15 @@ export function criarGlobalDeTextos(area: AreaTextos, chave: string = chaveDoSlu
     grupo.push(field)
   }
 
+  const temFormatado = Object.values(area.campos).some(campoEhFormatado)
+
   return {
     slug: area.slug,
     label: area.rotulo,
     admin: {
       group: 'Textos do site',
       hidden: area.ocultaNoPainel ?? false,
-      description: `${area.descricao} Para voltar ao texto original, apague o campo e salve.`,
+      description: `${area.descricao} ${temFormatado ? 'Selecione palavras para negrito, itálico, sublinhado, link ou lista. ' : ''}Para voltar ao texto original, apague o campo e salve.`,
     },
     access: {
       // Public site copy, nothing sensitive

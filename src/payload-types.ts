@@ -2048,7 +2048,7 @@ export interface Contact {
   createdAt?: string | null;
 }
 /**
- * Menu do topo, rodapé, confirmação de maioridade (18+), página não encontrada, página de erro, galeria e paginação. Para voltar ao texto original, apague o campo e salve.
+ * Menu do topo, rodapé, confirmação de maioridade (18+), página não encontrada, página de erro, galeria e paginação. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-geral".
@@ -2151,14 +2151,42 @@ export interface TextosGeral {
    */
   rodapeCopyright?: string | null;
   idadeTitulo?: string | null;
-  idadeTexto?: string | null;
+  idadeTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   idadeBotaoEntrar?: string | null;
   idadeBotaoSair?: string | null;
   naoEncontradaTitulo?: string | null;
   naoEncontradaTexto?: string | null;
   naoEncontradaBotao?: string | null;
   erroTitulo?: string | null;
-  erroTexto?: string | null;
+  erroTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Use {codigo} para o código que a equipe técnica precisa.
    */
@@ -2239,7 +2267,7 @@ export interface TextosFesta {
   createdAt?: string | null;
 }
 /**
- * Textos fixos da página do espaço (as fotos são editadas em Galeria do espaço). Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos da página do espaço (as fotos são editadas em Galeria do espaço). Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-espaco".
@@ -2254,16 +2282,44 @@ export interface TextosEspaco {
   /**
    * Também é a descrição que aparece no Google.
    */
-  intro?: string | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   vazioTitulo?: string | null;
-  vazioTexto?: string | null;
+  vazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   vazioBotaoComoChegar?: string | null;
   vazioBotaoFestas?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Textos fixos da lista de modelos e da página de cada modelo (as modelos em si são editadas em Modelos). Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos da lista de modelos e da página de cada modelo (as modelos em si são editadas em Modelos). Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-modelos".
@@ -2280,7 +2336,21 @@ export interface TextosModelo {
    */
   intro?: string | null;
   vazioTitulo?: string | null;
-  vazioTexto?: string | null;
+  vazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   vazioBotaoFestas?: string | null;
   vazioBotaoEspaco?: string | null;
   umaFoto?: string | null;
@@ -2327,7 +2397,7 @@ export interface TextosInstitucional {
   createdAt?: string | null;
 }
 /**
- * Textos fixos da página de contato (endereço, telefone e horário são editados em Contato e endereço). Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos da página de contato (endereço, telefone e horário são editados em Contato e endereço). Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-contato".
@@ -2338,7 +2408,21 @@ export interface TextosContato {
    * Também é o título que aparece no Google.
    */
   titulo?: string | null;
-  intro?: string | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   descricaoGoogle?: string | null;
   /**
    * Use {cep} para o número do CEP.
@@ -2356,7 +2440,7 @@ export interface TextosContato {
   createdAt?: string | null;
 }
 /**
- * Textos fixos da página Assine Já, da tabela Grátis × Assinante e da chamada "Assine Já" dos contos e do ClassiSex. Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos da página Assine Já, da tabela Grátis × Assinante e da chamada "Assine Já" dos contos e do ClassiSex. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-assine".
@@ -2370,7 +2454,21 @@ export interface TextosAssine {
   googleDescricao?: string | null;
   topoEtiqueta?: string | null;
   topoTitulo?: string | null;
-  topoTexto?: string | null;
+  topoTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   comparativoTitulo?: string | null;
   comparativoColunaItem?: string | null;
   comparativoColunaGratis?: string | null;
@@ -2432,7 +2530,7 @@ export interface TextosAssine {
   createdAt?: string | null;
 }
 /**
- * Textos fixos das telas de entrar, cadastro, confirmação de e-mail e recuperação de senha. Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos das telas de entrar, cadastro, confirmação de e-mail e recuperação de senha. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-conta".
@@ -2450,16 +2548,58 @@ export interface TextosConta {
   entrarBotao?: string | null;
   entrarEsqueci?: string | null;
   entrarSemEmail?: string | null;
-  entrarEsqueciSemEmail?: string | null;
+  entrarEsqueciSemEmail?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   entrarCriarConta?: string | null;
   entrarAssine?: string | null;
   cadastroGoogleTitulo?: string | null;
   cadastroGoogleDescricao?: string | null;
   cadastroTitulo?: string | null;
   cadastroFechado?: string | null;
-  cadastroEnviado?: string | null;
+  cadastroEnviado?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   cadastroNaoRecebeu?: string | null;
-  cadastroIntro?: string | null;
+  cadastroIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   cadastroJaTem?: string | null;
   formSenha?: string | null;
   formSenhaDica?: string | null;
@@ -2484,7 +2624,21 @@ export interface TextosConta {
   esqueciGoogleDescricao?: string | null;
   esqueciTitulo?: string | null;
   esqueciSemEmail?: string | null;
-  esqueciEnviado?: string | null;
+  esqueciEnviado?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   esqueciIntro?: string | null;
   esqueciBotao?: string | null;
   esqueciVoltar?: string | null;
@@ -2499,7 +2653,7 @@ export interface TextosConta {
   createdAt?: string | null;
 }
 /**
- * Textos fixos da área do assinante: início, minha assinatura, trocar senha e avisos de renovação. Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos da área do assinante: início, minha assinatura, trocar senha e avisos de renovação. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-area-assinante".
@@ -2519,7 +2673,21 @@ export interface TextosAreaAssinante {
    */
   contaTitulo?: string | null;
   contaTipoGratuita?: string | null;
-  contaTexto?: string | null;
+  contaTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contaBotaoAnuncios?: string | null;
   dadosTitulo?: string | null;
   /**
@@ -2570,7 +2738,21 @@ export interface TextosAreaAssinante {
   renovFaltam?: string | null;
   renovBotao?: string | null;
   inativoTitulo?: string | null;
-  inativoTexto?: string | null;
+  inativoTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   inativoAssine?: string | null;
   inativoAnuncios?: string | null;
   inativoNaoAtiva?: string | null;
@@ -2578,7 +2760,7 @@ export interface TextosAreaAssinante {
   createdAt?: string | null;
 }
 /**
- * Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões e denúncia. Para voltar ao texto original, apague o campo e salve.
+ * Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões e denúncia. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-classisex".
@@ -2589,11 +2771,39 @@ export interface TextosClassisex {
   publicoGoogleDescricao?: string | null;
   publicoTopo?: string | null;
   publicoTitulo?: string | null;
-  publicoIntro?: string | null;
+  publicoIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   publicoBotaoAnunciar?: string | null;
   publicoLinkAssinante?: string | null;
   publicoAssineTitulo?: string | null;
-  publicoAssineTexto?: string | null;
+  publicoAssineTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   filtroEuSou?: string | null;
   filtroTodos?: string | null;
   filtroCidade?: string | null;
@@ -2636,7 +2846,21 @@ export interface TextosClassisex {
   membrosIntro?: string | null;
   membrosDenunciaEnviada?: string | null;
   membrosPublicadosTitulo?: string | null;
-  membrosGratisTexto?: string | null;
+  membrosGratisTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   anuncioGoogleTitulo?: string | null;
   anuncioTopo?: string | null;
   /**
@@ -2675,11 +2899,39 @@ export interface TextosClassisex {
   anunciarGoogleTitulo?: string | null;
   anunciarTopo?: string | null;
   anunciarTitulo?: string | null;
-  anunciarIntro?: string | null;
+  anunciarIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   visitanteEmailRotulo?: string | null;
   visitanteEmailAjuda?: string | null;
   fotoRotulo?: string | null;
-  fotoAjuda?: string | null;
+  fotoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   fotoEscolher?: string | null;
   fotoTrocar?: string | null;
   fotoTirar?: string | null;
@@ -2703,7 +2955,7 @@ export interface TextosClassisex {
   createdAt?: string | null;
 }
 /**
- * Lista dos anúncios do assinante, Novo anúncio, Editar anúncio, os campos do formulário e o envio de fotos e vídeos. Para voltar ao texto original, apague o campo e salve.
+ * Lista dos anúncios do assinante, Novo anúncio, Editar anúncio, os campos do formulário e o envio de fotos e vídeos. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-meus-anuncios".
@@ -2716,8 +2968,36 @@ export interface TextosMeusAnuncio {
    */
   topo?: string | null;
   listaTitulo?: string | null;
-  listaIntro?: string | null;
-  listaAvisoAntigo?: string | null;
+  listaIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  listaAvisoAntigo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   listaBotaoNovo?: string | null;
   listaVazio?: string | null;
   listaOkEnviado?: string | null;
@@ -2751,12 +3031,54 @@ export interface TextosMeusAnuncio {
   donoApagarSim?: string | null;
   novoGoogleTitulo?: string | null;
   novoTitulo?: string | null;
-  novoIntro?: string | null;
+  novoIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   novoAvisoGratis?: string | null;
   editarGoogleTitulo?: string | null;
   editarTitulo?: string | null;
-  editarAvisoAntigo?: string | null;
-  editarAvisoRascunho?: string | null;
+  editarAvisoAntigo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  editarAvisoRascunho?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   editarAvisoPublicado?: string | null;
   editarAvisoSalvar?: string | null;
   midiaFotoOk?: string | null;
@@ -2770,7 +3092,21 @@ export interface TextosMeusAnuncio {
   cidadeRotulo?: string | null;
   textoRotulo?: string | null;
   textoAjuda?: string | null;
-  textoAjudaAntigo?: string | null;
+  textoAjudaAntigo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contatoLegenda?: string | null;
   whatsappRotulo?: string | null;
   telegramRotulo?: string | null;
@@ -2792,11 +3128,39 @@ export interface TextosMeusAnuncio {
   /**
    * Use {fotos}, {videos} e {segundos} para os limites.
    */
-  midiaAjudaComVideo?: string | null;
+  midiaAjudaComVideo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Use {fotos} para o limite de fotos.
    */
-  midiaAjudaSoFoto?: string | null;
+  midiaAjudaSoFoto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   /**
    * Use {n} para quantas já foram escolhidas e {max} para o limite.
    */
@@ -2814,7 +3178,21 @@ export interface TextosMeusAnuncio {
    */
   midiaTirarVideo?: string | null;
   gerTitulo?: string | null;
-  gerDicaAssinante?: string | null;
+  gerDicaAssinante?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   gerDicaGratis?: string | null;
   gerCapaNota?: string | null;
   gerSemFotos?: string | null;
@@ -2841,7 +3219,7 @@ export interface TextosMeusAnuncio {
   createdAt?: string | null;
 }
 /**
- * Página e formulário para qualquer pessoa enviar um conto, e a confirmação de envio. Para voltar ao texto original, apague o campo e salve.
+ * Página e formulário para qualquer pessoa enviar um conto, e a confirmação de envio. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-enviar-conto".
@@ -2851,7 +3229,21 @@ export interface TextosEnviarConto {
   googleTitulo?: string | null;
   topo?: string | null;
   titulo?: string | null;
-  intro?: string | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   obrigatorio?: string | null;
   tituloRotulo?: string | null;
   assinadoRotulo?: string | null;
@@ -2860,11 +3252,39 @@ export interface TextosEnviarConto {
   /**
    * Use {min} e {max} para o mínimo e o máximo de caracteres.
    */
-  contoAjuda?: string | null;
+  contoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   emailRotulo?: string | null;
   emailAjuda?: string | null;
   imagemRotulo?: string | null;
-  imagemAjuda?: string | null;
+  imagemAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   imagemEscolher?: string | null;
   imagemTrocar?: string | null;
   imagemTirar?: string | null;
@@ -2873,7 +3293,21 @@ export interface TextosEnviarConto {
   termosLink?: string | null;
   termosE?: string | null;
   termosPolitica?: string | null;
-  aviso?: string | null;
+  aviso?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   botao?: string | null;
   botaoEnviando?: string | null;
   enviadoGoogleTitulo?: string | null;
@@ -2886,7 +3320,7 @@ export interface TextosEnviarConto {
   createdAt?: string | null;
 }
 /**
- * Lista de contos, página de cada conto e a área de contos dos assinantes. Para voltar ao texto original, apague o campo e salve.
+ * Lista de contos, página de cada conto e a área de contos dos assinantes. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-contos".
@@ -2897,14 +3331,56 @@ export interface TextosConto {
   googleListaDescricao?: string | null;
   listaEyebrow?: string | null;
   listaTitulo?: string | null;
-  listaIntro?: string | null;
+  listaIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   listaLinkAssinante?: string | null;
   listaLinkEnviar?: string | null;
   listaVazioTitulo?: string | null;
-  listaVazioTexto?: string | null;
+  listaVazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   listaVazioBotao?: string | null;
   listaCtaTitulo?: string | null;
-  listaCtaTexto?: string | null;
+  listaCtaTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   googleContoNaoEncontrado?: string | null;
   /**
    * Também usada na página do conto completo para assinantes.
@@ -2915,7 +3391,21 @@ export interface TextosConto {
    */
   contoPor?: string | null;
   contoCtaTitulo?: string | null;
-  contoCtaTexto?: string | null;
+  contoCtaTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contoCtaBotao?: string | null;
   /**
    * Também usado na página do conto completo para assinantes.
@@ -2930,13 +3420,27 @@ export interface TextosConto {
   membrosTitulo?: string | null;
   membrosIntro?: string | null;
   membrosVazioTitulo?: string | null;
-  membrosVazioTexto?: string | null;
+  membrosVazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   membrosGoogleConto?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Lista de Dicas Hot, página de cada dica e a área de dicas dos assinantes. Para voltar ao texto original, apague o campo e salve.
+ * Lista de Dicas Hot, página de cada dica e a área de dicas dos assinantes. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-dicas-hot".
@@ -2947,20 +3451,76 @@ export interface TextosDicasHot {
   googleListaDescricao?: string | null;
   listaEyebrow?: string | null;
   listaTitulo?: string | null;
-  listaIntro?: string | null;
+  listaIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   listaLinkAssinante?: string | null;
   listaVazioTitulo?: string | null;
-  listaVazioTexto?: string | null;
+  listaVazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   listaVazioBotao?: string | null;
   listaCtaTitulo?: string | null;
-  listaCtaTexto?: string | null;
+  listaCtaTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   googleDicaNaoEncontrada?: string | null;
   /**
    * Também usado na página da dica completa para assinantes.
    */
   dicaEyebrow?: string | null;
   dicaCtaTitulo?: string | null;
-  dicaCtaTexto?: string | null;
+  dicaCtaTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   dicaCtaBotao?: string | null;
   leiaTambem?: string | null;
   /**
@@ -2976,13 +3536,27 @@ export interface TextosDicasHot {
   membrosTitulo?: string | null;
   membrosIntro?: string | null;
   membrosVazioTitulo?: string | null;
-  membrosVazioTexto?: string | null;
+  membrosVazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   membrosGoogleDica?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
 /**
- * Caixa de recados dos assinantes: lista, novo recado, conversa, bloquear e denunciar. Para voltar ao texto original, apague o campo e salve.
+ * Caixa de recados dos assinantes: lista, novo recado, conversa, bloquear e denunciar. Selecione palavras para negrito, itálico, sublinhado, link ou lista. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-mensagens".
@@ -2997,7 +3571,21 @@ export interface TextosMensagen {
   titulo?: string | null;
   intro?: string | null;
   vazioTitulo?: string | null;
-  vazioTexto?: string | null;
+  vazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   vazioBotao?: string | null;
   novaMarca?: string | null;
   /**
@@ -3019,7 +3607,21 @@ export interface TextosMensagen {
    */
   voltar?: string | null;
   formApelido?: string | null;
-  formApelidoAjuda?: string | null;
+  formApelidoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   formRecado?: string | null;
   formEnviar?: string | null;
   formEnviando?: string | null;
@@ -3034,7 +3636,21 @@ export interface TextosMensagen {
   bloqueado?: string | null;
   desbloquear?: string | null;
   bloquearResumo?: string | null;
-  bloquearAviso?: string | null;
+  bloquearAviso?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   bloquearConfirmar?: string | null;
   denunciarResumo?: string | null;
   denunciarMotivo?: string | null;
