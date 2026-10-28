@@ -5,7 +5,8 @@ import { AREAS } from '../../src/lib/textos/areas'
 import { geral } from '../../src/lib/textos/areas/geral'
 import { mensagens } from '../../src/lib/textos/areas/mensagens'
 import { mesclarTextos, padroesDaArea, preencher } from '../../src/lib/textos/mesclar'
-import type { CampoTexto } from '../../src/lib/textos/tipos'
+import { textoParaRico } from '../../src/lib/textos/rico'
+import { type CampoTexto, campoEhFormatado, campoEhLongo } from '../../src/lib/textos/tipos'
 
 const area = {
   slug: 'textos-teste',
@@ -31,6 +32,45 @@ describe('mesclarTextos (PAINEL-10)', () => {
   })
 })
 
+describe('mesclarTextos with formatted fields', () => {
+  const comEditor = {
+    ...area,
+    campos: {
+      ...area.campos,
+      paragrafo: { rotulo: 'Parágrafo', padrao: 'Linha um\nLinha dois\n\nOutro {nome}', formatado: true, ajuda: 'Use {nome}.' },
+    },
+  }
+  const salvo = {
+    root: {
+      type: 'root',
+      version: 1,
+      children: [{ type: 'paragraph', version: 1, children: [{ type: 'text', version: 1, text: 'Novo', format: 1 }] }],
+    },
+  }
+  const vazio = {
+    root: { type: 'root', version: 1, children: [{ type: 'paragraph', version: 1, children: [] }] },
+  }
+
+  it('turns the original of a formatted field into editor state', () => {
+    const out = padroesDaArea(comEditor)
+    expect(out.paragrafo).toEqual(textoParaRico('Linha um\nLinha dois\n\nOutro {nome}'))
+    expect(out.titulo).toBe('Original')
+  })
+
+  it('uses saved editor state, falls back to the original for an emptied editor', () => {
+    expect(mesclarTextos(comEditor, { paragrafo: salvo }).paragrafo).toBe(salvo)
+    for (const esvaziado of [vazio, null, undefined, '', '   ', 42, {}, { root: null }]) {
+      expect(mesclarTextos(comEditor, { paragrafo: esvaziado }).paragrafo).toEqual(padroesDaArea(comEditor).paragrafo)
+    }
+  })
+
+  it('converts a plain string still stored in a formatted field (before the migration ran)', () => {
+    expect(mesclarTextos(comEditor, { paragrafo: 'Texto antigo\n\nSegundo' }).paragrafo).toEqual(
+      textoParaRico('Texto antigo\n\nSegundo'),
+    )
+  })
+})
+
 describe('preencher', () => {
   it('replaces variables and keeps unknown ones', () => {
     expect(preencher('Olá {nome}, {n} fotos {x}', { nome: 'Ana', n: 3 })).toBe('Olá Ana, 3 fotos {x}')
@@ -43,6 +83,15 @@ describe('preencher', () => {
 
 describe('registry sanity (all areas)', () => {
   const areas = Object.values(AREAS)
+
+  it('marks every long text as formatted or plain explicitly, and never meta/Google texts as formatted', () => {
+    for (const a of areas) {
+      for (const [nome, campo] of Object.entries(a.campos as Record<string, CampoTexto>)) {
+        if (campoEhLongo(campo)) expect(typeof campo.formatado, `${a.slug}.${nome}`).toBe('boolean')
+        if (/google/i.test(nome)) expect(campoEhFormatado(campo), `${a.slug}.${nome}`).toBe(false)
+      }
+    }
+  })
 
   it('has unique slugs starting with textos-', () => {
     const slugs = areas.map((a) => a.slug)
@@ -76,9 +125,15 @@ describe('criarGlobalDeTextos', () => {
     const flat = global.fields.flatMap((f) => ('fields' in f && f.type === 'collapsible' ? f.fields : [f]))
     expect(flat).toHaveLength(Object.keys(geral.campos).length)
     for (const f of flat) {
-      if (f.type !== 'text' && f.type !== 'textarea') throw new Error('unexpected field type')
+      if (f.type !== 'text' && f.type !== 'textarea' && f.type !== 'richText') throw new Error('unexpected field type')
       const campo = (geral.campos as Record<string, CampoTexto>)[f.name]
-      expect(f.defaultValue).toBe(campo.padrao)
+      if (campoEhFormatado(campo)) {
+        expect(f.type).toBe('richText')
+        expect(f.defaultValue).toEqual(textoParaRico(campo.padrao))
+      } else {
+        expect(f.type).toBe(campoEhLongo(campo) ? 'textarea' : 'text')
+        expect(f.defaultValue).toBe(campo.padrao)
+      }
       expect('required' in f && f.required).toBeFalsy()
     }
     expect(global.fields.every((f) => f.type === 'collapsible')).toBe(true)
