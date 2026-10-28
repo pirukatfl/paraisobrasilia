@@ -12,6 +12,7 @@ import { getAssinante } from '@/lib/assinantes/session'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
+import { TextoRico } from '@/components/TextoRico'
 import { getTextos } from '@/lib/textos/queries'
 
 // Reads the session cookie: rendered per request, never cached (T-03-05)
@@ -85,7 +86,9 @@ export default async function EntrarPage({
             {t.entrarSemEmail}{' '}
           </>
         ) : (
-          <>{t.entrarEsqueciSemEmail} </>
+          <>
+            <TextoRico valor={t.entrarEsqueciSemEmail} inline />{' '}
+          </>
         )}
         {contact.whatsapp && (
           <ExternalLink

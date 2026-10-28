@@ -5,6 +5,7 @@ import { useActionState } from 'react'
 import { bloquear, denunciarConversa, desbloquear } from '@/lib/mensagens/actions'
 import { MESSAGE_REPORT_REASONS } from '@/lib/mensagens/rules'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * Block / report controls of a thread (REC-03). The other person is derived on the server from
@@ -39,7 +40,7 @@ export function BlockReportPanel({
           <summary className="type-label cursor-pointer text-muted">{textos.bloquearResumo}</summary>
           <form action={bloquear} className="mt-4 flex flex-col gap-3">
             <input type="hidden" name="conversa" value={conversaId} />
-            <p className="text-body text-muted">{textos.bloquearAviso}</p>
+            <TextoRico valor={textos.bloquearAviso} className="text-body text-muted" />
             <div>
               <button type="submit" className="min-h-11 rounded-lg border border-line px-5 text-body text-text hover:border-accent">
                 {textos.bloquearConfirmar}

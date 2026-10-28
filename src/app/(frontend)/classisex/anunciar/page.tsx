@@ -6,6 +6,7 @@ import { getAssinante } from '@/lib/assinantes/session'
 import { getActiveAdCategories } from '@/lib/classisex/queries'
 import { uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,9 +52,7 @@ export default async function AnunciarPage({
       <h1 id="titulo-anunciar" className="type-display mt-2">
         {t.anunciarTitulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.anunciarIntro}
-      </p>
+      <TextoRico valor={t.anunciarIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <VisitorAdForm textos={t} campos={campos} categories={categories} erro={erro} />
     </section>
   )

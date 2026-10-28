@@ -6,6 +6,7 @@ import { MAX_AD_PHOTOS } from '@/lib/classisex/media-messages'
 import { definirCapa, removerMidia } from '@/lib/classisex/actions'
 import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * "Fotos e vídeos" on Editar anúncio (CLAS-03, D-01). Server component: plain forms work without
@@ -28,7 +29,7 @@ export async function OwnerMediaManager({ adId, media, tier, legacy = false }: {
       <h2 id="titulo-midia" className="type-heading">
         {t.gerTitulo}
       </h2>
-      <p className="mt-2 text-body text-muted">{tier === 'gratis' ? t.gerDicaGratis : t.gerDicaAssinante}</p>
+      <TextoRico valor={tier === 'gratis' ? t.gerDicaGratis : t.gerDicaAssinante} className="mt-2 text-body text-muted" />
       <p className="mt-1 text-body text-muted">{t.gerCapaNota}</p>
 
       {media.fotos.length === 0 ? (

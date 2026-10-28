@@ -1,5 +1,7 @@
 'use client'
 
+import { TextoRico } from '@/components/TextoRico'
+
 import type { AgeGateTextos, AgeVerifier } from './index'
 
 /** Click-through 18+ confirmation (no sign-up, no form). Copy from UI-SPEC S1. */
@@ -25,9 +27,7 @@ function SelfDeclarationPrompt({ onVerified, textos }: { onVerified: () => void;
       <h2 id="age-gate-titulo" className="type-heading mt-6">
         {textos.titulo}
       </h2>
-      <p id="age-gate-texto" className="mt-4 text-body text-muted">
-        {textos.texto}
-      </p>
+      <TextoRico id="age-gate-texto" valor={textos.texto} className="mt-4 text-body text-muted" />
       <button type="button" data-age-primary onClick={onVerified} className="btn-primary mt-8 w-full">
         {textos.botaoEntrar}
       </button>

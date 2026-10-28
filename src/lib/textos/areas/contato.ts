@@ -13,11 +13,13 @@ export const contato = definirArea({
       ajuda: 'Também é o título que aparece no Google.',
     },
     intro: {
+      formatado: true,
       rotulo: 'Texto de abertura',
       padrao: 'Estamos no Núcleo Rural Lago Oeste, em Sobradinho. Fale com a gente pelo WhatsApp para reservas e dúvidas.',
       secao: 'Topo da página',
     },
     descricaoGoogle: {
+      formatado: false,
       rotulo: 'Descrição no Google',
       padrao: 'Endereço, mapa e WhatsApp do Paraíso Brasília, no Núcleo Rural Lago Oeste, Sobradinho – DF.',
       secao: 'Topo da página',

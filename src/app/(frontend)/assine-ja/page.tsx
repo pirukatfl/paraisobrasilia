@@ -13,6 +13,7 @@ import { getContact } from '@/lib/site/queries'
 import type { Textos } from '@/lib/textos/areas'
 import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (no database at build); data from the tagged caches ('plans', 'contact').
 export const dynamic = 'force-dynamic'
@@ -68,7 +69,7 @@ export default async function AssineJaPage() {
       <h1 id="titulo-assine" className="type-display mt-2">
         {t.topoTitulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">{t.topoTexto}</p>
+      <TextoRico valor={t.topoTexto} className="mt-4 max-w-[680px] text-body text-muted" />
 
       <PlanComparison signupLink={emailEnabled()} assineLink={false} id="comparativo-assine" />
 

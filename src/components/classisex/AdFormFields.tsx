@@ -1,5 +1,6 @@
 import type { AdFormValues } from '@/lib/classisex/actions'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 export const inputClass =
   'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent'
@@ -131,9 +132,7 @@ export function AdFormFields({
           aria-describedby={['ajuda-texto', described('texto')].filter(Boolean).join(' ')}
           className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text focus:border-accent"
         />
-        <p id="ajuda-texto" className="type-label text-muted">
-          {legacy ? t.textoAjudaAntigo : t.textoAjuda}
-        </p>
+        <TextoRico id="ajuda-texto" valor={legacy ? t.textoAjudaAntigo : t.textoAjuda} className="type-label text-muted" />
         <FieldError id="erro-texto" message={errors.texto} />
       </div>
 

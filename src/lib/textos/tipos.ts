@@ -2,6 +2,8 @@
  * Editable site texts (PAINEL-10). One registry entry per area; the Payload global, the TypeScript
  * type and the fallback text all come from the same `campos` object.
  */
+import type { TextoRico } from './rico'
+
 export type CampoTexto = {
   /** Label shown in the admin. */
   rotulo: string
@@ -11,6 +13,12 @@ export type CampoTexto = {
   secao?: string
   /** Force textarea (true) or single line (false). Omitted: textarea when long or multi-line. */
   longo?: boolean
+  /**
+   * Rich-text editor (bold, italic, underline, lists, links). Set `true` explicitly on every long text that
+   * renders as a block of site copy; `false` on long texts that feed `<meta>`, attributes, labels or e-mails.
+   * Omitted: plain text. The literal `true` is what types the field as `TextoRico` in `Textos<K>`.
+   */
+  formatado?: boolean
   /** Help text under the field; must mention every {variable} of `padrao`. */
   ajuda?: string
 }
@@ -35,9 +43,16 @@ export function definirArea<const C extends Record<string, CampoTexto>>(area: {
   return area
 }
 
-export type TextosDaArea<A extends { campos: Record<string, CampoTexto> }> = { [K in keyof A['campos']]: string }
+export type TextosDaArea<A extends { campos: Record<string, CampoTexto> }> = {
+  [K in keyof A['campos']]: A['campos'][K] extends { readonly formatado: true } ? TextoRico : string
+}
 
 /** Textarea for long or multi-line defaults unless the field says otherwise. */
 export function campoEhLongo(campo: CampoTexto): boolean {
   return campo.longo ?? (campo.padrao.length > 90 || campo.padrao.includes('\n'))
+}
+
+/** Fields saved as Lexical JSON instead of a string. */
+export function campoEhFormatado(campo: CampoTexto): boolean {
+  return campo.formatado === true
 }

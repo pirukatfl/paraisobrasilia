@@ -1,5 +1,7 @@
 import type React from 'react'
 
+import type { TextoRico } from '@/lib/textos/rico'
+
 import { selfDeclaration } from './self-declaration'
 
 /**
@@ -9,7 +11,7 @@ import { selfDeclaration } from './self-declaration'
  */
 export type AgeGateTextos = {
   titulo: string
-  texto: string
+  texto: TextoRico
   botaoEntrar: string
   botaoSair: string
 }

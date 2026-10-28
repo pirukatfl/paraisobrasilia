@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/EmptyState'
 import { getPublicDicas } from '@/lib/dicas/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Per request (query string, no database at build); data from the tagged cache 'dicas'.
 export const dynamic = 'force-dynamic'
@@ -39,9 +40,7 @@ export default async function DicasHotPage({ searchParams }: { searchParams: Sea
       <h1 id="titulo-dicas" className="type-display mt-2">
         {t.listaTitulo}
       </h1>
-      <p className="mt-4 max-w-[680px] text-body text-muted">
-        {t.listaIntro}
-      </p>
+      <TextoRico valor={t.listaIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <p className="mt-4">
         <Link href="/area-do-assinante/dicas-hot" className="type-label font-semibold text-accent underline underline-offset-4">
           {t.listaLinkAssinante}

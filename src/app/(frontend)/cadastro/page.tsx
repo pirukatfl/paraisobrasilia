@@ -12,6 +12,7 @@ import { buildPageMetadata } from '@/lib/seo/metadata'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Depends on the session and on runtime configuration (SMTP): per request, never cached
 export const dynamic = 'force-dynamic'
@@ -56,9 +57,7 @@ export default async function CadastroPage({
         </div>
       ) : enviado ? (
         <div className="mt-6 max-w-[560px]">
-          <p role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text">
-            {t.cadastroEnviado}
-          </p>
+          <TextoRico valor={t.cadastroEnviado} role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text" />
           <h2 className="type-heading mt-8">{t.cadastroNaoRecebeu}</h2>
           <ResendForm />
         </div>
@@ -69,7 +68,7 @@ export default async function CadastroPage({
               Muitas tentativas. Tente de novo em 1 hora.
             </p>
           )}
-          <p className="mt-4 max-w-[560px] text-body text-muted">{t.cadastroIntro}</p>
+          <TextoRico valor={t.cadastroIntro} className="mt-4 max-w-[560px] text-body text-muted" />
           <SignupForm textos={t} />
         </>
       )}

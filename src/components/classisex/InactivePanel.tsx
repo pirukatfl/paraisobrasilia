@@ -6,6 +6,7 @@ import type { AccessStatus } from '@/lib/assinantes/access'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * Restricted pages (ClassiSex board/detail, recados, contos) for an account without an
@@ -21,7 +22,7 @@ export async function InactivePanel({ access }: { access: AccessStatus }) {
       {never ? (
         <div className="max-w-[560px] rounded-xl border border-line bg-surface p-6">
           <h2 className="type-heading mb-4">{t.inativoTitulo}</h2>
-          <p className="text-body">{t.inativoTexto}</p>
+          <TextoRico valor={t.inativoTexto} className="text-body" />
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link href="/assine-ja" className="btn-primary">
               {t.inativoAssine}

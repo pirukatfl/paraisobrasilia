@@ -9,6 +9,7 @@ import { buildPageMetadata } from '@/lib/seo/metadata'
 import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Depends on runtime configuration (SMTP) and the query string: per request, never cached
 export const dynamic = 'force-dynamic'
@@ -52,9 +53,7 @@ export default async function EsqueciSenhaPage({
       ) : (
         <>
           {enviado && (
-            <p role="status" className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 text-body text-text">
-              {t.esqueciEnviado}
-            </p>
+            <TextoRico valor={t.esqueciEnviado} role="status" className="mt-6 rounded-lg border border-line bg-surface px-4 py-2 text-body text-text" />
           )}
           {limite && (
             <p role="alert" className="mt-6 rounded-lg border border-danger px-4 py-2 text-body text-text">

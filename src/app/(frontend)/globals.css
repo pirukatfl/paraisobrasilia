@@ -188,6 +188,40 @@
     font-weight: 600;
   }
 
+  /* Formatted site texts (Textos do site): sit inside the caller's own size/colour classes, so only spacing and inline marks are set here */
+  .texto-rico > p + p,
+  .texto-rico > p + ul,
+  .texto-rico > p + ol,
+  .texto-rico > ul + p,
+  .texto-rico > ol + p,
+  .texto-rico > ul + ul,
+  .texto-rico > ol + ol,
+  .texto-rico > ul + ol,
+  .texto-rico > ol + ul {
+    margin-top: 0.75em;
+  }
+  .texto-rico ul,
+  .texto-rico ol {
+    padding-left: 1.5em;
+  }
+  .texto-rico ul {
+    list-style: disc;
+  }
+  .texto-rico ol {
+    list-style: decimal;
+  }
+  .texto-rico li + li {
+    margin-top: 0.25em;
+  }
+  .texto-rico a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .texto-rico strong {
+    font-weight: 600;
+  }
+
   /* Secondary button (Champagne Gild): 1px gold outline, gold text, faint gold fill on hover/focus */
   .btn-secondary {
     display: inline-flex;

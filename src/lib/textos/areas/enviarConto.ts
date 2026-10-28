@@ -10,6 +10,7 @@ export const enviarConto = definirArea({
     topo: { rotulo: 'Linha pequena acima do título', padrao: 'Contos', secao: 'Página Enviar um conto' },
     titulo: { rotulo: 'Título da página', padrao: 'Enviar um conto', secao: 'Página Enviar um conto' },
     intro: {
+      formatado: true,
       rotulo: 'Texto de abertura',
       padrao:
         'Qualquer pessoa pode enviar, sem cadastro. O conto aparece depois da análise da equipe: todo mundo lê o começo; o conto completo é só para assinantes. Telefone, e-mail, @ e links não são aceitos.',
@@ -27,6 +28,7 @@ export const enviarConto = definirArea({
     },
     contoRotulo: { rotulo: 'Campo: Conto', padrao: 'Conto', secao: 'Formulário' },
     contoAjuda: {
+      formatado: true,
       rotulo: 'Ajuda do campo Conto',
       padrao:
         'De {min} a {max} caracteres. Deixe uma linha em branco entre os parágrafos. Telefone, e-mail, @ e links são recusados.',
@@ -41,6 +43,7 @@ export const enviarConto = definirArea({
     },
     imagemRotulo: { rotulo: 'Imagem: título do campo', padrao: 'Imagem (opcional)', secao: 'Formulário' },
     imagemAjuda: {
+      formatado: true,
       rotulo: 'Imagem: ajuda',
       padrao:
         '1 imagem JPG, PNG ou WebP, até 15 MB. Aparece na lista e no conto, para todo mundo: sem nudez explícita e sem contatos. Só é mostrada depois da aprovação.',
@@ -50,6 +53,7 @@ export const enviarConto = definirArea({
     imagemTrocar: { rotulo: 'Imagem: botão Trocar', padrao: 'Trocar imagem', secao: 'Formulário' },
     imagemTirar: { rotulo: 'Imagem: botão Tirar', padrao: 'Tirar imagem', secao: 'Formulário' },
     consentimento: {
+      formatado: false,
       rotulo: 'Termo de consentimento (caixa de marcar)',
       padrao:
         'Tenho 18 anos ou mais, o conto é de minha autoria, e a imagem (se houver) é minha ou tenho autorização, sem nudez explícita e sem contatos.',
@@ -60,6 +64,7 @@ export const enviarConto = definirArea({
     termosE: { rotulo: 'Termos: palavra entre os links', padrao: 'e a', secao: 'Formulário' },
     termosPolitica: { rotulo: 'Termos: link da Política de Privacidade', padrao: 'Política de Privacidade', secao: 'Formulário' },
     aviso: {
+      formatado: true,
       rotulo: 'Aviso antes de enviar',
       padrao: 'Depois de enviar, não dá para editar nem apagar o conto. Ele só aparece no site depois que a equipe aprovar.',
       secao: 'Formulário',

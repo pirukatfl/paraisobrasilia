@@ -7,28 +7,15 @@ import {
 
 import type { RichTextState } from '@/lib/parties/types'
 
-// T-02-04b: only http(s), mailto, tel and site-relative links become anchors; anything else renders as text.
-const SAFE_HREF = /^(https?:\/\/|mailto:|tel:|\/(?!\/)|#)/i
+import { renderLink } from './richLink'
 
-const renderLink: JSXConverter<SerializedLinkNode | SerializedAutoLinkNode> = ({ node, nodesToJSX }) => {
-  const children = nodesToJSX({ nodes: node.children })
-  const url = node.fields?.url ?? ''
-  if (!SAFE_HREF.test(url)) return <span>{children}</span>
-  if (/^https?:\/\//i.test(url)) {
-    return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
-        {children}
-        <span className="sr-only"> (abre em nova aba)</span>
-      </a>
-    )
-  }
-  return <a href={url}>{children}</a>
-}
+const renderLinkNode: JSXConverter<SerializedLinkNode | SerializedAutoLinkNode> = ({ node, nodesToJSX }) =>
+  renderLink(node.fields?.url ?? '', nodesToJSX({ nodes: node.children }))
 
 const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
   ...defaultConverters,
-  link: renderLink as JSXConverter<SerializedLinkNode>,
-  autolink: renderLink as JSXConverter<SerializedAutoLinkNode>,
+  link: renderLinkNode as JSXConverter<SerializedLinkNode>,
+  autolink: renderLinkNode as JSXConverter<SerializedAutoLinkNode>,
 })
 
 /** Institutional page text (UI-SPEC Phase 2 typography via the `.rich-text` class in globals.css). */
