@@ -11,6 +11,8 @@ import { TextosGeraisProvider } from '@/lib/textos/TextosGeraisProvider'
 import { getTextos } from '@/lib/textos/queries'
 
 import './globals.css'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 // Display and headings: Playfair Display (design system "Bordeaux & Crimson Desire")
 const playfair = Playfair_Display({
@@ -38,10 +40,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000'),
     title: {
-      default: t.googleTitulo,
+      default: textoPuro(t.googleTitulo),
       template: '%s · Paraíso Brasília',
     },
-    description: t.googleDescricao,
+    description: textoPuro(t.googleDescricao),
     openGraph: {
       siteName: 'Paraíso Brasília',
       locale: 'pt_BR',
@@ -85,7 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             href="#conteudo"
             className="type-label sr-only z-50 bg-surface px-4 py-2 text-text focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:inline-flex focus:min-h-11 focus:items-center"
           >
-            {t.pularConteudo}
+            <TextoRico valor={t.pularConteudo} linha />
           </a>
           <RenewalBanner />
           <Header />

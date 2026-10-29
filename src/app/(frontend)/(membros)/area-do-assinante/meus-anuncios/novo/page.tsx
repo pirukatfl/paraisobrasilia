@@ -9,12 +9,13 @@ import { criarAnuncio } from '@/lib/classisex/actions'
 import { getActiveAdCategories } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('meusAnuncios')
-  return { title: t.novoGoogleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.novoGoogleTitulo), robots: { index: false, follow: false } }
 }
 
 // Needs a login only: free accounts create ads too (G-02); the tier sets the media limits
@@ -24,9 +25,9 @@ export default async function NovoAnuncioPage() {
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.topo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.topo} linha /></p>
       <h1 id="titulo-novo-anuncio" className="type-display mt-2">
-        {t.novoTitulo}
+        <TextoRico valor={t.novoTitulo} linha />
       </h1>
     </>
   )
@@ -38,7 +39,7 @@ export default async function NovoAnuncioPage() {
       <TextoRico valor={t.novoIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       {tier === 'gratis' && (
         <p role="note" className="mt-4 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body">
-          {t.novoAvisoGratis}
+          <TextoRico valor={t.novoAvisoGratis} linha />
         </p>
       )}
       <AdForm

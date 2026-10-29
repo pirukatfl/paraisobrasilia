@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Plain GET form (no client JS): Eu sou (+ cidade for members) (D-07). */
 export async function AdFilters({
@@ -22,7 +23,7 @@ export async function AdFilters({
     <form method="get" action={action} role="search" aria-label="Filtrar anúncios" className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end">
       <div className="flex flex-col gap-2">
         <label htmlFor="filtro-eu-sou" className="type-label text-text">
-          {t.filtroEuSou}
+          <TextoRico valor={t.filtroEuSou} linha />
         </label>
         <select
           id="filtro-eu-sou"
@@ -30,7 +31,7 @@ export async function AdFilters({
           defaultValue={euSou ? String(euSou) : ''}
           className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
         >
-          <option value="">{t.filtroTodos}</option>
+          <option value=""><TextoRico valor={t.filtroTodos} linha /></option>
           {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
@@ -41,7 +42,7 @@ export async function AdFilters({
       {showCidade && (
       <div className="flex flex-col gap-2">
         <label htmlFor="filtro-cidade" className="type-label text-text">
-          {t.filtroCidade}
+          <TextoRico valor={t.filtroCidade} linha />
         </label>
         <input
           id="filtro-cidade"
@@ -55,10 +56,10 @@ export async function AdFilters({
       )}
       <div className="flex items-center gap-4">
         <button type="submit" className="btn-primary">
-          {t.filtroBotao}
+          <TextoRico valor={t.filtroBotao} linha />
         </button>
         <Link href={action} className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.filtroLimpar}
+          <TextoRico valor={t.filtroLimpar} linha />
         </Link>
       </div>
     </form>

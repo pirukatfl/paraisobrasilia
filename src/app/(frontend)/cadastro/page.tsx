@@ -13,6 +13,7 @@ import { whatsappUrl } from '@/lib/site/contact'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 // Depends on the session and on runtime configuration (SMTP): per request, never cached
 export const dynamic = 'force-dynamic'
@@ -20,7 +21,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('conta')
   return {
-    ...buildPageMetadata({ title: t.cadastroGoogleTitulo, description: t.cadastroGoogleDescricao, path: '/cadastro' }),
+    ...buildPageMetadata({ title: textoPuro(t.cadastroGoogleTitulo), description: textoPuro(t.cadastroGoogleDescricao), path: '/cadastro' }),
     robots: { index: false, follow: false },
   }
 }
@@ -39,26 +40,26 @@ export default async function CadastroPage({
 
   return (
     <section aria-labelledby="titulo-cadastro">
-      <p className="type-eyebrow text-muted">{t.etiqueta}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.etiqueta} linha /></p>
       <h1 id="titulo-cadastro" className="type-display mt-2">
-        {t.cadastroTitulo}
+        <TextoRico valor={t.cadastroTitulo} linha />
       </h1>
 
       {!enabled ? (
         <div className="mt-6 max-w-[560px]">
           <p role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text">
-            {t.cadastroFechado}
+            <TextoRico valor={t.cadastroFechado} linha />
           </p>
           {contact.whatsapp && (
             <ExternalLink href={whatsappUrl(contact.whatsapp)} className="btn-primary mt-4">
-              {t.botaoWhatsapp}
+              <TextoRico valor={t.botaoWhatsapp} linha />
             </ExternalLink>
           )}
         </div>
       ) : enviado ? (
         <div className="mt-6 max-w-[560px]">
           <TextoRico valor={t.cadastroEnviado} role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text" />
-          <h2 className="type-heading mt-8">{t.cadastroNaoRecebeu}</h2>
+          <h2 className="type-heading mt-8"><TextoRico valor={t.cadastroNaoRecebeu} linha /></h2>
           <ResendForm />
         </div>
       ) : (
@@ -77,7 +78,7 @@ export default async function CadastroPage({
 
       <p className="mt-8">
         <Link href="/entrar" className="type-label inline-flex min-h-11 items-center text-accent underline-offset-4 hover:underline">
-          {t.cadastroJaTem}
+          <TextoRico valor={t.cadastroJaTem} linha />
         </Link>
       </p>
     </section>

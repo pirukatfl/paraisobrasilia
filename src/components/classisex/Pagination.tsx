@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Previous/next links that keep the current filters (D-07). */
 export async function Pagination({
@@ -28,15 +28,15 @@ export async function Pagination({
     <nav aria-label="Paginação" className="mt-8 flex flex-wrap items-center gap-4">
       {page > 1 && (
         <Link href={href(page - 1)} className="btn-secondary">
-          {t.paginacaoAnteriores}
+          <TextoRico valor={t.paginacaoAnteriores} linha />
         </Link>
       )}
       <p className="type-label text-muted">
-        {preencher(t.paginacaoPagina, { pagina: Math.min(page, totalPages), total: totalPages })}
+        <TextoRico valor={t.paginacaoPagina} vars={{ pagina: Math.min(page, totalPages), total: totalPages }} linha />
       </p>
       {page < totalPages && (
         <Link href={href(page + 1)} className="btn-secondary">
-          {t.paginacaoProximos}
+          <TextoRico valor={t.paginacaoProximos} linha />
         </Link>
       )}
     </nav>

@@ -2,8 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { ContoCardDTO } from '@/lib/contos/dto'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { juntarComPonto, TextoRico } from '@/components/TextoRico'
 
 /** One conto in a list: optional image, title, date, author nickname and the first lines (open part only). */
 export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: string }) {
@@ -31,13 +31,16 @@ export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: st
         </h2>
         {(conto.dateLabel || conto.assinadoComo) && (
           <p className="type-label mt-1 text-muted">
-            {[conto.dateLabel, conto.assinadoComo ? preencher(t.contoPor, { nome: conto.assinadoComo }) : ''].filter(Boolean).join(' · ')}
+            {juntarComPonto([
+            conto.dateLabel,
+            conto.assinadoComo ? <TextoRico valor={t.contoPor} vars={{ nome: conto.assinadoComo }} linha /> : null,
+          ])}
           </p>
         )}
         <p className="mt-3 flex-1 text-body text-muted">{conto.chamada}</p>
         <p className="mt-4">
           <Link href={href} className="type-label font-semibold text-accent underline underline-offset-4">
-            {preencher(t.cardLer, { titulo: conto.title })}
+            <TextoRico valor={t.cardLer} vars={{ titulo: conto.title }} linha />
           </Link>
         </p>
       </div>

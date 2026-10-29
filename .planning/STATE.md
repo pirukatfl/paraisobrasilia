@@ -165,6 +165,7 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 | 2026-10-26 | recados-fora-do-painel | Area "Recados" de Textos do site oculta no painel (`ocultaNoPainel`), sem migracao; guia atualizado (see .planning/quick/2026-10-26-recados-fora-do-painel/) |
 | 2026-10-27 | classisex-mais-contatos | ClassiSex: e-mail, links de outras plataformas (ate 5) e observacao no contato do anuncio, so assinantes veem; migracoes 20261027_190955_classisex_mais_contatos e 20261027_191302_classisex_mais_contatos_textos; gate: Vitest unit 499 + int 402, Playwright 122 passed (see .planning/quick/2026-10-27-classisex-mais-contatos/) |
 | 2026-10-28 | textos-formatados | Textos longos do site (46 campos) viram editor Lexical (negrito, itálico, sublinhado, listas, links) renderizado por conversores em lista branca; migração 20261028_165121_textos_formatados preserva os textos salvos (see .planning/quick/2026-10-28-textos-formatados/) |
+| 2026-10-28 | todos-textos-formatados | Todos os Textos do site viram editor (bloco 52, linha 499 com negrito/italico/sublinhado/riscado, soTexto 45 com aviso); migracao 20261028_224917_todos_textos_formatados; gate: Vitest unit 528 + int 407, build ok, Playwright 569 passed, 9 falhas ja existentes na base (see .planning/quick/2026-10-28-todos-textos-formatados/) |
 
 ## Deferred Items
 

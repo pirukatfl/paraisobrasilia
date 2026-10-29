@@ -7,7 +7,7 @@ import type { MemberPhotoDTO, MemberVideoDTO } from '@/lib/classisex/dto'
 import type { LightboxSlide } from '@/lib/gallery/types'
 import { useHydrated } from '@/lib/gallery/use-hydrated'
 import type { Textos } from '@/lib/textos/areas'
-import { preencher } from '@/lib/textos/mesclar'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * Photos and video of a full ad (CLAS-02). Every URL is the protected route
@@ -107,9 +107,11 @@ export function MediaGallery({
             src={video.src}
             className="aspect-video w-full rounded-lg border border-line bg-surface"
           />
-          <figcaption className="type-label mt-2 text-muted">{videos.length > 1
-              ? preencher(t.galeriaVideoVarios, { n: i + 1, duracao: video.durationLabel })
-              : preencher(t.galeriaVideoUm, { duracao: video.durationLabel })}
+          <figcaption className="type-label mt-2 text-muted">{videos.length > 1 ? (
+              <TextoRico valor={t.galeriaVideoVarios} vars={{ n: i + 1, duracao: video.durationLabel }} linha />
+            ) : (
+              <TextoRico valor={t.galeriaVideoUm} vars={{ duracao: video.durationLabel }} linha />
+            )}
           </figcaption>
         </figure>
       ))}

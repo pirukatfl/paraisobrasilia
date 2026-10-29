@@ -25,18 +25,18 @@ function SelfDeclarationPrompt({ onVerified, textos }: { onVerified: () => void;
         className="mx-auto h-auto w-40 mix-blend-lighten"
       />
       <h2 id="age-gate-titulo" className="type-heading mt-6">
-        {textos.titulo}
+        <TextoRico valor={textos.titulo} linha />
       </h2>
       <TextoRico id="age-gate-texto" valor={textos.texto} className="mt-4 text-body text-muted" />
       <button type="button" data-age-primary onClick={onVerified} className="btn-primary mt-8 w-full">
-        {textos.botaoEntrar}
+        <TextoRico valor={textos.botaoEntrar} linha />
       </button>
       <button
         type="button"
         onClick={() => window.location.assign('https://www.google.com')}
         className="type-label mt-4 inline-flex min-h-11 min-w-11 items-center justify-center px-6 text-muted underline-offset-4 hover:underline"
       >
-        {textos.botaoSair}
+        <TextoRico valor={textos.botaoSair} linha />
       </button>
     </div>
   )

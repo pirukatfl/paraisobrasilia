@@ -10,10 +10,10 @@ import { selfDeclaration } from './self-declaration'
  * Pages never know which provider is active; the gate never redirects or hides HTML.
  */
 export type AgeGateTextos = {
-  titulo: string
+  titulo: TextoRico
   texto: TextoRico
-  botaoEntrar: string
-  botaoSair: string
+  botaoEntrar: TextoRico
+  botaoSair: TextoRico
 }
 
 export interface AgeVerifier {

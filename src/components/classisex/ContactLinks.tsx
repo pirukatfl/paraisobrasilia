@@ -1,7 +1,7 @@
 import { ExternalLink } from '@/components/ExternalLink'
 import type { MemberAdDTO } from '@/lib/classisex/dto'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Links typed by the advertiser: search engines must not follow them (user-generated content). */
 const AD_LINK_REL = 'noopener noreferrer nofollow ugc'
@@ -14,23 +14,23 @@ export async function ContactLinks({ contato }: { contato: MemberAdDTO['contato'
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         {contato.whatsapp && (
           <ExternalLink href={contato.whatsapp.href} className="btn-primary">
-            {t.contatoWhatsapp}
+            <TextoRico valor={t.contatoWhatsapp} linha />
           </ExternalLink>
         )}
         {contato.telegram && (
           <ExternalLink href={contato.telegram.href} className="btn-secondary">
-            {preencher(t.contatoTelegram, { contato: contato.telegram.label })}
+            <TextoRico valor={t.contatoTelegram} vars={{ contato: contato.telegram.label }} linha />
           </ExternalLink>
         )}
         {contato.email && (
           <a href={contato.email.href} className="btn-secondary">
-            {t.contatoEmail}: {contato.email.label}
+            <TextoRico valor={t.contatoEmail} linha />: {contato.email.label}
           </a>
         )}
       </div>
       {contato.links.length > 0 && (
         <div className="flex flex-col gap-2">
-          <p className="type-label text-muted">{t.contatoLinksTitulo}</p>
+          <p className="type-label text-muted"><TextoRico valor={t.contatoLinksTitulo} linha /></p>
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             {contato.links.map((link) => (
               <ExternalLink key={link.href} href={link.href} rel={AD_LINK_REL} className="btn-secondary">
@@ -42,7 +42,7 @@ export async function ContactLinks({ contato }: { contato: MemberAdDTO['contato'
       )}
       {contato.observacao && (
         <p className="type-label text-muted">
-          {t.contatoObservacao}: {contato.observacao}
+          <TextoRico valor={t.contatoObservacao} linha />: {contato.observacao}
         </p>
       )}
     </div>

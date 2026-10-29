@@ -3,9 +3,9 @@ import type { Field, GlobalAfterChangeHook, GlobalConfig } from 'payload'
 import { isStaff } from '../access/roles'
 import { expire } from '../lib/cache/expire'
 import { AREAS } from '../lib/textos/areas'
-import { editorDosTextos } from '../lib/textos/editor'
+import { editorBloco, editorLinha } from '../lib/textos/editor'
 import { textoParaRico } from '../lib/textos/rico'
-import { type AreaTextos, campoEhFormatado, campoEhLongo } from '../lib/textos/tipos'
+import { ajudaDoCampo, type AreaTextos, campoEhBloco } from '../lib/textos/tipos'
 
 /**
  * One global per area of editable site texts (PAINEL-10, 06.2). Fields are never required and start
@@ -25,17 +25,16 @@ export function criarGlobalDeTextos(area: AreaTextos, chave: string = chaveDoSlu
   const fields: Field[] = []
   const secoes = new Map<string, Field[]>()
   for (const [name, campo] of Object.entries(area.campos)) {
-    const base = {
+    const ajuda = ajudaDoCampo(campo)
+    // Every text is Lexical JSON; the default is the original text so the editor shows what the site says
+    const field: Field = {
       name,
       label: campo.rotulo,
-      admin: campo.ajuda ? { description: campo.ajuda } : {},
+      admin: ajuda ? { description: ajuda } : {},
+      type: 'richText',
+      editor: campoEhBloco(campo) ? editorBloco : editorLinha,
+      defaultValue: textoParaRico(campo.padrao),
     }
-    // Formatted texts are Lexical JSON; the default is the original text so the editor shows what the site says
-    const field: Field = campoEhFormatado(campo)
-      ? { ...base, type: 'richText', editor: editorDosTextos, defaultValue: textoParaRico(campo.padrao) }
-      : campoEhLongo(campo)
-        ? { ...base, type: 'textarea', defaultValue: campo.padrao }
-        : { ...base, type: 'text', defaultValue: campo.padrao }
     if (!campo.secao) {
       fields.push(field)
       continue
@@ -49,15 +48,13 @@ export function criarGlobalDeTextos(area: AreaTextos, chave: string = chaveDoSlu
     grupo.push(field)
   }
 
-  const temFormatado = Object.values(area.campos).some(campoEhFormatado)
-
   return {
     slug: area.slug,
     label: area.rotulo,
     admin: {
       group: 'Textos do site',
       hidden: area.ocultaNoPainel ?? false,
-      description: `${area.descricao} ${temFormatado ? 'Selecione palavras para negrito, itálico, sublinhado, link ou lista. ' : ''}Para voltar ao texto original, apague o campo e salve.`,
+      description: `${area.descricao} Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.`,
     },
     access: {
       // Public site copy, nothing sensitive

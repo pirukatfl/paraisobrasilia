@@ -10,14 +10,15 @@ import { MediaGallery } from '@/components/classisex/MediaGallery'
 import { ReportForm } from '@/components/classisex/ReportForm'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberAd, isOwnAd } from '@/lib/classisex/queries'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('classisex')
-  return { title: t.anuncioGoogleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.anuncioGoogleTitulo), robots: { index: false, follow: false } }
 }
 
 /** Full ad with contacts (CLAS-02, D-05). Hidden ads (pending, refused, unpublished) are a plain 404; ads of free authors show only the cover (G-05). */
@@ -29,9 +30,9 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
     return (
       <section aria-labelledby="titulo-anuncio">
         <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-        <p className="type-eyebrow text-muted">{t.membrosTopo}</p>
+        <p className="type-eyebrow text-muted"><TextoRico valor={t.membrosTopo} linha /></p>
         <h1 id="titulo-anuncio" className="type-display mt-2">
-          {t.membrosTitulo}
+          <TextoRico valor={t.membrosTitulo} linha />
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -44,12 +45,12 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
   return (
     <article aria-labelledby="titulo-anuncio" className="max-w-[720px]">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.anuncioTopo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.anuncioTopo} linha /></p>
       <h1 id="titulo-anuncio" className="type-display mt-2">
         {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </h1>
-      <p className="type-label mt-2 text-muted">{preencher(t.anuncioPublicadoEm, { data: ad.publishedLabel })}</p>
+      <p className="type-label mt-2 text-muted"><TextoRico valor={t.anuncioPublicadoEm} vars={{ data: ad.publishedLabel }} linha /></p>
       <MediaGallery
         fotos={ad.fotos}
         videos={ad.videos}
@@ -58,12 +59,12 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
       <p className="mt-6 whitespace-pre-line text-body">{ad.texto}</p>
       <section aria-labelledby="titulo-contato" className="mt-8">
         <h2 id="titulo-contato" className="type-heading mb-4">
-          {t.anuncioContato}
+          <TextoRico valor={t.anuncioContato} linha />
         </h2>
         <ContactLinks contato={ad.contato} />
         {canReport &&
           (ad.autorGratuito ? (
-            <p className="type-label mt-4 text-muted">{t.anuncioRecadoGratuito}</p>
+            <p className="type-label mt-4 text-muted"><TextoRico valor={t.anuncioRecadoGratuito} linha /></p>
           ) : (
             <EnviarRecadoLink id={ad.id} />
           ))}
@@ -87,7 +88,7 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
       )}
       <p className="mt-10">
         <Link href="/area-do-assinante/classisex" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.anuncioVoltar}
+          <TextoRico valor={t.anuncioVoltar} linha />
         </Link>
       </p>
     </article>

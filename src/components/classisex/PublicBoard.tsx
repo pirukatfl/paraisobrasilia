@@ -5,6 +5,7 @@ import { EmptyState } from '@/components/EmptyState'
 import type { BoardFilters, BoardPage } from '@/lib/classisex/board'
 import type { PublicAdDTO } from '@/lib/classisex/dto'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /**
  * The open ClassiSex board (public DTOs only): filter by Eu sou, cards with the redacted text and
@@ -41,15 +42,15 @@ export async function PublicBoard({
       {result.items.length === 0 ? (
         filtered ? (
           <EmptyState
-            heading={t.vazioFiltroTitulo}
+            heading={<TextoRico valor={t.vazioFiltroTitulo} linha />}
             body={t.vazioFiltroPublicoTexto}
-            actions={[{ href: basePath, label: t.vazioVerTodos, variant: 'secondary' }]}
+            actions={[{ href: basePath, label: <TextoRico valor={t.vazioVerTodos} linha />, variant: 'secondary' }]}
           />
         ) : (
           <EmptyState
-            heading={t.vazioTitulo}
+            heading={<TextoRico valor={t.vazioTitulo} linha />}
             body={t.vazioPublicoTexto}
-            actions={signedIn ? [] : [{ href: '/assine-ja', label: t.vazioPublicoBotao, variant: 'primary' }]}
+            actions={signedIn ? [] : [{ href: '/assine-ja', label: <TextoRico valor={t.vazioPublicoBotao} linha />, variant: 'primary' }]}
           />
         )
       ) : (

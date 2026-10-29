@@ -39,6 +39,7 @@ import * as migration_20261026_032443_textos_do_site from './20261026_032443_tex
 import * as migration_20261027_190955_classisex_mais_contatos from './20261027_190955_classisex_mais_contatos';
 import * as migration_20261027_191302_classisex_mais_contatos_textos from './20261027_191302_classisex_mais_contatos_textos';
 import * as migration_20261028_165121_textos_formatados from './20261028_165121_textos_formatados';
+import * as migration_20261028_224917_todos_textos_formatados from './20261028_224917_todos_textos_formatados';
 
 export const migrations = [
   {
@@ -244,6 +245,11 @@ export const migrations = [
   {
     up: migration_20261028_165121_textos_formatados.up,
     down: migration_20261028_165121_textos_formatados.down,
-    name: '20261028_165121_textos_formatados'
+    name: '20261028_165121_textos_formatados',
+  },
+  {
+    up: migration_20261028_224917_todos_textos_formatados.up,
+    down: migration_20261028_224917_todos_textos_formatados.down,
+    name: '20261028_224917_todos_textos_formatados',
   },
 ];

@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import type { InboxItemDTO } from '@/lib/mensagens/dto'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Conversations of the viewer, newest first. */
 export async function InboxList({ items }: { items: InboxItemDTO[] }) {
@@ -20,7 +21,7 @@ export async function InboxList({ items }: { items: InboxItemDTO[] }) {
             </span>
             <span className="type-label text-muted">{c.assunto}</span>
             <span className="flex items-center gap-2 text-body">
-              {c.naoLida && <span className="type-eyebrow text-accent">{t.novaMarca}</span>}
+              {c.naoLida && <span className="type-eyebrow text-accent"><TextoRico valor={t.novaMarca} linha /></span>}
               <span className={c.naoLida ? 'font-semibold' : undefined}>{c.ultimo}</span>
             </span>
           </Link>

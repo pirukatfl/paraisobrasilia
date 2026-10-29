@@ -10,12 +10,14 @@ import { tierOf } from '@/lib/assinantes/tier'
 import { getOwnAds } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
+import type { ReactNode } from 'react'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('meusAnuncios')
-  return { title: t.listaGoogleTitulo, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.listaGoogleTitulo), robots: { index: false, follow: false } }
 }
 
 /**
@@ -29,7 +31,7 @@ export default async function MeusAnunciosPage({
 }) {
   const assinante = await requireAssinante('/area-do-assinante/meus-anuncios')
   const t = await getTextos('meusAnuncios')
-  const OK: Record<string, string> = { enviado: t.listaOkEnviado, apagado: t.listaOkApagado }
+  const OK: Record<string, ReactNode> = { enviado: <TextoRico valor={t.listaOkEnviado} linha />, apagado: <TextoRico valor={t.listaOkApagado} linha /> }
   const [ads, access, params] = await Promise.all([getOwnAds(assinante.id), getAccessStatus(assinante.id), searchParams])
   const tier = tierOf(access)
   const hasOldAds = ads.some((ad) => ad.antigo)
@@ -52,19 +54,19 @@ export default async function MeusAnunciosPage({
           Não foi possível apagar o anúncio por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.
         </p>
       )}
-      <p className="type-eyebrow text-muted">{t.topo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.topo} linha /></p>
       <h1 id="titulo-meus-anuncios" className="type-display mt-2">
-        {t.listaTitulo}
+        <TextoRico valor={t.listaTitulo} linha />
       </h1>
       <TextoRico valor={t.listaIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       {hasOldAds && (
         <TextoRico valor={t.listaAvisoAntigo} role="note" className="mt-6 max-w-[680px] rounded-lg border border-accent px-4 py-2 text-body" />
       )}
       <Link href="/area-do-assinante/meus-anuncios/novo" className="btn-primary mt-6">
-        {t.listaBotaoNovo}
+        <TextoRico valor={t.listaBotaoNovo} linha />
       </Link>
       {ads.length === 0 ? (
-        <p className="mt-8 text-body">{t.listaVazio}</p>
+        <p className="mt-8 text-body"><TextoRico valor={t.listaVazio} linha /></p>
       ) : (
         <div className="mt-8 flex max-w-[720px] flex-col gap-4">
           {ads.map((ad) => (

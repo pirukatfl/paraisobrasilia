@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import type { SpaceItemDTO } from '@/lib/gallery/types'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Home "Conheça o espaço" (UI-SPEC S2'): up to 6 photos, lazy, card derivative; hidden when empty. */
 export async function SpaceTeaser({ photos }: { photos: SpaceItemDTO[] }) {
@@ -11,7 +12,7 @@ export async function SpaceTeaser({ photos }: { photos: SpaceItemDTO[] }) {
   return (
     <section aria-labelledby="titulo-conheca-espaco" className="mt-12">
       <h2 id="titulo-conheca-espaco" className="type-heading">
-        {t.espacoTitulo}
+        <TextoRico valor={t.espacoTitulo} linha />
       </h2>
       <ul role="list" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
         {photos.map((photo) => (
@@ -29,7 +30,7 @@ export async function SpaceTeaser({ photos }: { photos: SpaceItemDTO[] }) {
         ))}
       </ul>
       <Link href="/espaco" className="btn-secondary mt-6">
-        {t.espacoBotao}
+        <TextoRico valor={t.espacoBotao} linha />
       </Link>
     </section>
   )

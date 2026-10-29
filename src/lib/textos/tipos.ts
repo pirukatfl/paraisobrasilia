@@ -11,14 +11,18 @@ export type CampoTexto = {
   padrao: string
   /** Admin collapsible the field is grouped under. */
   secao?: string
-  /** Force textarea (true) or single line (false). Omitted: textarea when long or multi-line. */
-  longo?: boolean
   /**
-   * Rich-text editor (bold, italic, underline, lists, links). Set `true` explicitly on every long text that
-   * renders as a block of site copy; `false` on long texts that feed `<meta>`, attributes, labels or e-mails.
-   * Omitted: plain text. The literal `true` is what types the field as `TextoRico` in `Textos<K>`.
+   * Every field is a rich-text editor. `true`: full block editor (paragraphs, lists, links), for long
+   * copy that renders as a block. Omitted: line editor (bold, italic, underline, strikethrough only), for
+   * titles, buttons, labels and other short texts that sit inside `<a>`, `<button>`, `<h2>`.
    */
-  formatado?: boolean
+  bloco?: true
+  /**
+   * The destination only takes plain text (`<meta>`, `<title>`, attributes, `<option>`, e-mail, strings
+   * handed to libraries). The editor is still there, the site shows `textoPuro(...)` and the admin warns
+   * that formatting does not show.
+   */
+  soTexto?: true
   /** Help text under the field; must mention every {variable} of `padrao`. */
   ajuda?: string
 }
@@ -44,15 +48,20 @@ export function definirArea<const C extends Record<string, CampoTexto>>(area: {
 }
 
 export type TextosDaArea<A extends { campos: Record<string, CampoTexto> }> = {
-  [K in keyof A['campos']]: A['campos'][K] extends { readonly formatado: true } ? TextoRico : string
+  [K in keyof A['campos']]: TextoRico
 }
 
-/** Textarea for long or multi-line defaults unless the field says otherwise. */
-export function campoEhLongo(campo: CampoTexto): boolean {
-  return campo.longo ?? (campo.padrao.length > 90 || campo.padrao.includes('\n'))
+/** Full block editor (paragraphs, lists, links) instead of the line editor. */
+export function campoEhBloco(campo: CampoTexto): boolean {
+  return campo.bloco === true
 }
 
-/** Fields saved as Lexical JSON instead of a string. */
-export function campoEhFormatado(campo: CampoTexto): boolean {
-  return campo.formatado === true
+/** Notice for fields whose destination drops the formatting. */
+export const AVISO_SO_TEXTO =
+  'Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.'
+
+/** Admin help of a field: its own help plus the plain-text notice when the destination drops formatting. */
+export function ajudaDoCampo(campo: CampoTexto): string | undefined {
+  const partes = [campo.ajuda, campo.soTexto ? AVISO_SO_TEXTO : undefined].filter((p): p is string => Boolean(p))
+  return partes.length > 0 ? partes.join(' ') : undefined
 }

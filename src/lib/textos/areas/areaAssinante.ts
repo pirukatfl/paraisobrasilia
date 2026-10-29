@@ -6,7 +6,7 @@ export const areaAssinante = definirArea({
   descricao: 'Textos fixos da área do assinante: início, minha assinatura, trocar senha e avisos de renovação.',
   campos: {
     // Início da área
-    googleTitulo: { rotulo: 'Título no Google', padrao: 'Área do assinante', secao: 'Início da área' },
+    googleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Área do assinante', secao: 'Início da área' },
     etiqueta: { rotulo: 'Frase pequena acima do título (início e trocar senha)', padrao: 'Área do assinante', secao: 'Início da área' },
     senhaAlterada: { rotulo: 'Aviso de senha alterada', padrao: 'Senha alterada.', secao: 'Início da área' },
     saudacao: {
@@ -22,9 +22,9 @@ export const areaAssinante = definirArea({
       secao: 'Início da área',
       ajuda: 'Use {tipo} para o tipo da conta (veja o campo abaixo).',
     },
-    contaTipoGratuita: { rotulo: 'Nome da conta grátis', padrao: 'Conta gratuita', secao: 'Início da área' },
+    contaTipoGratuita: { soTexto: true, rotulo: 'Nome da conta grátis', padrao: 'Conta gratuita', secao: 'Início da área' },
     contaTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto da conta grátis',
       padrao:
         'Você pode publicar até 3 anúncios com 1 foto cada. Também lê os anúncios dos outros, sem os contatos e só com a foto de capa. Para ver o contato, todas as fotos e os vídeos e para trocar recados, assine.',
@@ -40,7 +40,7 @@ export const areaAssinante = definirArea({
     },
 
     // Trocar senha
-    senhaGoogleTitulo: { rotulo: 'Título no Google', padrao: 'Trocar senha', secao: 'Trocar senha' },
+    senhaGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Trocar senha', secao: 'Trocar senha' },
     senhaTitulo: { rotulo: 'Título da página', padrao: 'Trocar senha', secao: 'Trocar senha' },
     senhaCampoAtual: { rotulo: 'Campo da senha atual', padrao: 'Senha atual', secao: 'Trocar senha' },
     senhaCampoNova: { rotulo: 'Campo da nova senha', padrao: 'Nova senha', secao: 'Trocar senha' },
@@ -105,8 +105,9 @@ export const areaAssinante = definirArea({
       secao: 'Faixa de renovação (topo do site)',
       ajuda: 'Use {data} para a data e {quando} para "último dia" ou "faltam N dias".',
     },
-    renovUltimoDia: { rotulo: 'Faixa: "último dia"', padrao: 'último dia', secao: 'Faixa de renovação (topo do site)' },
+    renovUltimoDia: { soTexto: true, rotulo: 'Faixa: "último dia"', padrao: 'último dia', secao: 'Faixa de renovação (topo do site)' },
     renovFaltam: {
+      soTexto: true,
       rotulo: 'Faixa: "faltam N dias"',
       padrao: 'faltam {dias} dias',
       secao: 'Faixa de renovação (topo do site)',
@@ -121,7 +122,7 @@ export const areaAssinante = definirArea({
       secao: 'Aviso nas páginas só para assinantes',
     },
     inativoTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto do aviso (conta grátis)',
       padrao:
         'Com a conta gratuita você publica seus anúncios em Meus anúncios e lê os anúncios dos outros (sem os contatos e só com a foto de capa). Assine para ver o contato, todas as fotos e os vídeos e para mandar e receber recados.',

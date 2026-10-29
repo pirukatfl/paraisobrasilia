@@ -3,16 +3,20 @@ import Link from 'next/link'
 import type { OwnerAdDTO } from '@/lib/classisex/dto'
 import { apagarAnuncio } from '@/lib/classisex/actions'
 import type { Textos } from '@/lib/textos/areas'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { juntarComPonto, TextoRico } from '@/components/TextoRico'
 
 const mediaSummary = (t: Textos<'meusAnuncios'>, fotos: number, videos: number) =>
-  [
-    fotos === 0 ? t.donoSemFotos : fotos === 1 ? t.donoUmaFoto : preencher(t.donoFotos, { n: fotos }),
-    videos === 0 ? null : videos === 1 ? t.donoUmVideo : preencher(t.donoVideos, { n: videos }),
-  ]
-    .filter(Boolean)
-    .join(' · ')
+  juntarComPonto([
+    fotos === 0 ? (
+      <TextoRico valor={t.donoSemFotos} linha />
+    ) : fotos === 1 ? (
+      <TextoRico valor={t.donoUmaFoto} linha />
+    ) : (
+      <TextoRico valor={t.donoFotos} vars={{ n: fotos }} linha />
+    ),
+    videos === 0 ? null : videos === 1 ? <TextoRico valor={t.donoUmVideo} linha /> : <TextoRico valor={t.donoVideos} vars={{ n: videos }} linha />,
+  ])
 
 /** One ad in Meus anúncios (owner view): status, refusal reason, text, contacts, edit/delete. */
 export async function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: boolean }) {
@@ -25,11 +29,11 @@ export async function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: bo
         <p className={`type-eyebrow ${published ? 'text-accent' : 'text-muted'}`}>
           {ad.motivo ? `${ad.statusLabel}: ${ad.motivo}` : ad.statusLabel}
         </p>
-        <p className="type-label text-muted">{preencher(t.donoAtualizadoEm, { data: ad.updatedLabel })}</p>
+        <p className="type-label text-muted"><TextoRico valor={t.donoAtualizadoEm} vars={{ data: ad.updatedLabel }} linha /></p>
       </div>
-      {draft && <p className="mt-3 text-body text-muted">{t.donoRascunho}</p>}
+      {draft && <p className="mt-3 text-body text-muted"><TextoRico valor={t.donoRascunho} linha /></p>}
       {ad.motivo && (
-        <p className="mt-3 text-body text-muted">{t.donoCorrigir}</p>
+        <p className="mt-3 text-body text-muted"><TextoRico valor={t.donoCorrigir} linha /></p>
       )}
       <div className="mt-3 flex items-start gap-4">
         {ad.capa && (
@@ -55,34 +59,34 @@ export async function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: bo
       <p className="mt-2 whitespace-pre-line text-body">{ad.texto}</p>
       <ul className="type-label mt-3 flex flex-col gap-1 text-muted">
         {ad.contato.whatsapp && <li>
-            {t.donoWhatsapp}: {ad.contato.whatsapp}
+            <TextoRico valor={t.donoWhatsapp} linha />: {ad.contato.whatsapp}
           </li>}
         {ad.contato.telegram && <li>
-            {t.donoTelegram}: @{ad.contato.telegram}
+            <TextoRico valor={t.donoTelegram} linha />: @{ad.contato.telegram}
           </li>}
         {ad.contato.email && <li>
-            {t.donoEmail}: {ad.contato.email}
+            <TextoRico valor={t.donoEmail} linha />: {ad.contato.email}
           </li>}
         {ad.contato.links.length > 0 && <li className="break-all">
-            {t.donoLinks}: {ad.contato.links.join(', ')}
+            <TextoRico valor={t.donoLinks} linha />: {ad.contato.links.join(', ')}
           </li>}
         {ad.contato.observacao && <li>
-            {t.donoObservacao}: {ad.contato.observacao}
+            <TextoRico valor={t.donoObservacao} linha />: {ad.contato.observacao}
           </li>}
       </ul>
       <div className="mt-4 flex flex-wrap items-start gap-4">
         {canEdit && (
           <Link href={`/area-do-assinante/meus-anuncios/${ad.id}/editar`} className={draft ? 'btn-primary' : 'btn-secondary'}>
-            {draft ? t.donoRevisar : t.donoEditar}
+            {draft ? <TextoRico valor={t.donoRevisar} linha /> : <TextoRico valor={t.donoEditar} linha />}
           </Link>
         )}
         <details className="group">
-          <summary className="btn-secondary cursor-pointer list-none">{t.donoApagar}</summary>
+          <summary className="btn-secondary cursor-pointer list-none"><TextoRico valor={t.donoApagar} linha /></summary>
           <form action={apagarAnuncio} className="mt-3 flex flex-col gap-2">
             <input type="hidden" name="id" value={ad.id} />
-            <p className="text-body">{t.donoApagarConfirma}</p>
+            <p className="text-body"><TextoRico valor={t.donoApagarConfirma} linha /></p>
             <button type="submit" className="btn-primary">
-              {t.donoApagarSim}
+              <TextoRico valor={t.donoApagarSim} linha />
             </button>
           </form>
         </details>

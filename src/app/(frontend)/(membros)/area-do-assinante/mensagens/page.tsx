@@ -9,12 +9,14 @@ import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getInbox } from '@/lib/mensagens/queries'
 import { parsePage } from '@/lib/mensagens/rules'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('mensagens')
-  return { title: t.googleLista, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.googleLista), robots: { index: false, follow: false } }
 }
 
 const PATH = '/area-do-assinante/mensagens'
@@ -30,11 +32,11 @@ export default async function MensagensPage({
   const header = (
     <>
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.eyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.eyebrow} linha /></p>
       <h1 id="titulo-mensagens" className="type-display mt-2">
-        {t.titulo}
+        <TextoRico valor={t.titulo} linha />
       </h1>
-      <p className="mt-2 max-w-[560px] text-body text-muted">{t.intro}</p>
+      <p className="mt-2 max-w-[560px] text-body text-muted"><TextoRico valor={t.intro} linha /></p>
     </>
   )
   if (check.inactive) {
@@ -52,10 +54,10 @@ export default async function MensagensPage({
       {header}
       {inbox.items.length === 0 ? (
         <EmptyState
-          heading={t.vazioTitulo}
+          heading={<TextoRico valor={t.vazioTitulo} linha />}
           body={t.vazioTexto}
           actions={[
-            { href: '/area-do-assinante/classisex', label: t.vazioBotao, variant: 'secondary' },
+            { href: '/area-do-assinante/classisex', label: <TextoRico valor={t.vazioBotao} linha />, variant: 'secondary' },
           ]}
         />
       ) : (

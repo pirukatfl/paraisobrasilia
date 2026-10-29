@@ -9,6 +9,7 @@ import { getPageIntro } from '@/lib/pages/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 // Rendered per request, never at build time: the Docker/CI build has no database.
 // The data itself stays in the Next data cache (unstable_cache, tags 'parties', 'space',
@@ -39,22 +40,22 @@ export default async function HomePage() {
     <>
       {hasParties ? (
         <section aria-labelledby="titulo-proximas-festas">
-          <p className="type-eyebrow text-muted">{t.chamadaTopo}</p>
+          <p className="type-eyebrow text-muted"><TextoRico valor={t.chamadaTopo} linha /></p>
           <h1 id="titulo-proximas-festas" className="type-display mt-2">
-            {t.tituloProximasFestas}
+            <TextoRico valor={t.tituloProximasFestas} linha />
           </h1>
           <PartyGrid parties={parties} />
         </section>
       ) : (
         <>
-          <p className="type-eyebrow text-muted">{t.chamadaTopo}</p>
-          <h1 className="type-display mt-2">{t.tituloSemFestas}</h1>
+          <p className="type-eyebrow text-muted"><TextoRico valor={t.chamadaTopo} linha /></p>
+          <h1 className="type-display mt-2"><TextoRico valor={t.tituloSemFestas} linha /></h1>
           <section aria-labelledby="titulo-proximas-festas" className="mt-8 max-w-[480px]">
             <h2 id="titulo-proximas-festas" className="type-heading">
-              {t.tituloProximasFestas}
+              <TextoRico valor={t.tituloProximasFestas} linha />
             </h2>
-            <p className="type-label mt-4 text-text">{t.semFestasTitulo}</p>
-            <p className="mt-2 text-body text-muted">{t.semFestasTexto}</p>
+            <p className="type-label mt-4 text-text"><TextoRico valor={t.semFestasTitulo} linha /></p>
+            <p className="mt-2 text-body text-muted"><TextoRico valor={t.semFestasTexto} linha /></p>
           </section>
         </>
       )}

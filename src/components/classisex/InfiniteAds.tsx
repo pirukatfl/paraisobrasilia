@@ -7,6 +7,7 @@ import { PublicAdCard } from '@/components/classisex/PublicAdCard'
 import type { MemberAdDTO, PublicAdDTO } from '@/lib/classisex/dto'
 import { loadMoreClassisex } from '@/lib/classisex/more-actions'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 type AnyAd = MemberAdDTO | PublicAdDTO
 
@@ -96,7 +97,7 @@ export function InfiniteAds({
       <div className="mt-8 flex flex-col items-center gap-3" data-infinite-status>
         {loading && (
           <p role="status" className="type-label text-muted">
-            {t.carregando}
+            <TextoRico valor={t.carregando} linha />
           </p>
         )}
         {failed && (
@@ -106,10 +107,10 @@ export function InfiniteAds({
         )}
         {!done && !loading && (
           <button type="button" className="btn-secondary" onClick={() => void loadNext()}>
-            {t.carregarMais}
+            <TextoRico valor={t.carregarMais} linha />
           </button>
         )}
-        {done && pages > 1 && <p className="type-label text-muted">{t.fimDaLista}</p>}
+        {done && pages > 1 && <p className="type-label text-muted"><TextoRico valor={t.fimDaLista} linha /></p>}
       </div>
     </>
   )

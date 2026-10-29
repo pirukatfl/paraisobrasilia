@@ -6,6 +6,7 @@ import { useActionState } from 'react'
 import { FormField } from '@/components/assinantes/FormField'
 import { cadastrar, type CadastroState } from '@/lib/assinantes/actions'
 import type { Textos } from '@/lib/textos/areas'
+import { TextoRico } from '@/components/TextoRico'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-[var(--color-accent)]'
 
@@ -24,26 +25,26 @@ export function SignupForm({ textos: t }: { textos: Textos<'conta'> }) {
           {errors.form}
         </p>
       )}
-      <FormField id="cad-email" name="email" type="email" label={t.campoEmail} autoComplete="email" defaultValue={values?.email} error={errors.email} />
+      <FormField id="cad-email" name="email" type="email" label={<TextoRico valor={t.campoEmail} linha />} autoComplete="email" defaultValue={values?.email} error={errors.email} />
       <FormField
         id="cad-senha"
         name="password"
         type="password"
-        label={t.formSenha}
+        label={<TextoRico valor={t.formSenha} linha />}
         autoComplete="new-password"
         minLength={8}
-        hint={t.formSenhaDica}
+        hint={<TextoRico valor={t.formSenhaDica} linha />}
         error={errors.senha}
       />
       <FormField
         id="cad-apelido"
         name="apelido"
         type="text"
-        label={t.formApelido}
+        label={<TextoRico valor={t.formApelido} linha />}
         autoComplete="nickname"
         maxLength={40}
         defaultValue={values?.apelido}
-        hint={t.formApelidoDica}
+        hint={<TextoRico valor={t.formApelidoDica} linha />}
         error={errors.apelido}
       />
       {/* Honeypot: people never see or fill it */}
@@ -54,7 +55,7 @@ export function SignupForm({ textos: t }: { textos: Textos<'conta'> }) {
       <div className="flex flex-col gap-1">
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="maior18" value="sim" defaultChecked={values?.maior18} className={checkbox} aria-describedby={errors.maior18 ? 'cad-maior18-erro' : undefined} />
-          <span>{t.formMaior18}</span>
+          <span><TextoRico valor={t.formMaior18} linha /></span>
         </label>
         {errors.maior18 && (
           <p id="cad-maior18-erro" role="alert" className="type-label text-danger">
@@ -66,13 +67,13 @@ export function SignupForm({ textos: t }: { textos: Textos<'conta'> }) {
         <label className="flex items-start gap-3 text-body text-text">
           <input type="checkbox" name="termos" value="sim" defaultChecked={values?.termos} className={checkbox} aria-describedby={errors.termos ? 'cad-termos-erro' : undefined} />
           <span>
-            {t.formTermosAntes}{' '}
+            <TextoRico valor={t.formTermosAntes} linha />{' '}
             <Link href="/termos-de-uso" className="text-accent underline underline-offset-4">
-              {t.formTermosLink}
+              <TextoRico valor={t.formTermosLink} linha />
             </Link>{' '}
-            {t.formTermosMeio}{' '}
+            <TextoRico valor={t.formTermosMeio} linha />{' '}
             <Link href="/politica-de-privacidade" className="text-accent underline underline-offset-4">
-              {t.formPoliticaLink}
+              <TextoRico valor={t.formPoliticaLink} linha />
             </Link>
           </span>
         </label>
@@ -83,7 +84,7 @@ export function SignupForm({ textos: t }: { textos: Textos<'conta'> }) {
         )}
       </div>
       <button type="submit" className="btn-primary mt-2" disabled={pending}>
-        {pending ? t.formEnviando : t.formBotao}
+        {pending ? <TextoRico valor={t.formEnviando} linha /> : <TextoRico valor={t.formBotao} linha />}
       </button>
     </form>
   )

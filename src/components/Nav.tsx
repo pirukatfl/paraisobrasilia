@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
+import { TextoRico } from '@/components/TextoRico'
 
 /** Desktop inline navigation (≥ 1024px). Active item: accent underline + aria-current. */
 export function Nav({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
@@ -29,7 +30,7 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
                   active ? 'border-accent text-text' : 'border-transparent text-muted'
                 }`}
               >
-                {item.label}
+                <TextoRico valor={item.label} linha />
               </Link>
             </li>
           )
@@ -41,7 +42,7 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
                 type="submit"
                 className="type-eyebrow inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-muted hover:text-accent"
               >
-                {t.menuSair}
+                <TextoRico valor={t.menuSair} linha />
               </button>
             </form>
           </li>

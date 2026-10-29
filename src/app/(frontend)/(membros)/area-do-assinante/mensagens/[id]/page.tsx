@@ -11,14 +11,15 @@ import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { responderMensagem } from '@/lib/mensagens/actions'
 import { MENSAGEM_MESSAGES } from '@/lib/mensagens/rules'
 import { getThreadFor, getThreadSafety } from '@/lib/mensagens/queries'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('mensagens')
-  return { title: t.googleConversa, robots: { index: false, follow: false } }
+  return { title: textoPuro(t.googleConversa), robots: { index: false, follow: false } }
 }
 
 /** One conversation (REC-02). Only its two participants get anything but a 404 (T-05-05). */
@@ -41,7 +42,7 @@ export default async function ConversaPage({
       <section aria-labelledby="titulo-conversa">
         <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
         <h1 id="titulo-conversa" className="type-display mt-2">
-          {t.titulo}
+          <TextoRico valor={t.titulo} linha />
         </h1>
         <InactivePanel access={check.access} />
       </section>
@@ -53,9 +54,9 @@ export default async function ConversaPage({
   return (
     <section aria-labelledby="titulo-conversa">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
-      <p className="type-eyebrow text-muted">{t.novoEyebrow}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.novoEyebrow} linha /></p>
       <h1 id="titulo-conversa" className="type-display mt-2">
-        {preencher(t.conversaTitulo, { nome: thread.outroApelido })}
+        <TextoRico valor={t.conversaTitulo} vars={{ nome: thread.outroApelido }} linha />
       </h1>
       <p className="type-label mt-2 text-muted">{thread.assunto}</p>
       {query.erro === 'inesperado' && (
@@ -69,15 +70,15 @@ export default async function ConversaPage({
       ) : (
         <section aria-labelledby="titulo-responder" className="mt-8">
           <h2 id="titulo-responder" className="type-heading">
-            {t.responderTitulo}
+            <TextoRico valor={t.responderTitulo} linha />
           </h2>
-          <MessageForm action={responderMensagem} hidden={{ conversa: String(thread.id) }} submitLabel={t.formEnviar} rows={3} textos={t} />
+          <MessageForm action={responderMensagem} hidden={{ conversa: String(thread.id) }} submitLabel={<TextoRico valor={t.formEnviar} linha />} rows={3} textos={t} />
         </section>
       )}
       <BlockReportPanel conversaId={thread.id} euBloqueei={euBloqueei} textos={t} />
       <p className="mt-8">
         <Link href="/area-do-assinante/mensagens" className="type-label text-muted underline underline-offset-4 hover:text-accent">
-          {t.voltar}
+          <TextoRico valor={t.voltar} linha />
         </Link>
       </p>
     </section>

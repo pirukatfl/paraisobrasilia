@@ -7,13 +7,15 @@ export const assine = definirArea({
   campos: {
     // Google
     googleTitulo: {
+      soTexto: true,
       rotulo: 'Título no Google',
       padrao: 'Assine Já',
       secao: 'Google',
       ajuda: 'Aparece na aba do navegador e no Google.',
     },
     googleDescricao: {
-      formatado: false,
+      bloco: true,
+      soTexto: true,
       rotulo: 'Descrição no Google',
       padrao:
         'Planos de assinatura do Paraíso Brasília: acesso à área de assinantes com perfis, fotos e contatos. Pague pelo PagBank e envie o comprovante pelo WhatsApp.',
@@ -24,7 +26,7 @@ export const assine = definirArea({
     topoEtiqueta: { rotulo: 'Frase pequena acima do título', padrao: 'Assinatura', secao: 'Topo da página' },
     topoTitulo: { rotulo: 'Título da página', padrao: 'Assine Já', secao: 'Topo da página' },
     topoTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto de apresentação',
       padrao:
         'A assinatura libera a área de assinantes do Paraíso: perfis completos do ClassiSex com fotos, vídeos e contatos, e recados privados entre assinantes.',
@@ -112,6 +114,7 @@ export const assine = definirArea({
     cartaoPagar: { rotulo: 'Botão de pagar', padrao: 'Pagar', secao: 'Planos' },
     cartaoWhatsapp: { rotulo: 'Botão de combinar pelo WhatsApp', padrao: 'Combinar pelo WhatsApp', secao: 'Planos' },
     cartaoWhatsappMensagem: {
+      soTexto: true,
       rotulo: 'Mensagem que abre no WhatsApp ao escolher um plano',
       padrao: 'Olá! Quero assinar o plano {plano}.',
       secao: 'Planos',
@@ -157,6 +160,7 @@ export const assine = definirArea({
       secao: 'Como assinar',
     },
     comprovanteMensagem: {
+      soTexto: true,
       rotulo: 'Mensagem que abre no WhatsApp ao enviar o comprovante',
       padrao: 'Olá! Fiz o pagamento da assinatura e vou enviar o comprovante. Meu nome: … Meu e-mail: …',
       secao: 'Como assinar',

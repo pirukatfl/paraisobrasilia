@@ -7,10 +7,10 @@ export const institucional = definirArea({
     'Abas de Quem somos, botões do fim da página e "Atualizado em". Os títulos e textos das páginas são editados em Páginas.',
   campos: {
     // Abas
-    abaQuemSomos: { rotulo: 'Aba: Quem somos', padrao: 'Quem somos', secao: 'Abas de Quem somos' },
-    abaNormas: { rotulo: 'Aba: Normas', padrao: 'Normas', secao: 'Abas de Quem somos' },
-    abaRegras: { rotulo: 'Aba: Regras', padrao: 'Regras', secao: 'Abas de Quem somos' },
-    abaDicas: { rotulo: 'Aba: Dicas', padrao: 'Dicas', secao: 'Abas de Quem somos' },
+    abaQuemSomos: { rotulo: 'Aba: Quem somos', padrao: 'Quem somos', secao: 'Abas de Quem somos', ajuda: 'Também aparece no botão "Próximo" (lá, sem formatação).' },
+    abaNormas: { rotulo: 'Aba: Normas', padrao: 'Normas', secao: 'Abas de Quem somos', ajuda: 'Também aparece no botão "Próximo" (lá, sem formatação).' },
+    abaRegras: { rotulo: 'Aba: Regras', padrao: 'Regras', secao: 'Abas de Quem somos', ajuda: 'Também aparece no botão "Próximo" (lá, sem formatação).' },
+    abaDicas: { rotulo: 'Aba: Dicas', padrao: 'Dicas', secao: 'Abas de Quem somos', ajuda: 'Também aparece no botão "Próximo" (lá, sem formatação).' },
 
     // Fim da página
     botaoProximo: {

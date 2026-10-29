@@ -1,8 +1,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { ReactNode } from 'react'
 
 import type { ModelCardDTO } from '@/lib/gallery/types'
-import { preencher } from '@/lib/textos/mesclar'
+import { juntarComPonto, TextoRico } from '@/components/TextoRico'
 import { getTextos } from '@/lib/textos/queries'
 import type { Textos } from '@/lib/textos/areas'
 
@@ -13,10 +14,11 @@ export function countLabel(
   photoCount: number,
   videoCount: number,
   t: Pick<Textos<'modelos'>, 'umaFoto' | 'variasFotos' | 'umVideo' | 'variosVideos'>,
-): string {
-  const photos = photoCount === 1 ? t.umaFoto : preencher(t.variasFotos, { n: photoCount })
-  if (videoCount <= 0) return photos
-  return `${photos} · ${videoCount === 1 ? t.umVideo : preencher(t.variosVideos, { n: videoCount })}`
+): ReactNode {
+  return juntarComPonto([
+    photoCount === 1 ? <TextoRico valor={t.umaFoto} linha /> : <TextoRico valor={t.variasFotos} vars={{ n: photoCount }} linha />,
+    videoCount <= 0 ? null : videoCount === 1 ? <TextoRico valor={t.umVideo} linha /> : <TextoRico valor={t.variosVideos} vars={{ n: videoCount }} linha />,
+  ])
 }
 
 /** Model cards (UI-SPEC S11'): each card is one link to the model page; cover = first photo 4:5. */

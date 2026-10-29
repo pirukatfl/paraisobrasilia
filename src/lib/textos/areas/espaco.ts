@@ -11,20 +11,20 @@ export const espaco = definirArea({
       rotulo: 'Título da página',
       padrao: 'Conheça o Paraíso',
       secao: 'Topo da página',
-      ajuda: 'Também é o título que aparece no Google.',
+      ajuda: 'Também é o título que aparece no Google (lá, sem formatação).',
     },
     intro: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto de abertura',
       padrao: 'Conheça os ambientes do Paraíso: pista, bar, jardim e piscina numa chácara reservada no Lago Oeste.',
       secao: 'Topo da página',
-      ajuda: 'Também é a descrição que aparece no Google.',
+      ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
     },
 
     // Sem fotos
     vazioTitulo: { rotulo: 'Título quando não há fotos', padrao: 'Fotos do espaço em breve', secao: 'Quando não há fotos' },
     vazioTexto: {
-      formatado: true,
+      bloco: true,
       rotulo: 'Texto quando não há fotos',
       padrao: 'Estamos preparando novas fotos e vídeos dos ambientes. Enquanto isso, venha conhecer pessoalmente.',
       secao: 'Quando não há fotos',

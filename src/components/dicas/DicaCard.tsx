@@ -2,8 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { DicaCardDTO } from '@/lib/dicas/dto'
-import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
+import { TextoRico } from '@/components/TextoRico'
 
 /** One dica in a list: optional confirmed cover, title, date and resumo. */
 export async function DicaCard({ dica, href, showImage = false }: { dica: DicaCardDTO; href: string; showImage?: boolean }) {
@@ -33,7 +33,7 @@ export async function DicaCard({ dica, href, showImage = false }: { dica: DicaCa
         <p className="mt-3 flex-1 text-body text-muted">{dica.resumo}</p>
         <p className="mt-4">
           <Link href={href} className="type-label font-semibold text-accent underline underline-offset-4">
-            {preencher(t.cardLer, { titulo: dica.title })}
+            <TextoRico valor={t.cardLer} vars={{ titulo: dica.title }} linha />
           </Link>
         </p>
       </div>

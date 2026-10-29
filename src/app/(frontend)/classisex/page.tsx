@@ -8,6 +8,7 @@ import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
 
 // Per request (query string, no database at build); data from the tagged cache 'ads'.
 export const dynamic = 'force-dynamic'
@@ -16,7 +17,7 @@ const PATH = '/classisex'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('classisex')
-  return buildPageMetadata({ title: t.publicoGoogleTitulo, description: t.publicoGoogleDescricao, path: PATH })
+  return buildPageMetadata({ title: textoPuro(t.publicoGoogleTitulo), description: textoPuro(t.publicoGoogleDescricao), path: PATH })
 }
 
 /**
@@ -34,24 +35,24 @@ export default async function ClassisexPublicPage({
   const [result, categories] = await Promise.all([getPublicAds(filters), getPublicAdFilters()])
   return (
     <section aria-labelledby="titulo-classisex">
-      <p className="type-eyebrow text-muted">{t.publicoTopo}</p>
+      <p className="type-eyebrow text-muted"><TextoRico valor={t.publicoTopo} linha /></p>
       <h1 id="titulo-classisex" className="type-display mt-2">
-        {t.publicoTitulo}
+        <TextoRico valor={t.publicoTitulo} linha />
       </h1>
       <TextoRico valor={t.publicoIntro} className="mt-4 max-w-[680px] text-body text-muted" />
       <p className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
         <Link href="/classisex/anunciar" className="btn-primary">
-          {t.publicoBotaoAnunciar}
+          <TextoRico valor={t.publicoBotaoAnunciar} linha />
         </Link>
         <Link
           href="/area-do-assinante/classisex"
           className="type-label font-semibold text-accent underline underline-offset-4"
         >
-          {t.publicoLinkAssinante}
+          <TextoRico valor={t.publicoLinkAssinante} linha />
         </Link>
       </p>
       <AssineJaCta
-        title={t.publicoAssineTitulo}
+        title={<TextoRico valor={t.publicoAssineTitulo} linha />}
         text={t.publicoAssineTexto}
         membersHref="/area-do-assinante/classisex"
       />
