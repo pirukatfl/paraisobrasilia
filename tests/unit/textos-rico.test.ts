@@ -157,21 +157,21 @@ describe('TextoRico render (whitelist, T-02-04b)', () => {
     expect(out).toBe('<div id="ajuda" role="note" class="texto-rico mt-4 text-muted"><p>Até 10 fotos</p></div>')
   })
 
-  it('inline renders a span with no block elements', () => {
+  it('inline renders no block elements and no wrapper without id, role or class', () => {
     const out = html(
       estado(paragrafo(texto('Um', 1)), paragrafo(texto('Dois')), lista('bullet', 'a', 'b'), paragrafo(link('/x', texto('ver')))),
       { inline: true },
     )
     expect(out).not.toMatch(/<(p|ul|ol|li|div)[ >]/)
-    expect(out.startsWith('<span>')).toBe(true)
+    expect(out.startsWith('<strong>')).toBe(true)
     expect(out).toContain('<strong>Um</strong><br/>Dois<br/>a<br/>b<br/><a href="/x">ver</a>')
   })
 })
 
 describe('TextoRico linha (line editor texts)', () => {
-  it('keeps bold, italic, underline and strikethrough inline in a span', () => {
+  it('keeps bold, italic, underline and strikethrough inline', () => {
     const out = html(estado(paragrafo(texto('a', 1), texto('b', 2), texto('c', 8), texto('d', 4))), { linha: true })
-    expect(out).toBe('<span><strong>a</strong><em>b</em><u>c</u><s>d</s></span>')
+    expect(out).toBe('<strong>a</strong><em>b</em><u>c</u><s>d</s>')
   })
 
   it('drops a stored link (words stay) and flattens a stored list to lines', () => {
@@ -185,7 +185,15 @@ describe('TextoRico linha (line editor texts)', () => {
 
   it('separates paragraphs with a line break and fills {vars}', () => {
     const out = html(estado(paragrafo(texto('Oi {nome}')), paragrafo(texto('Fim'))), { linha: true, vars: { nome: 'Ana' } })
-    expect(out).toBe('<span>Oi Ana<br/>Fim</span>')
+    expect(out).toBe('Oi Ana<br/>Fim')
+  })
+
+  it('unformatted text renders exactly as the old plain string', () => {
+    expect(html(estado(paragrafo(texto('Sair'))), { linha: true })).toBe('Sair')
+  })
+
+  it('wraps in a span when it carries an id, role or class', () => {
+    expect(html(estado(paragrafo(texto('Sair'))), { linha: true, className: 'x' })).toBe('<span class="x">Sair</span>')
   })
 
   it('still renders links in the block mode (unchanged)', () => {

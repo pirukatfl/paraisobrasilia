@@ -93,7 +93,7 @@ function renderNos(nos: No[], inline: boolean, linha: boolean): ReactNode[] {
 
 /**
  * Formatted site text (Textos do site). Block by default (`div` with paragraphs and lists, pass the size
- * and colour classes of the old `<p>`); `inline` renders a `span` with no block elements, for parents that
+ * and colour classes of the old `<p>`); `inline` renders a `span` (or no wrapper at all when there is no id, role or class) with no block elements, for parents that
  * only accept phrasing content. `linha` is for the line editor's texts (titles, buttons, labels): inline,
  * and links and lists a stored value might carry are dropped, only text, marks and breaks remain. `{name}` placeholders are filled from `vars` before rendering.
  */
@@ -116,6 +116,8 @@ export function TextoRico({
 }) {
   const estado = vars ? preencherRico(valor, vars) : valor
   const filhos = renderNos(filhosDe(ehObjeto(estado.root) ? estado.root : {}), inline, linha)
+  // Inline with nothing to hang on a wrapper: plain text renders exactly as the old string did
+  if (inline && !id && !role && !className) return <>{filhos}</>
   const classes = inline ? className : `texto-rico ${className ?? ''}`.trim()
   return inline ? (
     <span id={id} role={role} className={classes}>
