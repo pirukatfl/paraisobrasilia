@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { AssineJaCta } from '@/components/contos/AssineJaCta'
 import { PublicBoard } from '@/components/classisex/PublicBoard'
 import { parseBoardFilters } from '@/lib/classisex/board'
 import { getPublicAdFilters, getPublicAds } from '@/lib/classisex/public'
@@ -51,11 +50,6 @@ export default async function ClassisexPublicPage({
           <TextoRico valor={t.publicoLinkAssinante} linha />
         </Link>
       </p>
-      <AssineJaCta
-        title={<TextoRico valor={t.publicoAssineTitulo} linha />}
-        text={t.publicoAssineTexto}
-        membersHref="/area-do-assinante/classisex"
-      />
       <PublicBoard basePath={PATH} result={result} categories={categories} filters={filters} />
     </section>
   )
