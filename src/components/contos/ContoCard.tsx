@@ -19,7 +19,7 @@ export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: st
             width={conto.imagem.width}
             height={conto.imagem.height}
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="h-auto w-full"
+            className="aspect-[4/3] w-full object-cover"
           />
         </Link>
       )}
