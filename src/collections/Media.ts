@@ -73,6 +73,10 @@ export const Media: CollectionConfig = {
     formatOptions: webp,
     imageSizes: [
       { name: 'card', width: 640, formatOptions: webp },
+      // Conto listing cards (the old site used 340x224). Today's card is 4:3 and up to ~480 CSS px wide,
+      // so thumb serves 1x and thumb2x serves retina. Both crop around the focal point.
+      { name: 'thumb', width: 480, height: 360, formatOptions: webp },
+      { name: 'thumb2x', width: 960, height: 720, formatOptions: webp },
       { name: 'square', width: 1080, height: 1080, formatOptions: webp },
       { name: 'portrait', width: 1080, height: 1350, formatOptions: webp },
       // Lightbox (space and model galleries): long side up to 1600 px

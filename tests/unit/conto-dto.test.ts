@@ -68,6 +68,25 @@ describe('conto DTOs with image and signature', () => {
     expect(toContoCardDTO(withImage).assinadoComo).toBe('Casal BSB')
   })
 
+  it('the card prefers the 4:3 thumb2x, then thumb, then card, then the original', () => {
+    const thumb = { url: '/api/media/file/capa-480x360.webp', width: 480, height: 360 }
+    const thumb2x = { url: '/api/media/file/capa-960x720.webp', width: 960, height: 720 }
+    const card = media.sizes.card
+    const cardOf = (sizes: object) => toContoCardDTO({ ...doc, imagem: { ...media, sizes } }).imagem
+    expect(cardOf({ card, thumb, thumb2x })).toEqual({ url: thumb2x.url, width: 960, height: 720, alt: 'Imagem do conto Um' })
+    expect(cardOf({ card, thumb })?.url).toBe(thumb.url)
+    expect(cardOf({ card })?.url).toBe(card.url)
+    // Payload leaves a size empty when the original is smaller than it
+    expect(cardOf({ card, thumb: { url: null, width: null, height: null }, thumb2x: {} })?.url).toBe(card.url)
+    expect(cardOf({ thumb2x: { url: null } })?.url).toBe('/api/media/file/capa.webp')
+  })
+
+  it('the conto pages keep the large gallery image even when thumbs exist', () => {
+    const sizes = { ...media.sizes, thumb2x: { url: '/api/media/file/capa-960x720.webp', width: 960, height: 720 } }
+    expect(toPublicContoDTO({ ...doc, imagem: { ...media, sizes } }).imagem?.url).toBe('/api/media/file/capa-1600.webp')
+    expect(toMemberContoDTO({ ...doc, imagem: { ...media, sizes } }).imagem?.url).toBe('/api/media/file/capa-1600.webp')
+  })
+
   it('falls back to the original when the size is missing', () => {
     expect(toContoCardDTO({ ...doc, imagem: { ...media, sizes: {} } }).imagem?.url).toBe('/api/media/file/capa.webp')
   })
