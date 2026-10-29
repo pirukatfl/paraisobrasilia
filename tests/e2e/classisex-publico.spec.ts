@@ -216,7 +216,7 @@ test('approving shows the ad at once; unpublishing removes it and its previews',
   // only Otto's ad (author without a subscription, still approved) is left
   await expect(main.getByRole('article')).toHaveCount(1)
   await expect(main).toContainText(APELIDO_OTTO)
-  await expect(main.getByRole('link', { name: 'Assine Já' }).first()).toHaveAttribute('href', '/assine-ja')
+  await expect(main.getByRole('link', { name: 'Assine para ver o contato, todas as fotos e os vídeos' }).first()).toHaveAttribute('href', '/assine-ja')
   const anon = await playwright.request.newContext({ baseURL })
   expect((await anon.get(`/classisex/previa/${photoIds[0]}`)).status()).toBe(404)
   await anon.dispose()
