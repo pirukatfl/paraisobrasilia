@@ -22,7 +22,7 @@ type MediaLike = {
   height?: number | null
   alt?: string | null
   pendente?: boolean | null
-  sizes?: { card?: MediaSize; gallery?: MediaSize }
+  sizes?: { thumb?: MediaSize; thumb2x?: MediaSize; card?: MediaSize; gallery?: MediaSize }
 }
 
 export type ContoImageDTO = { url: string; width: number; height: number; alt: string }
@@ -62,13 +62,22 @@ const dateLabelOf = (publishedAt?: string | null) => (publishedAt ? formatShortD
 const splitOf = (doc: ContoSource) =>
   splitConto(doc.texto as LexicalStateLike | null | undefined, doc.paragrafosAbertos ?? DEFAULT_OPEN_BLOCKS)
 
-/** Only a populated, non-pending Media with a url becomes an image (pending ones are never shown). */
-function imageOf(doc: ContoSource, size: 'card' | 'gallery'): ContoImageDTO | null {
+type SizeName = keyof NonNullable<MediaLike['sizes']>
+
+/** Listing cards: the 4:3 crop at 2x (next/image derives the 1x/2x srcset from it), then older/smaller variants. */
+const CARD_SIZES: SizeName[] = ['thumb2x', 'thumb', 'card']
+
+/**
+ * Only a populated, non-pending Media with a url becomes an image (pending ones are never shown).
+ * Takes the first size that exists, then the original (older images have no thumb until regenerated;
+ * small originals never get the sizes bigger than themselves).
+ */
+function imageOf(doc: ContoSource, sizes: SizeName[]): ContoImageDTO | null {
   const media = doc.imagem
   if (!media || typeof media !== 'object') return null
   const m = media as MediaLike
   if (m.pendente === true) return null
-  const sized = m.sizes?.[size]
+  const sized = sizes.map((name) => m.sizes?.[name]).find((size) => size?.url)
   const source = sized?.url ? sized : m.url ? m : null
   if (!source?.url) return null
   return { url: source.url, width: source.width ?? m.width ?? 0, height: source.height ?? m.height ?? 0, alt: m.alt ?? '' }
@@ -82,7 +91,7 @@ export function toContoCardDTO(doc: ContoSource): ContoCardDTO {
     title: doc.title,
     dateLabel: dateLabelOf(doc.publishedAt),
     chamada: chamadaOf(splitOf(doc).open, 200),
-    imagem: imageOf(doc, 'card'),
+    imagem: imageOf(doc, CARD_SIZES),
     assinadoComo: signedBy(doc),
   }
 }
@@ -96,7 +105,7 @@ export function toPublicContoDTO(doc: ContoSource): PublicContoDTO {
     open: split.open as unknown as RichTextState,
     description: chamadaOf(split.open, 155),
     hasMore: split.totalBlocks > split.openBlocks || split.totalWords > split.openWords,
-    imagem: imageOf(doc, 'gallery'),
+    imagem: imageOf(doc, ['gallery']),
     assinadoComo: signedBy(doc),
   }
 }
@@ -107,7 +116,7 @@ export function toMemberContoDTO(doc: ContoSource): MemberContoDTO {
     title: doc.title,
     dateLabel: dateLabelOf(doc.publishedAt),
     texto: doc.texto as RichTextState,
-    imagem: imageOf(doc, 'gallery'),
+    imagem: imageOf(doc, ['gallery']),
     assinadoComo: signedBy(doc),
   }
 }

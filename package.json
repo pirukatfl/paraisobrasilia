@@ -12,6 +12,7 @@
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "thumbs:contos": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/thumbs/contos.ts",
     "import:contos": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import/contos.ts",
     "import:dicas": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import/dicas.ts",
     "import:wordpress": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import/wordpress.ts",

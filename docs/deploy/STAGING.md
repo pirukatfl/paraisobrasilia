@@ -279,6 +279,24 @@ Vídeo ocupa muito mais espaço que foto, então:
 - **Onde ficam os recados:** no Postgres (`pgdata`). O backup de `pgdata` os cobre; backup fora do servidor chega na Fase 7.
 
 ---
+### Miniaturas dos contos (29/10/2026)
+
+- **Migração:** `thumbs_contos` (nome completo `20261029_180440_thumbs_contos`). Acrescenta à tabela `media` as colunas das
+  miniaturas `thumb` (480x360) e `thumb2x` (960x720), 4:3 como o card da lista. O timer roda sozinho; sem SQL manual.
+- **Imagens novas:** o painel gera as miniaturas ao enviar a imagem do conto. Nada a fazer.
+- **Imagens que já estavam nos contos:** o painel só gera miniatura no envio, então rode **uma vez** depois da atualização
+  (o volume `media` precisa estar montado, como no passo das capas das Dicas):
+
+  ```bash
+  docker compose --env-file .env.staging run --rm -v paraiso-staging_media:/app/media -e MEDIA_DIR=/app/media migrate node_modules/.bin/payload run scripts/thumbs/contos.ts
+  ```
+
+  Imprime só contagens (`miniaturas geradas N · já tinham N · sem arquivo N · original pequena N · falhas N`). É seguro repetir:
+  o que já tem miniatura é pulado e os arquivos originais nunca são alterados. Enquanto não rodar, o card usa a imagem
+  antiga (`card`) ou a original, sem quebrar. Imagem menor que 480x360 não ganha miniatura (usa a original).
+  Em desenvolvimento: `pnpm thumbs:contos`.
+
+---
 ### 7.5 Conta gratuita (20/10/2026)
 
 - **Migração:** `conta_gratuita` (nome completo `20261020_172550_conta_gratuita`). Acrescenta à tabela `assinantes` as colunas
