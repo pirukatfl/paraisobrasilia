@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function PlanCard({ plan, whatsapp, t }: { plan: PlanDTO; whatsapp: string; t: Textos<'assine'> }) {
   return (
-    <li className="flex flex-col rounded-xl border border-line bg-surface p-6">
+    <li className="flex w-full flex-col rounded-xl border border-line bg-surface p-6 sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)]">
       <h3 className="type-heading">{plan.name}</h3>
       <p className="type-label mt-2 text-muted">{plan.durationLabel}</p>
       <div className="mt-4">
@@ -85,7 +85,7 @@ export default async function AssineJaPage() {
           <h2 id="titulo-planos" className="sr-only">
             Planos
           </h2>
-          <ul role="list" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul role="list" className="flex flex-wrap justify-center gap-4">
             {plans.map((plan) => (
               <PlanCard key={plan.id} plan={plan} whatsapp={contact.whatsapp} t={t} />
             ))}
