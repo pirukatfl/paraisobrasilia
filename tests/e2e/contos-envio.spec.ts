@@ -6,7 +6,8 @@ import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 
 // Client decision 2026-10-24: anyone can send a conto (optional image) without an account; it is moderated
-// (draft until staff publish), the list shows the image, visitors read only the open part, subscribers all.
+// (draft until staff publish), visitors read only the open part, subscribers all. Contos are shown without
+// photo (client 2026-11-01): the image is still stored and uploaded, just not rendered in lists or pages.
 test.describe.configure({ mode: 'serial' })
 
 const FIXTURES = path.resolve('tests/fixtures')
@@ -134,7 +135,7 @@ test('nothing shows publicly while pending: list, page, image and e-mail', async
   await api.dispose()
 })
 
-test('published: the list shows the image, visitors read only the open part, the image is public', async ({ browser, baseURL, request }) => {
+test('published: the list has no image, visitors read only the open part, the stored image stays public', async ({ browser, baseURL, request }) => {
   const api = await staffApi(request)
   const doc = (await findByTitle(api, TITULO))!
   await api.updateConto(doc.id, { _status: 'published' })
@@ -146,17 +147,14 @@ test('published: the list shows the image, visitors read only the open part, the
   }).toPass()
   const card = page.locator('main').getByRole('article').filter({ hasText: TITULO })
   await expect(card).toContainText('por Casal Verão')
-  const img = card.locator('img')
-  await expect(img).toHaveCount(1)
-  await expect(img).toHaveAttribute('alt', `Imagem do conto ${TITULO}`)
-  await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0)).toBe(true)
+  await expect(card.locator('img')).toHaveCount(0)
   await expect(page.locator('main')).not.toContainText(TITULO_SEM)
   expect((await page.request.get(`/api/media/file/${doc.imagem!.filename}`)).status()).toBe(200)
 
   await page.goto(`/contos/${doc.slug}`)
   const main = page.locator('main')
   await expect(page.getByRole('heading', { name: TITULO, level: 1 })).toBeVisible()
-  await expect(main.locator('img')).toHaveCount(1)
+  await expect(main.locator('img')).toHaveCount(0)
   await expect(main).toContainText('por Casal Verão')
   await expect(main).toContainText('Parágrafo primeiro do conto')
   await expect(main).not.toContainText('Parágrafo quinto do conto')
@@ -171,7 +169,7 @@ test('published: the list shows the image, visitors read only the open part, the
   await api.dispose()
 })
 
-test('an active subscriber reads the whole sent conto, with the image', async ({ browser, baseURL, request }) => {
+test('an active subscriber reads the whole sent conto, also without the image', async ({ browser, baseURL, request }) => {
   const api = await staffApi(request)
   const doc = (await findByTitle(api, TITULO))!
   await api.dispose()
@@ -179,8 +177,8 @@ test('an active subscriber reads the whole sent conto, with the image', async ({
   await loginAsAssinante(page, SUB.email, SUB.password, `/area-do-assinante/contos/${doc.slug}`)
   const main = page.locator('main')
   await expect(main).toContainText(SENTINELA)
-  await expect(main.locator('img')).toHaveCount(1)
+  await expect(main.locator('img')).toHaveCount(0)
   await page.goto('/area-do-assinante/contos')
-  await expect(page.locator('main').getByRole('article').filter({ hasText: TITULO }).locator('img')).toHaveCount(1)
+  await expect(page.locator('main').getByRole('article').filter({ hasText: TITULO }).locator('img')).toHaveCount(0)
   await context.close()
 })

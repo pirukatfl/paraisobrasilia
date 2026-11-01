@@ -1068,7 +1068,7 @@ export interface Conto {
     [k: string]: unknown;
   };
   /**
-   * Opcional. Aparece na lista e na página do conto, para todo mundo: sem nudez explícita e sem contatos.
+   * Opcional e guardada, mas por enquanto os contos aparecem no site sem foto (pedido do cliente, 2026-11-01). Se voltar a aparecer: sem nudez explícita e sem contatos.
    */
   imagem?: (number | null) | Media;
   /**
