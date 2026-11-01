@@ -2,6 +2,7 @@
  * Seed helpers shared by integration (vitest) and e2e (playwright global setup) tests.
  * Everything goes through the Payload Local API against the isolated test database.
  */
+import { sql } from '@payloadcms/db-postgres'
 import { config as loadEnv } from 'dotenv'
 import path from 'path'
 import type { Payload } from 'payload'
@@ -87,6 +88,8 @@ export async function resetDatabase(payload: Payload): Promise<void> {
       context: { skipAudit: true },
     })
   }
+  // "Menu do site" global: back to "nothing hidden, original external link" (its items cascade)
+  await payload.db.drizzle.execute(sql`delete from menu_do_site`)
 }
 
 /** Restores (or overrides) the "Contato e endereço" global with the seeded values. */

@@ -64,6 +64,11 @@ export async function staffApi(request: APIRequestContext) {
 
   return {
     headers,
+    /** Saves a global through the running server (its afterChange hook expires the Next cache tag). */
+    async updateGlobal(slug: string, data: Record<string, unknown>) {
+      const res = await request.post(`/api/globals/${slug}`, { headers, data })
+      if (!res.ok()) throw new Error(`update global ${slug} failed: ${res.status()} ${await res.text()}`)
+    },
     async createSpacePhoto(opts: { alt?: string; order?: number; caption?: string; fixture?: string } = {}) {
       const media = await upload('media', opts.fixture ?? 'flyer-square.jpg', { alt: opts.alt ?? 'Pista de dança do Paraíso' })
       const res = await request.post('/api/space-items', {

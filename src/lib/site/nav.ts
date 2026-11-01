@@ -6,71 +6,98 @@
  * 02-04 Modelos (always listed since quick menu-modelos; the page shows an empty state until a model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
  * Logged-in subscribers get getMemberNavItems() instead (quick menu-logado, 2026-10-24): Festas · Quem somos · Espaço ·
- * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha (+ Sair
- * rendered by Nav/MobileMenu). Header picks the list on the server; pinned by tests/e2e/menu-logado.spec.ts.
+ * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha · link externo for subscribers (Menu do site, last) (+ Sair
+ * rendered by Nav/MobileMenu). Items staff hide in "Menu do site" are filtered out by key (menu.ts). Header picks the list on the server; pinned by tests/e2e/menu-logado.spec.ts.
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
-import type { Textos } from '../textos/areas'
-import type { TextoRico } from '../textos/rico'
 import { pathForKey } from '../pages/keys'
+import type { Textos } from '../textos/areas'
+import { textoParaRico, type TextoRico } from '../textos/rico'
+import { filtrarItens, MENU_VAZIO, type MenuConfig } from './menu'
 
-/** `exact`: active only on the exact path (e.g. /area-do-assinante). */
-export type NavItem = { href: string; label: TextoRico; children?: NavItem[]; exact?: boolean }
+/**
+ * `key`: stable name of the item (see MENU_ITENS in menu.ts), what staff hide in "Menu do site".
+ * `exact`: active only on the exact path (e.g. /area-do-assinante).
+ * `external`: opens another site in a new tab (only the subscribers' external link).
+ */
+export type NavItem = {
+  key: string
+  href: string
+  label: TextoRico
+  children?: NavItem[]
+  exact?: boolean
+  external?: boolean
+}
 
-export function getNavItems(t: Textos<'geral'>): NavItem[] {
-  return [
-    { href: '/', label: t.menuFestas },
+export function getNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): NavItem[] {
+  const items: NavItem[] = [
+    { key: 'festas', href: '/', label: t.menuFestas },
     {
+      key: 'quem-somos',
       href: pathForKey('quem-somos'),
       label: t.menuQuemSomos,
       children: [
-        { href: pathForKey('normas'), label: t.menuNormas },
-        { href: pathForKey('regras'), label: t.menuRegras },
-        { href: pathForKey('dicas'), label: t.menuDicas },
+        { key: 'normas', href: pathForKey('normas'), label: t.menuNormas },
+        { key: 'regras', href: pathForKey('regras'), label: t.menuRegras },
+        { key: 'dicas', href: pathForKey('dicas'), label: t.menuDicas },
       ],
     },
-    { href: '/espaco', label: t.menuEspaco },
+    { key: 'espaco', href: '/espaco', label: t.menuEspaco },
     // quick menu-modelos: always listed (client request); /modelos shows an empty state until a model is published.
     // Novo planejamento 2026-11-01: renamed Galeria, with the Profissionais / Amadoras submenus (?tipo=).
     {
+      key: 'galeria',
       href: '/modelos',
       label: t.menuGaleria,
       children: [
-        { href: '/modelos?tipo=profissionais', label: t.menuGaleriaProfissionais },
-        { href: '/modelos?tipo=amadoras', label: t.menuGaleriaAmadoras },
+        { key: 'galeria-profissionais', href: '/modelos?tipo=profissionais', label: t.menuGaleriaProfissionais },
+        { key: 'galeria-amadoras', href: '/modelos?tipo=amadoras', label: t.menuGaleriaAmadoras },
       ],
     },
     // PREV-01: open preview; the full board lives in the members area
-    { href: '/classisex', label: t.menuClassisex },
+    { key: 'classisex', href: '/classisex', label: t.menuClassisex },
     // PREV-03: open excerpts of the contos (05-03)
-    { href: '/contos', label: t.menuContos },
+    { key: 'contos', href: '/contos', label: t.menuContos },
     // quick dicas-hot-menu: client asked for the open Dicas Hot section in the main menu (also stays in the footer)
-    { href: '/dicas-hot', label: t.menuDicasHot },
-    { href: '/contato', label: t.menuContato },
+    { key: 'dicas-hot', href: '/dicas-hot', label: t.menuDicasHot },
+    { key: 'contato', href: '/contato', label: t.menuContato },
     // Phase 3: plans page (03-02) and members area
-    { href: '/assine-ja', label: t.menuAssineJa },
+    { key: 'assine-ja', href: '/assine-ja', label: t.menuAssineJa },
     // members area (redirects to /entrar when logged out)
-    { href: '/area-do-assinante', label: t.menuAreaAssinante },
+    { key: 'area-do-assinante', href: '/area-do-assinante', label: t.menuAreaAssinante },
   ]
+  return filtrarItens(items, menu.ocultos)
 }
 
-/** Menu for a logged-in subscriber: replaces the public list (quick menu-logado). Sair is added by the menu components. */
-export function getMemberNavItems(t: Textos<'geral'>): NavItem[] {
-  const base = getNavItems(t)
-  const pick = (href: string) => base.find((item) => item.href === href)!
-  return [
-    pick('/'),
-    pick(pathForKey('quem-somos')),
-    pick('/espaco'),
-    pick('/modelos'),
-    { href: '/area-do-assinante/classisex', label: t.menuClassisex },
-    { href: '/area-do-assinante/contos', label: t.menuContos },
-    { href: '/area-do-assinante/dicas-hot', label: t.menuDicasHot },
-    pick('/contato'),
-    { href: '/area-do-assinante/meus-anuncios', label: t.menuMeusAnuncios },
-    { href: '/area-do-assinante', label: t.menuMinhaAssinatura, exact: true },
-    { href: '/area-do-assinante/senha', label: t.menuTrocarSenha },
+/**
+ * Menu for a logged-in subscriber: replaces the public list (quick menu-logado). Sair is added by the menu components.
+ * The external link (Menu do site) exists only here, last before Sair: never in the public menu or the footer.
+ */
+export function getMemberNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): NavItem[] {
+  const base = getNavItems(t) // unfiltered: the picks below are filtered once, with the rest
+  const pick = (key: string) => base.find((item) => item.key === key)!
+  const items: NavItem[] = [
+    pick('festas'),
+    pick('quem-somos'),
+    pick('espaco'),
+    pick('galeria'),
+    { key: 'classisex', href: '/area-do-assinante/classisex', label: t.menuClassisex },
+    { key: 'contos', href: '/area-do-assinante/contos', label: t.menuContos },
+    { key: 'dicas-hot', href: '/area-do-assinante/dicas-hot', label: t.menuDicasHot },
+    pick('contato'),
+    { key: 'meus-anuncios', href: '/area-do-assinante/meus-anuncios', label: t.menuMeusAnuncios },
+    { key: 'minha-assinatura', href: '/area-do-assinante', label: t.menuMinhaAssinatura, exact: true },
+    { key: 'trocar-senha', href: '/area-do-assinante/senha', label: t.menuTrocarSenha },
   ]
+  if (menu.linkExterno) {
+    items.push({
+      key: 'link-externo',
+      href: menu.linkExterno.url,
+      label: textoParaRico(menu.linkExterno.rotulo),
+      external: true,
+    })
+  }
+  return filtrarItens(items, menu.ocultos)
 }
 
 /** Active state: exact match, a child path, or party pages under "Festas". */

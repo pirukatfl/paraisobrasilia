@@ -181,6 +181,24 @@ Para mudar algum desses, peça ajuda à equipe técnica.
 
 ---
 
+## Menu do site (esconder itens e link externo)
+
+Para esconder ou mostrar um item do menu **sem mexer em mais nada** (a página continua existindo; só some o link):
+
+1. Menu da esquerda → **Configurações → Menu do site**.
+2. Em **Itens escondidos**, escolha os itens que devem **sumir**. Eles somem do menu do topo, do menu do celular **e do rodapé**.
+   Esconder **Quem somos** esconde também Normas, Regras e Dicas; esconder **Galeria** esconde Profissionais e Amadoras.
+   Os itens "Menu do assinante" valem só para quem está logado.
+3. **Salvar**. Vale na hora. Para mostrar de novo, tire o item da lista e salve.
+
+**Link externo para assinantes** (mais abaixo, na mesma página): é um item extra que aparece **só no menu de quem está logado como
+assinante**, por último, antes do **Sair**. Abre em outra aba. Ele **nunca** aparece para visitantes, no rodapé nem no mapa do site.
+
+- **Mostrar o link**: desmarque para tirar.
+- **Texto do link** e **Endereço**: o endereço precisa começar com `https://` (ou `http://`); outro tipo de endereço é recusado.
+
+---
+
 ## Contato e endereço
 
 Endereço, telefone, WhatsApp, e-mail, Instagram e horário aparecem na página **Contato**, no rodapé e na página inicial.

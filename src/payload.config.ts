@@ -30,6 +30,7 @@ import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
+import { MenuDoSite } from './globals/MenuDoSite'
 import { TextosGlobals } from './globals/Textos'
 import { traduzirErroDaApi } from './lib/errors/after-error'
 import { buildEmailAdapter } from './lib/email/config'
@@ -108,7 +109,7 @@ export default buildConfig({
     SpaceItems,
     Models,
   ],
-  globals: [Contact, ...TextosGlobals],
+  globals: [Contact, MenuDoSite, ...TextosGlobals],
   hooks: {
     // Clear Portuguese reason on every API error (admin and site), see lib/errors/after-error.ts
     afterError: [traduzirErroDaApi],

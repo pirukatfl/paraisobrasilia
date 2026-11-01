@@ -11,6 +11,9 @@ import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 import { TextoRico } from '@/components/TextoRico'
 import { textoPuro } from '@/lib/textos/rico'
 
+/** External links open another site: no referrer, no opener, no SEO credit. */
+const EXTERNAL_REL = 'noopener noreferrer nofollow'
+
 const linkClasses = (active: boolean) =>
   `type-eyebrow inline-flex min-h-11 whitespace-nowrap items-center border-b-2 transition-colors duration-150 hover:text-accent focus-visible:text-accent ${
     active ? 'border-accent text-text' : 'border-transparent text-muted'
@@ -48,7 +51,7 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
   return (
     <li
       ref={rootRef}
-      className="relative"
+      className="relative flex items-center"
       onMouseEnter={() => setState((cur) => cur ?? { path: pathname, mode: 'hover' })}
       onMouseLeave={() => setState((cur) => (cur?.mode === 'hover' ? null : cur))}
       onFocus={(event) => {
@@ -60,29 +63,29 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         if (!event.currentTarget.contains(event.relatedTarget)) setState(null)
       }}
     >
-      <span className="inline-flex items-center">
-        <Link href={item.href} aria-current={active ? 'page' : undefined} className={linkClasses(active)}>
-          <TextoRico valor={item.label} linha />
-        </Link>
-        <button
-          ref={buttonRef}
-          type="button"
-          aria-expanded={open}
-          aria-controls={open ? menuId : undefined}
-          aria-label={`Submenu de ${textoPuro(item.label)}`}
-          onClick={() => setState((cur) => (cur?.path === pathname && cur.mode === 'pinned' ? null : { path: pathname, mode: 'pinned' }))}
-          className="inline-flex min-h-11 min-w-6 cursor-pointer items-center justify-center text-muted hover:text-accent focus-visible:text-accent"
-        >
-          <ChevronDownIcon size={16} className={open ? 'rotate-180' : undefined} />
-        </button>
-      </span>
+      <Link href={item.href} aria-current={active ? 'page' : undefined} className={linkClasses(active)}>
+        <TextoRico valor={item.label} linha />
+      </Link>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
+        aria-label={`Submenu de ${textoPuro(item.label)}`}
+        onClick={() =>
+          setState((cur) => (cur?.path === pathname && cur.mode === 'pinned' ? null : { path: pathname, mode: 'pinned' }))
+        }
+        className="inline-flex min-h-11 min-w-6 cursor-pointer items-center justify-center text-muted hover:text-accent focus-visible:text-accent"
+      >
+        <ChevronDownIcon size={16} className={open ? 'rotate-180' : undefined} />
+      </button>
       {open && (
         <ul
           id={menuId}
           className="absolute left-0 top-full z-50 min-w-44 rounded-lg border border-line bg-surface py-1 shadow-lg"
         >
           {children.map((child) => (
-            <li key={child.href}>
+            <li key={child.key}>
               <Link
                 href={child.href}
                 className="type-label flex min-h-11 items-center whitespace-nowrap px-4 text-text hover:text-accent focus-visible:text-accent"
@@ -109,10 +112,19 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
         }
       >
         {items.map((item) => {
-          if (item.children?.length) return <NavDropdown key={item.href} item={item} pathname={pathname} />
+          if (item.children?.length) return <NavDropdown key={item.key} item={item} pathname={pathname} />
+          if (item.external) {
+            return (
+              <li key={item.key}>
+                <a href={item.href} target="_blank" rel={EXTERNAL_REL} className={linkClasses(false)}>
+                  <TextoRico valor={item.label} linha />
+                </a>
+              </li>
+            )
+          }
           const active = isActivePath(item.href, pathname, item.exact)
           return (
-            <li key={item.href}>
+            <li key={item.key}>
               <Link href={item.href} aria-current={active ? 'page' : undefined} className={linkClasses(active)}>
                 <TextoRico valor={item.label} linha />
               </Link>

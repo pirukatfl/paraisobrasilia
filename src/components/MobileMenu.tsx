@@ -72,21 +72,35 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
         <nav aria-label="Menu">
           <ul className="divide-y divide-line">
             {items.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  aria-current={
-                    pathname === item.href || (!item.children && isActivePath(item.href, pathname, item.exact)) ? 'page' : undefined
-                  }
-                  className={linkClass(item)}
-                  onClick={() => setOpen(false)}
-                >
-                  <TextoRico valor={item.label} linha />
-                </Link>
-                {item.children && (
+              <li key={item.key}>
+                {item.external ? (
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="type-eyebrow flex min-h-11 items-center text-text hover:text-accent"
+                    onClick={() => setOpen(false)}
+                  >
+                    <TextoRico valor={item.label} linha />
+                  </a>
+                ) : (
+                  <Link
+                    href={item.href}
+                    aria-current={
+                      pathname === item.href || (!item.children && isActivePath(item.href, pathname, item.exact))
+                        ? 'page'
+                        : undefined
+                    }
+                    className={linkClass(item)}
+                    onClick={() => setOpen(false)}
+                  >
+                    <TextoRico valor={item.label} linha />
+                  </Link>
+                )}
+                {item.children?.length ? (
                   <ul className="pb-2 pl-4">
                     {item.children.map((child) => (
-                      <li key={child.href}>
+                      <li key={child.key}>
                         <Link
                           href={child.href}
                           aria-current={pathname === child.href ? 'page' : undefined}
@@ -98,7 +112,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                       </li>
                     ))}
                   </ul>
-                )}
+                ) : null}
               </li>
             ))}
             {logado && (

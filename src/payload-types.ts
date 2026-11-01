@@ -139,6 +139,7 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     contact: Contact;
+    'menu-do-site': MenuDoSite;
     'textos-geral': TextosGeral;
     'textos-inicio': TextosInicio;
     'textos-festas': TextosFesta;
@@ -158,6 +159,7 @@ export interface Config {
   };
   globalsSelect: {
     contact: ContactSelect<false> | ContactSelect<true>;
+    'menu-do-site': MenuDoSiteSelect<false> | MenuDoSiteSelect<true>;
     'textos-geral': TextosGeralSelect<false> | TextosGeralSelect<true>;
     'textos-inicio': TextosInicioSelect<false> | TextosInicioSelect<true>;
     'textos-festas': TextosFestasSelect<false> | TextosFestasSelect<true>;
@@ -2085,6 +2087,51 @@ export interface Contact {
    * Opcional (ex.: Abrimos às 22h e seguimos até por volta das 5h).
    */
   hours?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Esconda itens do menu e escolha o link externo que só os assinantes veem.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-do-site".
+ */
+export interface MenuDoSite {
+  id: number;
+  /**
+   * Itens marcados somem do menu do topo, do menu do celular e do rodapé. A página continua existindo. Para mostrar de novo, tire a marca.
+   */
+  itensOcultos?:
+    | (
+        | 'festas'
+        | 'quem-somos'
+        | 'normas'
+        | 'regras'
+        | 'dicas'
+        | 'espaco'
+        | 'galeria'
+        | 'galeria-profissionais'
+        | 'galeria-amadoras'
+        | 'classisex'
+        | 'contos'
+        | 'dicas-hot'
+        | 'contato'
+        | 'assine-ja'
+        | 'area-do-assinante'
+        | 'meus-anuncios'
+        | 'minha-assinatura'
+        | 'trocar-senha'
+        | 'link-externo'
+      )[]
+    | null;
+  /**
+   * Aparece só no menu de quem está logado como assinante, por último (abre em outra aba). Nunca aparece para visitantes, no rodapé nem no mapa do site.
+   */
+  linkExterno?: {
+    ativo?: boolean | null;
+    rotulo?: string | null;
+    url?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -11082,6 +11129,23 @@ export interface ContactSelect<T extends boolean = true> {
   avisoNovoCadastroEmail?: T;
   instagram?: T;
   hours?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-do-site_select".
+ */
+export interface MenuDoSiteSelect<T extends boolean = true> {
+  itensOcultos?: T;
+  linkExterno?:
+    | T
+    | {
+        ativo?: T;
+        rotulo?: T;
+        url?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
