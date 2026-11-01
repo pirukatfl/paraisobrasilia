@@ -13,6 +13,13 @@ export const festas = definirArea({
       secao: 'Topo da festa',
       ajuda: 'Use {hora} para o horário de início da festa.',
     },
+    horarioComTermino: {
+      rotulo: 'Frase do horário (com término)',
+      padrao: 'Das {inicio} às {fim}',
+      secao: 'Topo da festa',
+      ajuda:
+        'Usada quando a festa tem "Data e hora de término" preenchida. Use {inicio} e {fim}. Sem término, vale a frase acima.',
+    },
     jaAconteceu: { rotulo: 'Aviso de festa que já passou', padrao: 'Esta festa já aconteceu', secao: 'Topo da festa' },
 
     // Seções

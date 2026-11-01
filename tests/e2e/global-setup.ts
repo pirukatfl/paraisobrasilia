@@ -57,6 +57,13 @@ export default async function globalSetup(): Promise<void> {
       startsAt: brasiliaAt(-2, 23),
       endsAt: brasiliaAt(-1, 9),
     })
+    // Ended with a custom end time (22h to 5h): its page shows "Das 22h às 5h"
+    await seedParty(payload, {
+      title: 'Festa Madrugada',
+      flyerFormat: 'square',
+      startsAt: brasiliaAt(-3, 22),
+      endsAt: brasiliaAt(-2, 5),
+    })
   } catch (err) {
     console.warn(`[global-setup] party seed skipped: ${(err as Error).message}`)
   }

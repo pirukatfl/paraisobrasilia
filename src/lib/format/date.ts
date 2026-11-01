@@ -40,10 +40,11 @@ export function formatPartyDate(iso: string): string {
   return `${capitalize(clean(p.weekday))}, ${p.day} de ${clean(p.month)}`
 }
 
-/** "23h", or "23h30" when minutes are not zero */
+/** "23h", "5h" (no leading zero), or "23h30" when minutes are not zero */
 export function formatPartyTime(iso: string): string {
   const p = parts(timeFmt, iso)
-  return p.minute === '00' ? `${p.hour}h` : `${p.hour}h${p.minute}`
+  const hour = String(Number(p.hour))
+  return p.minute === '00' ? `${hour}h` : `${hour}h${p.minute}`
 }
 
 /** "Sáb, 24 out · 23h" */

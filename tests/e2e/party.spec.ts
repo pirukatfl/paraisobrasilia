@@ -66,3 +66,15 @@ test('unknown party returns 404', async ({ page }) => {
   const res = await page.goto('/festas/nao-existe')
   expect(res?.status()).toBe(404)
 })
+
+test('party page shows start and end time when staff filled the end in', async ({ page }) => {
+  await page.goto('/festas/festa-madrugada')
+  await expect(page.getByText('Das 22h às 5h')).toBeVisible()
+  await expect(page.getByText('A partir das')).toHaveCount(0)
+})
+
+test('party page shows only the start when the end was left to the automatic one', async ({ page }) => {
+  await page.goto('/festas/festa-passada')
+  await expect(page.getByText('A partir das 23h')).toBeVisible()
+  await expect(page.getByText(/^Das \d/)).toHaveCount(0)
+})

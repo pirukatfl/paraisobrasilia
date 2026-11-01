@@ -3157,6 +3157,24 @@ export interface TextosFesta {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Usada quando a festa tem "Data e hora de término" preenchida. Use {inicio} e {fim}. Sem término, vale a frase acima.
+   */
+  horarioComTermino?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   jaAconteceu?: {
     root: {
       type: string;
@@ -11030,6 +11048,7 @@ export interface TextosInicioSelect<T extends boolean = true> {
 export interface TextosFestasSelect<T extends boolean = true> {
   voltar?: T;
   horario?: T;
+  horarioComTermino?: T;
   jaAconteceu?: T;
   tituloValores?: T;
   tituloDressCode?: T;

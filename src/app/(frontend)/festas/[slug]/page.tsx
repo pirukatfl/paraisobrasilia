@@ -6,6 +6,7 @@ import { FlyerFrame } from '@/components/party/FlyerFrame'
 import { PartyDetails } from '@/components/party/PartyDetails'
 import { formatPartyDate, formatPartyTime } from '@/lib/format/date'
 import { getPartyBySlug } from '@/lib/parties/queries'
+import { hasCustomEnd } from '@/lib/parties/visibility'
 import { buildPartyMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
@@ -53,7 +54,17 @@ export default async function PartyPage({ params }: Props) {
 
         <p className="type-label mt-4 flex flex-col gap-2 text-gold">
           <span>{formatPartyDate(party.startsAt)}</span>
-          <span><TextoRico valor={t.horario} vars={{ hora: formatPartyTime(party.startsAt) }} linha /></span>
+          <span>
+            {hasCustomEnd(party) ? (
+              <TextoRico
+                valor={t.horarioComTermino}
+                vars={{ inicio: formatPartyTime(party.startsAt), fim: formatPartyTime(party.endsAt) }}
+                linha
+              />
+            ) : (
+              <TextoRico valor={t.horario} vars={{ hora: formatPartyTime(party.startsAt) }} linha />
+            )}
+          </span>
         </p>
 
         {party.isPast && (
