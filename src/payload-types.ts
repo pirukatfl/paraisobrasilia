@@ -3090,6 +3090,114 @@ export interface TextosInicio {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Não aparece na tela: é lido por leitores de tela. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoCarrossel?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoAnterior?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoProxima?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {n} para o número da foto e {total} para a quantidade de fotos. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoIrPara?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoPausar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoRetomar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   quemSomosTitulo?: {
     root: {
       type: string;
@@ -11221,6 +11329,12 @@ export interface TextosInicioSelect<T extends boolean = true> {
   semFestasTexto?: T;
   espacoTitulo?: T;
   espacoBotao?: T;
+  espacoCarrossel?: T;
+  espacoAnterior?: T;
+  espacoProxima?: T;
+  espacoIrPara?: T;
+  espacoPausar?: T;
+  espacoRetomar?: T;
   quemSomosTitulo?: T;
   quemSomosTextoReserva?: T;
   quemSomosBotao?: T;

@@ -36,6 +36,44 @@ export const inicio = definirArea({
     // Espaço
     espacoTitulo: { rotulo: 'Título da seção do espaço', padrao: 'Conheça o espaço', secao: 'Seção do espaço' },
     espacoBotao: { rotulo: 'Botão da galeria', padrao: 'Ver galeria completa', secao: 'Seção do espaço' },
+    espacoCarrossel: {
+      soTexto: true,
+      rotulo: 'Nome do carrossel (leitores de tela)',
+      padrao: 'Fotos do espaço',
+      secao: 'Seção do espaço',
+      ajuda: 'Não aparece na tela: é lido por leitores de tela.',
+    },
+    espacoAnterior: {
+      soTexto: true,
+      rotulo: 'Seta: foto anterior (leitores de tela)',
+      padrao: 'Foto anterior',
+      secao: 'Seção do espaço',
+    },
+    espacoProxima: {
+      soTexto: true,
+      rotulo: 'Seta: próxima foto (leitores de tela)',
+      padrao: 'Próxima foto',
+      secao: 'Seção do espaço',
+    },
+    espacoIrPara: {
+      soTexto: true,
+      rotulo: 'Pontinho: ir para a foto (leitores de tela)',
+      padrao: 'Ir para a foto {n} de {total}',
+      secao: 'Seção do espaço',
+      ajuda: 'Use {n} para o número da foto e {total} para a quantidade de fotos.',
+    },
+    espacoPausar: {
+      soTexto: true,
+      rotulo: 'Botão: pausar a troca automática (leitores de tela)',
+      padrao: 'Pausar a troca automática das fotos',
+      secao: 'Seção do espaço',
+    },
+    espacoRetomar: {
+      soTexto: true,
+      rotulo: 'Botão: retomar a troca automática (leitores de tela)',
+      padrao: 'Retomar a troca automática das fotos',
+      secao: 'Seção do espaço',
+    },
 
     // Quem somos
     quemSomosTitulo: { rotulo: 'Título da seção Quem somos', padrao: 'Quem somos', secao: 'Seção Quem somos' },

@@ -44,6 +44,7 @@ import * as migration_20261029_180440_thumbs_contos from './20261029_180440_thum
 import * as migration_20261101_220336_festa_horario_termino from './20261101_220336_festa_horario_termino';
 import * as migration_20261101_220922_galeria_categoria from './20261101_220922_galeria_categoria';
 import * as migration_20261101_221850_menu_do_site from './20261101_221850_menu_do_site';
+import * as migration_20261101_232627_espaco_carrossel from './20261101_232627_espaco_carrossel';
 
 export const migrations = [
   {
@@ -274,6 +275,11 @@ export const migrations = [
   {
     up: migration_20261101_221850_menu_do_site.up,
     down: migration_20261101_221850_menu_do_site.down,
-    name: '20261101_221850_menu_do_site'
+    name: '20261101_221850_menu_do_site',
+  },
+  {
+    up: migration_20261101_232627_espaco_carrossel.up,
+    down: migration_20261101_232627_espaco_carrossel.down,
+    name: '20261101_232627_espaco_carrossel'
   },
 ];

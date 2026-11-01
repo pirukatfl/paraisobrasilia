@@ -28,7 +28,7 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
 export default async function HomePage() {
   const [parties, photos, intro, contact, dicas, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
-    optional(() => getSpacePhotos(6)),
+    optional(() => getSpacePhotos(8)),
     optional(() => getPageIntro('quem-somos')),
     optional(() => getContact()),
     optional(() => getLatestDicas(3)),
