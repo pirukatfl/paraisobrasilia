@@ -85,9 +85,21 @@ export const inicio = definirArea({
     },
     quemSomosBotao: { rotulo: 'Botão da seção', padrao: 'Conheça a casa', secao: 'Seção Quem somos' },
 
-    // Dicas
-    dicasTitulo: { rotulo: 'Título da seção de dicas', padrao: 'Dicas Hot', secao: 'Seção Dicas Hot' },
-    dicasBotao: { rotulo: 'Botão das dicas', padrao: 'Ver todas as Dicas Hot', secao: 'Seção Dicas Hot' },
+    // ClassiSex, Contos e Dicas Hot (3 quadros lado a lado)
+    classisexTitulo: { rotulo: 'Título do quadro ClassiSex', padrao: 'ClassiSex', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
+    classisexTexto: {
+      bloco: true,
+      rotulo: 'Texto do quadro ClassiSex',
+      padrao: 'Anúncios de casais, mulheres, homens e trans do Paraíso. Leia os recados e anuncie também.',
+      secao: 'Quadros ClassiSex, Contos e Dicas Hot',
+    },
+    classisexBotao: { rotulo: 'Botão do quadro ClassiSex', padrao: 'Ver o ClassiSex', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
+    contosTitulo: { rotulo: 'Título do quadro Contos', padrao: 'Contos', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
+    contosBotao: { rotulo: 'Botão do quadro Contos', padrao: 'Ler todos os contos', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
+
+    // Dicas Hot
+    dicasTitulo: { rotulo: 'Título da seção de dicas', padrao: 'Dicas Hot', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
+    dicasBotao: { rotulo: 'Botão das dicas', padrao: 'Ver todas as Dicas Hot', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
 
     // Como chegar
     comoChegarTitulo: { rotulo: 'Título da seção Como chegar', padrao: 'Como chegar', secao: 'Seção Como chegar' },

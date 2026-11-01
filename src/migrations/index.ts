@@ -45,6 +45,7 @@ import * as migration_20261101_220336_festa_horario_termino from './20261101_220
 import * as migration_20261101_220922_galeria_categoria from './20261101_220922_galeria_categoria';
 import * as migration_20261101_221850_menu_do_site from './20261101_221850_menu_do_site';
 import * as migration_20261101_232627_espaco_carrossel from './20261101_232627_espaco_carrossel';
+import * as migration_20261101_232839_quadros_inicio from './20261101_232839_quadros_inicio';
 
 export const migrations = [
   {
@@ -280,6 +281,11 @@ export const migrations = [
   {
     up: migration_20261101_232627_espaco_carrossel.up,
     down: migration_20261101_232627_espaco_carrossel.down,
-    name: '20261101_232627_espaco_carrossel'
+    name: '20261101_232627_espaco_carrossel',
+  },
+  {
+    up: migration_20261101_232839_quadros_inicio.up,
+    down: migration_20261101_232839_quadros_inicio.down,
+    name: '20261101_232839_quadros_inicio'
   },
 ];
