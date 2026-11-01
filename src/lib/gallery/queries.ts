@@ -7,6 +7,7 @@ import type { Media, Model, SpaceItem, Video } from '../../payload-types'
 import { cached } from '../cache/cached'
 import { SLUG_RE } from '../contos/excerpt'
 import { MODEL_VIDEOS_ENABLED } from './flags'
+import { toCategoria } from './tipo'
 import type { GalleryImage, GalleryItemDTO, ModelCardDTO, ModelPageDTO, SpaceItemDTO } from './types'
 
 const SPACE_LIMIT = 120 // bounded list
@@ -104,6 +105,7 @@ export function toModelCardDTO(doc: Model): ModelCardDTO | null {
     id: String(doc.id),
     slug: doc.slug,
     name,
+    categoria: toCategoria(doc.categoria),
     cover: photos[0],
     photoCount: photos.length,
     videoCount: modelVideos(doc, name).length,

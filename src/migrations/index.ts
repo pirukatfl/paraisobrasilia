@@ -42,6 +42,7 @@ import * as migration_20261028_165121_textos_formatados from './20261028_165121_
 import * as migration_20261028_224917_todos_textos_formatados from './20261028_224917_todos_textos_formatados';
 import * as migration_20261029_180440_thumbs_contos from './20261029_180440_thumbs_contos';
 import * as migration_20261101_220336_festa_horario_termino from './20261101_220336_festa_horario_termino';
+import * as migration_20261101_220922_galeria_categoria from './20261101_220922_galeria_categoria';
 
 export const migrations = [
   {
@@ -262,6 +263,11 @@ export const migrations = [
   {
     up: migration_20261101_220336_festa_horario_termino.up,
     down: migration_20261101_220336_festa_horario_termino.down,
-    name: '20261101_220336_festa_horario_termino'
+    name: '20261101_220336_festa_horario_termino',
+  },
+  {
+    up: migration_20261101_220922_galeria_categoria.up,
+    down: migration_20261101_220922_galeria_categoria.down,
+    name: '20261101_220922_galeria_categoria'
   },
 ];

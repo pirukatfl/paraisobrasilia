@@ -120,15 +120,15 @@ test('Modelos is always in nav and footer; the sitemap lists it only while a mod
 
   let links = await navLinks()
   await expect(links.filter({ hasText: 'Contato' })).toHaveCount(1)
-  await expect(links.filter({ hasText: 'Profissionais e amadoras' })).toHaveCount(1)
-  await expect(page.locator('footer').getByRole('link', { name: 'Profissionais e amadoras' })).toHaveCount(1)
+  await expect(links.filter({ hasText: 'Galeria' })).toHaveCount(1)
+  await expect(page.locator('footer').getByRole('link', { name: 'Galeria' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).not.toContain('/modelos</loc>')
 
   await api.createModel({ name: 'Aurora', photos: 1 })
   links = await navLinks()
   // UI-SPEC order, pinned explicitly: Contos (05-03) sits between ClassiSex and Dicas Hot; Dicas Hot (quick dicas-hot-menu) precedes Contato.
   // Recados removed 2026-10-20 (quick recados-privados, R-08)
-  const order = ['Festas', 'Quem somos', 'Espaço', 'Profissionais e amadoras', 'ClassiSex', 'Contos', 'Dicas Hot', 'Contato', 'Assine Já', 'Área do assinante']
+  const order = ['Festas', 'Quem somos', 'Espaço', 'Galeria', 'ClassiSex', 'Contos', 'Dicas Hot', 'Contato', 'Assine Já', 'Área do assinante']
   await expect(links).toHaveText(order)
   if (!isMobile) {
     // the eleven items stay on one line at 1280 px
@@ -144,7 +144,7 @@ test('Modelos is always in nav and footer; the sitemap lists it only while a mod
     expect(fits.oneLine).toBe(true)
     expect(fits.right).toBeLessThanOrEqual(fits.viewport)
   }
-  await expect(page.locator('footer').getByRole('link', { name: 'Profissionais e amadoras' })).toHaveCount(1)
+  await expect(page.locator('footer').getByRole('link', { name: 'Galeria' })).toHaveCount(1)
   expect(await (await request.get('/sitemap.xml')).text()).toContain('/modelos</loc>')
 })
 
@@ -176,6 +176,85 @@ test.describe('staff unpublishes a model (fast removal)', () => {
     await expect(site.getByText('Em breve, as modelos da casa aqui.')).toBeVisible()
     expect((await site.goto('/modelos/aurora'))?.status()).toBe(404)
     await site.goto('/')
-    await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Profissionais e amadoras' })).toHaveCount(1)
+    await expect(site.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Galeria' })).toHaveCount(1)
   })
+})
+
+test('Galeria submenus: ?tipo= filters by categoria and changes the page title', async ({ page, request }) => {
+  test.setTimeout(120_000)
+  const api = await staffApi(request)
+  await api.deleteAll('models')
+  await api.createModel({ name: 'Aurora', photos: 1, order: 1 }) // categoria padrão: profissional
+  await api.createModel({ name: 'Bella', photos: 1, order: 2, categoria: 'amadora' })
+
+  const names = async () => page.locator('main ul[role="list"] > li').allTextContents()
+
+  await page.goto('/modelos')
+  await expect(page.getByRole('heading', { name: 'Modelos', level: 1 })).toBeVisible()
+  expect((await names()).join('|')).toMatch(/Aurora.*\|.*Bella/)
+
+  await page.goto('/modelos?tipo=profissionais')
+  await expect(page.getByRole('heading', { name: 'Profissionais', level: 1 })).toBeVisible()
+  expect(await names()).toHaveLength(1)
+  await expect(page.locator('main')).toContainText('Aurora')
+  await expect(page.locator('main')).not.toContainText('Bella')
+
+  await page.goto('/modelos?tipo=amadoras')
+  await expect(page.getByRole('heading', { name: 'Amadoras', level: 1 })).toBeVisible()
+  expect(await names()).toHaveLength(1)
+  await expect(page.locator('main')).toContainText('Bella')
+  await expect(page.locator('main')).not.toContainText('Aurora')
+
+  // unknown value: the whole gallery
+  await page.goto('/modelos?tipo=outra')
+  await expect(page.getByRole('heading', { name: 'Modelos', level: 1 })).toBeVisible()
+  expect(await names()).toHaveLength(2)
+})
+
+test('the Galeria menu item has Profissionais and Amadoras submenus (desktop dropdown, mobile list)', async ({
+  page,
+  request,
+  isMobile,
+}) => {
+  const api = await staffApi(request)
+  await api.deleteAll('models')
+  await page.goto('/')
+
+  if (isMobile) {
+    await page.getByRole('button', { name: 'Abrir menu' }).click()
+    const menu = page.getByRole('navigation', { name: 'Menu' })
+    await expect(menu.getByRole('link', { name: 'Profissionais', exact: true })).toHaveAttribute('href', '/modelos?tipo=profissionais')
+    await menu.getByRole('link', { name: 'Amadoras', exact: true }).click()
+    await expect(page).toHaveURL(/\/modelos\?tipo=amadoras$/)
+    return
+  }
+
+  const nav = page.getByRole('navigation', { name: 'Principal' })
+  const button = nav.getByRole('button', { name: 'Submenu de Galeria' })
+  // closed by default: the submenu links are not in the page, the parent stays a link to /modelos
+  await expect(button).toHaveAttribute('aria-expanded', 'false')
+  await expect(nav.getByRole('link', { name: 'Amadoras', exact: true })).toHaveCount(0)
+  await expect(nav.getByRole('link', { name: 'Galeria', exact: true })).toHaveAttribute('href', '/modelos')
+
+  // keyboard: Tab onto the parent opens it, Esc closes it and keeps focus on the button
+  await nav.getByRole('link', { name: 'Galeria', exact: true }).focus()
+  await page.keyboard.press('Tab')
+  await expect(button).toBeFocused()
+  await expect(button).toHaveAttribute('aria-expanded', 'true')
+  await expect(nav.getByRole('link', { name: 'Profissionais', exact: true })).toHaveAttribute('href', '/modelos?tipo=profissionais')
+  await page.keyboard.press('Escape')
+  await expect(button).toHaveAttribute('aria-expanded', 'false')
+  await expect(button).toBeFocused()
+
+  // pointer: hover opens it, a click on the item inside navigates
+  await page.mouse.move(0, 0)
+  await nav.getByRole('link', { name: 'Galeria', exact: true }).hover()
+  await expect(button).toHaveAttribute('aria-expanded', 'true')
+  await nav.getByRole('link', { name: 'Amadoras', exact: true }).click()
+  await expect(page).toHaveURL(/\/modelos\?tipo=amadoras$/)
+  await expect(page.getByRole('heading', { name: 'Amadoras', level: 1 })).toBeVisible()
+
+  // Quem somos opens its pages the same way
+  await nav.getByRole('link', { name: 'Quem somos', exact: true }).hover()
+  await expect(nav.getByRole('link', { name: 'Normas', exact: true })).toBeVisible()
 })

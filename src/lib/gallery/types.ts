@@ -22,10 +22,13 @@ export type SpaceItemDTO = {
 export type GalleryItemDTO = SpaceItemDTO
 
 /** /modelos card (UI-SPEC S11'): cover = first photo. */
+export type ModelCategoria = 'profissional' | 'amadora'
+
 export type ModelCardDTO = {
   id: string
   slug: string
   name: string
+  categoria: ModelCategoria
   cover: GalleryImage
   photoCount: number
   videoCount: number

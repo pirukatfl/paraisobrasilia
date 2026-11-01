@@ -67,7 +67,7 @@ test('the header menu has no Recados item; own content has no Enviar recado', as
     'Festas',
     'Quem somos',
     'Espaço',
-    'Profissionais e amadoras',
+    'Galeria',
     'ClassiSex',
     'Contos',
     'Dicas Hot',

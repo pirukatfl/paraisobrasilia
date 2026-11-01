@@ -1211,6 +1211,10 @@ export interface Model {
   id: number;
   name: string;
   /**
+   * Define em qual submenu da Galeria ela aparece: Profissionais ou Amadoras.
+   */
+  categoria: 'profissional' | 'amadora';
+  /**
    * Endereço da página: /modelos/…  Se ficar vazio, é criado a partir do nome. Mudar o endereço quebra links já compartilhados.
    */
   slug: string;
@@ -1969,6 +1973,7 @@ export interface SpaceItemsSelect<T extends boolean = true> {
  */
 export interface ModelsSelect<T extends boolean = true> {
   name?: T;
+  categoria?: T;
   slug?: T;
   description?: T;
   photos?:
@@ -2269,9 +2274,57 @@ export interface TextosGeral {
     [k: string]: unknown;
   } | null;
   /**
-   * Também usado no rodapé.
+   * Não aparece mais no menu: o item agora se chama Galeria (campos abaixo). Mantido só por segurança.
    */
   menuModelos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuGaleria?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  menuGaleriaProfissionais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  menuGaleriaAmadoras?: {
     root: {
       type: string;
       children: {
@@ -3495,6 +3548,78 @@ export interface TextosModelo {
    * Também é a descrição que aparece no Google (lá, sem formatação).
    */
   intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Título da página quando o visitante abre Galeria → Profissionais. Também aparece no Google (lá, sem formatação).
+   */
+  tituloProfissionais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também é a descrição que aparece no Google (lá, sem formatação).
+   */
+  introProfissionais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Título da página quando o visitante abre Galeria → Amadoras. Também aparece no Google (lá, sem formatação).
+   */
+  tituloAmadoras?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também é a descrição que aparece no Google (lá, sem formatação).
+   */
+  introAmadoras?: {
     root: {
       type: string;
       children: {
@@ -10977,6 +11102,9 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuDicas?: T;
   menuEspaco?: T;
   menuModelos?: T;
+  menuGaleria?: T;
+  menuGaleriaProfissionais?: T;
+  menuGaleriaAmadoras?: T;
   menuClassisex?: T;
   menuContos?: T;
   menuDicasHot?: T;
@@ -11087,6 +11215,10 @@ export interface TextosModelosSelect<T extends boolean = true> {
   chamadaTopo?: T;
   titulo?: T;
   intro?: T;
+  tituloProfissionais?: T;
+  introProfissionais?: T;
+  tituloAmadoras?: T;
+  introAmadoras?: T;
   vazioTitulo?: T;
   vazioTexto?: T;
   vazioBotaoFestas?: T;

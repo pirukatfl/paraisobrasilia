@@ -61,7 +61,7 @@ export async function Footer() {
     { href: pathForKey('regras'), label: <TextoRico valor={t.menuRegras} linha /> },
     { href: pathForKey('dicas'), label: <TextoRico valor={t.menuDicas} linha /> },
     { href: '/espaco', label: <TextoRico valor={t.menuEspaco} linha /> },
-    { href: '/modelos', label: <TextoRico valor={t.menuModelos} linha /> },
+    { href: '/modelos', label: <TextoRico valor={t.menuGaleria} linha /> },
     { href: '/classisex', label: <TextoRico valor={t.menuClassisex} linha /> },
     { href: '/contos', label: <TextoRico valor={t.menuContos} linha /> },
     { href: '/dicas-hot', label: <TextoRico valor={t.menuDicasHot} linha /> },

@@ -58,8 +58,8 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 
 ## Profissionais e amadoras
 
-Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição e fotos (por enquanto, **só fotos**: vídeos de modelos estão desligados). O item
-**Profissionais e amadoras** fica sempre no menu; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
+Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição e fotos (por enquanto, **só fotos**: vídeos de modelos estão desligados). No menu, o item
+**Galeria** (com os submenus **Profissionais** e **Amadoras**) fica sempre; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
 no mapa do site, para o Google, quando há pelo menos uma modelo publicada).
 A área é aberta ao público: **sem nudez explícita e sem contato** (telefone, WhatsApp, e-mail, @ ou links).
 
@@ -73,9 +73,12 @@ A área é aberta ao público: **sem nudez explícita e sem contato** (telefone,
    para mudar a ordem. Cada foto precisa do **Texto alternativo**.
    **Dica:** envie várias fotos de uma vez em **Arquivos → Mídias** e depois use **Escolher existente** em cada linha.
    A 31ª foto não é aceita: "Cada modelo pode ter no máximo 30 fotos.".
-6. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
-7. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
-8. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
+6. **Categoria** (coluna da direita): **Profissional** ou **Amadora**. É ela que decide em qual submenu da Galeria a
+   pessoa aparece (Galeria mostra todas; Profissionais e Amadoras mostram só o seu grupo). As que já existiam ficaram como **Profissional**:
+   troque para **Amadora** onde for o caso. Na lista, a coluna **Categoria** e o filtro ajudam a conferir.
+7. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
+8. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
+9. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
    menu somem).
 
 ---

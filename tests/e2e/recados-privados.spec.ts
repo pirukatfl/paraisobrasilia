@@ -71,7 +71,7 @@ test('1. Ana and Beto see the conversation in Recados; there is no Recados menu 
     'Festas',
     'Quem somos',
     'Espaço',
-    'Profissionais e amadoras',
+    'Galeria',
     'ClassiSex',
     'Contos',
     'Dicas Hot',

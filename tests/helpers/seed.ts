@@ -420,6 +420,7 @@ export async function seedModel(
     slug?: string
     description?: string
     videoCount?: number
+    categoria?: 'profissional' | 'amadora'
     authorization?: { date?: string; note?: string }
   },
 ) {
@@ -459,6 +460,7 @@ export async function seedModel(
       photos,
       ...(videos.length ? { videos } : {}),
       order: input.order ?? 0,
+      ...(input.categoria ? { categoria: input.categoria } : {}),
       ...(input.slug ? { slug: input.slug } : {}),
       ...(input.description ? { description: input.description } : {}),
       ...(input.authorization ? { imageAuthorization: input.authorization } : {}),

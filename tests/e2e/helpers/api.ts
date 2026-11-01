@@ -92,6 +92,7 @@ export async function staffApi(request: APIRequestContext) {
       slug?: string
       description?: string
       videos?: number
+      categoria?: 'profissional' | 'amadora'
     }) {
       const videos = []
       for (let i = 0; i < (opts.videos ?? 0); i++) {
@@ -113,6 +114,7 @@ export async function staffApi(request: APIRequestContext) {
           photos,
           ...(videos.length ? { videos } : {}),
           order: opts.order ?? 0,
+          ...(opts.categoria ? { categoria: opts.categoria } : {}),
           ...(opts.slug ? { slug: opts.slug } : {}),
           ...(opts.description ? { description: opts.description } : {}),
           _status: opts.published === false ? 'draft' : 'published',

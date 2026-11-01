@@ -1,12 +1,12 @@
 /**
  * Site navigation registry (header menu, mobile menu, footer).
  * Fixed order (UI-SPEC Phase 2, updated by 05-03; Recados removed 2026-10-20, quick recados-privados): Festas · Quem somos ·
- * Espaço · Modelos (label "Profissionais e amadoras", 2026-10-24) · ClassiSex · Contos (05-03) · Dicas Hot (quick dicas-hot-menu) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
+ * Espaço · Galeria (was "Profissionais e amadoras"; submenus Profissionais / Amadoras, 2026-11-01) · ClassiSex · Contos (05-03) · Dicas Hot (quick dicas-hot-menu) · Contato · Assine Já · Área do assinante. Pinned by tests/e2e/modelos.spec.ts.
  * Slices add their entries here: 02-02 Quem somos (+ Normas/Regras/Dicas), 02-03 Espaço,
  * 02-04 Modelos (always listed since quick menu-modelos; the page shows an empty state until a model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
  * Logged-in subscribers get getMemberNavItems() instead (quick menu-logado, 2026-10-24): Festas · Quem somos · Espaço ·
- * Profissionais e amadoras · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha (+ Sair
+ * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha (+ Sair
  * rendered by Nav/MobileMenu). Header picks the list on the server; pinned by tests/e2e/menu-logado.spec.ts.
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
@@ -30,8 +30,16 @@ export function getNavItems(t: Textos<'geral'>): NavItem[] {
       ],
     },
     { href: '/espaco', label: t.menuEspaco },
-    // quick menu-modelos: always listed (client request); /modelos shows an empty state until a model is published
-    { href: '/modelos', label: t.menuModelos },
+    // quick menu-modelos: always listed (client request); /modelos shows an empty state until a model is published.
+    // Novo planejamento 2026-11-01: renamed Galeria, with the Profissionais / Amadoras submenus (?tipo=).
+    {
+      href: '/modelos',
+      label: t.menuGaleria,
+      children: [
+        { href: '/modelos?tipo=profissionais', label: t.menuGaleriaProfissionais },
+        { href: '/modelos?tipo=amadoras', label: t.menuGaleriaAmadoras },
+      ],
+    },
     // PREV-01: open preview; the full board lives in the members area
     { href: '/classisex', label: t.menuClassisex },
     // PREV-03: open excerpts of the contos (05-03)

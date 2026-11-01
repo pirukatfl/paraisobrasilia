@@ -14,7 +14,7 @@ const LABELS = [
   'Festas',
   'Quem somos',
   'Espaço',
-  'Profissionais e amadoras',
+  'Galeria',
   'ClassiSex',
   'Contos',
   'Dicas Hot',
