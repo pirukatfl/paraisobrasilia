@@ -32,11 +32,12 @@ function Group({ id, title, children }: { id: string; title: React.ReactNode; ch
   )
 }
 
-function LinkList({ links }: { links: FooterLink[] }) {
+/** `columns`: flows the links in CSS columns (2 on the phone, 3 from lg), read top to bottom. */
+function LinkList({ links, columns = false }: { links: FooterLink[]; columns?: boolean }) {
   return (
-    <ul>
+    <ul className={columns ? 'columns-2 gap-x-6 lg:columns-3' : undefined}>
       {links.map((l) => (
-        <li key={l.href}>
+        <li key={l.href} className={columns ? 'break-inside-avoid' : undefined}>
           <Link href={l.href} className={linkClass}>
             {l.label}
           </Link>
@@ -46,7 +47,8 @@ function LinkList({ links }: { links: FooterLink[] }) {
   )
 }
 
-/** Site footer (UI-SPEC Global — Footer): Contato · Navegue · Legal + the 18+ line. */
+/** Site footer (UI-SPEC Global — Footer): Contato · Navegue · Legal + the 18+ line.
+ * Navegue is the wide block (2 columns on the phone, 3 on desktop) so the 13 links do not stack. */
 export async function Footer() {
   const year = new Date().getFullYear()
   const contact = await loadContact()
@@ -74,7 +76,7 @@ export async function Footer() {
 
   return (
     <footer className="mt-16 border-t border-line bg-bg">
-      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-4 pt-8 lg:grid-cols-3 lg:px-8">
+      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-4 pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] lg:px-8">
         {contact && (
           <Group id="rodape-contato" title={<TextoRico valor={t.rodapeContatoTitulo} linha />}>
             <address className="type-label not-italic text-muted">
@@ -119,7 +121,7 @@ export async function Footer() {
         )}
         <nav aria-label="Rodapé" className="contents">
           <Group id="rodape-navegue" title={<TextoRico valor={t.rodapeNavegueTitulo} linha />}>
-            <LinkList links={navigate} />
+            <LinkList links={navigate} columns />
           </Group>
           <Group id="rodape-legal" title={<TextoRico valor={t.rodapeLegalTitulo} linha />}>
             <LinkList links={legal} />
