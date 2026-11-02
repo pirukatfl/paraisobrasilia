@@ -511,6 +511,10 @@ export interface Ad {
    * Opcional. Só letras. Só assinantes veem.
    */
   cidade?: string | null;
+  /**
+   * Opcional, de 18 a 99. Só assinantes veem e filtram; nunca aparece na área aberta.
+   */
+  idade?: number | null;
   cidadeBusca?: string | null;
   /**
    * Até 600 caracteres. Só assinantes veem o texto.
@@ -1667,6 +1671,7 @@ export interface AdsSelect<T extends boolean = true> {
   apelido?: T;
   euSou?: T;
   cidade?: T;
+  idade?: T;
   cidadeBusca?: T;
   texto?: T;
   contato?:
@@ -7014,6 +7019,129 @@ export interface TextosClassisex {
     };
     [k: string]: unknown;
   } | null;
+  filtroIdade?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdadeTodas?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade18a29?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade30a39?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade40a49?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade50mais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aparece no cartão e na página do anúncio, só para assinantes. Mantenha {idade}.
+   */
+  idadeAnos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   filtroBotao?: {
     root: {
       type: string;
@@ -8970,6 +9098,39 @@ export interface TextosMeusAnuncio {
     [k: string]: unknown;
   } | null;
   cidadeRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  idadeRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Mantenha {idade}.
+   */
+  idadeAnos?: {
     root: {
       type: string;
       children: {
@@ -12430,6 +12591,13 @@ export interface TextosClassisexSelect<T extends boolean = true> {
   filtroEuSou?: T;
   filtroTodos?: T;
   filtroCidade?: T;
+  filtroIdade?: T;
+  filtroIdadeTodas?: T;
+  filtroIdade18a29?: T;
+  filtroIdade30a39?: T;
+  filtroIdade40a49?: T;
+  filtroIdade50mais?: T;
+  idadeAnos?: T;
   filtroBotao?: T;
   filtroLimpar?: T;
   vazioFiltroTitulo?: T;
@@ -12566,6 +12734,8 @@ export interface TextosMeusAnunciosSelect<T extends boolean = true> {
   apelidoAjuda?: T;
   euSouRotulo?: T;
   cidadeRotulo?: T;
+  idadeRotulo?: T;
+  idadeAnos?: T;
   textoRotulo?: T;
   textoAjuda?: T;
   textoAjudaAntigo?: T;

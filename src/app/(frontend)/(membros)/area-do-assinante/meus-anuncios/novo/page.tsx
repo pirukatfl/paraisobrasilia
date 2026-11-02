@@ -52,6 +52,7 @@ export default async function NovoAnuncioPage() {
           apelido: '',
           euSou: '',
           cidade: '',
+          idade: '',
           texto: '',
           whatsapp: check.assinante.whatsapp ?? '',
           telegram: '',

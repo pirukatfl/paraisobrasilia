@@ -230,6 +230,7 @@ export async function staffApi(request: APIRequestContext) {
       apelido?: string
       euSou?: number
       cidade?: string
+      idade?: number
       texto?: string
       contato?: { whatsapp?: string; telegram?: string; email?: string; links?: { url: string }[]; observacao?: string }
       status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'

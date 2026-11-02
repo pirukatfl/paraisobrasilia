@@ -1,7 +1,16 @@
 import Link from 'next/link'
 
+import { FAIXAS_IDADE } from '@/lib/classisex/idade'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { textoPuro } from '@/lib/textos/rico'
+
+const FAIXA_TEXTO = {
+  '18-29': 'filtroIdade18a29',
+  '30-39': 'filtroIdade30a39',
+  '40-49': 'filtroIdade40a49',
+  '50-mais': 'filtroIdade50mais',
+} as const
 
 /** Plain GET form (no client JS): Eu sou (+ cidade for members) (D-07). */
 export async function AdFilters({
@@ -9,14 +18,20 @@ export async function AdFilters({
   categories,
   euSou,
   cidade,
+  idade,
   showCidade = true,
+  showIdade = false,
 }: {
   action: string
   categories: { id: number; name: string }[]
   euSou?: number
   cidade?: string
+  /** Selected age range key (members area only). */
+  idade?: string
   /** The open area filters by tipo only: the city is never shown there. */
   showCidade?: boolean
+  /** Members area only: the open area never filters by age. */
+  showIdade?: boolean
 }) {
   const t = await getTextos('classisex')
   return (
@@ -53,6 +68,26 @@ export async function AdFilters({
           className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
         />
       </div>
+      )}
+      {showIdade && (
+        <div className="flex flex-col gap-2">
+          <label htmlFor="filtro-idade" className="type-label text-text">
+            <TextoRico valor={t.filtroIdade} linha />
+          </label>
+          <select
+            id="filtro-idade"
+            name="idade"
+            defaultValue={idade ?? ''}
+            className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
+          >
+            <option value="">{textoPuro(t.filtroIdadeTodas)}</option>
+            {FAIXAS_IDADE.map((f) => (
+              <option key={f.key} value={f.key}>
+                {textoPuro(t[FAIXA_TEXTO[f.key]])}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
       <div className="flex items-center gap-4">
         <button type="submit" className="btn-primary">

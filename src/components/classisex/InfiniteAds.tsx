@@ -24,6 +24,7 @@ export function InfiniteAds({
   totalPages,
   euSou,
   cidade,
+  idade,
   gridClassName,
   noscriptPagination,
 }: {
@@ -35,6 +36,8 @@ export function InfiniteAds({
   totalPages: number
   euSou?: number
   cidade?: string
+  /** Age range key (members board only; the server ignores it for everyone else). */
+  idade?: string
   gridClassName: string
   noscriptPagination?: ReactNode
 }) {
@@ -53,7 +56,7 @@ export function InfiniteAds({
     setLoading(true)
     setFailed(false)
     try {
-      const r = await loadMoreClassisex(scope, { euSou, cidade, page: page + 1 })
+      const r = await loadMoreClassisex(scope, { euSou, cidade, idade, page: page + 1 })
       setItems((prev) => {
         const seen = new Set(prev.map((a) => a.id))
         return [...prev, ...(r.items as AnyAd[]).filter((a) => !seen.has(a.id))]
@@ -66,7 +69,7 @@ export function InfiniteAds({
       busy.current = false
       setLoading(false)
     }
-  }, [scope, euSou, cidade, page, pages])
+  }, [scope, euSou, cidade, idade, page, pages])
 
   useEffect(() => {
     const el = sentinel.current

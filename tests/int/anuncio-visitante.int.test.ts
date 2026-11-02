@@ -98,6 +98,13 @@ describe('ad sent without an account (S-02..S-09, S-12)', () => {
     expect(totalDocs).toBe(0)
   })
 
+  it('keeps the optional age of a visitor ad (saved for the members board only)', async () => {
+    const { id } = await send({ input: { idade: '41' } })
+    expect((await ad(id!)).idade).toBe(41)
+    const { id: semIdade } = await send({})
+    expect((await ad(semIdade!)).idade ?? null).toBeNull()
+  })
+
   it('works without a photo too (the photo is optional)', async () => {
     const { id } = await send({ files: [] })
     expect(await mediaOf(id!)).toHaveLength(0)

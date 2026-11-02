@@ -470,7 +470,7 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 ### Anúncios sem conta
 
 Desde 23/10/2026 **qualquer pessoa pode anunciar, sem cadastro**: o botão **Anunciar** do ClassiSex abre um formulário com
-os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, WhatsApp ou Telegram, declaração de 18 anos) mais o
+os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, idade, texto, WhatsApp ou Telegram, declaração de 18 anos) mais o
 **e-mail** da pessoa (opcional) e o aceite dos Termos. **Só são obrigatórios**: apelido, Eu sou, texto, a declaração de
 18 anos ou mais e o aceite dos Termos (no anúncio de assinante, os mesmos, menos os Termos). Cidade, contato, foto e e-mail são opcionais.
 
@@ -489,6 +489,18 @@ os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, Whats
   pode criar uma conta gratuita para ter esse controle nos próximos anúncios.
 - Sem recados: ninguém consegue mandar recado para esse anúncio. Quem é assinante ativo vê o WhatsApp/Telegram normalmente.
 - Antes de aprovar, confira o texto (contato escondido de outro jeito) e **a capa**: é a foto que todo visitante vê.
+
+### Idade do anúncio e filtro por idade
+
+- O anúncio tem um campo **Idade** (opcional, de 18 a 99): no formulário do assinante (novo e editar), no **anúncio sem
+  conta** e no painel (**ClassiSex → Anúncios**, ao lado da cidade). Anúncios antigos ficam sem idade; a equipe pode
+  preencher no painel. Para casal, use a idade que a pessoa quiser mostrar (o campo é um número só).
+- **Só assinantes com acesso ativo** veem a idade (no cartão e na página do anúncio, "34 anos") e podem **filtrar por idade**
+  na área do assinante, ao lado de "Eu sou" e "Cidade": **18 a 29**, **30 a 39**, **40 a 49**, **50 ou mais** ou "Todas".
+  Anúncio sem idade só aparece em "Todas".
+- **A área aberta (/classisex) não muda**: continua só com o filtro "Eu sou", sem idade e sem cidade no filtro, e a idade
+  nunca vai no HTML nem em consulta aberta. Visitantes e contas gratuitas não veem a idade.
+- Os nomes das faixas e o rótulo do filtro ficam em **Textos do site → ClassiSex** (seção "Filtros dos anúncios").
 
 ### Opções "Eu sou"
 

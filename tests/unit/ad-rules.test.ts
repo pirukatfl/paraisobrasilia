@@ -38,6 +38,20 @@ const errorsOf = (input: Partial<AdInput>) => {
 }
 
 describe('ClassiSex ad rules (D-01, D-02)', () => {
+  it('age is optional, 18 to 99, and normalised to a number', () => {
+    const ok = (idade?: string) => {
+      const r = validateAdInput({ ...valid, idade })
+      if (!r.ok) throw new Error('expected ok')
+      return r.value.idade
+    }
+    expect(ok(undefined)).toBeNull()
+    expect(ok('')).toBeNull()
+    expect(ok(' 35 ')).toBe(35)
+    expect(errorsOf({ idade: '17' }).idade).toBeTruthy()
+    expect(errorsOf({ idade: '100' }).idade).toBeTruthy()
+    expect(errorsOf({ idade: 'abc' }).idade).toBeTruthy()
+  })
+
   it('exposes the limits', () => {
     expect(TEXT_MAX).toBe(600)
     expect(CIDADE_MAX).toBe(60)

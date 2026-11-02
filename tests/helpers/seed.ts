@@ -485,6 +485,7 @@ export interface SeedAdInput {
   apelido?: string
   euSou?: number
   cidade?: string
+  idade?: number
   texto?: string
   contato?: { whatsapp?: string; telegram?: string; email?: string; links?: { url: string }[]; observacao?: string }
   status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
@@ -511,6 +512,7 @@ export async function seedAd(payload: Payload, input: SeedAdInput) {
       apelido: input.apelido ?? 'Casal Teste',
       euSou,
       cidade: input.cidade ?? 'Brasília',
+      ...(input.idade !== undefined ? { idade: input.idade } : {}),
       texto: input.texto ?? 'Casal simpático procura amigos para a próxima festa.',
       contato: input.contato ?? { whatsapp: '5561999990000' },
       status,

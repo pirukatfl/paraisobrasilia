@@ -16,6 +16,7 @@ import {
   type MemberAdDTO,
   type PublicAdDTO,
 } from './dto'
+import { limitesDaFaixa, parseFaixaIdade, type FaixaIdade } from './idade'
 import { CIDADE_MAX, normaliseCidade } from './rules'
 import { categoryLabels, mediaByAd } from './service'
 import { visibleAdsWhere } from './visibility'
@@ -29,17 +30,19 @@ export function clampPage(raw: unknown): number {
   return Number.isInteger(n) && n >= 1 ? Math.min(n, MAX_PAGE) : 1
 }
 
-export type BoardFilters = { euSou?: number; cidade?: string; page?: number }
+export type BoardFilters = { euSou?: number; cidade?: string; idade?: FaixaIdade; page?: number }
 
 const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
 
-/** Defensive parse of ?eu-sou=&cidade=&pagina= (untrusted query string). */
+/** Defensive parse of ?eu-sou=&cidade=&idade=&pagina= (untrusted query string). */
 export function parseBoardFilters(params: Record<string, string | string[] | undefined>): BoardFilters {
   const out: BoardFilters = {}
   const euSou = Number.parseInt(first(params['eu-sou']) ?? '', 10)
   if (Number.isInteger(euSou) && euSou > 0) out.euSou = euSou
   const cidade = (first(params.cidade) ?? '').trim().slice(0, CIDADE_MAX)
   if (cidade) out.cidade = cidade
+  const idade = parseFaixaIdade(params.idade)
+  if (idade) out.idade = idade
   const page = Number.parseInt(first(params.pagina) ?? '', 10)
   out.page = Number.isInteger(page) && page >= 1 ? Math.min(page, MAX_PAGE) : 1
   return out
@@ -50,6 +53,11 @@ export function boardWhere(filters: BoardFilters, now: Date): Where {
   if (filters.euSou) and.push({ euSou: { equals: filters.euSou } })
   const cidade = filters.cidade ? normaliseCidade(filters.cidade) : ''
   if (cidade) and.push({ cidadeBusca: { like: cidade } })
+  if (filters.idade) {
+    // An ad without age never matches a range (only "Todas" lists it)
+    const { min, max } = limitesDaFaixa(filters.idade)
+    and.push({ idade: { greater_than_equal: min } }, { idade: { less_than_equal: max } })
+  }
   return { and }
 }
 
@@ -168,8 +176,8 @@ export async function findMemberAd(payload: Payload, id: number | string, now: D
  * are read (never filenames).
  */
 export async function findPublicAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<PublicAdDTO>> {
-  // The city is not public: the open area never filters by it
-  const { items, labels, ...rest } = await findVisibleAdDocs(payload, { ...filters, cidade: undefined }, now)
+  // City and age are members-only: the open area never filters by them
+  const { items, labels, ...rest } = await findVisibleAdDocs(payload, { ...filters, cidade: undefined, idade: undefined }, now)
   const ids = items.map((d) => d.id)
   const byAd = new Map<number, AdMediaDocLike[]>()
   if (ids.length) {

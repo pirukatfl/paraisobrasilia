@@ -50,6 +50,7 @@ import * as migration_20261101_233218_promocao from './20261101_233218_promocao'
 import * as migration_20261101_233442_promocao_textos from './20261101_233442_promocao_textos';
 import * as migration_20261102_012634_envios_midia from './20261102_012634_envios_midia';
 import * as migration_20261102_024123_pages_intro_formatada from './20261102_024123_pages_intro_formatada';
+import * as migration_20261102_024939_classisex_idade from './20261102_024939_classisex_idade';
 
 export const migrations = [
   {
@@ -310,6 +311,11 @@ export const migrations = [
   {
     up: migration_20261102_024123_pages_intro_formatada.up,
     down: migration_20261102_024123_pages_intro_formatada.down,
-    name: '20261102_024123_pages_intro_formatada'
+    name: '20261102_024123_pages_intro_formatada',
+  },
+  {
+    up: migration_20261102_024939_classisex_idade.up,
+    down: migration_20261102_024939_classisex_idade.down,
+    name: '20261102_024939_classisex_idade'
   },
 ];

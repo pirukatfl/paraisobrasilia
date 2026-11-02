@@ -19,6 +19,7 @@ export type AdFormValues = {
   apelido: string
   euSou: string
   cidade: string
+  idade: string
   texto: string
   whatsapp: string
   telegram: string
@@ -41,6 +42,7 @@ function readInput(formData: FormData): { input: AdInput; values: AdFormValues }
     apelido: field(formData, 'apelido'),
     euSou: field(formData, 'euSou'),
     cidade: field(formData, 'cidade'),
+    idade: field(formData, 'idade'),
     texto: field(formData, 'texto'),
     whatsapp: field(formData, 'whatsapp'),
     telegram: field(formData, 'telegram'),
@@ -55,6 +57,7 @@ function readInput(formData: FormData): { input: AdInput; values: AdFormValues }
       apelido: values.apelido,
       euSou: Number.isInteger(euSou) && euSou > 0 ? euSou : null,
       cidade: values.cidade,
+      idade: values.idade,
       texto: values.texto,
       whatsapp: values.whatsapp,
       telegram: values.telegram,

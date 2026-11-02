@@ -1,0 +1,36 @@
+import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
+
+export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+  await db.execute(sql`
+   ALTER TABLE "textos_classisex" ALTER COLUMN "vazio_filtro_membros_texto" SET DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Tente outra opção em Eu sou, outra cidade ou outra faixa de idade.","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "ads" ADD COLUMN "idade" numeric;
+  ALTER TABLE "textos_classisex" ADD COLUMN "filtro_idade" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Idade","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_classisex" ADD COLUMN "filtro_idade_todas" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Todas","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_classisex" ADD COLUMN "filtro_idade18a29" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"18 a 29 anos","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_classisex" ADD COLUMN "filtro_idade30a39" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"30 a 39 anos","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_classisex" ADD COLUMN "filtro_idade40a49" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"40 a 49 anos","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_classisex" ADD COLUMN "filtro_idade50mais" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"50 anos ou mais","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_classisex" ADD COLUMN "idade_anos" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"{idade} anos","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_meus_anuncios" ADD COLUMN "idade_rotulo" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Idade (opcional, de 18 a 99, só assinantes veem)","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "textos_meus_anuncios" ADD COLUMN "idade_anos" jsonb DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"{idade} anos","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  -- A row still holding the old default text follows the new one (texts edited by the staff stay as they are)
+  UPDATE "textos_classisex" SET "vazio_filtro_membros_texto" = '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Tente outra opção em Eu sou, outra cidade ou outra faixa de idade.","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb WHERE "vazio_filtro_membros_texto" = '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Tente outra opção em Eu sou ou outra cidade.","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  CREATE INDEX "ads_idade_idx" ON "ads" USING btree ("idade");`)
+}
+
+export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+  await db.execute(sql`
+   DROP INDEX "ads_idade_idx";
+  ALTER TABLE "textos_classisex" ALTER COLUMN "vazio_filtro_membros_texto" SET DEFAULT '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Tente outra opção em Eu sou ou outra cidade.","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;
+  ALTER TABLE "ads" DROP COLUMN "idade";
+  ALTER TABLE "textos_classisex" DROP COLUMN "filtro_idade";
+  ALTER TABLE "textos_classisex" DROP COLUMN "filtro_idade_todas";
+  ALTER TABLE "textos_classisex" DROP COLUMN "filtro_idade18a29";
+  ALTER TABLE "textos_classisex" DROP COLUMN "filtro_idade30a39";
+  ALTER TABLE "textos_classisex" DROP COLUMN "filtro_idade40a49";
+  ALTER TABLE "textos_classisex" DROP COLUMN "filtro_idade50mais";
+  ALTER TABLE "textos_classisex" DROP COLUMN "idade_anos";
+  ALTER TABLE "textos_meus_anuncios" DROP COLUMN "idade_rotulo";
+  ALTER TABLE "textos_meus_anuncios" DROP COLUMN "idade_anos";
+  UPDATE "textos_classisex" SET "vazio_filtro_membros_texto" = '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Tente outra opção em Eu sou ou outra cidade.","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb WHERE "vazio_filtro_membros_texto" = '{"root":{"type":"root","version":1,"children":[{"type":"paragraph","version":1,"children":[{"type":"text","version":1,"text":"Tente outra opção em Eu sou, outra cidade ou outra faixa de idade.","format":0,"detail":0,"mode":"normal","style":""}],"direction":"ltr","format":"","indent":0,"textFormat":0,"textStyle":""}],"direction":"ltr","format":"","indent":0}}'::jsonb;`)
+}

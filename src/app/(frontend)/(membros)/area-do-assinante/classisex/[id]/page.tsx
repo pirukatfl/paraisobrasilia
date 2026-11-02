@@ -49,6 +49,7 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
       <h1 id="titulo-anuncio" className="type-display mt-2">
         {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
+        {ad.idade ? <> · <TextoRico valor={t.idadeAnos} vars={{ idade: ad.idade }} linha /></> : null}
       </h1>
       <p className="type-label mt-2 text-muted"><TextoRico valor={t.anuncioPublicadoEm} vars={{ data: ad.publishedLabel }} linha /></p>
       <MediaGallery

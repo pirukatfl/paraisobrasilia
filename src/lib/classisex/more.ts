@@ -5,9 +5,10 @@
 import type { Payload } from 'payload'
 
 import { clampPage, findMemberAds, findPublicAds } from './board'
+import { parseFaixaIdade } from './idade'
 import type { MemberAdDTO, PublicAdDTO } from './dto'
 
-export type MoreInput = { euSou?: unknown; cidade?: unknown; page?: unknown }
+export type MoreInput = { euSou?: unknown; cidade?: unknown; idade?: unknown; page?: unknown }
 
 export type MoreResult =
   | { audience: 'membros'; items: MemberAdDTO[]; page: number; totalPages: number }
@@ -21,6 +22,7 @@ export function sanitiseMoreInput(input: MoreInput) {
   return {
     euSou: Number.isInteger(euSou) && euSou > 0 ? euSou : undefined,
     cidade: cidade || undefined,
+    idade: parseFaixaIdade(input.idade),
     page: clampPage(input.page),
   }
 }
@@ -28,7 +30,7 @@ export function sanitiseMoreInput(input: MoreInput) {
 /**
  * Next page of the board. `memberActive` is decided on the server from the session and the
  * subscription (never from the client): only then the members DTOs (contacts) are returned;
- * everyone else gets the public, redacted DTOs, and the city filter is ignored for them.
+ * everyone else gets the public, redacted DTOs, and the city and age filters are ignored for them.
  */
 export async function loadMoreAds(
   payload: Payload,
@@ -36,9 +38,9 @@ export async function loadMoreAds(
   input: MoreInput,
   now: Date,
 ): Promise<MoreResult> {
-  const { euSou, cidade, page } = sanitiseMoreInput(input)
+  const { euSou, cidade, idade, page } = sanitiseMoreInput(input)
   if (memberActive) {
-    const r = await findMemberAds(payload, { euSou, cidade, page }, now)
+    const r = await findMemberAds(payload, { euSou, cidade, idade, page }, now)
     return { audience: 'membros', items: r.items, page: r.page, totalPages: r.totalPages }
   }
   const r = await findPublicAds(payload, { euSou, page }, now)

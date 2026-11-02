@@ -154,6 +154,8 @@ export const meusAnuncios = definirArea({
     },
     euSouRotulo: { rotulo: 'Campo: Eu sou', padrao: 'Eu sou', secao: CAMPOS },
     cidadeRotulo: { rotulo: 'Campo: Cidade', padrao: 'Cidade (opcional, só assinantes veem)', secao: CAMPOS },
+    idadeRotulo: { rotulo: 'Campo: Idade', padrao: 'Idade (opcional, de 18 a 99, só assinantes veem)', secao: CAMPOS },
+    idadeAnos: { rotulo: 'Idade no cartão do anúncio', padrao: '{idade} anos', secao: CAMPOS, ajuda: 'Mantenha {idade}.' },
     textoRotulo: { rotulo: 'Campo: Texto do anúncio', padrao: 'Texto do anúncio', secao: CAMPOS },
     textoAjuda: {
       bloco: true,

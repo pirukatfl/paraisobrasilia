@@ -122,6 +122,25 @@ export function AdFormFields({
       </div>
 
       <div className="flex flex-col gap-2">
+        <label htmlFor="idade" className="type-label text-text">
+          <TextoRico valor={t.idadeRotulo} linha />
+        </label>
+        <input
+          id="idade"
+          name="idade"
+          type="number"
+          inputMode="numeric"
+          min={18}
+          max={99}
+          step={1}
+          defaultValue={values.idade}
+          aria-describedby={described('idade')}
+          className={`${inputClass} w-32`}
+        />
+        <FieldError id="erro-idade" message={errors.idade} />
+      </div>
+
+      <div className="flex flex-col gap-2">
         <label htmlFor="texto" className="type-label text-text">
           <TextoRico valor={t.textoRotulo} linha /> <Required texto={<TextoRico valor={t.campoObrigatorio} linha />} />
         </label>
