@@ -90,6 +90,8 @@ export interface Config {
     dicas: Dica;
     'space-items': SpaceItem;
     models: Model;
+    'envios-midia': EnviosMidia;
+    'envios-midia-arquivos': EnviosMidiaArquivo;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -103,6 +105,9 @@ export interface Config {
     ads: {
       midias: 'ad-media';
       denuncias: 'ad-reports';
+    };
+    'envios-midia': {
+      arquivos: 'envios-midia-arquivos';
     };
   };
   collectionsSelect: {
@@ -128,6 +133,8 @@ export interface Config {
     dicas: DicasSelect<false> | DicasSelect<true>;
     'space-items': SpaceItemsSelect<false> | SpaceItemsSelect<true>;
     models: ModelsSelect<false> | ModelsSelect<true>;
+    'envios-midia': EnviosMidiaSelect<false> | EnviosMidiaSelect<true>;
+    'envios-midia-arquivos': EnviosMidiaArquivosSelect<false> | EnviosMidiaArquivosSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -154,6 +161,7 @@ export interface Config {
     'textos-classisex': TextosClassisex;
     'textos-meus-anuncios': TextosMeusAnuncio;
     'textos-enviar-conto': TextosEnviarConto;
+    'textos-enviar-midia': TextosEnviarMidia;
     'textos-contos': TextosConto;
     'textos-dicas-hot': TextosDicasHot;
     'textos-mensagens': TextosMensagen;
@@ -175,6 +183,7 @@ export interface Config {
     'textos-classisex': TextosClassisexSelect<false> | TextosClassisexSelect<true>;
     'textos-meus-anuncios': TextosMeusAnunciosSelect<false> | TextosMeusAnunciosSelect<true>;
     'textos-enviar-conto': TextosEnviarContoSelect<false> | TextosEnviarContoSelect<true>;
+    'textos-enviar-midia': TextosEnviarMidiaSelect<false> | TextosEnviarMidiaSelect<true>;
     'textos-contos': TextosContosSelect<false> | TextosContosSelect<true>;
     'textos-dicas-hot': TextosDicasHotSelect<false> | TextosDicasHotSelect<true>;
     'textos-mensagens': TextosMensagensSelect<false> | TextosMensagensSelect<true>;
@@ -1260,6 +1269,76 @@ export interface Model {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Fotos e vídeos que o público mandou pelo site. Nada aparece no site sozinho: veja os arquivos aqui, baixe o que for usar e marque o envio como aprovado ou recusado.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia".
+ */
+export interface EnviosMidia {
+  id: number;
+  /**
+   * Aprovar não publica nada: serve só para a equipe se organizar.
+   */
+  status: 'novo' | 'aprovado' | 'recusado';
+  apelido: string;
+  /**
+   * Só a equipe vê.
+   */
+  contato: string;
+  mensagem?: string | null;
+  /**
+   * Data e hora em que a pessoa confirmou ter 18 anos e autorizar o uso das imagens.
+   */
+  consentAt?: string | null;
+  /**
+   * Anotação interna (ex.: "usar na galeria de dezembro").
+   */
+  observacao?: string | null;
+  /**
+   * Clique em um arquivo para ver a prévia e baixar o original.
+   */
+  arquivos?: {
+    docs?: (number | EnviosMidiaArquivo)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cada foto ou vídeo de um envio. Ficam fora da área pública: só a equipe abre.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia-arquivos".
+ */
+export interface EnviosMidiaArquivo {
+  id: number;
+  envio: number | EnviosMidia;
+  kind: 'foto' | 'video';
+  durationSeconds?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -1370,6 +1449,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'models';
         value: number | Model;
+      } | null)
+    | ({
+        relationTo: 'envios-midia';
+        value: number | EnviosMidia;
+      } | null)
+    | ({
+        relationTo: 'envios-midia-arquivos';
+        value: number | EnviosMidiaArquivo;
       } | null);
   globalSlug?: string | null;
   user:
@@ -2002,6 +2089,55 @@ export interface ModelsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia_select".
+ */
+export interface EnviosMidiaSelect<T extends boolean = true> {
+  status?: T;
+  apelido?: T;
+  contato?: T;
+  mensagem?: T;
+  consentAt?: T;
+  observacao?: T;
+  arquivos?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia-arquivos_select".
+ */
+export interface EnviosMidiaArquivosSelect<T extends boolean = true> {
+  envio?: T;
+  kind?: T;
+  durationSeconds?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -9980,6 +10116,458 @@ export interface TextosEnviarConto {
   createdAt?: string | null;
 }
 /**
+ * Página e formulário para qualquer pessoa enviar fotos e vídeos, e a confirmação de envio. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-enviar-midia".
+ */
+export interface TextosEnviarMidia {
+  id: number;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  googleTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  googleDescricao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  topo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  titulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  obrigatorio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  apelidoRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  apelidoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contatoRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contatoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  mensagemRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  mensagemAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  arquivosRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {fotos} e {videos} para as quantidades máximas.
+   */
+  arquivosAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  arquivosEscolher?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  arquivosTirar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  maior18?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * A data e a hora em que a pessoa marcou ficam registradas no envio.
+   */
+  autorizacao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  aviso?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  botao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  botaoEnviando?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {n} para o arquivo atual e {total} para a quantidade de arquivos. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  progresso?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  enviadoGoogleTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoTopo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {n} para a quantidade de arquivos que não foram aceitos. Só aparece quando houve falha.
+   */
+  enviadoFalhas?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoBotaoInicio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Lista de contos, página de cada conto e a área de contos dos assinantes. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -12046,6 +12634,43 @@ export interface TextosEnviarContoSelect<T extends boolean = true> {
   enviadoTexto?: T;
   enviadoBotaoContos?: T;
   enviadoBotaoConta?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-enviar-midia_select".
+ */
+export interface TextosEnviarMidiaSelect<T extends boolean = true> {
+  googleTitulo?: T;
+  googleDescricao?: T;
+  topo?: T;
+  titulo?: T;
+  intro?: T;
+  obrigatorio?: T;
+  apelidoRotulo?: T;
+  apelidoAjuda?: T;
+  contatoRotulo?: T;
+  contatoAjuda?: T;
+  mensagemRotulo?: T;
+  mensagemAjuda?: T;
+  arquivosRotulo?: T;
+  arquivosAjuda?: T;
+  arquivosEscolher?: T;
+  arquivosTirar?: T;
+  maior18?: T;
+  autorizacao?: T;
+  aviso?: T;
+  botao?: T;
+  botaoEnviando?: T;
+  progresso?: T;
+  enviadoGoogleTitulo?: T;
+  enviadoTopo?: T;
+  enviadoTitulo?: T;
+  enviadoTexto?: T;
+  enviadoFalhas?: T;
+  enviadoBotaoInicio?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

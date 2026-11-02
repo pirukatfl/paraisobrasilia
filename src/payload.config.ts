@@ -8,6 +8,8 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { AdCategories } from './collections/AdCategories'
+import { EnviosMidia } from './collections/EnviosMidia'
+import { EnviosMidiaArquivos } from './collections/EnviosMidiaArquivos'
 import { AdMedia } from './collections/AdMedia'
 import { AdReports } from './collections/AdReports'
 import { Ads } from './collections/Ads'
@@ -109,6 +111,11 @@ export default buildConfig({
     Dicas,
     SpaceItems,
     Models,
+    EnviosMidia,
+    {
+      ...EnviosMidiaArquivos,
+      upload: { ...(typeof EnviosMidiaArquivos.upload === 'object' ? EnviosMidiaArquivos.upload : {}), staticDir: privateDir },
+    },
   ],
   globals: [Contact, MenuDoSite, Promocao, ...TextosGlobals],
   hooks: {

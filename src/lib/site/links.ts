@@ -4,8 +4,7 @@
  * No Next, no Payload: pure, unit-testable.
  */
 export const ENVIO_CONTOS_HREF = '/contos/enviar'
-// Until the client decided, photos and videos went to /contato; the open form now exists (item I).
-export const ENVIO_MIDIA_HREF = '/contato'
+export const ENVIO_MIDIA_HREF = '/enviar-fotos-e-videos'
 
 /** Whole words only ("contos", not "contosa"); accents are letters, so "vídeos" never matches inside a word. */
 const PALAVRAS = /(?<![\p{L}\p{N}])(contos|fotos e v[ií]deos)(?![\p{L}\p{N}])/giu

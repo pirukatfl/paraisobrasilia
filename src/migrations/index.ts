@@ -48,6 +48,7 @@ import * as migration_20261101_232627_espaco_carrossel from './20261101_232627_e
 import * as migration_20261101_232839_quadros_inicio from './20261101_232839_quadros_inicio';
 import * as migration_20261101_233218_promocao from './20261101_233218_promocao';
 import * as migration_20261101_233442_promocao_textos from './20261101_233442_promocao_textos';
+import * as migration_20261102_012634_envios_midia from './20261102_012634_envios_midia';
 
 export const migrations = [
   {
@@ -298,6 +299,11 @@ export const migrations = [
   {
     up: migration_20261101_233442_promocao_textos.up,
     down: migration_20261101_233442_promocao_textos.down,
-    name: '20261101_233442_promocao_textos'
+    name: '20261101_233442_promocao_textos',
+  },
+  {
+    up: migration_20261102_012634_envios_midia.up,
+    down: migration_20261102_012634_envios_midia.down,
+    name: '20261102_012634_envios_midia'
   },
 ];

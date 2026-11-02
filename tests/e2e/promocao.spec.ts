@@ -61,9 +61,9 @@ test('never on top of the age gate: appears only after the 18+ confirmation, onc
 
   // The words become highlighted links; the two buttons close the pop-up
   await expect(popup(page).getByRole('link', { name: 'contos', exact: true })).toHaveAttribute('href', '/contos/enviar')
-  await expect(popup(page).getByRole('link', { name: 'fotos e vídeos', exact: true })).toHaveAttribute('href', '/contato')
+  await expect(popup(page).getByRole('link', { name: 'fotos e vídeos', exact: true })).toHaveAttribute('href', '/enviar-fotos-e-videos')
   await expect(popup(page).getByRole('link', { name: 'Enviar contos' })).toHaveAttribute('href', '/contos/enviar')
-  await expect(popup(page).getByRole('link', { name: 'Enviar fotos e vídeos' })).toHaveAttribute('href', '/contato')
+  await expect(popup(page).getByRole('link', { name: 'Enviar fotos e vídeos' })).toHaveAttribute('href', '/enviar-fotos-e-videos')
 
   // Esc closes
   await page.keyboard.press('Escape')

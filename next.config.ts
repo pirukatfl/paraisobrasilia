@@ -13,6 +13,9 @@ const isProduction = process.env.SITE_ENV === 'production'
 const nextConfig: NextConfig = {
   // Self-contained server for the Docker image (.next/standalone/server.js)
   output: 'standalone',
+  // Upload route handlers (ClassiSex media, open photo/video form) take bodies up to ~105 MB; with the proxy
+  // (src/proxy.ts) Next buffers only 10 MB by default and would cut a bigger body. Same cap as Caddy.
+  experimental: { proxyClientMaxBodySize: '110mb' },
   // R-05 (quick recados-privados): the public mural is gone. Fixed destinations, nothing user-controlled.
   async redirects() {
     return [

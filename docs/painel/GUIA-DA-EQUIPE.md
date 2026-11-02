@@ -213,6 +213,22 @@ Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo
 
 ---
 
+## Fotos e vídeos enviados pelo público
+
+Qualquer pessoa pode mandar fotos e vídeos em **/enviar-fotos-e-videos** (sem cadastro; o link também está nos textos da promoção e da página inicial). **Nada vai para o site sozinho**: só a equipe vê o que chega.
+
+1. Menu da esquerda → **Envios do público → Fotos e vídeos enviados**. A lista mostra apelido, situação, contato e data. Os envios novos aparecem como **Novo**.
+2. Abra um envio. Você vê o **apelido**, o **contato** (e-mail ou WhatsApp, só a equipe vê), a **mensagem** e a **data e hora em que a pessoa confirmou ter 18 anos e autorizar o uso das imagens** (guarde: é o registro de autorização).
+3. Em **Arquivos**, clique em cada foto ou vídeo para ver a **prévia** e **baixar o original**.
+4. Se for usar uma imagem na galeria do site, baixe o arquivo e envie pelo painel (**Site → Fotos e vídeos do espaço** ou **Profissionais e amadoras**), como de costume.
+5. Mude a **Situação** para **Aprovado** ou **Recusado** (só organiza a fila: aprovar **não publica**) e, se quiser, escreva uma **Observação da equipe**. **Salvar**.
+
+Limites do formulário: até **10 fotos** (JPG, PNG ou WebP, até 15 MB) e **2 vídeos** (MP4 ou MOV, até 100 MB e 60 segundos) por envio. Os arquivos ficam em armazenamento privado, fora da área pública, e entram no backup junto com os arquivos do ClassiSex.
+Para **apagar** um envio (por exemplo, a pessoa pediu para retirar), use **Excluir**: os arquivos dele são apagados juntos.
+Os textos da página (título, avisos, texto da autorização) ficam em **Textos do site → Enviar fotos e vídeos**.
+
+---
+
 ## Contato e endereço
 
 Endereço, telefone, WhatsApp, e-mail, Instagram e horário aparecem na página **Contato**, no rodapé e na página inicial.
