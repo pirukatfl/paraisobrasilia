@@ -3233,7 +3233,7 @@ export interface TextosGeral {
   createdAt?: string | null;
 }
 /**
- * Textos fixos da página inicial: próximas festas, espaço, quem somos, dicas e como chegar. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
+ * Textos fixos da página inicial: próximas festas, espaço, ClassiSex, contos, dicas e como chegar. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-inicio".

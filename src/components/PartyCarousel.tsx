@@ -5,15 +5,18 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { FlyerFrame } from '@/components/party/FlyerFrame'
 import { formatCardDate } from '@/lib/format/date'
-import { AUTO_ADVANCE_MS, indexFromScroll, shouldAutoplay, slideLabel, stepIndex } from '@/lib/parties/carousel'
+import { AUTO_ADVANCE_MS, indexFromScroll, isPaused, shouldAutoplay, slideLabel, stepIndex } from '@/lib/parties/carousel'
 import type { PartyCardDTO } from '@/lib/parties/types'
+
+/** Longest a smooth slide change takes to settle; scroll events in this window are ours, not a swipe. */
+const SCROLL_SETTLE_MS = 900
 
 /**
  * Home carousel of ALL upcoming parties (the old site had a flyer slider). CSS scroll-snap does the
  * sliding and the touch swipe; this component adds the arrows, the dots and the auto-advance
- * (every ~6 s, paused on hover/focus/touch, off with prefers-reduced-motion or after the visitor
- * stops it). Each slide keeps the whole flyer at its own proportions: the flyer button enlarges it,
- * the title/date link goes to the party page.
+ * (every ~6 s from the moment the page opens; paused only by keyboard focus or a finger on it, off with
+ * prefers-reduced-motion or after the visitor stops it with the pause button). Each slide keeps the
+ * whole flyer at its own proportions: the flyer button enlarges it, the title/date link goes to the party page.
  * A single party shows no controls.
  */
 export function PartyCarousel({
@@ -27,7 +30,17 @@ export function PartyCarousel({
   const total = parties.length
   const trackRef = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
+  // The slide we are smooth-scrolling to (and until when): scroll events fired on the way must not move
+  // `index` back (they used to fight the animation and make the slider flip between two slides).
+  const scrolling = useRef<{ until: number } | null>(null)
+  const indexRef = useRef(0)
+  useEffect(() => {
+    indexRef.current = index
+  }, [index])
+  // Pauses: keyboard focus inside the carousel, or a finger on it. Never the mouse pointer hovering
+  // (it usually rests over this huge carousel, e.g. right after the 18+ gate, and would stop it forever).
+  const [focusPaused, setFocusPaused] = useState(false)
+  const [touching, setTouching] = useState(false)
   const [userStopped, setUserStopped] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
 
@@ -44,6 +57,7 @@ export function PartyCarousel({
       const track = trackRef.current
       if (!track) return
       const clamped = Math.min(total - 1, Math.max(0, target))
+      scrolling.current = reducedMotion ? null : { until: Date.now() + SCROLL_SETTLE_MS }
       track.scrollTo({ left: clamped * track.clientWidth, behavior: reducedMotion ? 'auto' : 'smooth' })
       setIndex(clamped)
     },
@@ -54,10 +68,11 @@ export function PartyCarousel({
   const onScroll = useCallback(() => {
     const track = trackRef.current
     if (!track) return
+    if (scrolling.current && Date.now() < scrolling.current.until) return
     setIndex(indexFromScroll(track.scrollLeft, track.clientWidth, total))
   }, [total])
 
-  const autoplay = shouldAutoplay({ total, reducedMotion, paused, userStopped })
+  const autoplay = shouldAutoplay({ total, reducedMotion, paused: isPaused({ keyboardFocus: focusPaused, touching }), userStopped })
   useEffect(() => {
     if (!autoplay) return
     // A new timer after every slide change, so a manual move always gets a full interval
@@ -69,12 +84,17 @@ export function PartyCarousel({
   useEffect(() => {
     const track = trackRef.current
     if (!track || total < 2) return
+    let lastWidth = track.clientWidth
     const observer = new ResizeObserver(() => {
-      track.scrollTo({ left: index * track.clientWidth, behavior: 'auto' })
+      // Only a real width change (rotation, resize) realigns; the first callback and height changes do not
+      if (track.clientWidth === lastWidth) return
+      lastWidth = track.clientWidth
+      scrolling.current = null
+      track.scrollTo({ left: indexRef.current * track.clientWidth, behavior: 'auto' })
     })
     observer.observe(track)
     return () => observer.disconnect()
-  }, [index, total])
+  }, [total])
 
   const many = total > 1
 
@@ -85,12 +105,14 @@ export function PartyCarousel({
       data-party-carousel
       data-autoplay={autoplay ? 'on' : 'off'}
       className="relative mx-auto w-full max-w-[1000px]"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
-      onTouchStart={() => setPaused(true)}
-      onTouchEnd={() => setPaused(false)}
+      onFocus={(event) => {
+        // Only keyboard focus pauses (a mouse click on a button must not freeze the slider)
+        if (event.target.matches(':focus-visible')) setFocusPaused(true)
+      }}
+      onBlur={() => setFocusPaused(false)}
+      onTouchStart={() => setTouching(true)}
+      onTouchEnd={() => setTouching(false)}
+      onTouchCancel={() => setTouching(false)}
     >
       <div
         ref={trackRef}

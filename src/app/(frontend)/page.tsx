@@ -1,14 +1,14 @@
-import { AboutTeaser } from '@/components/home/AboutTeaser'
 import { ClassiContosDicas } from '@/components/home/ClassiContosDicas'
 import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
+import { GaleriaTeaser } from '@/components/home/GaleriaTeaser'
 import { PromocaoSemJs } from '@/components/home/PromocaoPopup'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
 import { getLatestContos } from '@/lib/contos/public'
 import { getLatestDicas } from '@/lib/dicas/public'
-import { getSpacePhotos } from '@/lib/gallery/queries'
-import { getPageIntro } from '@/lib/pages/queries'
+import { getPublishedModels, getSpaceItems } from '@/lib/gallery/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
+import { estaOculto } from '@/lib/site/menu'
 import { getMenuConfig } from '@/lib/site/menu-queries'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
@@ -16,7 +16,7 @@ import { TextoRico } from '@/components/TextoRico'
 
 // Rendered per request, never at build time: the Docker/CI build has no database.
 // The data itself stays in the Next data cache (unstable_cache, tags 'parties', 'space',
-// 'page:quem-somos', 'contact'), so staff changes show at once and ended parties drop off by time.
+// 'models', 'contact'), so staff changes show at once and ended parties drop off by time.
 export const dynamic = 'force-dynamic'
 
 /** Optional home sections fail soft: an error hides only that section (T-02-15). */
@@ -31,10 +31,10 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
 export default async function HomePage({ searchParams }: { searchParams: Promise<{ promocao?: string | string[] }> }) {
   // `/?promocao=abrir`: where the menu item "Promoção" lands without JavaScript (with JS the modal opens instead)
   const abrirPromocao = (await searchParams).promocao === 'abrir'
-  const [parties, photos, intro, contact, dicas, contos, menu, t] = await Promise.all([
+  const [parties, spaceItems, models, contact, dicas, contos, menu, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
-    optional(() => getSpacePhotos(8)),
-    optional(() => getPageIntro('quem-somos')),
+    optional(() => getSpaceItems()), // all items: the lightbox walks them, only 4 tiles are rendered
+    optional(() => getPublishedModels()),
     optional(() => getContact()),
     optional(() => getLatestDicas(3)),
     optional(() => getLatestContos(3)),
@@ -68,8 +68,8 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         </>
       )}
 
-      <SpaceTeaser photos={photos ?? []} />
-      <AboutTeaser intro={intro} />
+      <SpaceTeaser items={spaceItems ?? []} abaixoDaDobra={hasParties} />
+      {!estaOculto('galeria', menu.ocultos) && <GaleriaTeaser models={models ?? []} />}
       <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} ocultos={menu.ocultos} />
       {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
     </>

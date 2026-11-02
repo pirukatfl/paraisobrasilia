@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AUTO_ADVANCE_MS, indexFromScroll, shouldAutoplay, slideLabel, stepIndex } from '@/lib/parties/carousel'
+import { AUTO_ADVANCE_MS, indexFromScroll, isPaused, shouldAutoplay, slideLabel, stepIndex } from '@/lib/parties/carousel'
 
 describe('party carousel helpers', () => {
   it('advances every ~6 seconds', () => {
@@ -30,5 +30,10 @@ describe('party carousel helpers', () => {
     expect(shouldAutoplay({ ...base, reducedMotion: true })).toBe(false)
     expect(shouldAutoplay({ ...base, paused: true })).toBe(false)
     expect(shouldAutoplay({ ...base, userStopped: true })).toBe(false)
+  })
+  it('pauses only for keyboard focus or a touch, never for the mouse pointer', () => {
+    expect(isPaused({ keyboardFocus: false, touching: false })).toBe(false)
+    expect(isPaused({ keyboardFocus: true, touching: false })).toBe(true)
+    expect(isPaused({ keyboardFocus: false, touching: true })).toBe(true)
   })
 })

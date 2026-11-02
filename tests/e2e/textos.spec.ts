@@ -26,7 +26,7 @@ async function salvar(
 
 // Every field is an editor: null = emptied editor = original text
 async function limpar(request: import('@playwright/test').APIRequestContext) {
-  await salvar(request, 'textos-inicio', { tituloProximasFestas: null, quemSomosBotao: null })
+  await salvar(request, 'textos-inicio', { tituloProximasFestas: null, classisexBotao: null })
   await salvar(request, 'textos-geral', { menuFestas: null })
   await salvar(request, 'textos-espaco', { intro: null })
   await salvar(request, 'textos-contato', { descricaoGoogle: null })
@@ -188,12 +188,12 @@ test('título com negrito e botão com itálico (campos de linha) aparecem forma
   await expect(page.locator('[data-field-path="tituloProximasFestas"] .toolbar-popup__button-link')).toHaveCount(0)
   await expect(page.locator('[data-field-path="tituloProximasFestas"] .toolbar-popup__button-unorderedList')).toHaveCount(0)
 
-  const botao = page.locator('[data-field-path="quemSomosBotao"] [contenteditable="true"]').first()
+  const botao = page.locator('[data-field-path="classisexBotao"] [contenteditable="true"]').first()
   await botao.click()
   await page.keyboard.press('ControlOrMeta+a')
-  await page.keyboard.type('Conheça ')
+  await page.keyboard.type('Ver o ')
   await page.keyboard.press('ControlOrMeta+i')
-  await page.keyboard.type('a casa')
+  await page.keyboard.type('ClassiSex')
 
   await page.getByRole('button', { name: 'Salvar' }).first().click()
   await expect(page.getByText('Atualizado com sucesso')).toBeVisible()
@@ -205,14 +205,14 @@ test('título com negrito e botão com itálico (campos de linha) aparecem forma
   })
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Próximas festas' }).locator('strong')).toHaveText('festas')
-  await expect(page.getByRole('link', { name: 'Conheça a casa' }).locator('em')).toHaveText('a casa')
+  await expect(page.getByRole('link', { name: 'Ver o ClassiSex' }).locator('em')).toHaveText('ClassiSex')
   expect(avisos).toEqual([])
 
   await limpar(request)
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Próximas festas' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Próximas festas' }).locator('strong')).toHaveCount(0)
-  await expect(page.getByRole('link', { name: 'Conheça a casa' }).locator('em')).toHaveCount(0)
+  await expect(page.getByRole('link', { name: 'Ver o ClassiSex' }).locator('em')).toHaveCount(0)
 })
 
 test('campo só texto (Google) tem o aviso no painel e sai como texto puro na <meta>', async ({ page, request }) => {

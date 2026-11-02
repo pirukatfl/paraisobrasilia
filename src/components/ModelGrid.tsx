@@ -22,7 +22,7 @@ export function countLabel(
 }
 
 /** Model cards (UI-SPEC S11'): each card is one link to the model page; cover = first photo 4:5. */
-export async function ModelGrid({ models }: { models: ModelCardDTO[] }) {
+export async function ModelGrid({ models, abaixoDaDobra = false }: { models: ModelCardDTO[]; abaixoDaDobra?: boolean }) {
   const t = await getTextos('modelos')
   return (
     <ul role="list" className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
@@ -40,7 +40,7 @@ export async function ModelGrid({ models }: { models: ModelCardDTO[] }) {
                 width={model.cover.thumbWidth}
                 height={model.cover.thumbHeight}
                 sizes={CARD_SIZES}
-                loading={i < 2 ? 'eager' : 'lazy'}
+                loading={!abaixoDaDobra && i < 2 ? 'eager' : 'lazy'}
                 className="h-full w-full object-cover transition-transform duration-[400ms] ease-out-expo group-hover:scale-[1.04]"
               />
             </span>

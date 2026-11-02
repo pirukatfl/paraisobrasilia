@@ -16,8 +16,9 @@ const TILE_SIZES = '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
 /**
  * Space gallery grid (UI-SPEC S9): 2 / 3 / 4 columns, square tiles. Before hydration (or without
  * JavaScript) each tile is a link to the large image; afterwards it is a button opening the lightbox.
+ * `abaixoDaDobra`: every image loads lazily (home sections below the fold).
  */
-export function Gallery({ items, limite }: { items: SpaceItemDTO[]; limite?: number }) {
+export function Gallery({ items, limite, abaixoDaDobra = false }: { items: SpaceItemDTO[]; limite?: number; abaixoDaDobra?: boolean }) {
   const hydrated = useHydrated()
   const t = useTextosGerais()
   const [index, setIndex] = useState<number | null>(null)
@@ -61,7 +62,7 @@ export function Gallery({ items, limite }: { items: SpaceItemDTO[]; limite?: num
                 width={item.image.thumbWidth}
                 height={item.image.thumbHeight}
                 sizes={TILE_SIZES}
-                loading={i < 2 ? 'eager' : 'lazy'}
+                loading={!abaixoDaDobra && i < 2 ? 'eager' : 'lazy'}
                 className="h-full w-full object-cover transition-transform duration-[400ms] ease-out-expo group-hover:scale-[1.04]"
               />
               {item.kind === 'video' && (

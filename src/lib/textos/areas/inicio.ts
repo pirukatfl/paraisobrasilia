@@ -3,7 +3,7 @@ import { definirArea } from '../tipos'
 export const inicio = definirArea({
   slug: 'textos-inicio',
   rotulo: 'Página inicial',
-  descricao: 'Textos fixos da página inicial: próximas festas, espaço, quem somos, dicas e como chegar.',
+  descricao: 'Textos fixos da página inicial: próximas festas, espaço, ClassiSex, contos, dicas e como chegar.',
   campos: {
     // Topo
     chamadaTopo: {
@@ -76,14 +76,14 @@ export const inicio = definirArea({
     },
 
     // Quem somos
-    quemSomosTitulo: { rotulo: 'Título da seção Quem somos', padrao: 'Quem somos', secao: 'Seção Quem somos' },
+    quemSomosTitulo: { rotulo: 'Título da seção Quem somos', padrao: 'Quem somos', secao: 'Quem somos (não aparece mais na página inicial)' },
     quemSomosTextoReserva: {
       rotulo: 'Texto de reserva de Quem somos',
       padrao: 'Uma casa de festas liberais com discrição, respeito e liberdade. Conheça o Paraíso.',
-      secao: 'Seção Quem somos',
+      secao: 'Quem somos (não aparece mais na página inicial)',
       ajuda: 'Só aparece se a página Quem somos estiver sem texto de abertura.',
     },
-    quemSomosBotao: { rotulo: 'Botão da seção', padrao: 'Conheça a casa', secao: 'Seção Quem somos' },
+    quemSomosBotao: { rotulo: 'Botão da seção', padrao: 'Conheça a casa', secao: 'Quem somos (não aparece mais na página inicial)' },
 
     // ClassiSex, Contos e Dicas Hot (3 quadros lado a lado)
     classisexTitulo: { rotulo: 'Título do quadro ClassiSex', padrao: 'ClassiSex', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },

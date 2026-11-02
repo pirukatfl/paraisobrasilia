@@ -18,9 +18,17 @@ Cada pessoa da equipe tem o seu próprio usuário.
 
 ---
 
+## Como a página inicial é montada
+
+De cima para baixo: **carrossel das próximas festas** → **2 festas pequenas** → **Conheça o espaço** (4 fotos) → **Galeria** (4 fotos) → ClassiSex, Contos e Dicas Hot → Como chegar. O bloco "Quem somos" **não aparece mais** na página inicial (a página **Quem somos** continua no menu e no rodapé).
+
+- **Carrossel das festas**: troca sozinho a cada 6 segundos assim que a página abre, mesmo com o mouse em cima. Só para enquanto a pessoa usa o teclado dentro dele ou segura o dedo na tela, e quem quiser pode parar no botão de pausa. Quem tem "reduzir movimento" ligado no aparelho não recebe a troca automática.
+- **2 festas pequenas**: são as duas festas seguintes à primeira do carrossel (flyer pequeno, data e nome; o clique leva à página da festa). Com uma festa só, essa linha some.
+- **Galeria**: mostra a foto de capa das **4 primeiras modelos publicadas** (na ordem definida no painel), cada uma levando à página da modelo, e o link "Ver toda a galeria". Some se não houver modelos publicadas ou se **Galeria** estiver em **Configurações → Menu do site → Itens escondidos**. O título "Galeria" e o link dessa linha são fixos (não têm campo em Textos do site).
+
 ## Fotos e vídeos do espaço
 
-As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial ("Conheça o espaço").
+As fotos e vídeos aparecem na página **Espaço**. Na página inicial, "Conheça o espaço" mostra **4 fotos pequenas**; ao clicar em uma delas abre o visualizador com **todas** as fotos e vídeos do espaço (setas para passar). Se houver mais de 4, a quarta foto mostra "+N" e aparece o botão "Ver todas as fotos". A ordem é a mesma da página Espaço.
 
 ### Enviar uma foto
 
@@ -91,11 +99,11 @@ A área é aberta ao público: **sem nudez explícita e sem contato** (telefone,
 Os seis textos já vêm escritos. A equipe pode mudar quando quiser.
 
 1. **Site → Páginas** → clique na página (ex.: **Regras**).
-2. Edite **Título**, **Introdução** (frase curta, até 200 caracteres — aparece no topo da página, na página inicial e no Google) e **Texto**.
+2. Edite **Título**, **Introdução** (frase curta, até 200 caracteres — aparece no topo da página e no Google) e **Texto**.
    - No **Texto**, selecione as palavras para colocar **negrito**, *itálico*, sublinhado, riscado, link ou lista.
    - Use "Título 2" e "Título 3" para os subtítulos.
    - Na **Introdução** vale negrito, itálico, sublinhado e riscado (sem link nem lista). A formatação aparece no topo da
-     página e no quadro "Quem somos" da página inicial; no Google e no WhatsApp vai só o texto, sem formatação. O limite de
+     página; no Google e no WhatsApp vai só o texto, sem formatação. O limite de
      200 caracteres conta só as letras, não a formatação.
    - Linha em branco no meio do texto vira espaço entre os parágrafos; para quebrar a linha sem abrir um parágrafo novo,
      use Shift + Enter.
@@ -123,7 +131,7 @@ descrição que aparecem no Google (estes dois, sem formatação).
 | Área | O que tem |
 |---|---|
 | Menu, rodapé e avisos gerais | menu do topo, rodapé, confirmação de 18+, página não encontrada, página de erro, galeria, paginação |
-| Página inicial | próximas festas, espaço, quem somos, dicas, como chegar |
+| Página inicial | próximas festas, espaço, ClassiSex, contos, dicas, como chegar (os campos de "Quem somos" e do carrossel do espaço não aparecem mais no site) |
 | Festas | página de cada festa |
 | Espaço | página do espaço |
 | Profissionais e amadoras | lista e página de cada uma |
