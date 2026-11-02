@@ -26,7 +26,7 @@ export default async function SpacePage() {
       </h1>
       <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
       {items.length > 0 ? (
-        <Gallery items={items} />
+        <Gallery items={items} limite={4} />
       ) : (
         <EmptyState
           heading={<TextoRico valor={t.vazioTitulo} linha />}

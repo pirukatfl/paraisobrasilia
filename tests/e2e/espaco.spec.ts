@@ -83,7 +83,42 @@ test('published photos and video appear as tiles', async ({ page, request, isMob
   expect(res.headers()['accept-ranges']).toBe('bytes')
 })
 
-test('a 12-photo gallery stays under 600 KB on a phone before interaction (MIDIA-03)', async ({
+test('page shows only 4 tiles and the lightbox walks the full list', async ({ page, request }) => {
+  test.setTimeout(180_000)
+  const api = await staffApi(request)
+  await api.deleteAll('space-items')
+  for (let i = 1; i <= 6; i++) await api.createSpacePhoto({ order: i, alt: `Ambiente ${i}` })
+
+  await page.goto('/espaco')
+  const grid = page.locator('main ul[role="list"]')
+  await expect(grid.getByRole('button')).toHaveCount(4)
+  await expect(grid.locator('img')).toHaveCount(4)
+  await expect(grid.getByRole('button', { name: 'Ambiente 4' })).toContainText('+2')
+  await expect(page.getByRole('button', { name: 'Ver todas as fotos (6)' })).toBeVisible()
+
+  await grid.getByRole('button', { name: 'Ambiente 2' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Galeria de fotos' })
+  await expect(dialog).toContainText('2 de 6')
+  for (const n of [3, 4, 5, 6]) {
+    await page.keyboard.press('ArrowRight')
+    await expect(dialog).toContainText(`${n} de 6`)
+  }
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+
+  await page.getByRole('button', { name: 'Ver todas as fotos (6)' }).click()
+  await expect(dialog).toContainText('1 de 6')
+  await page.keyboard.press('Escape')
+
+  // 4 or fewer: no extra control
+  await api.deleteAll('space-items')
+  for (let i = 1; i <= 4; i++) await api.createSpacePhoto({ order: i, alt: `Ambiente ${i}` })
+  await page.goto('/espaco')
+  await expect(grid.getByRole('button')).toHaveCount(4)
+  await expect(page.getByRole('button', { name: /Ver todas/ })).toHaveCount(0)
+})
+
+test('a 12-photo gallery (4 tiles) stays under 600 KB on a phone before interaction (MIDIA-03)', async ({
   page,
   request,
   isMobile,
@@ -98,7 +133,7 @@ test('a 12-photo gallery stays under 600 KB on a phone before interaction (MIDIA
 
   const { measureWeight } = await import('./helpers/weight')
   await page.goto('/espaco')
-  await expect(page.locator('main ul[role="list"] > li')).toHaveCount(12)
+  await expect(page.locator('main ul[role="list"] > li')).toHaveCount(4)
   const weight = await measureWeight(page)
   console.log(`[budget] /espaco 12 photos: ${Math.round(weight.total / 1024)} KB without JS`, weight.byType)
   expect(weight.total).toBeLessThanOrEqual(600 * 1024)

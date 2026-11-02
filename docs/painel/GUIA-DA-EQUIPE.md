@@ -49,6 +49,9 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 4. Legenda, ordem e autorização como na foto → **Publicar**.
 5. No celular, abra `/espaco`, toque no vídeo e confira se ele toca e se dá para avançar.
 
+> **Atenção à ordem:** a página **Espaço** mostra só os **4 primeiros** itens (pela **Ordem**). Ao tocar em qualquer um,
+> abre o visualizador com **todas** as fotos e vídeos, para passar de um a um pelas setas. Coloque as 4 melhores primeiro.
+
 ### Trocar a ordem ou tirar do site
 
 - Mude o número em **Ordem** e **Publicar** de novo.
