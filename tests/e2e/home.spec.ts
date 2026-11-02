@@ -19,13 +19,13 @@ test('home shows the upcoming party flyer linking to its page', async ({ page })
   await expect(img).toHaveAttribute('alt', /.+/)
 })
 
-test('with parties the house sections follow the party grid', async ({ page }) => {
+test('with parties the house sections follow the agenda (no Quem somos block)', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Próximas festas', level: 1 })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Paraíso Brasília', level: 1 })).toHaveCount(0)
   const headings = await page.locator('main h1, main h2').allTextContents()
   const grid = headings.indexOf('Próximas festas')
   expect(grid).toBe(0)
-  expect(headings.indexOf('Quem somos')).toBeGreaterThan(grid)
-  expect(headings.indexOf('Como chegar')).toBeGreaterThan(headings.indexOf('Quem somos'))
+  expect(headings).not.toContain('Quem somos')
+  expect(headings.indexOf('Como chegar')).toBeGreaterThan(grid)
 })

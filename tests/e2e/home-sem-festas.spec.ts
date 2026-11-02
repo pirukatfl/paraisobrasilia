@@ -22,7 +22,7 @@ test.afterAll(async ({ request }) => {
   await api.deleteAll('space-items')
 })
 
-test('without parties the home shows the house: space, about and directions', async ({ page, request }) => {
+test('without parties the home shows the house: space and directions', async ({ page, request }) => {
   test.setTimeout(120_000)
   const api = await staffApi(request)
   await api.deleteAll('space-items')
@@ -37,9 +37,7 @@ test('without parties the home shows the house: space, about and directions', as
   await expect(space.getByRole('img')).toHaveCount(4)
   await expect(space.getByRole('link', { name: 'Ver galeria completa' })).toHaveAttribute('href', '/espaco')
 
-  const about = page.getByRole('region', { name: 'Quem somos' })
-  await expect(about).toContainText('casa de festas liberais para casais e solteiros')
-  await expect(about.getByRole('link', { name: 'Conheça a casa' })).toHaveAttribute('href', '/quem-somos')
+  await expect(page.getByRole('region', { name: 'Quem somos' })).toHaveCount(0)
 
   const directions = page.getByRole('region', { name: 'Como chegar' })
   await expect(directions).toContainText('Rua 15, Travessa 01, Chácara 02')
@@ -58,6 +56,6 @@ test('without space photos the space section is hidden, the others stay', async 
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'Paraíso Brasília', level: 1 })).toBeVisible()
   await expect(page.getByRole('region', { name: 'Conheça o espaço' })).toHaveCount(0)
-  await expect(page.getByRole('region', { name: 'Quem somos' })).toBeVisible()
+  await expect(page.getByRole('region', { name: 'Quem somos' })).toHaveCount(0)
   await expect(page.getByRole('region', { name: 'Como chegar' })).toBeVisible()
 })

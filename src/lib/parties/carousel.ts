@@ -24,3 +24,12 @@ export function slideLabel(position: number, total: number, title: string): stri
 export function shouldAutoplay(opts: { total: number; reducedMotion: boolean; paused: boolean; userStopped: boolean }): boolean {
   return opts.total > 1 && !opts.reducedMotion && !opts.paused && !opts.userStopped
 }
+
+/**
+ * What pauses the automatic change: keyboard focus inside the carousel (WCAG 2.2.2) or a finger on it.
+ * The mouse pointer NEVER pauses it: the carousel is large, so the pointer often rests over it (e.g. after
+ * the 18+ gate) and the slider would never start.
+ */
+export function isPaused(opts: { keyboardFocus: boolean; touching: boolean }): boolean {
+  return opts.keyboardFocus || opts.touching
+}

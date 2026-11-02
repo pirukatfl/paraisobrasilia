@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 
-// Home: carousel of ALL upcoming parties (slider like the old site), grid of the others below.
+// Home: carousel of ALL upcoming parties (slider like the old site, automatic from the first second), 2 small cards below.
 test.describe.configure({ mode: 'serial' })
 
 test.beforeEach(async ({ context, baseURL }) => {
@@ -55,17 +55,66 @@ test('swipe (scroll-snap) changes the slide and updates the dots', async ({ page
   await expect(page.getByRole('button', { name: /^Ir para a festa 2 de/ })).toHaveAttribute('aria-current', 'true')
 })
 
-test('auto-advances after ~6 s and pauses while the pointer is over it', async ({ page }) => {
+const AUTO_ADVANCE_MS = 6000
+
+async function mouseOverCarousel(page: import('@playwright/test').Page) {
+  const box = (await page.locator('[data-party-carousel] [data-slide="1"]').boundingBox())!
+  await page.mouse.move(box.x + box.width / 2, box.y + Math.min(box.height / 2, 200))
+}
+
+test('auto-advances by itself after ~6 s', async ({ page }) => {
   test.setTimeout(60_000)
   await page.goto('/')
   await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'on')
-  await expect.poll(() => activeSlide(page), { timeout: 15_000 }).toBe(2)
-  // hovering pauses it
-  const target = page.locator('[data-party-carousel] [data-slide="2"]')
-  await target.hover()
-  await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'off')
-  await page.waitForTimeout(7_000)
-  expect(await activeSlide(page)).toBe(2)
+  await expect.poll(() => activeSlide(page), { timeout: AUTO_ADVANCE_MS + 6_000 }).toBe(2)
+})
+
+test('keeps advancing while the mouse hovers over the carousel (hover never pauses it)', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.goto('/')
+  await mouseOverCarousel(page)
+  await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'on')
+  await expect.poll(() => activeSlide(page), { timeout: AUTO_ADVANCE_MS + 6_000 }).toBe(2)
+  await expect.poll(() => activeSlide(page), { timeout: AUTO_ADVANCE_MS + 6_000 }).toBe(3)
+})
+
+test('starts on its own right after accepting the 18+ gate, with the mouse over the carousel', async ({ page, context }) => {
+  test.setTimeout(60_000)
+  await context.clearCookies()
+  await page.goto('/')
+  const enter = page.getByRole('button', { name: 'Tenho 18 anos ou mais — Entrar' })
+  await expect(enter).toBeFocused()
+  await enter.click()
+  await expect(page.getByRole('dialog', { name: 'Conteúdo para maiores de 18 anos' })).toBeHidden()
+  // the gate never leaves the focus inside the carousel
+  expect(await page.evaluate(() => !!document.activeElement?.closest('[data-party-carousel]'))).toBe(false)
+  await mouseOverCarousel(page)
+  await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'on')
+  await expect.poll(() => activeSlide(page), { timeout: AUTO_ADVANCE_MS + 6_000 }).toBe(2)
+})
+
+test('clicking a carousel button with the mouse does not freeze the slider', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Próxima festa' }).click()
+  await expect.poll(() => activeSlide(page)).toBe(2)
+  await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'on')
+  await expect.poll(() => activeSlide(page), { timeout: AUTO_ADVANCE_MS + 6_000 }).toBe(3)
+})
+
+test('keyboard focus inside the carousel pauses it, leaving resumes it', async ({ page }) => {
+  test.setTimeout(60_000)
+  await page.goto('/')
+  const carousel = page.locator('[data-party-carousel]')
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press('Tab')
+    if (await page.evaluate(() => !!document.activeElement?.closest('[data-party-carousel]'))) break
+  }
+  await expect(carousel).toHaveAttribute('data-autoplay', 'off')
+  await page.waitForTimeout(AUTO_ADVANCE_MS + 1_000)
+  expect(await activeSlide(page)).toBe(1)
+  await page.evaluate(() => (document.activeElement as HTMLElement).blur())
+  await expect(carousel).toHaveAttribute('data-autoplay', 'on')
 })
 
 test('the stop button halts the auto-advance', async ({ page }) => {
@@ -99,23 +148,32 @@ test('each flyer keeps its own proportion inside the slide (landscape is not cro
   await expect(landscape.locator('img')).toHaveCSS('object-fit', 'contain')
 })
 
-test('the other parties grid has bigger cards: 1 per row on mobile, 2 on tablet and desktop', async ({ page }) => {
+test('two small cards of the next parties sit side by side under the carousel (also on mobile)', async ({ page }) => {
   await page.goto('/')
-  const grid = page.getByRole('list').filter({ has: page.getByRole('link', { name: /Festa Paisagem/ }) })
-  const items = grid.locator('> li')
-  await items.last().scrollIntoViewIfNeeded()
-  const boxes = await items.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()))
-  expect(boxes.length).toBeGreaterThanOrEqual(2)
-  const vw = page.viewportSize()!.width
-  const sameRow = Math.abs(boxes[0]!.top - boxes[1]!.top) < 4
-  if (vw < 640) {
-    expect(sameRow).toBe(false)
-    expect(boxes[0]!.width).toBeGreaterThan(vw - 48)
-  } else {
-    expect(sameRow).toBe(true)
-    expect(boxes[0]!.width).toBeGreaterThan(Math.min(vw, 1136) / 2 - 40)
-    if (boxes.length > 2) expect(Math.abs(boxes[2]!.left - boxes[0]!.left)).toBeLessThan(4) // third wraps under the first
+  const row = page.locator('[data-mini-parties]')
+  const cards = row.locator('[data-mini-party]')
+  await expect(cards).toHaveCount(2)
+  await cards.last().scrollIntoViewIfNeeded()
+  // the 2 parties after the first slide, each one link to its page with flyer, date and title
+  const second = await slides(page).nth(1).getByRole('link').getAttribute('href')
+  const third = await slides(page).nth(2).getByRole('link').getAttribute('href')
+  await expect(cards.nth(0)).toHaveAttribute('href', second!)
+  await expect(cards.nth(1)).toHaveAttribute('href', third!)
+  for (const i of [0, 1]) {
+    await expect(cards.nth(i).locator('img')).toHaveCount(1)
+    await expect(cards.nth(i).locator('time')).toHaveCount(1)
   }
+  const boxes = await cards.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()))
+  expect(Math.abs(boxes[0]!.top - boxes[1]!.top)).toBeLessThan(4) // same row
+  const vw = page.viewportSize()!.width
+  expect(boxes[0]!.width).toBeLessThan(vw / 2) // small: not the big cards of before
+  expect(boxes[1]!.right).toBeLessThanOrEqual(vw)
+  // under the carousel, not beside it
+  const carouselBox = (await page.locator('[data-party-carousel]').boundingBox())!
+  expect(boxes[0]!.top).toBeGreaterThanOrEqual(carouselBox.y + carouselBox.height - 1)
+  // the carousel flyer still enlarges in the lightbox
+  await page.getByRole('button', { name: 'Ampliar flyer da festa Festa de Teste' }).first().click()
+  await expect(page.getByRole('dialog', { name: 'Flyers das festas' })).toBeVisible()
 })
 
 test.describe('a single upcoming party', () => {
@@ -144,5 +202,6 @@ test.describe('a single upcoming party', () => {
     await expect(page.getByRole('button', { name: 'Festa anterior' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: /^Ir para a festa/ })).toHaveCount(0)
     await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'off')
+    await expect(page.locator('[data-mini-parties]')).toHaveCount(0) // nothing after the first: no row
   })
 })
