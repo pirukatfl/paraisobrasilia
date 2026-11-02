@@ -162,7 +162,7 @@ export const Contos: CollectionConfig = {
       label: 'Imagem',
       admin: {
         description:
-          'Opcional. Aparece na lista e na página do conto, com 460 px de altura (a foto inteira, sem cortar), para todo mundo: sem nudez explícita e sem contatos.',
+          'Opcional. Aparece na lista (460 px de altura, foto inteira) e no topo da página do conto (preenche toda a largura com 460 px de altura; as bordas que sobrarem são cortadas), para todo mundo: sem nudez explícita e sem contatos.',
       },
     },
     {
