@@ -72,7 +72,52 @@ describe('institutional pages (INST-01, INST-06, PAINEL-04, T-02-04)', () => {
   it('getPageByKey returns the DTO with rich text', async () => {
     const page = await getPageByKey('privacidade')
     expect(page?.title).toBe('Política de Privacidade')
-    expect(page?.intro).toContain('LGPD')
+    expect(page?.introTexto).toContain('LGPD')
+    expect(page?.intro?.root.children.length).toBeGreaterThan(0)
     expect(page?.body?.root.children.length).toBeGreaterThan(5)
+  })
+
+  it('the intro is a formatted text: plain text for the description, limit counted on the visible text', async () => {
+    const regras = (await payload.find({ collection: 'pages', where: { key: { equals: 'regras' } } })).docs[0]
+    const marcado = (texto: string, formato: number) => ({
+      root: {
+        type: 'root', version: 1, direction: 'ltr', format: '', indent: 0,
+        children: [
+          {
+            type: 'paragraph', version: 1, direction: 'ltr', format: '', indent: 0, textFormat: 0, textStyle: '',
+            children: [{ type: 'text', version: 1, text: texto, format: formato, detail: 0, mode: 'normal', style: '' }],
+          },
+        ],
+      },
+    })
+    await payload.update({
+      collection: 'pages',
+      id: regras.id,
+      data: { intro: marcado('Regras em negrito e sublinhado', 9) as never, _status: 'published' },
+      overrideAccess: true,
+    })
+    const page = await getPageByKey('regras')
+    expect(page?.introTexto).toBe('Regras em negrito e sublinhado')
+    expect(JSON.stringify(page?.intro)).toContain('"format":9')
+
+    await expect(
+      payload.update({
+        collection: 'pages',
+        id: regras.id,
+        data: { intro: marcado('a'.repeat(201), 0) as never, _status: 'published' },
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow()
+
+    // an emptied editor is no intro at all
+    await payload.update({
+      collection: 'pages',
+      id: regras.id,
+      data: { intro: marcado('   ', 0) as never, _status: 'published' },
+      overrideAccess: true,
+    })
+    const vazio = await getPageByKey('regras')
+    expect(vazio?.intro).toBeNull()
+    expect(vazio?.introTexto).toBeNull()
   })
 })

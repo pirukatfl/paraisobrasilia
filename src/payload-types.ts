@@ -1016,9 +1016,23 @@ export interface Page {
   key: 'quem-somos' | 'normas' | 'regras' | 'dicas' | 'termos' | 'privacidade';
   title: string;
   /**
-   * Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp.
+   * Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp (lá, sem formatação).
    */
-  intro?: string | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   body?: {
     root: {
       type: string;

@@ -28,6 +28,7 @@ import { Recados } from './collections/Recados'
 import { SpaceItems } from './collections/SpaceItems'
 import { Subscriptions } from './collections/Subscriptions'
 import { Parties } from './collections/Parties'
+import { ricoTemTexto, textoPuro } from './lib/textos/rico'
 import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
@@ -159,8 +160,12 @@ export default buildConfig({
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => (doc as { title?: string })?.title ?? '',
       // Parties describe themselves with `summary`, pages with `intro`
-      generateDescription: ({ doc }) =>
-        (doc as { summary?: string; intro?: string })?.summary ?? (doc as { intro?: string })?.intro ?? '',
+      generateDescription: ({ doc }) => {
+        const { summary, intro } = (doc ?? {}) as { summary?: string; intro?: unknown }
+        if (summary) return summary
+        // Pages: the intro is an editor state, the description is its plain text
+        return ricoTemTexto(intro) ? textoPuro(intro) : ''
+      },
       tabbedUI: false,
     }),
   ],

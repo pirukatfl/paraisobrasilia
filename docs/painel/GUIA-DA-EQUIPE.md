@@ -88,9 +88,16 @@ A área é aberta ao público: **sem nudez explícita e sem contato** (telefone,
 Os seis textos já vêm escritos. A equipe pode mudar quando quiser.
 
 1. **Site → Páginas** → clique na página (ex.: **Regras**).
-2. Edite **Título**, **Introdução** (frase curta, até 200 caracteres — aparece no topo e no Google) e **Texto**.
-   - No **Texto**, selecione as palavras para colocar **negrito**, *itálico*, link ou lista.
+2. Edite **Título**, **Introdução** (frase curta, até 200 caracteres — aparece no topo da página, na página inicial e no Google) e **Texto**.
+   - No **Texto**, selecione as palavras para colocar **negrito**, *itálico*, sublinhado, riscado, link ou lista.
    - Use "Título 2" e "Título 3" para os subtítulos.
+   - Na **Introdução** vale negrito, itálico, sublinhado e riscado (sem link nem lista). A formatação aparece no topo da
+     página e no quadro "Quem somos" da página inicial; no Google e no WhatsApp vai só o texto, sem formatação. O limite de
+     200 caracteres conta só as letras, não a formatação.
+   - Linha em branco no meio do texto vira espaço entre os parágrafos; para quebrar a linha sem abrir um parágrafo novo,
+     use Shift + Enter.
+   - Se colar texto de outro programa (Word, site), o alinhamento e a cor do original são ignorados: o site usa sempre o
+     visual dele. Confira o resultado em **Publicar** e abra a página.
 3. **Salvar rascunho** guarda sem mudar o site — bom para revisar com calma.
 4. **Publicar** coloca a versão nova no ar na hora.
 5. Errou? Em **Versões** (no topo da página) dá para ver e restaurar uma versão anterior.

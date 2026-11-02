@@ -49,6 +49,7 @@ import * as migration_20261101_232839_quadros_inicio from './20261101_232839_qua
 import * as migration_20261101_233218_promocao from './20261101_233218_promocao';
 import * as migration_20261101_233442_promocao_textos from './20261101_233442_promocao_textos';
 import * as migration_20261102_012634_envios_midia from './20261102_012634_envios_midia';
+import * as migration_20261102_024123_pages_intro_formatada from './20261102_024123_pages_intro_formatada';
 
 export const migrations = [
   {
@@ -304,6 +305,11 @@ export const migrations = [
   {
     up: migration_20261102_012634_envios_midia.up,
     down: migration_20261102_012634_envios_midia.down,
-    name: '20261102_012634_envios_midia'
+    name: '20261102_012634_envios_midia',
+  },
+  {
+    up: migration_20261102_024123_pages_intro_formatada.up,
+    down: migration_20261102_024123_pages_intro_formatada.down,
+    name: '20261102_024123_pages_intro_formatada'
   },
 ];

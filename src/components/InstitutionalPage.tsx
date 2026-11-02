@@ -20,7 +20,7 @@ export async function InstitutionalPage({ page, activeKey }: { page: PageDTO; ac
     <article className="max-w-[680px]">
       <SubNav activeKey={activeKey} />
       <h1 className="type-display mt-8">{page.title}</h1>
-      {page.intro && <p className="mt-4 text-[1.125rem] leading-normal text-muted">{page.intro}</p>}
+      {page.intro && <TextoRico valor={page.intro} className="mt-4 text-[1.125rem] leading-normal text-muted" />}
       {/* RichText renders bare nodes (no wrapper), so the 18px size goes on this div and the text inherits it. */}
       {page.body && (
         <div className="rich-text-lg mt-8">
