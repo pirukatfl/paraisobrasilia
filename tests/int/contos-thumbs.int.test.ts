@@ -5,7 +5,7 @@ import type { Payload } from 'payload'
 import sharp from 'sharp'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { toContoCardDTO } from '@/lib/contos/dto'
+import { toContoCardDTO, toPublicContoDTO } from '@/lib/contos/dto'
 import { contoMediaIds, generateMissingThumbs } from '@/lib/media/thumbs'
 
 import { getTestPayload, resetDatabase, seedConto } from '../helpers/seed'
@@ -38,16 +38,15 @@ describe('conto card thumbs (thumb 480x360 / thumb2x 960x720)', () => {
     mediaDir = (payload.collections.media.config.upload as { staticDir: string }).staticDir
   })
 
-  it('a new upload gets the 4:3 variants and the card DTO uses thumb2x', async () => {
+  it('a new upload gets the 4:3 variants and the page DTO uses the whole photo (gallery), not the 4:3 crop', async () => {
     const media = await upload('thumbs-novo.png', 1600, 1200)
     expect(media.sizes?.thumb).toMatchObject({ width: 480, height: 360 })
     expect(media.sizes?.thumb2x).toMatchObject({ width: 960, height: 720 })
     const conto = await seedConto(payload, { title: 'Conto com capa', slug: 'conto-com-capa' })
     await payload.update({ collection: 'contos' as never, id: conto.id, data: { imagem: media.id } as never, overrideAccess: true })
     const doc = await payload.findByID({ collection: 'contos' as never, id: conto.id, depth: 1, overrideAccess: true })
-    const card = toContoCardDTO(doc as never).imagem
-    expect(card).toMatchObject({ width: 960, height: 720 })
-    expect(card?.url).toBe(media.sizes?.thumb2x?.url)
+    expect(toContoCardDTO(doc as never)).not.toHaveProperty('imagem')
+    expect(toPublicContoDTO(doc as never).imagem?.url).toBe(media.sizes?.gallery?.url ?? `/api/media/file/${media.filename}`)
   })
 
   it('a small original gets no variant bigger than itself and the card falls back', async () => {

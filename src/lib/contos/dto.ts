@@ -35,7 +35,6 @@ export type ContoCardDTO = {
   title: string
   dateLabel: string
   chamada: string
-  imagem: ContoImageDTO | null
   assinadoComo: string | null
 }
 
@@ -66,9 +65,6 @@ const splitOf = (doc: ContoSource) =>
   splitConto(doc.texto as LexicalStateLike | null | undefined, doc.paragrafosAbertos ?? DEFAULT_OPEN_BLOCKS)
 
 type SizeName = keyof NonNullable<MediaLike['sizes']>
-
-/** Listing cards: the whole photo (no crop, shown in a 460 px frame), like the conto page: gallery (1600 px wide), then the original. */
-const CARD_SIZES: SizeName[] = ['gallery']
 
 /**
  * Only a populated, non-pending Media with a url becomes an image (pending ones are never shown).
@@ -103,7 +99,6 @@ export function toContoCardDTO(doc: ContoSource): ContoCardDTO {
     title: doc.title,
     dateLabel: dateLabelOf(doc.publishedAt),
     chamada: chamadaOf(splitOf(doc).open, 200),
-    imagem: imageOf(doc, CARD_SIZES),
     assinadoComo: signedBy(doc),
   }
 }

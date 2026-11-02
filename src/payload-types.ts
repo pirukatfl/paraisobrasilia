@@ -1097,7 +1097,7 @@ export interface Conto {
     [k: string]: unknown;
   };
   /**
-   * Opcional. Aparece na lista e no topo da página do conto, sempre preenchendo todo o quadro de 460 px de altura (as bordas que sobrarem são cortadas), para todo mundo: sem nudez explícita e sem contatos.
+   * Opcional. Aparece só dentro do conto, no final do texto (não aparece na lista de contos), sempre preenchendo todo o quadro de 460 px de altura (as bordas que sobrarem são cortadas), para todo mundo: sem nudez explícita e sem contatos.
    */
   imagem?: (number | null) | Media;
   /**

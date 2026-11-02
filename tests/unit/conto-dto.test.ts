@@ -61,23 +61,24 @@ describe('conto DTOs with image and signature', () => {
   }
   const withImage = { ...doc, imagem: media, assinadoComo: ' Casal BSB ' }
 
-  it('the card and the pages use the whole photo (gallery size, never the 4:3 crop)', () => {
+  it('the pages use the whole photo (gallery size, never the 4:3 crop)', () => {
     const sizes = { ...media.sizes, thumb: { url: '/api/media/file/capa-480x360.webp', width: 480, height: 360 }, thumb2x: { url: '/api/media/file/capa-960x720.webp', width: 960, height: 720 } }
     const m = { ...media, sizes }
-    expect(toContoCardDTO({ ...withImage, imagem: m }).imagem).toEqual({ url: '/api/media/file/capa-1600.webp', width: 1000, height: 800, alt: 'Imagem do conto Um' })
+    expect(toContoCardDTO({ ...withImage, imagem: m })).not.toHaveProperty('imagem')
+    expect(toPublicContoDTO({ ...withImage, imagem: m }).imagem).toEqual({ url: '/api/media/file/capa-1600.webp', width: 1000, height: 800, alt: 'Imagem do conto Um' })
     expect(toPublicContoDTO({ ...withImage, imagem: m }).imagem?.url).toBe('/api/media/file/capa-1600.webp')
     expect(toMemberContoDTO({ ...withImage, imagem: m }).imagem?.url).toBe('/api/media/file/capa-1600.webp')
     expect(toContoCardDTO(withImage).assinadoComo).toBe('Casal BSB')
   })
 
   it('falls back to the original when the size is missing', () => {
-    expect(toContoCardDTO({ ...doc, imagem: { ...media, sizes: {} } }).imagem?.url).toBe('/api/media/file/capa.webp')
+    expect(toPublicContoDTO({ ...doc, imagem: { ...media, sizes: {} } }).imagem?.url).toBe('/api/media/file/capa.webp')
   })
 
   it('has no image for an id, a missing url, a pending media or no value', () => {
-    expect(toContoCardDTO({ ...doc, imagem: 12 }).imagem).toBeNull()
-    expect(toContoCardDTO({ ...doc, imagem: { alt: 'x' } }).imagem).toBeNull()
-    expect(toContoCardDTO({ ...doc, imagem: { ...media, pendente: true } }).imagem).toBeNull()
+    expect(toPublicContoDTO({ ...doc, imagem: 12 }).imagem).toBeNull()
+    expect(toPublicContoDTO({ ...doc, imagem: { alt: 'x' } }).imagem).toBeNull()
+    expect(toPublicContoDTO({ ...doc, imagem: { ...media, pendente: true } }).imagem).toBeNull()
     expect(toPublicContoDTO(doc).imagem).toBeNull()
     expect(toContoCardDTO(doc).assinadoComo).toBeNull()
   })

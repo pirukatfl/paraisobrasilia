@@ -53,10 +53,10 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
           ])}
         </p>
       )}
-      {conto.imagem && <ContoImagem imagem={conto.imagem} />}
       <div className="mt-6">
         <RichText data={conto.texto} />
       </div>
+      {conto.imagem && <ContoImagem imagem={conto.imagem} />}
       <p className="mt-10">
         <Link href="/area-do-assinante/contos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
           <TextoRico valor={t.contoVoltar} linha />

@@ -44,10 +44,10 @@ export default async function ContoPublicPage({ params }: Props) {
           ])}
         </p>
       )}
-      {conto.imagem && <ContoImagem imagem={conto.imagem} />}
       <div className="mt-6">
         <RichText data={conto.open} />
       </div>
+      {conto.imagem && <ContoImagem imagem={conto.imagem} />}
       {conto.hasMore && (
         <AssineJaCta
           title={<TextoRico valor={t.contoCtaTitulo} linha />}
