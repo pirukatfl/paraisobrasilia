@@ -19,7 +19,7 @@ export const Promocao: GlobalConfig = {
   admin: {
     group: 'Configurações',
     description:
-      'Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos.',
+      'Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos. Quem quiser entrar na promoção clica em Participar e preenche o formulário.',
   },
   access: {
     read: () => true,
@@ -49,8 +49,29 @@ export const Promocao: GlobalConfig = {
       label: 'Texto',
       admin: {
         description:
-          'As palavras "contos" e "fotos e vídeos" viram links sozinhas (para enviar contos e para enviar fotos e vídeos), em destaque. No fim do pop-up já aparecem os botões "Enviar contos" e "Enviar fotos e vídeos".',
+          'Quem entrar lê e fecha. No fim do pop-up já aparecem os botões "Participar" e "Fechar".',
       },
+    },
+    {
+      type: 'row',
+      fields: [
+        {
+          name: 'participarAtivo',
+          type: 'checkbox',
+          defaultValue: true,
+          label: 'Mostrar o botão Participar',
+          admin: {
+            description:
+              'Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: o pop-up só informa e tem apenas o botão Fechar.',
+          },
+        },
+        {
+          name: 'botaoParticipar',
+          type: 'text',
+          defaultValue: 'Participar',
+          label: 'Texto do botão Participar',
+        },
+      ],
     },
     {
       type: 'row',

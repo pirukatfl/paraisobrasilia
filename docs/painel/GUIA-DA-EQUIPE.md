@@ -208,14 +208,14 @@ assinante**, por último, antes do **Sair**. Abre em outra aba. Ele **nunca** ap
 
 ## Promoção (pop-up da página inicial)
 
-O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, clicando fora ou com a tecla **Esc**.
+O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, no botão **Fechar**, clicando fora ou com a tecla **Esc**. Quem entra lê e fecha; quem quiser entrar na promoção clica em **Participar** e vai para um formulário (dados, fotos e vídeos).
 
 1. Menu da esquerda → **Configurações → Promoção**.
 2. Preencha o **Título** e o **Texto**. Opcional: uma **Imagem** (sem nudez explícita) e o período (**Começa em** / **Termina em**; fora do período o pop-up some sozinho).
 3. Marque **Promoção ligada** e **Salvar**. Vale na hora.
 4. Para **tirar do ar**, desmarque **Promoção ligada** e salve. O texto fica guardado para a próxima vez.
 
-No texto, as palavras **contos** e **fotos e vídeos** viram links em destaque (para enviar contos e para enviar fotos e vídeos). No fim do pop-up já aparecem os botões **Enviar contos** e **Enviar fotos e vídeos**. Os textos dos botões ficam em **Textos do site → Página inicial → Pop-up da promoção**.
+No fim do pop-up aparecem os botões **Participar** (principal) e **Fechar**. O pop-up não cria links dentro do texto. Para um pop-up só informativo (sem formulário), desmarque **Mostrar o botão Participar**: fica só o **Fechar**. O texto do botão Participar é editado na própria tela da promoção; o texto do botão Fechar fica em **Textos do site → Página inicial → Pop-up da promoção**.
 Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo na próxima visita.
 
 ---

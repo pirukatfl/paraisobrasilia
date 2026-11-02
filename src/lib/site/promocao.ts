@@ -14,9 +14,14 @@ export type PromocaoDTO = {
   inicio: string | null
   fim: string | null
   imagem: GalleryImage | null
+  /** false: the pop-up is informative only (just "Fechar") */
+  participarAtivo: boolean
+  botaoParticipar: string
   /** Changes whenever staff save the promotion: a new edit shows the pop-up again in a session */
   versao: string
 }
+
+export const BOTAO_PARTICIPAR_PADRAO = 'Participar'
 
 /** On, inside the optional period, and with something to show. */
 export function promocaoNoAr(p: PromocaoDTO | null | undefined, agora: Date): p is PromocaoDTO {

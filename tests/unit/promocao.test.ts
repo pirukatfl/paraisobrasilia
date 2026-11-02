@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { promocaoNoAr, type PromocaoDTO } from '@/lib/site/promocao'
 
-const base: PromocaoDTO = { ativa: true, titulo: 'Promo', texto: null, inicio: null, fim: null, imagem: null, versao: 'v1' }
+const base: PromocaoDTO = { ativa: true, titulo: 'Promo', texto: null, inicio: null, fim: null, imagem: null, participarAtivo: true, botaoParticipar: 'Participar', versao: 'v1' }
 const agora = new Date('2026-11-10T12:00:00.000Z')
 
 describe('promocaoNoAr', () => {

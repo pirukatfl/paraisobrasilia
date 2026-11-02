@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { TextoRico } from '@/components/TextoRico'
-import { ENVIO_CONTOS_HREF, ENVIO_MIDIA_HREF, linkarEstado } from '@/lib/site/links'
+import { ENVIO_PROMOCAO_HREF } from '@/lib/site/links'
 import { promocaoNoAr } from '@/lib/site/promocao'
 import { getPromocao } from '@/lib/site/promocao-queries'
 import { getTextos } from '@/lib/textos/queries'
@@ -20,21 +20,19 @@ export async function PromocaoPopup() {
       titulo={promocao.titulo}
       imagem={promocao.imagem}
       textoFechar={textoPuro(t.promocaoFechar)}
-      botoes={
-        <>
-          <Link href={ENVIO_CONTOS_HREF} className="btn-primary flex-1 text-center">
-            <TextoRico valor={t.promocaoBotaoContos} linha />
+      participar={
+        promocao.participarAtivo ? (
+          <Link href={ENVIO_PROMOCAO_HREF} className="btn-primary flex-1 text-center">
+            {promocao.botaoParticipar}
           </Link>
-          <Link href={ENVIO_MIDIA_HREF} className="btn-secondary flex-1 text-center">
-            <TextoRico valor={t.promocaoBotaoMidia} linha />
-          </Link>
-        </>
+        ) : null
       }
+      botaoFechar={<TextoRico valor={t.promocaoBotaoFechar} linha />}
     >
       {promocao.texto && (
         <TextoRico
-          valor={linkarEstado(promocao.texto)}
-          className="text-body [&_a]:font-bold [&_a]:text-accent [&_a]:underline [&_a]:underline-offset-2"
+          valor={promocao.texto}
+          className="text-body"
         />
       )}
     </PromocaoDialog>

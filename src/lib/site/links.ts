@@ -5,6 +5,9 @@
  */
 export const ENVIO_CONTOS_HREF = '/contos/enviar'
 export const ENVIO_MIDIA_HREF = '/enviar-fotos-e-videos'
+/** "Participar" of the promotion pop-up: the same form, with the promotion shown on top */
+export const ENVIO_PROMOCAO_PARAM = 'promocao'
+export const ENVIO_PROMOCAO_HREF = `${ENVIO_MIDIA_HREF}?${ENVIO_PROMOCAO_PARAM}=1`
 
 /** Whole words only ("contos", not "contosa"); accents are letters, so "vídeos" never matches inside a word. */
 const PALAVRAS = /(?<![\p{L}\p{N}])(contos|fotos e v[ií]deos)(?![\p{L}\p{N}])/giu
