@@ -14,7 +14,7 @@ import { TextoRico } from '@/components/TextoRico'
 
 const checkbox = 'mt-1 size-5 shrink-0 accent-accent'
 
-const EMPTY: AdFormValues = { apelido: '', euSou: '', cidade: '', texto: '', whatsapp: '', telegram: '', emailContato: '', links: [], observacao: '' }
+const EMPTY: AdFormValues = { apelido: '', euSou: '', cidade: '', idade: '', texto: '', whatsapp: '', telegram: '', emailContato: '', links: [], observacao: '' }
 
 const field = (form: FormData, name: string) => {
   const value = form.get(name)
@@ -72,6 +72,7 @@ export function VisitorAdForm({
         apelido: field(data, 'apelido'),
         euSou: field(data, 'euSou'),
         cidade: field(data, 'cidade'),
+        idade: field(data, 'idade'),
         texto: field(data, 'texto'),
         whatsapp: field(data, 'whatsapp'),
         telegram: field(data, 'telegram'),

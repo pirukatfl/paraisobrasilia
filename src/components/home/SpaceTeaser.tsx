@@ -1,11 +1,12 @@
-import Image from 'next/image'
 import Link from 'next/link'
 
 import type { SpaceItemDTO } from '@/lib/gallery/types'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
+import { SpaceCarousel } from '@/components/home/SpaceCarousel'
+import { textoPuro } from '@/lib/textos/rico'
 
-/** Home "Conheça o espaço" (UI-SPEC S2'): up to 6 photos, lazy, card derivative; hidden when empty. */
+/** Home "Conheça o espaço" (UI-SPEC S2'): slideshow of up to 8 photos; hidden when empty. */
 export async function SpaceTeaser({ photos }: { photos: SpaceItemDTO[] }) {
   if (photos.length === 0) return null
   const t = await getTextos('inicio')
@@ -14,21 +15,17 @@ export async function SpaceTeaser({ photos }: { photos: SpaceItemDTO[] }) {
       <h2 id="titulo-conheca-espaco" className="type-heading">
         <TextoRico valor={t.espacoTitulo} linha />
       </h2>
-      <ul role="list" className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6">
-        {photos.map((photo) => (
-          <li key={photo.id} className="relative aspect-square overflow-hidden rounded-lg border border-line bg-surface">
-            <Image
-              src={photo.image.thumbUrl}
-              alt={photo.image.alt}
-              width={photo.image.thumbWidth}
-              height={photo.image.thumbHeight}
-              sizes="(min-width: 640px) 33vw, 50vw"
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          </li>
-        ))}
-      </ul>
+      <SpaceCarousel
+        photos={photos.map((photo) => photo.image)}
+        labels={{
+          carrossel: textoPuro(t.espacoCarrossel),
+          anterior: textoPuro(t.espacoAnterior),
+          proxima: textoPuro(t.espacoProxima),
+          irPara: textoPuro(t.espacoIrPara),
+          pausar: textoPuro(t.espacoPausar),
+          retomar: textoPuro(t.espacoRetomar),
+        }}
+      />
       <Link href="/espaco" className="btn-secondary mt-6">
         <TextoRico valor={t.espacoBotao} linha />
       </Link>

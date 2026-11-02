@@ -1,12 +1,15 @@
 import { AboutTeaser } from '@/components/home/AboutTeaser'
-import { DicasTeaser } from '@/components/home/DicasTeaser'
+import { ClassiContosDicas } from '@/components/home/ClassiContosDicas'
 import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
+import { PromocaoPopup } from '@/components/home/PromocaoPopup'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
+import { getLatestContos } from '@/lib/contos/public'
 import { getLatestDicas } from '@/lib/dicas/public'
 import { getSpacePhotos } from '@/lib/gallery/queries'
 import { getPageIntro } from '@/lib/pages/queries'
 import { getUpcomingParties } from '@/lib/parties/queries'
+import { getMenuConfig } from '@/lib/site/menu-queries'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
@@ -26,18 +29,21 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
 }
 
 export default async function HomePage() {
-  const [parties, photos, intro, contact, dicas, t] = await Promise.all([
+  const [parties, photos, intro, contact, dicas, contos, menu, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
-    optional(() => getSpacePhotos(6)),
+    optional(() => getSpacePhotos(8)),
     optional(() => getPageIntro('quem-somos')),
     optional(() => getContact()),
     optional(() => getLatestDicas(3)),
+    optional(() => getLatestContos(3)),
+    getMenuConfig(), // never throws
     getTextos('inicio'),
   ])
   const hasParties = parties.length > 0
 
   return (
     <>
+      <PromocaoPopup />
       {hasParties ? (
         <section aria-labelledby="titulo-proximas-festas">
           <p className="type-eyebrow text-muted"><TextoRico valor={t.chamadaTopo} linha /></p>
@@ -62,7 +68,7 @@ export default async function HomePage() {
 
       <SpaceTeaser photos={photos ?? []} />
       <AboutTeaser intro={intro} />
-      <DicasTeaser dicas={dicas ?? []} />
+      <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} ocultos={menu.ocultos} />
       {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
     </>
   )

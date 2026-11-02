@@ -4,6 +4,8 @@ import { ExternalLink } from '@/components/ExternalLink'
 import { WhatsAppIcon } from '@/components/icons'
 import { pathForKey } from '@/lib/pages/keys'
 import { type ContactDTO, instagramUrl, telUrl, whatsappUrl } from '@/lib/site/contact'
+import { estaOculto } from '@/lib/site/menu'
+import { getMenuConfig } from '@/lib/site/menu-queries'
 import { getContact } from '@/lib/site/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
@@ -19,7 +21,8 @@ async function loadContact(): Promise<ContactDTO | null> {
   }
 }
 
-type FooterLink = { href: string; label: React.ReactNode }
+/** `key`: the menu item name staff can hide in "Menu do site" (Legal links have none). */
+type FooterLink = { href: string; label: React.ReactNode; key?: string }
 
 function Group({ id, title, children }: { id: string; title: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -32,11 +35,12 @@ function Group({ id, title, children }: { id: string; title: React.ReactNode; ch
   )
 }
 
-function LinkList({ links }: { links: FooterLink[] }) {
+/** `columns`: flows the links in CSS columns (2 on the phone, 3 from lg), read top to bottom. */
+function LinkList({ links, columns = false }: { links: FooterLink[]; columns?: boolean }) {
   return (
-    <ul>
+    <ul className={columns ? 'columns-2 gap-x-6 lg:columns-3' : undefined}>
       {links.map((l) => (
-        <li key={l.href}>
+        <li key={l.href} className={columns ? 'break-inside-avoid' : undefined}>
           <Link href={l.href} className={linkClass}>
             {l.label}
           </Link>
@@ -46,27 +50,28 @@ function LinkList({ links }: { links: FooterLink[] }) {
   )
 }
 
-/** Site footer (UI-SPEC Global — Footer): Contato · Navegue · Legal + the 18+ line. */
+/** Site footer (UI-SPEC Global — Footer): Contato · Navegue · Legal + the 18+ line.
+ * Navegue is the wide block (2 columns on the phone, 3 on desktop) so the 13 links do not stack. */
 export async function Footer() {
   const year = new Date().getFullYear()
   const contact = await loadContact()
-  const t = await getTextos('geral')
+  const [t, menu] = await Promise.all([getTextos('geral'), getMenuConfig()])
   const instagram = instagramUrl(contact?.instagram)
-  const navigate: FooterLink[] = [
-    { href: '/', label: <TextoRico valor={t.menuFestas} linha /> },
-    { href: pathForKey('quem-somos'), label: <TextoRico valor={t.menuQuemSomos} linha /> },
-    { href: pathForKey('normas'), label: <TextoRico valor={t.menuNormas} linha /> },
-    { href: pathForKey('regras'), label: <TextoRico valor={t.menuRegras} linha /> },
-    { href: pathForKey('dicas'), label: <TextoRico valor={t.menuDicas} linha /> },
-    { href: '/espaco', label: <TextoRico valor={t.menuEspaco} linha /> },
-    { href: '/modelos', label: <TextoRico valor={t.menuModelos} linha /> },
-    { href: '/classisex', label: <TextoRico valor={t.menuClassisex} linha /> },
-    { href: '/contos', label: <TextoRico valor={t.menuContos} linha /> },
-    { href: '/dicas-hot', label: <TextoRico valor={t.menuDicasHot} linha /> },
-    { href: '/contato', label: <TextoRico valor={t.menuContato} linha /> },
-    { href: '/assine-ja', label: <TextoRico valor={t.menuAssineJa} linha /> },
-    { href: '/area-do-assinante', label: <TextoRico valor={t.menuAreaAssinante} linha /> },
-  ]
+  const navigate: FooterLink[] = ([
+    { key: 'festas', href: '/', label: <TextoRico valor={t.menuFestas} linha /> },
+    { key: 'quem-somos', href: pathForKey('quem-somos'), label: <TextoRico valor={t.menuQuemSomos} linha /> },
+    { key: 'normas', href: pathForKey('normas'), label: <TextoRico valor={t.menuNormas} linha /> },
+    { key: 'regras', href: pathForKey('regras'), label: <TextoRico valor={t.menuRegras} linha /> },
+    { key: 'dicas', href: pathForKey('dicas'), label: <TextoRico valor={t.menuDicas} linha /> },
+    { key: 'espaco', href: '/espaco', label: <TextoRico valor={t.menuEspaco} linha /> },
+    { key: 'galeria', href: '/modelos', label: <TextoRico valor={t.menuGaleria} linha /> },
+    { key: 'classisex', href: '/classisex', label: <TextoRico valor={t.menuClassisex} linha /> },
+    { key: 'contos', href: '/contos', label: <TextoRico valor={t.menuContos} linha /> },
+    { key: 'dicas-hot', href: '/dicas-hot', label: <TextoRico valor={t.menuDicasHot} linha /> },
+    { key: 'contato', href: '/contato', label: <TextoRico valor={t.menuContato} linha /> },
+    { key: 'assine-ja', href: '/assine-ja', label: <TextoRico valor={t.menuAssineJa} linha /> },
+    { key: 'area-do-assinante', href: '/area-do-assinante', label: <TextoRico valor={t.menuAreaAssinante} linha /> },
+  ] as FooterLink[]).filter((l) => !l.key || !estaOculto(l.key, menu.ocultos))
   const legal: FooterLink[] = [
     { href: pathForKey('termos'), label: <TextoRico valor={t.rodapeTermos} linha /> },
     { href: pathForKey('privacidade'), label: <TextoRico valor={t.rodapePrivacidade} linha /> },
@@ -74,7 +79,7 @@ export async function Footer() {
 
   return (
     <footer className="mt-16 border-t border-line bg-bg">
-      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-4 pt-8 lg:grid-cols-3 lg:px-8">
+      <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-8 px-4 pt-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,1fr)] lg:px-8">
         {contact && (
           <Group id="rodape-contato" title={<TextoRico valor={t.rodapeContatoTitulo} linha />}>
             <address className="type-label not-italic text-muted">
@@ -119,7 +124,7 @@ export async function Footer() {
         )}
         <nav aria-label="Rodapé" className="contents">
           <Group id="rodape-navegue" title={<TextoRico valor={t.rodapeNavegueTitulo} linha />}>
-            <LinkList links={navigate} />
+            <LinkList links={navigate} columns />
           </Group>
           <Group id="rodape-legal" title={<TextoRico valor={t.rodapeLegalTitulo} linha />}>
             <LinkList links={legal} />

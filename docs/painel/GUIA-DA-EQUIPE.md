@@ -58,8 +58,8 @@ As fotos e vídeos aparecem na página **Espaço** e alguns na página inicial (
 
 ## Profissionais e amadoras
 
-Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição e fotos (por enquanto, **só fotos**: vídeos de modelos estão desligados). O item
-**Profissionais e amadoras** fica sempre no menu; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
+Cada modelo tem a **própria página** (`/modelos/endereço-da-modelo`), com nome, descrição e fotos (por enquanto, **só fotos**: vídeos de modelos estão desligados). No menu, o item
+**Galeria** (com os submenus **Profissionais** e **Amadoras**) fica sempre; enquanto não houver modelo publicada, a página mostra um aviso "Em breve" (e só entra
 no mapa do site, para o Google, quando há pelo menos uma modelo publicada).
 A área é aberta ao público: **sem nudez explícita e sem contato** (telefone, WhatsApp, e-mail, @ ou links).
 
@@ -73,9 +73,12 @@ A área é aberta ao público: **sem nudez explícita e sem contato** (telefone,
    para mudar a ordem. Cada foto precisa do **Texto alternativo**.
    **Dica:** envie várias fotos de uma vez em **Arquivos → Mídias** e depois use **Escolher existente** em cada linha.
    A 31ª foto não é aceita: "Cada modelo pode ter no máximo 30 fotos.".
-6. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
-7. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
-8. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
+6. **Categoria** (coluna da direita): **Profissional** ou **Amadora**. É ela que decide em qual submenu da Galeria a
+   pessoa aparece (Galeria mostra todas; Profissionais e Amadoras mostram só o seu grupo). As que já existiam ficaram como **Profissional**:
+   troque para **Amadora** onde for o caso. Na lista, a coluna **Categoria** e o filtro ajudam a conferir.
+7. **Autorização de uso de imagem**: recomendado — data e observação de como a modelo autorizou.
+8. **Ordem** (menores primeiro) → **Publicar**. Confira `/modelos` e a página da modelo no celular.
+9. Para tirar do site: **Despublicar**. A página sai do ar **na hora** (se for a única modelo, a galeria e o item do
    menu somem).
 
 ---
@@ -85,9 +88,16 @@ A área é aberta ao público: **sem nudez explícita e sem contato** (telefone,
 Os seis textos já vêm escritos. A equipe pode mudar quando quiser.
 
 1. **Site → Páginas** → clique na página (ex.: **Regras**).
-2. Edite **Título**, **Introdução** (frase curta, até 200 caracteres — aparece no topo e no Google) e **Texto**.
-   - No **Texto**, selecione as palavras para colocar **negrito**, *itálico*, link ou lista.
+2. Edite **Título**, **Introdução** (frase curta, até 200 caracteres — aparece no topo da página, na página inicial e no Google) e **Texto**.
+   - No **Texto**, selecione as palavras para colocar **negrito**, *itálico*, sublinhado, riscado, link ou lista.
    - Use "Título 2" e "Título 3" para os subtítulos.
+   - Na **Introdução** vale negrito, itálico, sublinhado e riscado (sem link nem lista). A formatação aparece no topo da
+     página e no quadro "Quem somos" da página inicial; no Google e no WhatsApp vai só o texto, sem formatação. O limite de
+     200 caracteres conta só as letras, não a formatação.
+   - Linha em branco no meio do texto vira espaço entre os parágrafos; para quebrar a linha sem abrir um parágrafo novo,
+     use Shift + Enter.
+   - Se colar texto de outro programa (Word, site), o alinhamento e a cor do original são ignorados: o site usa sempre o
+     visual dele. Confira o resultado em **Publicar** e abra a página.
 3. **Salvar rascunho** guarda sem mudar o site — bom para revisar com calma.
 4. **Publicar** coloca a versão nova no ar na hora.
 5. Errou? Em **Versões** (no topo da página) dá para ver e restaurar uma versão anterior.
@@ -175,6 +185,54 @@ a informação simplesmente não aparece.
 - O próprio painel e os textos lidos só por leitores de tela (descrições de botões e imagens).
 
 Para mudar algum desses, peça ajuda à equipe técnica.
+
+---
+
+## Menu do site (esconder itens e link externo)
+
+Para esconder ou mostrar um item do menu **sem mexer em mais nada** (a página continua existindo; só some o link):
+
+1. Menu da esquerda → **Configurações → Menu do site**.
+2. Em **Itens escondidos**, escolha os itens que devem **sumir**. Eles somem do menu do topo, do menu do celular **e do rodapé**.
+   Esconder **Quem somos** esconde também Normas, Regras e Dicas; esconder **Galeria** esconde Profissionais e Amadoras.
+   Os itens "Menu do assinante" valem só para quem está logado.
+3. **Salvar**. Vale na hora. Para mostrar de novo, tire o item da lista e salve.
+
+**Link externo para assinantes** (mais abaixo, na mesma página): é um item extra que aparece **só no menu de quem está logado como
+assinante**, por último, antes do **Sair**. Abre em outra aba. Ele **nunca** aparece para visitantes, no rodapé nem no mapa do site.
+
+- **Mostrar o link**: desmarque para tirar.
+- **Texto do link** e **Endereço**: o endereço precisa começar com `https://` (ou `http://`); outro tipo de endereço é recusado.
+
+---
+
+## Promoção (pop-up da página inicial)
+
+O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, clicando fora ou com a tecla **Esc**.
+
+1. Menu da esquerda → **Configurações → Promoção**.
+2. Preencha o **Título** e o **Texto**. Opcional: uma **Imagem** (sem nudez explícita) e o período (**Começa em** / **Termina em**; fora do período o pop-up some sozinho).
+3. Marque **Promoção ligada** e **Salvar**. Vale na hora.
+4. Para **tirar do ar**, desmarque **Promoção ligada** e salve. O texto fica guardado para a próxima vez.
+
+No texto, as palavras **contos** e **fotos e vídeos** viram links em destaque (para enviar contos e para enviar fotos e vídeos). No fim do pop-up já aparecem os botões **Enviar contos** e **Enviar fotos e vídeos**. Os textos dos botões ficam em **Textos do site → Página inicial → Pop-up da promoção**.
+Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo na próxima visita.
+
+---
+
+## Fotos e vídeos enviados pelo público
+
+Qualquer pessoa pode mandar fotos e vídeos em **/enviar-fotos-e-videos** (sem cadastro; o link também está nos textos da promoção e da página inicial). **Nada vai para o site sozinho**: só a equipe vê o que chega.
+
+1. Menu da esquerda → **Envios do público → Fotos e vídeos enviados**. A lista mostra apelido, situação, contato e data. Os envios novos aparecem como **Novo**.
+2. Abra um envio. Você vê o **apelido**, o **contato** (e-mail ou WhatsApp, só a equipe vê), a **mensagem** e a **data e hora em que a pessoa confirmou ter 18 anos e autorizar o uso das imagens** (guarde: é o registro de autorização).
+3. Em **Arquivos**, clique em cada foto ou vídeo para ver a **prévia** e **baixar o original**.
+4. Se for usar uma imagem na galeria do site, baixe o arquivo e envie pelo painel (**Site → Fotos e vídeos do espaço** ou **Profissionais e amadoras**), como de costume.
+5. Mude a **Situação** para **Aprovado** ou **Recusado** (só organiza a fila: aprovar **não publica**) e, se quiser, escreva uma **Observação da equipe**. **Salvar**.
+
+Limites do formulário: até **10 fotos** (JPG, PNG ou WebP, até 15 MB) e **2 vídeos** (MP4 ou MOV, até 100 MB e 60 segundos) por envio. Os arquivos ficam em armazenamento privado, fora da área pública, e entram no backup junto com os arquivos do ClassiSex.
+Para **apagar** um envio (por exemplo, a pessoa pediu para retirar), use **Excluir**: os arquivos dele são apagados juntos.
+Os textos da página (título, avisos, texto da autorização) ficam em **Textos do site → Enviar fotos e vídeos**.
 
 ---
 
@@ -412,7 +470,7 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
 ### Anúncios sem conta
 
 Desde 23/10/2026 **qualquer pessoa pode anunciar, sem cadastro**: o botão **Anunciar** do ClassiSex abre um formulário com
-os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, WhatsApp ou Telegram, declaração de 18 anos) mais o
+os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, idade, texto, WhatsApp ou Telegram, declaração de 18 anos) mais o
 **e-mail** da pessoa (opcional) e o aceite dos Termos. **Só são obrigatórios**: apelido, Eu sou, texto, a declaração de
 18 anos ou mais e o aceite dos Termos (no anúncio de assinante, os mesmos, menos os Termos). Cidade, contato, foto e e-mail são opcionais.
 
@@ -431,6 +489,18 @@ os mesmos campos do anúncio de assinante (apelido, Eu sou, cidade, texto, Whats
   pode criar uma conta gratuita para ter esse controle nos próximos anúncios.
 - Sem recados: ninguém consegue mandar recado para esse anúncio. Quem é assinante ativo vê o WhatsApp/Telegram normalmente.
 - Antes de aprovar, confira o texto (contato escondido de outro jeito) e **a capa**: é a foto que todo visitante vê.
+
+### Idade do anúncio e filtro por idade
+
+- O anúncio tem um campo **Idade** (opcional, de 18 a 99): no formulário do assinante (novo e editar), no **anúncio sem
+  conta** e no painel (**ClassiSex → Anúncios**, ao lado da cidade). Anúncios antigos ficam sem idade; a equipe pode
+  preencher no painel. Para casal, use a idade que a pessoa quiser mostrar (o campo é um número só).
+- **Só assinantes com acesso ativo** veem a idade (no cartão e na página do anúncio, "34 anos") e podem **filtrar por idade**
+  na área do assinante, ao lado de "Eu sou" e "Cidade": **18 a 29**, **30 a 39**, **40 a 49**, **50 ou mais** ou "Todas".
+  Anúncio sem idade só aparece em "Todas".
+- **A área aberta (/classisex) não muda**: continua só com o filtro "Eu sou", sem idade e sem cidade no filtro, e a idade
+  nunca vai no HTML nem em consulta aberta. Visitantes e contas gratuitas não veem a idade.
+- Os nomes das faixas e o rótulo do filtro ficam em **Textos do site → ClassiSex** (seção "Filtros dos anúncios").
 
 ### Opções "Eu sou"
 

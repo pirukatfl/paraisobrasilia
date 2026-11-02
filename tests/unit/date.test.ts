@@ -14,6 +14,10 @@ describe('party dates in Brasília time (pt-BR)', () => {
   it('formats the start time as 23h / 23h30', () => {
     expect(formatPartyTime('2026-10-25T02:00:00.000Z')).toBe('23h')
     expect(formatPartyTime('2026-10-25T02:30:00.000Z')).toBe('23h30')
+    // morning hours have no leading zero: "Das 22h às 5h"
+    expect(formatPartyTime('2026-10-25T08:00:00.000Z')).toBe('5h')
+    expect(formatPartyTime('2026-10-25T08:15:00.000Z')).toBe('5h15')
+    expect(formatPartyTime('2026-10-25T03:00:00.000Z')).toBe('0h')
   })
 
   it('formats the card line', () => {

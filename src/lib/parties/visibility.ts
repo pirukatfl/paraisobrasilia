@@ -12,3 +12,14 @@ export function defaultEndsAt(startsAt: Date): Date {
 export function isUpcoming(p: { endsAt: string }, now: Date = new Date()): boolean {
   return new Date(p.endsAt).getTime() > now.getTime()
 }
+
+/**
+ * The end time is shown on the party page only when staff filled it in. An end equal to the
+ * automatic one (`defaultEndsAt`) means the field was left empty, so only the start is shown.
+ */
+export function hasCustomEnd(p: { startsAt: string; endsAt: string }): boolean {
+  const start = new Date(p.startsAt).getTime()
+  const end = new Date(p.endsAt).getTime()
+  if (Number.isNaN(start) || Number.isNaN(end)) return false
+  return end !== defaultEndsAt(new Date(start)).getTime()
+}

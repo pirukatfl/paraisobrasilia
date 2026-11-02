@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { MobileMenu } from '@/components/MobileMenu'
 import { Nav } from '@/components/Nav'
 import { getAssinante } from '@/lib/assinantes/session'
+import { getMenuConfig } from '@/lib/site/menu-queries'
 import { getMemberNavItems, getNavItems } from '@/lib/site/nav'
 import { getTextos } from '@/lib/textos/queries'
 
@@ -18,8 +19,9 @@ async function isLoggedIn(): Promise<boolean> {
 /** Logged-in subscribers get their own single menu (quick menu-logado); everyone else the public one. */
 export async function Header() {
   const logado = await isLoggedIn()
-  const t = await getTextos('geral')
-  const items = logado ? getMemberNavItems(t) : getNavItems(t)
+  const [t, menu] = await Promise.all([getTextos('geral'), getMenuConfig()])
+  // The external link exists only in the logged-in list: the public menu is built without it
+  const items = logado ? getMemberNavItems(t, menu) : getNavItems(t, menu)
   return (
     <header className="header-line relative z-30 bg-bg">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 lg:px-8">

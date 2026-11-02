@@ -22,6 +22,8 @@ export type AdDocLike = {
   apelido?: string | null
   euSou?: unknown
   cidade?: string | null
+  /** 18 to 99, members area only. NEVER copied into PublicAdDTO. */
+  idade?: number | null
   texto: string
   contato?: {
     whatsapp?: string | null
@@ -43,6 +45,7 @@ export type OwnerAdDTO = {
   apelido: string
   euSou: string
   cidade: string | null
+  idade: number | null
   texto: string
   contato: AdContatoDTO
   status: AdStatus
@@ -162,6 +165,7 @@ export function toOwnerAdDTO(
     apelido: doc.apelido ?? '',
     euSou: euSouLabel,
     cidade: doc.cidade || null,
+    idade: doc.idade || null,
     texto: doc.texto,
     contato: contatoOf(doc),
     status: doc.status,
@@ -198,6 +202,7 @@ export type MemberAdDTO = {
   apelido: string
   euSou: string
   cidade: string | null
+  idade: number | null
   texto: string
   publishedLabel: string
   contato: {
@@ -240,6 +245,7 @@ export function toMemberAdDTO(
     apelido: doc.apelido ?? '',
     euSou: euSouLabel,
     cidade: doc.cidade || null,
+    idade: doc.idade || null,
     texto: doc.texto,
     publishedLabel: doc.publishedAt ? formatShortDate(doc.publishedAt) : '',
     contato: {

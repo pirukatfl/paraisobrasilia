@@ -8,13 +8,19 @@ import {
   LinkFeature,
   OrderedListFeature,
   ParagraphFeature,
+  StrikethroughFeature,
+  UnderlineFeature,
   UnorderedListFeature,
 } from '@payloadcms/richtext-lexical'
 import type { CollectionConfig } from 'payload'
 
 import { isStaff, staffOrPublished } from '../access/roles'
+import { editorLinha } from '../lib/textos/editor'
+import { textoPuro, type TextoRico } from '../lib/textos/rico'
 import { PAGE_KEY_LABELS, PAGE_KEYS } from '../lib/pages/keys'
 import { revalidatePageAfterChange, revalidatePageAfterDelete } from '../lib/pages/revalidate'
+
+const INTRO_MAX = 200
 
 /**
  * Institutional and legal pages with fixed keys (INST-01, INST-06, PAINEL-04).
@@ -61,25 +67,35 @@ export const Pages: CollectionConfig = {
     },
     {
       name: 'intro',
-      type: 'textarea',
-      maxLength: 200,
+      type: 'richText',
       label: 'Introdução',
+      // Line editor (bold, italic, underline, strikethrough): same marks as the site texts, no links or lists
+      editor: editorLinha,
+      // The 200-character limit counts the visible text, not the editor JSON
+      validate: (value: unknown) => {
+        if (!value || typeof value !== 'object') return true
+        return textoPuro(value as TextoRico).length > INTRO_MAX
+          ? `A introdução pode ter até ${INTRO_MAX} caracteres.`
+          : true
+      },
       admin: {
         description:
-          'Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp.',
+          'Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp (lá, sem formatação).',
       },
     },
     {
       name: 'body',
       type: 'richText',
       label: 'Texto',
-      // Text only: paragraphs, H2/H3, bold, italic, lists, links — no images or embeds
+      // Text only: paragraphs, H2/H3, bold, italic, underline, strikethrough, lists, links — no images or embeds
       editor: lexicalEditor({
         features: () => [
           ParagraphFeature(),
           HeadingFeature({ enabledHeadingSizes: ['h2', 'h3'] }),
           BoldFeature(),
           ItalicFeature(),
+          UnderlineFeature(),
+          StrikethroughFeature(),
           UnorderedListFeature(),
           OrderedListFeature(),
           LinkFeature({ enabledCollections: [] }),

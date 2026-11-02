@@ -14,6 +14,7 @@ describe('sitemap (INST-06, T-02-13)', () => {
       expect.arrayContaining([
         '/',
         '/contato',
+        '/enviar-fotos-e-videos',
         '/espaco',
         '/quem-somos',
         '/quem-somos/normas',
@@ -29,7 +30,7 @@ describe('sitemap (INST-06, T-02-13)', () => {
     )
     expect(urls).not.toContain('/modelos')
     expect(urls).not.toContain('/recados') // mural removed 2026-10-20 (R-08)
-    expect(urls).toHaveLength(13)
+    expect(urls).toHaveLength(14)
   })
 
   it('includes /modelos and upcoming parties when present', () => {

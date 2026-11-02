@@ -67,7 +67,7 @@ test('the header menu has no Recados item; own content has no Enviar recado', as
     'Festas',
     'Quem somos',
     'Espaço',
-    'Profissionais e amadoras',
+    'Galeria',
     'ClassiSex',
     'Contos',
     'Dicas Hot',
@@ -75,6 +75,7 @@ test('the header menu has no Recados item; own content has no Enviar recado', as
     'Meus anúncios',
     'Minha assinatura',
     'Trocar senha',
+    'Vídeos pornô grátis',
   ])
   await expect(ana.page.getByRole('heading', { name: /AnaBSB/, level: 1 })).toBeVisible()
   await expect(ana.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)

@@ -10,6 +10,7 @@ import { isStaff } from '../access/roles'
 import { withRequestState } from '../lib/assinantes/context'
 import { expire } from '../lib/cache/expire'
 import { adEndpoints } from '../lib/classisex/endpoints'
+import { IDADE_MAX, IDADE_MESSAGE, IDADE_MIN, lerIdade } from '../lib/classisex/idade'
 import {
   AD_MESSAGES,
   APELIDO_MAX,
@@ -295,6 +296,23 @@ export const Ads: CollectionConfig = {
           validate: (value: unknown) => (value ? (cidadeError(String(value)) ?? true) : true),
         },
       ],
+    },
+    {
+      name: 'idade',
+      type: 'number',
+      min: IDADE_MIN,
+      max: IDADE_MAX,
+      index: true,
+      label: 'Idade',
+      admin: {
+        step: 1,
+        description: `Opcional, de ${IDADE_MIN} a ${IDADE_MAX}. Só assinantes veem e filtram; nunca aparece na área aberta.`,
+      },
+      validate: (value: unknown) => {
+        if (value === undefined || value === null || value === '') return true
+        const lida = lerIdade(typeof value === 'number' ? String(value) : String(value))
+        return lida.ok ? true : IDADE_MESSAGE
+      },
     },
     { name: 'cidadeBusca', type: 'text', index: true, admin: { hidden: true } },
     {

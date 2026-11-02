@@ -178,6 +178,18 @@ describe('owner service (CLAS-03, CLAS-04, D-02, D-03, T-04-04)', () => {
     expect(ad.consentAt).toBe(NOW.toISOString())
   })
 
+  it('saves the optional age, returns it to the edit form and clears it when emptied', async () => {
+    const { createAd, updateAd, getOwnAdFormValues, ServiceError } = await import('../../src/lib/classisex/service')
+    const { id } = await createAd(payload, { assinanteId: owner.id, input: input({ idade: '34' }), now: NOW })
+    expect((await payload.findByID({ collection: 'ads', id, depth: 0, overrideAccess: true })).idade).toBe(34)
+    expect((await getOwnAdFormValues(payload, owner.id, id))?.idade).toBe('34')
+    await updateAd(payload, { assinanteId: owner.id, id, input: input({ idade: '' }), now: NOW })
+    expect((await payload.findByID({ collection: 'ads', id, depth: 0, overrideAccess: true })).idade ?? null).toBeNull()
+    expect((await getOwnAdFormValues(payload, owner.id, id))?.idade).toBe('')
+    const err = await createAd(payload, { assinanteId: owner.id, input: input({ idade: '12' }), now: NOW }).catch((e) => e)
+    expect(err).toBeInstanceOf(ServiceError)
+  })
+
   it('refuses a 4th active ad; a refused ad does not count', async () => {
     const { createAd, ServiceError } = await import('../../src/lib/classisex/service')
     await seedAd(payload, { author: owner.id, status: 'recusado' })

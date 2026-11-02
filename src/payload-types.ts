@@ -90,6 +90,8 @@ export interface Config {
     dicas: Dica;
     'space-items': SpaceItem;
     models: Model;
+    'envios-midia': EnviosMidia;
+    'envios-midia-arquivos': EnviosMidiaArquivo;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -103,6 +105,9 @@ export interface Config {
     ads: {
       midias: 'ad-media';
       denuncias: 'ad-reports';
+    };
+    'envios-midia': {
+      arquivos: 'envios-midia-arquivos';
     };
   };
   collectionsSelect: {
@@ -128,6 +133,8 @@ export interface Config {
     dicas: DicasSelect<false> | DicasSelect<true>;
     'space-items': SpaceItemsSelect<false> | SpaceItemsSelect<true>;
     models: ModelsSelect<false> | ModelsSelect<true>;
+    'envios-midia': EnviosMidiaSelect<false> | EnviosMidiaSelect<true>;
+    'envios-midia-arquivos': EnviosMidiaArquivosSelect<false> | EnviosMidiaArquivosSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -139,6 +146,8 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     contact: Contact;
+    'menu-do-site': MenuDoSite;
+    promocao: Promocao;
     'textos-geral': TextosGeral;
     'textos-inicio': TextosInicio;
     'textos-festas': TextosFesta;
@@ -152,12 +161,15 @@ export interface Config {
     'textos-classisex': TextosClassisex;
     'textos-meus-anuncios': TextosMeusAnuncio;
     'textos-enviar-conto': TextosEnviarConto;
+    'textos-enviar-midia': TextosEnviarMidia;
     'textos-contos': TextosConto;
     'textos-dicas-hot': TextosDicasHot;
     'textos-mensagens': TextosMensagen;
   };
   globalsSelect: {
     contact: ContactSelect<false> | ContactSelect<true>;
+    'menu-do-site': MenuDoSiteSelect<false> | MenuDoSiteSelect<true>;
+    promocao: PromocaoSelect<false> | PromocaoSelect<true>;
     'textos-geral': TextosGeralSelect<false> | TextosGeralSelect<true>;
     'textos-inicio': TextosInicioSelect<false> | TextosInicioSelect<true>;
     'textos-festas': TextosFestasSelect<false> | TextosFestasSelect<true>;
@@ -171,6 +183,7 @@ export interface Config {
     'textos-classisex': TextosClassisexSelect<false> | TextosClassisexSelect<true>;
     'textos-meus-anuncios': TextosMeusAnunciosSelect<false> | TextosMeusAnunciosSelect<true>;
     'textos-enviar-conto': TextosEnviarContoSelect<false> | TextosEnviarContoSelect<true>;
+    'textos-enviar-midia': TextosEnviarMidiaSelect<false> | TextosEnviarMidiaSelect<true>;
     'textos-contos': TextosContosSelect<false> | TextosContosSelect<true>;
     'textos-dicas-hot': TextosDicasHotSelect<false> | TextosDicasHotSelect<true>;
     'textos-mensagens': TextosMensagensSelect<false> | TextosMensagensSelect<true>;
@@ -498,6 +511,10 @@ export interface Ad {
    * Opcional. Só letras. Só assinantes veem.
    */
   cidade?: string | null;
+  /**
+   * Opcional, de 18 a 99. Só assinantes veem e filtram; nunca aparece na área aberta.
+   */
+  idade?: number | null;
   cidadeBusca?: string | null;
   /**
    * Até 600 caracteres. Só assinantes veem o texto.
@@ -1003,9 +1020,23 @@ export interface Page {
   key: 'quem-somos' | 'normas' | 'regras' | 'dicas' | 'termos' | 'privacidade';
   title: string;
   /**
-   * Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp.
+   * Uma ou duas frases (até 200 caracteres). Aparece no topo e na prévia do Google/WhatsApp (lá, sem formatação).
    */
-  intro?: string | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   body?: {
     root: {
       type: string;
@@ -1066,7 +1097,7 @@ export interface Conto {
     [k: string]: unknown;
   };
   /**
-   * Opcional. Aparece na lista e na página do conto, para todo mundo: sem nudez explícita e sem contatos.
+   * Opcional e guardada, mas por enquanto os contos aparecem no site sem foto (pedido do cliente, 2026-11-01). Se voltar a aparecer: sem nudez explícita e sem contatos.
    */
   imagem?: (number | null) | Media;
   /**
@@ -1211,6 +1242,10 @@ export interface Model {
   id: number;
   name: string;
   /**
+   * Define em qual submenu da Galeria ela aparece: Profissionais ou Amadoras.
+   */
+  categoria: 'profissional' | 'amadora';
+  /**
    * Endereço da página: /modelos/…  Se ficar vazio, é criado a partir do nome. Mudar o endereço quebra links já compartilhados.
    */
   slug: string;
@@ -1250,6 +1285,76 @@ export interface Model {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * Fotos e vídeos que o público mandou pelo site. Nada aparece no site sozinho: veja os arquivos aqui, baixe o que for usar e marque o envio como aprovado ou recusado.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia".
+ */
+export interface EnviosMidia {
+  id: number;
+  /**
+   * Aprovar não publica nada: serve só para a equipe se organizar.
+   */
+  status: 'novo' | 'aprovado' | 'recusado';
+  apelido: string;
+  /**
+   * Só a equipe vê.
+   */
+  contato: string;
+  mensagem?: string | null;
+  /**
+   * Data e hora em que a pessoa confirmou ter 18 anos e autorizar o uso das imagens.
+   */
+  consentAt?: string | null;
+  /**
+   * Anotação interna (ex.: "usar na galeria de dezembro").
+   */
+  observacao?: string | null;
+  /**
+   * Clique em um arquivo para ver a prévia e baixar o original.
+   */
+  arquivos?: {
+    docs?: (number | EnviosMidiaArquivo)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Cada foto ou vídeo de um envio. Ficam fora da área pública: só a equipe abre.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia-arquivos".
+ */
+export interface EnviosMidiaArquivo {
+  id: number;
+  envio: number | EnviosMidia;
+  kind: 'foto' | 'video';
+  durationSeconds?: number | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1362,6 +1467,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'models';
         value: number | Model;
+      } | null)
+    | ({
+        relationTo: 'envios-midia';
+        value: number | EnviosMidia;
+      } | null)
+    | ({
+        relationTo: 'envios-midia-arquivos';
+        value: number | EnviosMidiaArquivo;
       } | null);
   globalSlug?: string | null;
   user:
@@ -1558,6 +1671,7 @@ export interface AdsSelect<T extends boolean = true> {
   apelido?: T;
   euSou?: T;
   cidade?: T;
+  idade?: T;
   cidadeBusca?: T;
   texto?: T;
   contato?:
@@ -1969,6 +2083,7 @@ export interface SpaceItemsSelect<T extends boolean = true> {
  */
 export interface ModelsSelect<T extends boolean = true> {
   name?: T;
+  categoria?: T;
   slug?: T;
   description?: T;
   photos?:
@@ -1993,6 +2108,55 @@ export interface ModelsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia_select".
+ */
+export interface EnviosMidiaSelect<T extends boolean = true> {
+  status?: T;
+  apelido?: T;
+  contato?: T;
+  mensagem?: T;
+  consentAt?: T;
+  observacao?: T;
+  arquivos?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "envios-midia-arquivos_select".
+ */
+export interface EnviosMidiaArquivosSelect<T extends boolean = true> {
+  envio?: T;
+  kind?: T;
+  durationSeconds?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2080,6 +2244,100 @@ export interface Contact {
    * Opcional (ex.: Abrimos às 22h e seguimos até por volta das 5h).
    */
   hours?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Esconda itens do menu e escolha o link externo que só os assinantes veem.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-do-site".
+ */
+export interface MenuDoSite {
+  id: number;
+  /**
+   * Itens marcados somem do menu do topo, do menu do celular e do rodapé. A página continua existindo. Para mostrar de novo, tire a marca.
+   */
+  itensOcultos?:
+    | (
+        | 'festas'
+        | 'quem-somos'
+        | 'normas'
+        | 'regras'
+        | 'dicas'
+        | 'espaco'
+        | 'galeria'
+        | 'galeria-profissionais'
+        | 'galeria-amadoras'
+        | 'classisex'
+        | 'contos'
+        | 'dicas-hot'
+        | 'contato'
+        | 'assine-ja'
+        | 'area-do-assinante'
+        | 'meus-anuncios'
+        | 'minha-assinatura'
+        | 'trocar-senha'
+        | 'link-externo'
+      )[]
+    | null;
+  /**
+   * Aparece só no menu de quem está logado como assinante, por último (abre em outra aba). Nunca aparece para visitantes, no rodapé nem no mapa do site.
+   */
+  linkExterno?: {
+    ativo?: boolean | null;
+    rotulo?: string | null;
+    url?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promocao".
+ */
+export interface Promocao {
+  id: number;
+  /**
+   * Desmarque para tirar o pop-up do site sem apagar o texto.
+   */
+  ativa?: boolean | null;
+  /**
+   * Ex.: Promoção de aniversário.
+   */
+  titulo?: string | null;
+  /**
+   * As palavras "contos" e "fotos e vídeos" viram links sozinhas (para enviar contos e para enviar fotos e vídeos), em destaque. No fim do pop-up já aparecem os botões "Enviar contos" e "Enviar fotos e vídeos".
+   */
+  texto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Horário de Brasília. Em branco: vale desde já.
+   */
+  inicio?: string | null;
+  /**
+   * Depois dessa hora o pop-up some sozinho. Em branco: fica até você desligar.
+   */
+  fim?: string | null;
+  /**
+   * Sem nudez explícita: o pop-up aparece na área aberta do site.
+   */
+  imagem?: (number | null) | Media;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -2269,9 +2527,57 @@ export interface TextosGeral {
     [k: string]: unknown;
   } | null;
   /**
-   * Também usado no rodapé.
+   * Não aparece mais no menu: o item agora se chama Galeria (campos abaixo). Mantido só por segurança.
    */
   menuModelos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também usado no rodapé.
+   */
+  menuGaleria?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  menuGaleriaProfissionais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  menuGaleriaAmadoras?: {
     root: {
       type: string;
       children: {
@@ -2990,6 +3296,114 @@ export interface TextosInicio {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Não aparece na tela: é lido por leitores de tela. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoCarrossel?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoAnterior?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoProxima?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {n} para o número da foto e {total} para a quantidade de fotos. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoIrPara?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoPausar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  espacoRetomar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   quemSomosTitulo?: {
     root: {
       type: string;
@@ -3038,6 +3452,81 @@ export interface TextosInicio {
     };
     [k: string]: unknown;
   } | null;
+  classisexTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  classisexTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  classisexBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contosTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contosBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   dicasTitulo?: {
     root: {
       type: string;
@@ -3054,6 +3543,54 @@ export interface TextosInicio {
     [k: string]: unknown;
   } | null;
   dicasBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoBotaoContos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoBotaoMidia?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  promocaoFechar?: {
     root: {
       type: string;
       children: {
@@ -3143,6 +3680,24 @@ export interface TextosFesta {
    * Use {hora} para o horário de início da festa.
    */
   horario?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Usada quando a festa tem "Data e hora de término" preenchida. Use {inicio} e {fim}. Sem término, vale a frase acima.
+   */
+  horarioComTermino?: {
     root: {
       type: string;
       children: {
@@ -3477,6 +4032,78 @@ export interface TextosModelo {
    * Também é a descrição que aparece no Google (lá, sem formatação).
    */
   intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Título da página quando o visitante abre Galeria → Profissionais. Também aparece no Google (lá, sem formatação).
+   */
+  tituloProfissionais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também é a descrição que aparece no Google (lá, sem formatação).
+   */
+  introProfissionais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Título da página quando o visitante abre Galeria → Amadoras. Também aparece no Google (lá, sem formatação).
+   */
+  tituloAmadoras?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também é a descrição que aparece no Google (lá, sem formatação).
+   */
+  introAmadoras?: {
     root: {
       type: string;
       children: {
@@ -6392,6 +7019,129 @@ export interface TextosClassisex {
     };
     [k: string]: unknown;
   } | null;
+  filtroIdade?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdadeTodas?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade18a29?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade30a39?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade40a49?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  filtroIdade50mais?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aparece no cartão e na página do anúncio, só para assinantes. Mantenha {idade}.
+   */
+  idadeAnos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   filtroBotao?: {
     root: {
       type: string;
@@ -8362,6 +9112,39 @@ export interface TextosMeusAnuncio {
     };
     [k: string]: unknown;
   } | null;
+  idadeRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Mantenha {idade}.
+   */
+  idadeAnos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   textoRotulo?: {
     root: {
       type: string;
@@ -9490,6 +10273,458 @@ export interface TextosEnviarConto {
     [k: string]: unknown;
   } | null;
   enviadoBotaoConta?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Página e formulário para qualquer pessoa enviar fotos e vídeos, e a confirmação de envio. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-enviar-midia".
+ */
+export interface TextosEnviarMidia {
+  id: number;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  googleTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  googleDescricao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  topo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  titulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  intro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  obrigatorio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  apelidoRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  apelidoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contatoRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contatoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  mensagemRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  mensagemAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  arquivosRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {fotos} e {videos} para as quantidades máximas.
+   */
+  arquivosAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  arquivosEscolher?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  arquivosTirar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  maior18?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * A data e a hora em que a pessoa marcou ficam registradas no envio.
+   */
+  autorizacao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  aviso?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  botao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  botaoEnviando?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {n} para o arquivo atual e {total} para a quantidade de arquivos. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  progresso?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  enviadoGoogleTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoTopo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Use {n} para a quantidade de arquivos que não foram aceitos. Só aparece quando houve falha.
+   */
+  enviadoFalhas?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  enviadoBotaoInicio?: {
     root: {
       type: string;
       children: {
@@ -10945,6 +12180,38 @@ export interface ContactSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "menu-do-site_select".
+ */
+export interface MenuDoSiteSelect<T extends boolean = true> {
+  itensOcultos?: T;
+  linkExterno?:
+    | T
+    | {
+        ativo?: T;
+        rotulo?: T;
+        url?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promocao_select".
+ */
+export interface PromocaoSelect<T extends boolean = true> {
+  ativa?: T;
+  titulo?: T;
+  texto?: T;
+  inicio?: T;
+  fim?: T;
+  imagem?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-geral_select".
  */
 export interface TextosGeralSelect<T extends boolean = true> {
@@ -10959,6 +12226,9 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuDicas?: T;
   menuEspaco?: T;
   menuModelos?: T;
+  menuGaleria?: T;
+  menuGaleriaProfissionais?: T;
+  menuGaleriaAmadoras?: T;
   menuClassisex?: T;
   menuContos?: T;
   menuDicasHot?: T;
@@ -11011,11 +12281,25 @@ export interface TextosInicioSelect<T extends boolean = true> {
   semFestasTexto?: T;
   espacoTitulo?: T;
   espacoBotao?: T;
+  espacoCarrossel?: T;
+  espacoAnterior?: T;
+  espacoProxima?: T;
+  espacoIrPara?: T;
+  espacoPausar?: T;
+  espacoRetomar?: T;
   quemSomosTitulo?: T;
   quemSomosTextoReserva?: T;
   quemSomosBotao?: T;
+  classisexTitulo?: T;
+  classisexTexto?: T;
+  classisexBotao?: T;
+  contosTitulo?: T;
+  contosBotao?: T;
   dicasTitulo?: T;
   dicasBotao?: T;
+  promocaoBotaoContos?: T;
+  promocaoBotaoMidia?: T;
+  promocaoFechar?: T;
   comoChegarTitulo?: T;
   comoChegarBotao?: T;
   comoChegarWhatsapp?: T;
@@ -11030,6 +12314,7 @@ export interface TextosInicioSelect<T extends boolean = true> {
 export interface TextosFestasSelect<T extends boolean = true> {
   voltar?: T;
   horario?: T;
+  horarioComTermino?: T;
   jaAconteceu?: T;
   tituloValores?: T;
   tituloDressCode?: T;
@@ -11068,6 +12353,10 @@ export interface TextosModelosSelect<T extends boolean = true> {
   chamadaTopo?: T;
   titulo?: T;
   intro?: T;
+  tituloProfissionais?: T;
+  introProfissionais?: T;
+  tituloAmadoras?: T;
+  introAmadoras?: T;
   vazioTitulo?: T;
   vazioTexto?: T;
   vazioBotaoFestas?: T;
@@ -11302,6 +12591,13 @@ export interface TextosClassisexSelect<T extends boolean = true> {
   filtroEuSou?: T;
   filtroTodos?: T;
   filtroCidade?: T;
+  filtroIdade?: T;
+  filtroIdadeTodas?: T;
+  filtroIdade18a29?: T;
+  filtroIdade30a39?: T;
+  filtroIdade40a49?: T;
+  filtroIdade50mais?: T;
+  idadeAnos?: T;
   filtroBotao?: T;
   filtroLimpar?: T;
   vazioFiltroTitulo?: T;
@@ -11438,6 +12734,8 @@ export interface TextosMeusAnunciosSelect<T extends boolean = true> {
   apelidoAjuda?: T;
   euSouRotulo?: T;
   cidadeRotulo?: T;
+  idadeRotulo?: T;
+  idadeAnos?: T;
   textoRotulo?: T;
   textoAjuda?: T;
   textoAjudaAntigo?: T;
@@ -11520,6 +12818,43 @@ export interface TextosEnviarContoSelect<T extends boolean = true> {
   enviadoTexto?: T;
   enviadoBotaoContos?: T;
   enviadoBotaoConta?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "textos-enviar-midia_select".
+ */
+export interface TextosEnviarMidiaSelect<T extends boolean = true> {
+  googleTitulo?: T;
+  googleDescricao?: T;
+  topo?: T;
+  titulo?: T;
+  intro?: T;
+  obrigatorio?: T;
+  apelidoRotulo?: T;
+  apelidoAjuda?: T;
+  contatoRotulo?: T;
+  contatoAjuda?: T;
+  mensagemRotulo?: T;
+  mensagemAjuda?: T;
+  arquivosRotulo?: T;
+  arquivosAjuda?: T;
+  arquivosEscolher?: T;
+  arquivosTirar?: T;
+  maior18?: T;
+  autorizacao?: T;
+  aviso?: T;
+  botao?: T;
+  botaoEnviando?: T;
+  progresso?: T;
+  enviadoGoogleTitulo?: T;
+  enviadoTopo?: T;
+  enviadoTitulo?: T;
+  enviadoTexto?: T;
+  enviadoFalhas?: T;
+  enviadoBotaoInicio?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

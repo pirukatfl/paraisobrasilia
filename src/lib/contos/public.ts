@@ -20,6 +20,16 @@ export const getPublicContos = cached(
   () => ['contos'],
 )
 
+/** The n newest contos (home card). Tag 'contos'. */
+export const getLatestContos = cached(
+  async (n: number): Promise<ContoCardDTO[]> => {
+    const payload = await getPayload({ config })
+    return (await findPublishedContos(payload, { page: 1, limit: n })).items.map(toContoCardDTO)
+  },
+  ['contos:latest'],
+  () => ['contos'],
+)
+
 /** One published conto, open blocks only. Tags 'contos' and 'conto:{slug}'. */
 export const getPublicConto = cached(
   async (slug: string): Promise<PublicContoDTO | null> => {

@@ -2,6 +2,7 @@
  * ClassiSex ad rules (D-01 fields, D-02 limit). Same messages in the admin and on the site.
  * Pure module: no Payload/Next imports.
  */
+import { lerIdade } from './idade'
 import { redactContacts } from './redact'
 
 export type AdStatus = 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
@@ -49,6 +50,8 @@ export type AdInput = {
   apelido: string
   euSou: number | null
   cidade: string
+  /** Optional age, as typed (empty = none); 18 to 99. Members area only. */
+  idade?: string
   texto: string
   whatsapp: string
   telegram: string
@@ -75,6 +78,7 @@ export type NormalisedAd = {
   euSou: number
   cidade: string | null
   cidadeBusca: string | null
+  idade: number | null
   texto: string
   contato: AdContato
 }
@@ -256,6 +260,8 @@ export function validateAdInput(
   if (input.euSou === null || !Number.isInteger(input.euSou)) errors.euSou = AD_MESSAGES.euSou
   const cErr = cidadeError(cidade)
   if (cErr) errors.cidade = cErr
+  const idadeLida = lerIdade(input.idade)
+  if (!idadeLida.ok) errors.idade = idadeLida.error
   const tErr = textoError(texto, { legacy })
   if (tErr) errors.texto = tErr
   if (whatsapp && !isValidWhatsapp(whatsapp)) errors.whatsapp = AD_MESSAGES.whatsapp
@@ -274,6 +280,7 @@ export function validateAdInput(
       euSou: input.euSou as number,
       cidade: cidade || null,
       cidadeBusca: cidade ? normaliseCidade(cidade) : null,
+      idade: idadeLida.ok ? idadeLida.idade : null,
       texto,
       contato: { whatsapp, telegram, email, links, observacao },
     },

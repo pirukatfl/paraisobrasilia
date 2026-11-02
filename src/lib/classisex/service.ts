@@ -144,6 +144,7 @@ export async function createAd(
       apelido: value.apelido,
       euSou: value.euSou,
       cidade: value.cidade,
+      idade: value.idade,
       texto: value.texto,
       contato: contatoData(value.contato),
       status: 'pendente',
@@ -178,6 +179,7 @@ export async function updateAd(
       apelido: value.apelido,
       euSou: value.euSou,
       cidade: value.cidade,
+      idade: value.idade,
       texto: value.texto,
       contato: contatoData(value.contato),
       status: 'pendente',
@@ -400,6 +402,8 @@ export type OwnAdFormValues = {
   euSou: number | null
   apelido: string
   cidade: string
+  /** Age as the form field shows it (empty = none). */
+  idade: string
   texto: string
   whatsapp: string
   telegram: string
@@ -424,6 +428,7 @@ export async function getOwnAdFormValues(
       apelido: ad.apelido ?? '',
       euSou: relId(ad.euSou),
       cidade: ad.cidade ?? '',
+      idade: ad.idade ? String(ad.idade) : '',
       texto: ad.texto,
       whatsapp: ad.contato?.whatsapp ?? '',
       telegram: ad.contato?.telegram ? `@${ad.contato.telegram}` : '',

@@ -75,7 +75,7 @@ export const Models: CollectionConfig = {
   admin: {
     group: 'Site',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'slug', 'photos', 'imageAuthorization.date', '_status'],
+    defaultColumns: ['name', 'categoria', 'slug', 'photos', 'imageAuthorization.date', '_status'],
     listSearchableFields: ['name', 'slug'],
     description:
       'Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita e sem contato: esta galeria é aberta ao público.',
@@ -106,6 +106,22 @@ export const Models: CollectionConfig = {
       validate: (value: unknown, { data }: { data?: { _status?: string } }) => {
         if (typeof value !== 'string' || !value.trim()) return data?._status === 'published' ? 'Informe o nome artístico.' : true
         return noContact(value)
+      },
+    },
+    {
+      name: 'categoria',
+      type: 'select',
+      required: true,
+      defaultValue: 'profissional',
+      index: true,
+      label: 'Categoria',
+      options: [
+        { label: 'Profissional', value: 'profissional' },
+        { label: 'Amadora', value: 'amadora' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Define em qual submenu da Galeria ela aparece: Profissionais ou Amadoras.',
       },
     },
     {

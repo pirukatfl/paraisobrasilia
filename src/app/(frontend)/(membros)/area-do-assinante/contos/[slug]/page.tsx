@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -52,17 +51,6 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
             conto.assinadoComo ? <TextoRico valor={t.contoPor} vars={{ nome: conto.assinadoComo }} linha /> : null,
           ])}
         </p>
-      )}
-      {conto.imagem && (
-        <Image
-          src={conto.imagem.url}
-          alt={conto.imagem.alt}
-          width={conto.imagem.width}
-          height={conto.imagem.height}
-          sizes="(min-width: 768px) 720px, 100vw"
-          priority
-          className="mt-6 h-auto w-full rounded-xl"
-        />
       )}
       <div className="mt-6">
         <RichText data={conto.texto} />

@@ -2,6 +2,7 @@
  * Seed helpers shared by integration (vitest) and e2e (playwright global setup) tests.
  * Everything goes through the Payload Local API against the isolated test database.
  */
+import { sql } from '@payloadcms/db-postgres'
 import { config as loadEnv } from 'dotenv'
 import path from 'path'
 import type { Payload } from 'payload'
@@ -57,6 +58,8 @@ const RESET_ORDER = [
   // Dicas Hot (quick dicas-hot): before media (capa references it)
   'dicas',
   // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
+  'envios-midia-arquivos',
+  'envios-midia',
   'ad-reports',
   'ad-media',
   'ads',
@@ -87,6 +90,8 @@ export async function resetDatabase(payload: Payload): Promise<void> {
       context: { skipAudit: true },
     })
   }
+  // "Menu do site" global: back to "nothing hidden, original external link" (its items cascade)
+  await payload.db.drizzle.execute(sql`delete from menu_do_site`)
 }
 
 /** Restores (or overrides) the "Contato e endereço" global with the seeded values. */
@@ -420,6 +425,7 @@ export async function seedModel(
     slug?: string
     description?: string
     videoCount?: number
+    categoria?: 'profissional' | 'amadora'
     authorization?: { date?: string; note?: string }
   },
 ) {
@@ -459,6 +465,7 @@ export async function seedModel(
       photos,
       ...(videos.length ? { videos } : {}),
       order: input.order ?? 0,
+      ...(input.categoria ? { categoria: input.categoria } : {}),
       ...(input.slug ? { slug: input.slug } : {}),
       ...(input.description ? { description: input.description } : {}),
       ...(input.authorization ? { imageAuthorization: input.authorization } : {}),
@@ -478,6 +485,7 @@ export interface SeedAdInput {
   apelido?: string
   euSou?: number
   cidade?: string
+  idade?: number
   texto?: string
   contato?: { whatsapp?: string; telegram?: string; email?: string; links?: { url: string }[]; observacao?: string }
   status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'
@@ -504,6 +512,7 @@ export async function seedAd(payload: Payload, input: SeedAdInput) {
       apelido: input.apelido ?? 'Casal Teste',
       euSou,
       cidade: input.cidade ?? 'Brasília',
+      ...(input.idade !== undefined ? { idade: input.idade } : {}),
       texto: input.texto ?? 'Casal simpático procura amigos para a próxima festa.',
       contato: input.contato ?? { whatsapp: '5561999990000' },
       status,

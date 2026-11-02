@@ -41,6 +41,13 @@ describe('toPublicAdDTO (PREV-01, D-04)', () => {
     expect(dto.cidade).toBe('Brasília')
   })
 
+  it('never carries the age (members only)', () => {
+    const dto = toPublicAdDTO({ ...doc, idade: 37 }, { euSouLabel: 'Casal', media })
+    expect(Object.keys(dto)).not.toContain('idade')
+    expect(JSON.stringify(dto)).not.toContain('37')
+    expect(JSON.stringify(dto)).not.toContain('"idade"')
+  })
+
   it('shows the whole text with the contacts removed', () => {
     const dto = toPublicAdDTO(doc, { euSouLabel: 'Casal', media })
     expect(dto.texto.startsWith('Casal top, ')).toBe(true)

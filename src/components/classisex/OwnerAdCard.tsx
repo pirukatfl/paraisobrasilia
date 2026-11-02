@@ -52,6 +52,7 @@ export async function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: bo
           <h2 className="type-heading">
             {ad.apelido} · {ad.euSou}
             {ad.cidade ? ` · ${ad.cidade}` : ''}
+            {ad.idade ? <> · <TextoRico valor={t.idadeAnos} vars={{ idade: ad.idade }} linha /></> : null}
           </h2>
           <p className="type-label mt-1 text-muted">{mediaSummary(t, ad.fotos, ad.videos)}</p>
         </div>

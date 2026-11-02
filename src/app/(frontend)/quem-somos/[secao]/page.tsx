@@ -23,7 +23,7 @@ async function load(secao: string) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const found = await load((await params).secao)
   if (!found) return { title: 'Página não encontrada' }
-  return buildPageMetadata({ title: found.page.title, description: found.page.intro, path: pathForKey(found.key) })
+  return buildPageMetadata({ title: found.page.title, description: found.page.introTexto, path: pathForKey(found.key) })
 }
 
 export default async function QuemSomosSectionPage({ params }: Props) {

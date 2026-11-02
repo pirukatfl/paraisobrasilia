@@ -8,6 +8,8 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { AdCategories } from './collections/AdCategories'
+import { EnviosMidia } from './collections/EnviosMidia'
+import { EnviosMidiaArquivos } from './collections/EnviosMidiaArquivos'
 import { AdMedia } from './collections/AdMedia'
 import { AdReports } from './collections/AdReports'
 import { Ads } from './collections/Ads'
@@ -26,10 +28,13 @@ import { Recados } from './collections/Recados'
 import { SpaceItems } from './collections/SpaceItems'
 import { Subscriptions } from './collections/Subscriptions'
 import { Parties } from './collections/Parties'
+import { ricoTemTexto, textoPuro } from './lib/textos/rico'
 import { Plans } from './collections/Plans'
 import { Users } from './collections/Users'
 import { Videos } from './collections/Videos'
 import { Contact } from './globals/Contact'
+import { MenuDoSite } from './globals/MenuDoSite'
+import { Promocao } from './globals/Promocao'
 import { TextosGlobals } from './globals/Textos'
 import { traduzirErroDaApi } from './lib/errors/after-error'
 import { buildEmailAdapter } from './lib/email/config'
@@ -107,8 +112,13 @@ export default buildConfig({
     Dicas,
     SpaceItems,
     Models,
+    EnviosMidia,
+    {
+      ...EnviosMidiaArquivos,
+      upload: { ...(typeof EnviosMidiaArquivos.upload === 'object' ? EnviosMidiaArquivos.upload : {}), staticDir: privateDir },
+    },
   ],
-  globals: [Contact, ...TextosGlobals],
+  globals: [Contact, MenuDoSite, Promocao, ...TextosGlobals],
   hooks: {
     // Clear Portuguese reason on every API error (admin and site), see lib/errors/after-error.ts
     afterError: [traduzirErroDaApi],
@@ -150,8 +160,12 @@ export default buildConfig({
       uploadsCollection: 'media',
       generateTitle: ({ doc }) => (doc as { title?: string })?.title ?? '',
       // Parties describe themselves with `summary`, pages with `intro`
-      generateDescription: ({ doc }) =>
-        (doc as { summary?: string; intro?: string })?.summary ?? (doc as { intro?: string })?.intro ?? '',
+      generateDescription: ({ doc }) => {
+        const { summary, intro } = (doc ?? {}) as { summary?: string; intro?: unknown }
+        if (summary) return summary
+        // Pages: the intro is an editor state, the description is its plain text
+        return ricoTemTexto(intro) ? textoPuro(intro) : ''
+      },
       tabbedUI: false,
     }),
   ],

@@ -92,6 +92,7 @@ export default async function EditarAnuncioPage({
           apelido: ad.apelido,
           euSou: ad.euSou === null ? '' : String(ad.euSou),
           cidade: ad.cidade,
+          idade: ad.idade,
           texto: ad.texto,
           whatsapp: ad.whatsapp,
           telegram: ad.telegram,

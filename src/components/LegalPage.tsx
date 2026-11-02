@@ -13,7 +13,7 @@ export async function LegalPage({ page }: { page: PageDTO }) {
       <p className="type-label mt-4 text-muted">
         <TextoRico valor={t.atualizadoEm} linha /> <time dateTime={page.updatedAt}>{formatUpdatedDate(page.updatedAt)}</time>
       </p>
-      {page.intro && <p className="mt-4 text-body text-muted">{page.intro}</p>}
+      {page.intro && <TextoRico valor={page.intro} className="mt-4 text-body text-muted" />}
       {page.body && <RichText data={page.body} className="mt-8" />}
     </article>
   )

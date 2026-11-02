@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata(): Promise<Metadata> {
   const page = await getPageByKey('quem-somos')
   if (!page) return { title: 'Página não encontrada' }
-  return buildPageMetadata({ title: page.title, description: page.intro, path: pathForKey('quem-somos') })
+  return buildPageMetadata({ title: page.title, description: page.introTexto, path: pathForKey('quem-somos') })
 }
 
 export default async function QuemSomosPage() {

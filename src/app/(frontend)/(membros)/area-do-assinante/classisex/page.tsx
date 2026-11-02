@@ -46,7 +46,7 @@ export default async function ClassisexPage({
   // A free account reads the same open board as a visitor (text with contacts removed, cover
   // cover): the public read model only, never the members DTOs.
   if (check.inactive) {
-    const publicFilters = { ...parseBoardFilters(params), cidade: undefined }
+    const publicFilters = { ...parseBoardFilters(params), cidade: undefined, idade: undefined }
     const [publicResult, publicCategories] = await Promise.all([getPublicAds(publicFilters), getPublicAdFilters()])
     return (
       <section aria-labelledby="titulo-classisex">
@@ -64,7 +64,7 @@ export default async function ClassisexPage({
   const filters = parseBoardFilters(params)
   const reported = params.denuncia === 'enviada'
   const [result, categories] = await Promise.all([listMemberAds(filters), getActiveAdCategories()])
-  const filtered = Boolean(filters.euSou || filters.cidade)
+  const filtered = Boolean(filters.euSou || filters.cidade || filters.idade)
   return (
     <section aria-labelledby="titulo-classisex">
       {header}
@@ -76,7 +76,7 @@ export default async function ClassisexPage({
       <p className="mt-4 max-w-[680px] text-body text-muted">
         <TextoRico valor={t.membrosIntro} linha />
       </p>
-      <AdFilters action={PATH} categories={categories} euSou={filters.euSou} cidade={filters.cidade} />
+      <AdFilters action={PATH} categories={categories} euSou={filters.euSou} cidade={filters.cidade} idade={filters.idade} showIdade />
       {result.items.length === 0 ? (
         filtered ? (
           <EmptyState
@@ -93,7 +93,7 @@ export default async function ClassisexPage({
         )
       ) : (
         <InfiniteAds
-          key={`${filters.euSou ?? ''}:${filters.cidade ?? ''}:${result.page}`}
+          key={`${filters.euSou ?? ''}:${filters.cidade ?? ''}:${filters.idade ?? ''}:${result.page}`}
           scope="membros"
           textos={t}
           initialItems={result.items}
@@ -101,13 +101,14 @@ export default async function ClassisexPage({
           totalPages={result.totalPages}
           euSou={filters.euSou}
           cidade={filters.cidade}
+          idade={filters.idade}
           gridClassName="mt-8 grid gap-4 md:grid-cols-2"
           noscriptPagination={
             <Pagination
               basePath={PATH}
               page={result.page}
               totalPages={result.totalPages}
-              params={{ 'eu-sou': filters.euSou ? String(filters.euSou) : undefined, cidade: filters.cidade }}
+              params={{ 'eu-sou': filters.euSou ? String(filters.euSou) : undefined, cidade: filters.cidade, idade: filters.idade }}
             />
           }
         />

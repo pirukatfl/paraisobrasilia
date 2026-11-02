@@ -64,6 +64,11 @@ export async function staffApi(request: APIRequestContext) {
 
   return {
     headers,
+    /** Saves a global through the running server (its afterChange hook expires the Next cache tag). */
+    async updateGlobal(slug: string, data: Record<string, unknown>) {
+      const res = await request.post(`/api/globals/${slug}`, { headers, data })
+      if (!res.ok()) throw new Error(`update global ${slug} failed: ${res.status()} ${await res.text()}`)
+    },
     async createSpacePhoto(opts: { alt?: string; order?: number; caption?: string; fixture?: string } = {}) {
       const media = await upload('media', opts.fixture ?? 'flyer-square.jpg', { alt: opts.alt ?? 'Pista de dança do Paraíso' })
       const res = await request.post('/api/space-items', {
@@ -92,6 +97,7 @@ export async function staffApi(request: APIRequestContext) {
       slug?: string
       description?: string
       videos?: number
+      categoria?: 'profissional' | 'amadora'
     }) {
       const videos = []
       for (let i = 0; i < (opts.videos ?? 0); i++) {
@@ -113,6 +119,7 @@ export async function staffApi(request: APIRequestContext) {
           photos,
           ...(videos.length ? { videos } : {}),
           order: opts.order ?? 0,
+          ...(opts.categoria ? { categoria: opts.categoria } : {}),
           ...(opts.slug ? { slug: opts.slug } : {}),
           ...(opts.description ? { description: opts.description } : {}),
           _status: opts.published === false ? 'draft' : 'published',
@@ -223,6 +230,7 @@ export async function staffApi(request: APIRequestContext) {
       apelido?: string
       euSou?: number
       cidade?: string
+      idade?: number
       texto?: string
       contato?: { whatsapp?: string; telegram?: string; email?: string; links?: { url: string }[]; observacao?: string }
       status?: 'pendente' | 'aprovado' | 'recusado' | 'despublicado' | 'rascunho'

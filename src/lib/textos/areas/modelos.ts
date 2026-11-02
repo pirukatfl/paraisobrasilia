@@ -20,6 +20,32 @@ export const modelos = definirArea({
       ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
     },
 
+    // Submenus da Galeria (/modelos?tipo=...)
+    tituloProfissionais: {
+      rotulo: 'Título: só profissionais',
+      padrao: 'Profissionais',
+      secao: 'Galeria: Profissionais',
+      ajuda: 'Título da página quando o visitante abre Galeria → Profissionais. Também aparece no Google (lá, sem formatação).',
+    },
+    introProfissionais: {
+      rotulo: 'Texto de abertura: só profissionais',
+      padrao: 'As modelos profissionais que animam as noites do Paraíso.',
+      secao: 'Galeria: Profissionais',
+      ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
+    },
+    tituloAmadoras: {
+      rotulo: 'Título: só amadoras',
+      padrao: 'Amadoras',
+      secao: 'Galeria: Amadoras',
+      ajuda: 'Título da página quando o visitante abre Galeria → Amadoras. Também aparece no Google (lá, sem formatação).',
+    },
+    introAmadoras: {
+      rotulo: 'Texto de abertura: só amadoras',
+      padrao: 'As amadoras que frequentam e encantam as noites do Paraíso.',
+      secao: 'Galeria: Amadoras',
+      ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
+    },
+
     // Sem modelos
     vazioTitulo: {
       rotulo: 'Título quando não há modelos',

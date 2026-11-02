@@ -42,6 +42,7 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
       <h2 id={titleId} className="type-heading">
         {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
+        {ad.idade ? <> · <TextoRico valor={t.idadeAnos} vars={{ idade: ad.idade }} linha /></> : null}
       </h2>
       {badge.length > 0 && <p className="type-label mt-1 text-muted">{badge}</p>}
       <p className="mt-2 whitespace-pre-line text-body">{excerpt}</p>

@@ -41,6 +41,16 @@ import * as migration_20261027_191302_classisex_mais_contatos_textos from './202
 import * as migration_20261028_165121_textos_formatados from './20261028_165121_textos_formatados';
 import * as migration_20261028_224917_todos_textos_formatados from './20261028_224917_todos_textos_formatados';
 import * as migration_20261029_180440_thumbs_contos from './20261029_180440_thumbs_contos';
+import * as migration_20261101_220336_festa_horario_termino from './20261101_220336_festa_horario_termino';
+import * as migration_20261101_220922_galeria_categoria from './20261101_220922_galeria_categoria';
+import * as migration_20261101_221850_menu_do_site from './20261101_221850_menu_do_site';
+import * as migration_20261101_232627_espaco_carrossel from './20261101_232627_espaco_carrossel';
+import * as migration_20261101_232839_quadros_inicio from './20261101_232839_quadros_inicio';
+import * as migration_20261101_233218_promocao from './20261101_233218_promocao';
+import * as migration_20261101_233442_promocao_textos from './20261101_233442_promocao_textos';
+import * as migration_20261102_012634_envios_midia from './20261102_012634_envios_midia';
+import * as migration_20261102_024123_pages_intro_formatada from './20261102_024123_pages_intro_formatada';
+import * as migration_20261102_024939_classisex_idade from './20261102_024939_classisex_idade';
 
 export const migrations = [
   {
@@ -256,6 +266,56 @@ export const migrations = [
   {
     up: migration_20261029_180440_thumbs_contos.up,
     down: migration_20261029_180440_thumbs_contos.down,
-    name: '20261029_180440_thumbs_contos'
+    name: '20261029_180440_thumbs_contos',
+  },
+  {
+    up: migration_20261101_220336_festa_horario_termino.up,
+    down: migration_20261101_220336_festa_horario_termino.down,
+    name: '20261101_220336_festa_horario_termino',
+  },
+  {
+    up: migration_20261101_220922_galeria_categoria.up,
+    down: migration_20261101_220922_galeria_categoria.down,
+    name: '20261101_220922_galeria_categoria',
+  },
+  {
+    up: migration_20261101_221850_menu_do_site.up,
+    down: migration_20261101_221850_menu_do_site.down,
+    name: '20261101_221850_menu_do_site',
+  },
+  {
+    up: migration_20261101_232627_espaco_carrossel.up,
+    down: migration_20261101_232627_espaco_carrossel.down,
+    name: '20261101_232627_espaco_carrossel',
+  },
+  {
+    up: migration_20261101_232839_quadros_inicio.up,
+    down: migration_20261101_232839_quadros_inicio.down,
+    name: '20261101_232839_quadros_inicio',
+  },
+  {
+    up: migration_20261101_233218_promocao.up,
+    down: migration_20261101_233218_promocao.down,
+    name: '20261101_233218_promocao',
+  },
+  {
+    up: migration_20261101_233442_promocao_textos.up,
+    down: migration_20261101_233442_promocao_textos.down,
+    name: '20261101_233442_promocao_textos',
+  },
+  {
+    up: migration_20261102_012634_envios_midia.up,
+    down: migration_20261102_012634_envios_midia.down,
+    name: '20261102_012634_envios_midia',
+  },
+  {
+    up: migration_20261102_024123_pages_intro_formatada.up,
+    down: migration_20261102_024123_pages_intro_formatada.down,
+    name: '20261102_024123_pages_intro_formatada',
+  },
+  {
+    up: migration_20261102_024939_classisex_idade.up,
+    down: migration_20261102_024939_classisex_idade.down,
+    name: '20261102_024939_classisex_idade'
   },
 ];

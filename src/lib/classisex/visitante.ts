@@ -106,6 +106,7 @@ export async function createVisitorAd(payload: Payload, params: VisitorAdInput):
       apelido: value.apelido,
       euSou: value.euSou,
       cidade: value.cidade,
+      idade: value.idade,
       texto: value.texto,
       contato: contatoData(value.contato),
       status: 'pendente',

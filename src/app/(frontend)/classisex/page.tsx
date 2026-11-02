@@ -28,9 +28,9 @@ export default async function ClassisexPublicPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  // The open area filters by tipo only; ?cidade= is ignored (the city is shown, never searched)
+  // The open area filters by tipo only; ?cidade= and ?idade= are ignored (the city is shown, never searched; the age is members-only)
   const t = await getTextos('classisex')
-  const filters = { ...parseBoardFilters(await searchParams), cidade: undefined }
+  const filters = { ...parseBoardFilters(await searchParams), cidade: undefined, idade: undefined }
   const [result, categories] = await Promise.all([getPublicAds(filters), getPublicAdFilters()])
   return (
     <section aria-labelledby="titulo-classisex">

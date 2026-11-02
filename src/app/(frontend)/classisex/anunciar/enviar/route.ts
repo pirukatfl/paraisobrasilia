@@ -116,6 +116,7 @@ export async function POST(request: Request) {
         apelido: text(form, 'apelido'),
         euSou: Number.isInteger(euSou) && euSou > 0 ? euSou : null,
         cidade: text(form, 'cidade'),
+        idade: text(form, 'idade'),
         texto: text(form, 'texto'),
         whatsapp: text(form, 'whatsapp'),
         telegram: text(form, 'telegram'),

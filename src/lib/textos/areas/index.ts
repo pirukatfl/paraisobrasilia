@@ -6,6 +6,7 @@ import { contato } from './contato'
 import { contos } from './contos'
 import { dicasHot } from './dicasHot'
 import { enviarConto } from './enviarConto'
+import { enviarMidia } from './enviarMidia'
 import { espaco } from './espaco'
 import { festas } from './festas'
 import { geral } from './geral'
@@ -31,6 +32,7 @@ export const AREAS = {
   classisex,
   meusAnuncios,
   enviarConto,
+  enviarMidia,
   contos,
   dicasHot,
   mensagens,

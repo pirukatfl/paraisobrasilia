@@ -47,6 +47,18 @@ export const classisex = definirArea({
     filtroEuSou: { rotulo: 'Filtro: Eu sou', padrao: 'Eu sou', secao: 'Filtros dos anúncios' },
     filtroTodos: { rotulo: 'Filtro: opção Todos', padrao: 'Todos', secao: 'Filtros dos anúncios' },
     filtroCidade: { rotulo: 'Filtro: Cidade', padrao: 'Cidade', secao: 'Filtros dos anúncios' },
+    filtroIdade: { rotulo: 'Filtro: Idade (área do assinante)', padrao: 'Idade', secao: 'Filtros dos anúncios' },
+    filtroIdadeTodas: { rotulo: 'Filtro de idade: opção Todas', padrao: 'Todas', soTexto: true, secao: 'Filtros dos anúncios' },
+    filtroIdade18a29: { rotulo: 'Filtro de idade: faixa 18 a 29', padrao: '18 a 29 anos', soTexto: true, secao: 'Filtros dos anúncios' },
+    filtroIdade30a39: { rotulo: 'Filtro de idade: faixa 30 a 39', padrao: '30 a 39 anos', soTexto: true, secao: 'Filtros dos anúncios' },
+    filtroIdade40a49: { rotulo: 'Filtro de idade: faixa 40 a 49', padrao: '40 a 49 anos', soTexto: true, secao: 'Filtros dos anúncios' },
+    filtroIdade50mais: { rotulo: 'Filtro de idade: faixa 50 ou mais', padrao: '50 anos ou mais', soTexto: true, secao: 'Filtros dos anúncios' },
+    idadeAnos: {
+      rotulo: 'Idade do anúncio (área do assinante)',
+      padrao: '{idade} anos',
+      secao: 'Filtros dos anúncios',
+      ajuda: 'Aparece no cartão e na página do anúncio, só para assinantes. Mantenha {idade}.',
+    },
     filtroBotao: { rotulo: 'Filtro: botão Filtrar', padrao: 'Filtrar', secao: 'Filtros dos anúncios' },
     filtroLimpar: { rotulo: 'Filtro: Limpar filtros', padrao: 'Limpar filtros', secao: 'Filtros dos anúncios' },
 
@@ -59,7 +71,7 @@ export const classisex = definirArea({
     },
     vazioFiltroMembrosTexto: {
       rotulo: 'Nada encontrado: texto (área do assinante)',
-      padrao: 'Tente outra opção em Eu sou ou outra cidade.',
+      padrao: 'Tente outra opção em Eu sou, outra cidade ou outra faixa de idade.',
       secao: 'Quando não há anúncios',
     },
     vazioVerTodos: { rotulo: 'Nada encontrado: botão', padrao: 'Ver todos os anúncios', secao: 'Quando não há anúncios' },

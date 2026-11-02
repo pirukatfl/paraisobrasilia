@@ -1,6 +1,7 @@
 import { convertMarkdownToLexical, editorConfigFactory } from '@payloadcms/richtext-lexical'
 import type { Payload, PayloadRequest, SanitizedConfig } from 'payload'
 
+import { textoParaRico } from '../../lib/textos/rico'
 import { PAGES_SEED } from './pages-content'
 
 type LexicalState = ReturnType<typeof convertMarkdownToLexical>
@@ -36,7 +37,7 @@ export async function seedPages(payload: Payload, req?: Partial<PayloadRequest>)
       data: {
         key: page.key,
         title: page.title,
-        intro: page.intro,
+        intro: textoParaRico(page.intro) as never,
         body: (await markdownToLexical(page.markdown, payload.config)) as never,
         _status: 'published',
       },

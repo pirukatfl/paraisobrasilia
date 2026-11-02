@@ -209,5 +209,21 @@ describe('models (MIDIA-06/07, PAINEL-09, G-01..G-06, D-09)', () => {
       const { docs } = await payload.find({ collection: 'models', overrideAccess: false, depth: 1 })
       expect(docs[0]).not.toHaveProperty('imageAuthorization')
     })
+
+    it('categoria: profissional by default, amadora when set; the card DTO carries it', async () => {
+      await resetDatabase(payload)
+      await seedModel(payload, { name: 'Pro Padrao', photoCount: 1 })
+      await seedModel(payload, { name: 'Amadora Um', photoCount: 1, categoria: 'amadora' })
+      const stored = await payload.find({ collection: 'models', overrideAccess: true, depth: 0, sort: 'name' })
+      expect(Object.fromEntries(stored.docs.map((d) => [d.name, d.categoria]))).toEqual({
+        'Pro Padrao': 'profissional',
+        'Amadora Um': 'amadora',
+      })
+      const cards = await getPublishedModels()
+      expect(Object.fromEntries(cards.map((c) => [c.name, c.categoria]))).toEqual({
+        'Pro Padrao': 'profissional',
+        'Amadora Um': 'amadora',
+      })
+    })
   })
 })

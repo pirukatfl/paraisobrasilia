@@ -14,7 +14,7 @@ const LABELS = [
   'Festas',
   'Quem somos',
   'Espaço',
-  'Profissionais e amadoras',
+  'Galeria',
   'ClassiSex',
   'Contos',
   'Dicas Hot',
@@ -22,6 +22,7 @@ const LABELS = [
   'Meus anúncios',
   'Minha assinatura',
   'Trocar senha',
+  'Vídeos pornô grátis',
 ]
 const HREFS = [
   '/',
@@ -35,6 +36,7 @@ const HREFS = [
   '/area-do-assinante/meus-anuncios',
   '/area-do-assinante',
   '/area-do-assinante/senha',
+  'https://www.redtube.com.br/', // link externo (Menu do site), só para assinante
 ]
 
 test.beforeAll(async ({ request }) => {

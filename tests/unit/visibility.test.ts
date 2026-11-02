@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { defaultEndsAt, isUpcoming, PARTY_DEFAULT_DURATION_H } from '../../src/lib/parties/visibility'
+import { defaultEndsAt, hasCustomEnd, isUpcoming, PARTY_DEFAULT_DURATION_H } from '../../src/lib/parties/visibility'
 
 describe('party visibility (FEST-04)', () => {
   it('is upcoming one second before it ends', () => {
@@ -14,5 +14,13 @@ describe('party visibility (FEST-04)', () => {
   it('defaults the end to 10 hours after the start (24/10 23:00 Brasília → 25/10 09:00)', () => {
     expect(PARTY_DEFAULT_DURATION_H).toBe(10)
     expect(defaultEndsAt(new Date('2026-10-25T02:00:00.000Z')).toISOString()).toBe('2026-10-25T12:00:00.000Z')
+  })
+
+  it('shows the end time only when staff filled it in (not the automatic +10h)', () => {
+    const startsAt = '2026-10-25T02:00:00.000Z'
+    expect(hasCustomEnd({ startsAt, endsAt: '2026-10-25T12:00:00.000Z' })).toBe(false)
+    expect(hasCustomEnd({ startsAt, endsAt: '2026-10-25T08:00:00.000Z' })).toBe(true)
+    expect(hasCustomEnd({ startsAt, endsAt: startsAt })).toBe(true)
+    expect(hasCustomEnd({ startsAt, endsAt: 'invalid' })).toBe(false)
   })
 })
