@@ -86,7 +86,7 @@ test('"Galeria": cover photos of 4 models, each linking to its page; hidden with
   await api.updateGlobal('menu-do-site', { itensOcultos: [] })
 })
 
-test('order: agenda, small parties, space, gallery, then the house boxes; no "Quem somos" block', async ({ page, request }) => {
+test('order: agenda, list of other parties, space, gallery, then the house boxes; no "Quem somos" block', async ({ page, request }) => {
   test.setTimeout(180_000)
   const api = await staffApi(request)
   await api.deleteAll('space-items')
@@ -101,12 +101,12 @@ test('order: agenda, small parties, space, gallery, then the house boxes; no "Qu
 
   const y = async (selector: string) => (await page.locator(selector).first().boundingBox())!.y + (await page.evaluate(() => window.scrollY))
   const carousel = await y('[data-party-carousel]')
-  const minis = await y('[data-mini-parties]')
+  const others = await y('[data-other-parties]')
   const espaco = await y('[data-home-espaco]')
   const galeria = await y('[data-home-galeria]')
   const quadros = await y('[data-home-quadros]')
-  expect(carousel).toBeLessThan(minis)
-  expect(minis).toBeLessThan(espaco)
+  expect(carousel).toBeLessThan(others)
+  expect(others).toBeLessThan(espaco)
   expect(espaco).toBeLessThan(galeria)
   expect(galeria).toBeLessThan(quadros)
   // the Quem somos page itself stays
