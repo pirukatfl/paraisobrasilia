@@ -202,3 +202,26 @@ test('an active subscriber reads the whole sent conto, with the image', async ({
   await expectFoto(page.locator('main').getByRole('article').filter({ hasText: TITULO }), `Imagem do conto ${TITULO}`)
   await context.close()
 })
+
+test('a logged-in subscriber also sends a conto, from the members list, and it reaches staff as a draft', async ({ browser, baseURL, request }) => {
+  const TITULO_ASS = `Enviado Logado ${RUN}`
+  const { context, page } = await visitor(browser, baseURL!)
+  await loginAsAssinante(page, SUB.email, SUB.password, '/area-do-assinante/contos')
+  await page.locator('main').getByRole('link', { name: 'Enviar um conto' }).click()
+  await expect(page).toHaveURL(/\/contos\/enviar$/)
+  await expect(page.getByRole('heading', { name: 'Enviar um conto', level: 1 })).toBeVisible()
+  await page.getByLabel('Título').fill(TITULO_ASS)
+  await page.locator('#texto').fill(TEXTO)
+  await page.getByLabel(/Tenho 18 anos ou mais, o conto é de minha autoria/).check()
+  await page.getByLabel(/Li e aceito os/).check()
+  await page.getByRole('button', { name: 'Enviar para aprovação' }).click()
+  await expect(page).toHaveURL(/\/contos\/enviado$/)
+  await expect(page.getByText('Recebemos seu conto. Ele aparece no site depois que a equipe aprovar.')).toBeVisible()
+  await context.close()
+
+  const api = await staffApi(request)
+  const doc = (await findByTitle(api, TITULO_ASS))!
+  expect(doc._status).toBe('draft')
+  expect(doc.enviadoPorVisitante).toBe(true)
+  await api.dispose()
+})

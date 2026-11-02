@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
@@ -52,6 +53,11 @@ export default async function MembrosContosPage({
     <section aria-labelledby="titulo-contos">
       {header}
       <p className="mt-4 max-w-[680px] text-body text-muted"><TextoRico valor={t.membrosIntro} linha /></p>
+      <p className="mt-4">
+        <Link href="/contos/enviar" className="type-label font-semibold text-accent underline underline-offset-4">
+          <TextoRico valor={t.listaLinkEnviar} linha />
+        </Link>
+      </p>
       {result.items.length === 0 ? (
         <EmptyState heading={<TextoRico valor={t.membrosVazioTitulo} linha />} body={t.membrosVazioTexto} actions={[]} />
       ) : (
