@@ -61,3 +61,17 @@ Substituir `DicasTeaser` por uma seção de 3 cartões lado a lado no desktop (e
 - Página de "recebido" depois do envio. Textos novos em área própria (`enviarMidia`). Página `noindex`? Não: é página aberta sem nudez; indexável, entra no sitemap.
 - Constante única do link (usada pela promoção e pelo teaser "Conheça a casa") passa a apontar para `/enviar-fotos-e-videos`.
 - Testes: int (anônimo não lê a coleção nem os arquivos; validação de tipos/tamanho), e2e (envio feliz com 1 foto, recusa sem autorização).
+
+## Lote 4 — formatação das páginas institucionais e filtros do ClassiSex (cliente disse "prossiga" sem detalhar; leitura mais provável)
+
+### J. Formatação igual em Quem somos, Normas, Regras e Dicas
+Leitura: no painel a formatação dessas páginas não aparece no site como nos outros textos.
+- `Pages.body`: mesmo conjunto de marcas dos Textos do site (somar `UnderlineFeature`, `StrikethroughFeature`) mantendo H2/H3, listas e links. Conferir que `.rich-text` no `globals.css` estiliza `u`, `s`, `em`, `strong`, quebras de linha (`linebreak`) e parágrafos vazios iguais ao `.texto-rico`, e que o `RichText` renderiza todos os nós que o editor cria (incluindo formato de alinhamento/indent se vier de texto colado: ignorar com segurança, sem quebrar).
+- `Pages.intro`: vira richText com `editorLinha` (negrito, itálico, sublinhado, riscado), renderizado com `<TextoRico linha>` no topo da página e no teaser da home (mantendo a regra de links de `src/lib/site/links.ts` do item G), e `textoPuro(...)` em meta description/OG/JSON-LD. Migração varchar→jsonb no mesmo padrão de `20261028_224917_todos_textos_formatados` (coluna temporária, cópia congelada de `textoParaRico`, vazio → NULL, `down` simétrico), incluindo a tabela de versões se existir. Manter limite de ~200 caracteres validando o texto puro.
+- Teste e2e: negrito/sublinhado na intro e no corpo de Regras e Quem somos aparecem no site; unit/int da conversão.
+
+### K. Filtros do ClassiSex
+- Novo campo opcional `idade` (number, 18–99) no anúncio: no formulário do assinante (novo e editar), no anúncio de visitante sem conta e no painel. Anúncios antigos ficam sem idade.
+- Área do assinante: filtro "Idade" por faixa (18–29, 30–39, 40–49, 50+; "Todas") junto de "Eu sou" e "Cidade"; anúncio sem idade só aparece em "Todas". Idade mostrada no card e na página do anúncio para assinante.
+- Área aberta continua só com "Eu sou" (decisão D-04: a área aberta não mostra cidade, idade, texto nem contato). Não mudar.
+- Textos novos nas áreas de textos; migração; testes unit (faixas), int (filtro) e e2e (filtro no assinante; área aberta sem filtro de idade/cidade e sem idade no HTML).
