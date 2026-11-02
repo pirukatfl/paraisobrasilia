@@ -87,3 +87,12 @@ describe('next.config', () => {
     expect(cfg).toContain('Service-Worker-Allowed')
   })
 })
+
+describe('aviso de instalação', () => {
+  it('aparece na home, mas não nas áreas restritas', async () => {
+    const { PWA_SEM_AVISO } = await import('@/lib/pwa/rotas')
+    expect(PWA_SEM_AVISO).not.toContain('/')
+    expect(PWA_SEM_AVISO).toContain('/area-do-assinante')
+    expect(PWA_SEM_AVISO).toContain('/entrar')
+  })
+})
