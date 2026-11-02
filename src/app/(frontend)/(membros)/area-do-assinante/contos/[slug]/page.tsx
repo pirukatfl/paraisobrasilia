@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 
 import { PasswordBanner } from '@/components/assinantes/PasswordBanner'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
+import { ContoImagem } from '@/components/contos/ContoImagem'
 import { RichText } from '@/components/RichText'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
 import { getMemberConto } from '@/lib/contos/queries'
@@ -52,6 +53,7 @@ export default async function MembrosContoPage({ params }: { params: Promise<{ s
           ])}
         </p>
       )}
+      {conto.imagem && <ContoImagem imagem={conto.imagem} />}
       <div className="mt-6">
         <RichText data={conto.texto} />
       </div>

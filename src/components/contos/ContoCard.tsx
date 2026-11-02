@@ -1,15 +1,21 @@
 import Link from 'next/link'
 
+import { ContoImagem } from '@/components/contos/ContoImagem'
 import type { ContoCardDTO } from '@/lib/contos/dto'
 import { getTextos } from '@/lib/textos/queries'
 import { juntarComPonto, TextoRico } from '@/components/TextoRico'
 
-/** One conto in a list: title, date, author nickname and the first lines (open part only). No image: the client asked for contos without photo (2026-11-01); the field stays in the data. */
+/** One conto in a list: optional image, title, date, author nickname and the first lines (open part only). Optional image in a 460 px frame (whole photo, no crop). */
 export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: string }) {
   const t = await getTextos('contos')
   const titleId = `conto-${conto.slug}`
   return (
     <article aria-labelledby={titleId} className="flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
+      {conto.imagem && (
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="block">
+          <ContoImagem imagem={conto.imagem} card />
+        </Link>
+      )}
       <div className="flex flex-1 flex-col p-5">
         <h2 id={titleId} className="type-heading">
           <Link href={href} className="hover:text-accent">
