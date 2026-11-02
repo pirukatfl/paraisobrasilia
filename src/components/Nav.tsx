@@ -15,9 +15,10 @@ import { textoPuro } from '@/lib/textos/rico'
 /** External links open another site: no referrer, no opener, no SEO credit. */
 const EXTERNAL_REL = 'noopener noreferrer nofollow'
 
+// Active/hover underline is a background (no pseudo-element), so it can never detach from the item
 const linkClasses = (active: boolean) =>
-  `type-eyebrow relative inline-flex min-h-11 whitespace-nowrap items-center border-b-2 border-transparent transition-colors duration-150 hover:text-accent focus-visible:text-accent after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-200 after:ease-[var(--ease-out-expo)] hover:after:scale-x-100 focus-visible:after:scale-x-100 ${
-    active ? 'text-text after:scale-x-100' : 'text-muted after:scale-x-0'
+  `type-eyebrow inline-flex min-h-11 whitespace-nowrap items-center border-b-2 border-transparent bg-linear-to-r from-accent to-accent bg-no-repeat bg-origin-border bg-bottom-left transition-[color,background-size] duration-200 ease-[var(--ease-out-expo)] hover:text-accent focus-visible:text-accent hover:bg-[length:100%_2px] focus-visible:bg-[length:100%_2px] ${
+    active ? 'text-text bg-[length:100%_2px]' : 'text-muted bg-[length:0%_2px]'
   }`
 
 // Dropdown arrives from 4px above (opacity + translate, 150ms); instant where @starting-style is unsupported
