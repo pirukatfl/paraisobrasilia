@@ -8,6 +8,7 @@ import { ChevronDownIcon } from '@/components/icons'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
+import { PromocaoMenuButton } from '@/components/PromocaoMenuButton'
 import { TextoRico } from '@/components/TextoRico'
 import { textoPuro } from '@/lib/textos/rico'
 
@@ -196,9 +197,18 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
   const conta = logado ? items.filter((item) => ACCOUNT_KEYS.includes(item.key)) : []
   return (
     <nav aria-label="Principal" className="hidden xl:block">
-      <ul className="flex items-center gap-4 xl:gap-5">
+      <ul className="flex items-center gap-4 min-[1440px]:gap-5">
         {principais.map((item) => {
           if (item.children?.length) return <NavDropdown key={item.key} item={item} pathname={pathname} />
+          if (item.acao === 'promocao') {
+            return (
+              <li key={item.key} className="flex items-center">
+                <PromocaoMenuButton className={`${linkClasses(false)} cursor-pointer`}>
+                  <TextoRico valor={item.label} linha />
+                </PromocaoMenuButton>
+              </li>
+            )
+          }
           if (item.external) {
             return (
               <li key={item.key}>

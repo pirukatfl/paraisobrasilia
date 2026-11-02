@@ -1,12 +1,16 @@
 'use client'
 
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import type { GalleryImage } from '@/lib/gallery/types'
+import { PROMOCAO_ABRIR_QUERY } from '@/lib/site/nav'
+import { PROMOCAO_ABRIR_EVENTO, type PromocaoAbrirDetalhe } from '@/lib/site/promocao-evento'
 
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 const STORAGE_KEY = 'pb_promo_vista'
+const [ABRIR_NOME, ABRIR_VALOR] = PROMOCAO_ABRIR_QUERY.split('=')
 
 // Fallback when sessionStorage is blocked: once per page load is the best we can do
 let vistaNestaCarga: string | null = null
@@ -30,10 +34,17 @@ function marcarVista(chave: string) {
 }
 
 /**
- * Home promotion pop-up. Renders nothing on the server (no JS: no pop-up) and nothing until the 18+
- * confirmation exists (html[data-age-ok], set by the head script or by the age gate when the visitor
- * confirms), so it is never on top of the age notice. Once per session per version of the promotion.
- * Closes on the X, the "Fechar" button, the backdrop and Esc; focus is trapped inside and returned on close.
+ * Promotion modal, mounted site-wide by the frontend layout.
+ * - Automatic opening: only on the home page, nothing on the server (no JS: no pop-up) and nothing until the 18+
+ *   confirmation exists (html[data-age-ok], set by the head script or by the age gate when the visitor
+ *   confirms), so it is never on top of the age notice. Once per session per version of the promotion.
+ * - Opened on demand by the "Promoção" menu item (window event, any page, ignores the once-per-session flag),
+ *   or by the home page with `?promocao=abrir` (the item's fallback when the page is loaded with that address, e.g.
+ *   without JavaScript; the query is dropped from the address once it is open). Without JavaScript the home page
+ *   shows the promotion as a block instead (PromocaoSemJs).
+ * - It belongs to the page it was opened on: navigating (e.g. Participar) closes it.
+ * Closes on the X, the "Fechar" button, the backdrop and Esc; focus is trapped inside and returned on close
+ * (to the menu item that opened it).
  */
 export function PromocaoDialog({
   versao,
@@ -54,19 +65,23 @@ export function PromocaoDialog({
   botaoFechar: ReactNode
   children: ReactNode
 }) {
-  const [aberta, setAberta] = useState(false)
+  const pathname = usePathname() ?? '/'
+  // Open state is tied to the path it was opened on: navigating closes it by itself.
+  const [abertaEm, setAbertaEm] = useState<string | null>(null)
+  const aberta = abertaEm === pathname
   const rootRef = useRef<HTMLDivElement>(null)
   const opener = useRef<HTMLElement | null>(null)
+  const chave = versao || 'v0'
 
-  // Wait for the age confirmation, then open once
+  // Wait for the age confirmation, then open once (home page only)
   useEffect(() => {
-    const chave = versao || 'v0'
+    if (pathname !== '/') return
     const html = document.documentElement
     const tentar = () => {
       if (!html.dataset.ageOk || jaVista(chave)) return false
       opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
       marcarVista(chave)
-      setAberta(true)
+      setAbertaEm(pathname)
       return true
     }
     if (html.dataset.ageOk) {
@@ -78,10 +93,36 @@ export function PromocaoDialog({
     })
     observer.observe(html, { attributes: true, attributeFilter: ['data-age-ok'] })
     return () => observer.disconnect()
-  }, [versao])
+  }, [chave, pathname])
+
+  // The "Promoção" menu item: open here, whatever the page
+  useEffect(() => {
+    const onAbrir = (event: Event) => {
+      const retorno = (event as CustomEvent<PromocaoAbrirDetalhe>).detail?.retorno
+      opener.current = retorno ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null)
+      marcarVista(chave)
+      setAbertaEm(pathname)
+    }
+    window.addEventListener(PROMOCAO_ABRIR_EVENTO, onAbrir)
+    return () => window.removeEventListener(PROMOCAO_ABRIR_EVENTO, onAbrir)
+  }, [chave, pathname])
+
+  // Loaded as `/?promocao=abrir`: open, and take the query out of the address so a reload or a shared link does not reopen it
+  useEffect(() => {
+    if (pathname !== '/') return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get(ABRIR_NOME) !== ABRIR_VALOR) return
+    const timer = window.setTimeout(() => {
+      marcarVista(chave)
+      setAbertaEm(pathname)
+      url.searchParams.delete(ABRIR_NOME)
+      window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [pathname, chave])
 
   const fechar = useCallback(() => {
-    setAberta(false)
+    setAbertaEm(null)
     const alvo = opener.current
     if (alvo && document.contains(alvo)) alvo.focus()
   }, [])

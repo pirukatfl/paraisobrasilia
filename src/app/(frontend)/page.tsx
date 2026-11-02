@@ -1,7 +1,7 @@
 import { AboutTeaser } from '@/components/home/AboutTeaser'
 import { ClassiContosDicas } from '@/components/home/ClassiContosDicas'
 import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
-import { PromocaoPopup } from '@/components/home/PromocaoPopup'
+import { PromocaoSemJs } from '@/components/home/PromocaoPopup'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
 import { getLatestContos } from '@/lib/contos/public'
@@ -28,7 +28,9 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ promocao?: string | string[] }> }) {
+  // `/?promocao=abrir`: where the menu item "Promoção" lands without JavaScript (with JS the modal opens instead)
+  const abrirPromocao = (await searchParams).promocao === 'abrir'
   const [parties, photos, intro, contact, dicas, contos, menu, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
     optional(() => getSpacePhotos(8)),
@@ -43,7 +45,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <PromocaoPopup />
+      {abrirPromocao && <PromocaoSemJs />}
       {hasParties ? (
         <section aria-labelledby="titulo-proximas-festas">
           <p className="type-eyebrow text-muted"><TextoRico valor={t.chamadaTopo} linha /></p>

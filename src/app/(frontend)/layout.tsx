@@ -3,6 +3,7 @@ import { Manrope, Playfair_Display } from 'next/font/google'
 import React from 'react'
 
 import { Footer } from '@/components/Footer'
+import { PromocaoPopup } from '@/components/home/PromocaoPopup'
 import { Header } from '@/components/Header'
 import { RenewalBanner } from '@/components/assinantes/RenewalBanner'
 import { AgeGate } from '@/lib/age-gate/AgeGate'
@@ -91,6 +92,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </a>
           <RenewalBanner />
           <Header />
+          {/* Site-wide: opens by itself only on the home page; the "Promoção" menu item opens it anywhere */}
+          <PromocaoPopup />
           <main id="conteudo" className="mx-auto w-full max-w-[1200px] flex-1 px-4 pt-12 lg:px-8">
             {children}
           </main>

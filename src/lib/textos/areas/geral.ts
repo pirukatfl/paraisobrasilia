@@ -54,6 +54,12 @@ export const geral = definirArea({
     menuContos: { rotulo: 'Menu: Contos', padrao: 'Contos', secao: 'Menu', ajuda: 'Também usado no rodapé.' },
     menuDicasHot: { rotulo: 'Menu: Dicas Hot', padrao: 'Dicas Hot', secao: 'Menu', ajuda: 'Também usado no rodapé.' },
     menuContato: { rotulo: 'Menu: Contato', padrao: 'Contato', secao: 'Menu', ajuda: 'Também usado no rodapé.' },
+    menuPromocao: {
+      rotulo: 'Menu: Promoção',
+      padrao: 'Promoção',
+      secao: 'Menu',
+      ajuda: 'Só aparece no menu enquanto a promoção está no ar. Abre o pop-up da promoção; não aparece no rodapé.',
+    },
     menuAssineJa: { rotulo: 'Menu: Assine Já', padrao: 'Assine Já', secao: 'Menu', ajuda: 'Também usado no rodapé.' },
     menuAreaAssinante: {
       rotulo: 'Menu: Área do assinante',

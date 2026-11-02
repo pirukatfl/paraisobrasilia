@@ -2283,6 +2283,7 @@ export interface MenuDoSite {
         | 'contos'
         | 'dicas-hot'
         | 'contato'
+        | 'promocao'
         | 'assine-ja'
         | 'area-do-assinante'
         | 'meus-anuncios'
@@ -2665,6 +2666,24 @@ export interface TextosGeral {
    * Também usado no rodapé.
    */
   menuContato?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Só aparece no menu enquanto a promoção está no ar. Abre o pop-up da promoção; não aparece no rodapé.
+   */
+  menuPromocao?: {
     root: {
       type: string;
       children: {
@@ -12364,6 +12383,7 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuContos?: T;
   menuDicasHot?: T;
   menuContato?: T;
+  menuPromocao?: T;
   menuAssineJa?: T;
   menuAreaAssinante?: T;
   menuMeusAnuncios?: T;
