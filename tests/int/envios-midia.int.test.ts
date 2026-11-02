@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import type { Payload } from 'payload'
 import sharp from 'sharp'
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { ServiceError, type UploadFile } from '@/lib/classisex/service'
 import { privateMediaDir } from '@/lib/classisex/storage'
@@ -160,7 +160,7 @@ describe('fotos e vídeos enviados sem conta', () => {
 
   it('a filled honeypot creates nothing and looks like success', async () => {
     const res = await send({ website: 'http://spam.example' })
-    expect(res).toEqual({ id: null, token: null })
+    expect(res).toEqual({ id: null, token: null, promocao: null })
     expect(await countEnvios()).toBe(0)
     expect(await countArquivos()).toBe(0)
   })
@@ -181,6 +181,75 @@ describe('fotos e vídeos enviados sem conta', () => {
     await payload.delete({ collection: 'envios-midia', id: id!, overrideAccess: true })
     expect(await countArquivos()).toBe(0)
     expect(fs.existsSync(stored)).toBe(false)
+  })
+
+  describe('participação na promoção', () => {
+    const setPromocao = (data: Record<string, unknown>) =>
+      payload.updateGlobal({ slug: 'promocao', data: { titulo: '', texto: null, inicio: null, fim: null, ...data } as never, overrideAccess: true })
+    const doc = (id: number) => payload.findByID({ collection: 'envios-midia', id, overrideAccess: true, depth: 0 })
+
+    afterEach(async () => {
+      await setPromocao({ ativa: false })
+    })
+
+    it('stores the title read from the global, and the party/date, while the promotion is on', async () => {
+      await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
+      const res = await send({ participarPromocao: true, dataFesta: 'Sábado, 14/11' })
+      expect(res.promocao).toBe('Promoção de Novembro')
+      const envio = await doc(res.id!)
+      expect(envio).toMatchObject({ promocao: 'Promoção de Novembro', dataFesta: 'Sábado, 14/11' })
+    })
+
+    it('the title is never taken from the request: extra fields in the params are ignored', async () => {
+      await setPromocao({ ativa: true, titulo: 'Título do servidor' })
+      const res = await send({ participarPromocao: true, ...({ promocao: 'Título forjado' } as object) })
+      expect((await doc(res.id!)).promocao).toBe('Título do servidor')
+    })
+
+    it('without participating, the submission is a plain one (no promotion, no party/date)', async () => {
+      await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
+      const res = await send({ dataFesta: 'Sábado, 14/11' })
+      expect(res.promocao).toBeNull()
+      expect(await doc(res.id!)).toMatchObject({ promocao: null, dataFesta: null })
+    })
+
+    it.each([
+      ['switched off', { ativa: false, titulo: 'X' }],
+      ['expired', { ativa: true, titulo: 'X', fim: '2020-01-01T00:00:00.000Z' }],
+      ['not started', { ativa: true, titulo: 'X', inicio: '2999-01-01T00:00:00.000Z' }],
+    ])('asking to participate while the promotion is %s is ignored (plain submission)', async (_name, data) => {
+      await setPromocao(data)
+      const res = await send({ participarPromocao: true, dataFesta: 'Sábado' })
+      expect(res.promocao).toBeNull()
+      expect(await doc(res.id!)).toMatchObject({ promocao: null, dataFesta: null })
+    })
+
+    it('a long party/date is refused only when participating', async () => {
+      await setPromocao({ ativa: true, titulo: 'P' })
+      const err = await send({ participarPromocao: true, dataFesta: 'x'.repeat(81) }).catch((e: unknown) => e)
+      expect((err as ServiceError).errors).toHaveProperty('dataFesta')
+      expect(await countEnvios()).toBe(0)
+    })
+
+    it('what was submitted for the promotion is still unreadable for the public, even by filtering on it', async () => {
+      await setPromocao({ ativa: true, titulo: 'Promoção Secreta' })
+      const { id } = await send({ participarPromocao: true, dataFesta: 'Festa Reservada' })
+      for (const res of [
+        await rest('GET', ['envios-midia']),
+        await rest('GET', ['envios-midia'], { query: '?where[promocao][equals]=Promo%C3%A7%C3%A3o%20Secreta' }),
+        await rest('GET', ['envios-midia', String(id)]),
+      ]) {
+        expect([401, 403, 404]).toContain(res.status)
+        expect(res.text).not.toContain('Promoção Secreta')
+        expect(res.text).not.toContain('Festa Reservada')
+      }
+      await seedAssinante(payload, { email: 'a-promo@teste.local', password: 'senha-assinante-123', name: 'A' })
+      const subToken = await tokenFor(payload, 'assinantes', 'a-promo@teste.local', 'senha-assinante-123')
+      const asSub = await rest('GET', ['envios-midia'], { token: subToken })
+      expect([401, 403]).toContain(asSub.status)
+      const staff = await rest('GET', ['envios-midia'], { token, query: '?where[promocao][equals]=Promo%C3%A7%C3%A3o%20Secreta' })
+      expect(staff.text).toContain('Festa Reservada')
+    })
   })
 
   describe('token', () => {

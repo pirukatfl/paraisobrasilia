@@ -1305,6 +1305,14 @@ export interface EnviosMidia {
   contato: string;
   mensagem?: string | null;
   /**
+   * Preenchido pelo site quando a pessoa clicou em Participar: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.
+   */
+  promocao?: string | null;
+  /**
+   * Só aparece em quem participou da promoção.
+   */
+  dataFesta?: string | null;
+  /**
    * Data e hora em que a pessoa confirmou ter 18 anos e autorizar o uso das imagens.
    */
   consentAt?: string | null;
@@ -2118,6 +2126,8 @@ export interface EnviosMidiaSelect<T extends boolean = true> {
   apelido?: T;
   contato?: T;
   mensagem?: T;
+  promocao?: T;
+  dataFesta?: T;
   consentAt?: T;
   observacao?: T;
   arquivos?: T;
@@ -10372,6 +10382,114 @@ export interface TextosEnviarMidia {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Use {titulo} para o título da promoção (Configurações → Promoção).
+   */
+  promocaoQuadro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  dataFestaRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  dataFestaAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoEnviadoTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoEnviadoTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   obrigatorio?: {
     root: {
       type: string;
@@ -12826,6 +12944,13 @@ export interface TextosEnviarMidiaSelect<T extends boolean = true> {
   topo?: T;
   titulo?: T;
   intro?: T;
+  promocaoQuadro?: T;
+  promocaoIntro?: T;
+  promocaoBotao?: T;
+  dataFestaRotulo?: T;
+  dataFestaAjuda?: T;
+  promocaoEnviadoTitulo?: T;
+  promocaoEnviadoTexto?: T;
   obrigatorio?: T;
   apelidoRotulo?: T;
   apelidoAjuda?: T;

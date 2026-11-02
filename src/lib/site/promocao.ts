@@ -23,8 +23,11 @@ export type PromocaoDTO = {
 
 export const BOTAO_PARTICIPAR_PADRAO = 'Participar'
 
+/** What the "is it on" rule looks at (the DTO, or a global read straight from the database). */
+export type PromocaoVigencia = Pick<PromocaoDTO, 'ativa' | 'titulo' | 'texto' | 'inicio' | 'fim' | 'imagem'>
+
 /** On, inside the optional period, and with something to show. */
-export function promocaoNoAr(p: PromocaoDTO | null | undefined, agora: Date): p is PromocaoDTO {
+export function promocaoNoAr<T extends PromocaoVigencia>(p: T | null | undefined, agora: Date): p is T {
   if (!p || !p.ativa) return false
   if (!p.titulo.trim() && !p.texto && !p.imagem) return false
   const t = agora.getTime()
@@ -37,4 +40,12 @@ export function promocaoNoAr(p: PromocaoDTO | null | undefined, agora: Date): p 
     if (Number.isFinite(f) && t > f) return false
   }
   return true
+}
+
+export const PROMOCAO_TITULO_PADRAO = 'Promoção'
+
+/** Title stored on a submission that took part in the promotion; never comes from the browser. */
+export function tituloDaParticipacao(p: PromocaoVigencia | null | undefined, agora: Date): string | null {
+  if (!promocaoNoAr(p, agora)) return null
+  return p.titulo.trim() || PROMOCAO_TITULO_PADRAO
 }

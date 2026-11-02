@@ -109,6 +109,8 @@ test('Participar leads to the form with the promotion on top; switched off it is
   await popup(page).getByRole('link', { name: 'Participar' }).click()
   await expect(page).toHaveURL(/\/enviar-fotos-e-videos\?promocao=1$/)
   await expect(page.getByRole('heading', { name: 'Enviar fotos e vídeos', level: 1 })).toBeVisible()
+  await expect(page.locator('[data-promocao-quadro]')).toHaveText('Participando da promoção: Promoção de Teste')
+  await expect(page.getByLabel(/^Festa \/ data que pretende ir/)).toBeVisible()
 
   await setPromocao(request, { ...ON, participarAtivo: false })
   const informativa = await context.newPage()

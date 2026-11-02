@@ -52,6 +52,7 @@ import * as migration_20261102_012634_envios_midia from './20261102_012634_envio
 import * as migration_20261102_024123_pages_intro_formatada from './20261102_024123_pages_intro_formatada';
 import * as migration_20261102_024939_classisex_idade from './20261102_024939_classisex_idade';
 import * as migration_20261102_032528_promocao_participar from './20261102_032528_promocao_participar';
+import * as migration_20261102_033220_promocao_formulario from './20261102_033220_promocao_formulario';
 
 export const migrations = [
   {
@@ -322,6 +323,11 @@ export const migrations = [
   {
     up: migration_20261102_032528_promocao_participar.up,
     down: migration_20261102_032528_promocao_participar.down,
-    name: '20261102_032528_promocao_participar'
+    name: '20261102_032528_promocao_participar',
+  },
+  {
+    up: migration_20261102_033220_promocao_formulario.up,
+    down: migration_20261102_033220_promocao_formulario.down,
+    name: '20261102_033220_promocao_formulario'
   },
 ];

@@ -14,10 +14,12 @@ export const MAX_VIDEO_BYTES = MAX_AD_VIDEO_BYTES
 export const APELIDO_MIN = 2
 export const APELIDO_MAX = 60
 export const MENSAGEM_MAX = 1000
+export const DATA_FESTA_MAX = 80
 
 export const ENVIO_MIDIA_MESSAGES = {
   apelido: `Informe um apelido (de ${APELIDO_MIN} a ${APELIDO_MAX} caracteres).`,
   contato: 'Informe um e-mail válido ou um WhatsApp com DDD. Só a equipe vê.',
+  dataFesta: `A festa ou data pode ter até ${DATA_FESTA_MAX} caracteres.`,
   mensagem: `A mensagem pode ter até ${MENSAGEM_MAX} caracteres.`,
   maior18: 'Confirme que você tem 18 anos ou mais.',
   autorizacao: 'Confirme que autoriza o uso das imagens e que todas as pessoas que aparecem também autorizaram.',
@@ -34,10 +36,12 @@ export type EnvioMidiaInput = {
   mensagem: string
   maior18: boolean
   autorizacao: boolean
+  /** Only read when the submission takes part in the promotion */
+  dataFesta?: string
 }
 
-export type EnvioMidiaValue = { apelido: string; contato: string; mensagem: string | null }
-export type EnvioMidiaErrors = Partial<Record<'apelido' | 'contato' | 'mensagem' | 'maior18' | 'autorizacao', string>>
+export type EnvioMidiaValue = { apelido: string; contato: string; mensagem: string | null; dataFesta: string | null }
+export type EnvioMidiaErrors = Partial<Record<'apelido' | 'contato' | 'mensagem' | 'dataFesta' | 'maior18' | 'autorizacao', string>>
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -68,13 +72,15 @@ export function validarEnvioMidia(
   const apelido = limpar(input.apelido).replace(/\s+/g, ' ')
   const mensagem = limpar(input.mensagem)
   const contato = normalizarContato(input.contato)
+  const dataFesta = limpar(input.dataFesta ?? '').replace(/\s+/g, ' ')
 
   if (apelido.length < APELIDO_MIN || apelido.length > APELIDO_MAX) errors.apelido = ENVIO_MIDIA_MESSAGES.apelido
   if (!contato) errors.contato = ENVIO_MIDIA_MESSAGES.contato
   if (mensagem.length > MENSAGEM_MAX) errors.mensagem = ENVIO_MIDIA_MESSAGES.mensagem
+  if (dataFesta.length > DATA_FESTA_MAX) errors.dataFesta = ENVIO_MIDIA_MESSAGES.dataFesta
   if (!input.maior18) errors.maior18 = ENVIO_MIDIA_MESSAGES.maior18
   if (!input.autorizacao) errors.autorizacao = ENVIO_MIDIA_MESSAGES.autorizacao
 
   if (Object.keys(errors).length > 0) return { ok: false, errors }
-  return { ok: true, value: { apelido, contato: contato!, mensagem: mensagem || null } }
+  return { ok: true, value: { apelido, contato: contato!, mensagem: mensagem || null, dataFesta: dataFesta || null } }
 }

@@ -4,6 +4,9 @@ import { MidiaEnvioForm } from '@/components/midia/MidiaEnvioForm'
 import { TextoRico } from '@/components/TextoRico'
 import { uploadErrorMessage } from '@/lib/classisex/media-messages'
 import { ENVIO_MIDIA_MESSAGES } from '@/lib/midia-enviada/regras'
+import { ENVIO_PROMOCAO_PARAM } from '@/lib/site/links'
+import { tituloDaParticipacao } from '@/lib/site/promocao'
+import { getPromocao } from '@/lib/site/promocao-queries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { getTextos } from '@/lib/textos/queries'
 import { textoPuro } from '@/lib/textos/rico'
@@ -39,7 +42,11 @@ export default async function EnviarMidiaPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const t = await getTextos('enviarMidia')
-  const raw = (await searchParams).erro
+  const params = await searchParams
+  const raw = params.erro
+  // ?promocao=1 only counts while the promotion is on and inside its period; otherwise it is ignored
+  const tituloPromocao =
+    params[ENVIO_PROMOCAO_PARAM] === '1' ? tituloDaParticipacao(await getPromocao(), new Date()) : null
   const erro = erroMessage(typeof raw === 'string' ? raw.slice(0, 40) : undefined)
   return (
     <section aria-labelledby="titulo-enviar-midia">
@@ -47,8 +54,20 @@ export default async function EnviarMidiaPage({
       <h1 id="titulo-enviar-midia" className="type-display mt-2">
         <TextoRico valor={t.titulo} linha />
       </h1>
-      <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
-      <MidiaEnvioForm erro={erro} textos={t} />
+      {tituloPromocao !== null && (
+        <div
+          role="note"
+          data-promocao-quadro
+          className="mt-4 max-w-[680px] rounded-lg border border-gold/40 bg-surface px-4 py-3 font-bold text-text"
+        >
+          <TextoRico valor={t.promocaoQuadro} vars={{ titulo: tituloPromocao }} linha />
+        </div>
+      )}
+      <TextoRico
+        valor={tituloPromocao !== null ? t.promocaoIntro : t.intro}
+        className="mt-4 max-w-[680px] text-body text-muted"
+      />
+      <MidiaEnvioForm erro={erro} textos={t} participando={tituloPromocao !== null} />
     </section>
   )
 }

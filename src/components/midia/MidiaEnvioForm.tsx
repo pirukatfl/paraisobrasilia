@@ -8,6 +8,7 @@ import { TextoRico } from '@/components/TextoRico'
 import { CLIENT_MESSAGES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from '@/lib/classisex/media-messages'
 import {
   APELIDO_MAX,
+  DATA_FESTA_MAX,
   ENVIO_MIDIA_MESSAGES,
   MAX_FOTOS,
   MAX_FOTO_BYTES,
@@ -34,8 +35,8 @@ const isVideo = (file: File) => VIDEO_MIME_TYPES.includes(typeOf(file))
 
 const megabytes = (bytes: number) => `${(bytes / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`
 
-type Values = { apelido: string; contato: string; mensagem: string }
-const EMPTY: Values = { apelido: '', contato: '', mensagem: '' }
+type Values = { apelido: string; contato: string; mensagem: string; dataFesta: string }
+const EMPTY: Values = { apelido: '', contato: '', mensagem: '', dataFesta: '' }
 
 const field = (form: FormData, name: string) => {
   const value = form.get(name)
@@ -47,7 +48,16 @@ const field = (form: FormData, name: string) => {
  * POST (303 back with ?erro=); with JavaScript the first file goes with the text and the rest one by one (a
  * 100 MB video cannot travel with ten photos), with progress. The server decides every rule again.
  */
-export function MidiaEnvioForm({ erro, textos: t }: { erro?: string; textos: Textos<'enviarMidia'> }) {
+export function MidiaEnvioForm({
+  erro,
+  textos: t,
+  participando = false,
+}: {
+  erro?: string
+  textos: Textos<'enviarMidia'>
+  /** Arrived through "Participar" and the promotion is on: shows the party/date field and tells the server (which checks again) */
+  participando?: boolean
+}) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -113,7 +123,12 @@ export function MidiaEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
       })
       const json = (await response.json()) as { ok: boolean; token?: string | null; redirect?: string; errors?: Record<string, string> }
       if (!json.ok || !json.redirect) {
-        setValues({ apelido: field(data, 'apelido'), contato: field(data, 'contato'), mensagem: field(data, 'mensagem') })
+        setValues({
+          apelido: field(data, 'apelido'),
+          contato: field(data, 'contato'),
+          mensagem: field(data, 'mensagem'),
+          dataFesta: field(data, 'dataFesta'),
+        })
         const next = json.errors ?? { form: 'Não foi possível enviar agora. Tente de novo.' }
         setErrors(next)
         requestAnimationFrame(() => {
@@ -143,7 +158,8 @@ export function MidiaEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
           }
         }
       }
-      router.push(failures > 0 ? `${json.redirect}?falhas=${Math.min(failures, 99)}` : json.redirect)
+      const separador = json.redirect.includes('?') ? '&' : '?'
+      router.push(failures > 0 ? `${json.redirect}${separador}falhas=${Math.min(failures, 99)}` : json.redirect)
     } catch {
       setErrors({ form: 'Sem conexão. Confira a internet e tente de novo.' })
     } finally {
@@ -169,6 +185,8 @@ export function MidiaEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
           {errors.form}
         </p>
       )}
+
+      {participando && <input type="hidden" name="promocao" value="1" />}
 
       {/* The key re-mounts the uncontrolled fields with the values the server just refused; the file list sits outside it so the chosen files survive a refusal */}
       <div key={key} className="flex flex-col gap-6">
@@ -212,6 +230,28 @@ export function MidiaEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
           </p>
           <FieldError id="erro-contato" message={errors.contato} />
         </div>
+
+        {participando && (
+          <div className="flex flex-col gap-2">
+            <label htmlFor="dataFesta" className="type-label text-text">
+              <TextoRico valor={t.dataFestaRotulo} linha />
+            </label>
+            <input
+              id="dataFesta"
+              name="dataFesta"
+              type="text"
+              maxLength={DATA_FESTA_MAX}
+              autoComplete="off"
+              defaultValue={values.dataFesta}
+              aria-describedby={described('dataFesta', 'ajuda-dataFesta')}
+              className={inputClass}
+            />
+            <p id="ajuda-dataFesta" className="type-label text-muted">
+              <TextoRico valor={t.dataFestaAjuda} linha />
+            </p>
+            <FieldError id="erro-dataFesta" message={errors.dataFesta} />
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <label htmlFor="mensagem" className="type-label text-text">
@@ -322,7 +362,7 @@ export function MidiaEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
       )}
 
       <button type="submit" className="btn-primary" disabled={pending}>
-        {pending ? <TextoRico valor={t.botaoEnviando} linha /> : <TextoRico valor={t.botao} linha />}
+        {pending ? <TextoRico valor={t.botaoEnviando} linha /> : <TextoRico valor={participando ? t.promocaoBotao : t.botao} linha />}
       </button>
     </form>
   )

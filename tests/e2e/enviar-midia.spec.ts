@@ -165,3 +165,84 @@ test('staff open the submission in the panel and see the file with its preview',
   // the join list shows both files
   await expect(page.locator('.relationship-table tbody tr')).toHaveCount(2)
 })
+
+// Promoção (2026-11-02): "Participar" in the home pop-up leads here with ?promocao=1
+const PROMO_TITULO = `Promoção Participar ${RUN}`
+const PROMO_ON = { ativa: true, titulo: PROMO_TITULO, texto: null, inicio: null, fim: null, imagem: null }
+const PROMO_OFF = { ...PROMO_ON, ativa: false, titulo: '' }
+const APELIDO_PROMO = `Casal Promo ${RUN}`
+
+test.describe('participar da promoção', () => {
+  test.afterAll(async ({ request }) => {
+    const api = await staffApi(request)
+    await api.updateGlobal('promocao', PROMO_OFF)
+    await api.dispose()
+  })
+
+  test('with the promotion on: banner, party/date field, own received message; the envio is marked in the panel', async ({
+    browser,
+    baseURL,
+    request,
+    page: staffPage,
+  }) => {
+    test.setTimeout(90_000)
+    const api = await staffApi(request)
+    await api.updateGlobal('promocao', PROMO_ON)
+
+    const { context, page } = await visitor(browser, baseURL!)
+    await page.goto('/enviar-fotos-e-videos?promocao=1')
+    await expect(page.locator('[data-promocao-quadro]')).toHaveText(`Participando da promoção: ${PROMO_TITULO}`)
+    await page.getByLabel(/^Apelido/).fill(APELIDO_PROMO)
+    await page.getByLabel(/^Seu e-mail ou WhatsApp/).fill(`promo.${RUN}@teste.local`)
+    await page.getByLabel(/^Festa \/ data que pretende ir/).fill('Sábado, 14/11')
+    await page.setInputFiles('input[name="arquivos"]', path.join(FIXTURES, 'flyer-square.jpg'))
+    await page.getByLabel(/^Tenho 18 anos ou mais/).check()
+    await page.getByLabel(/^Autorizo o Paraíso Brasília a usar/).check()
+    await page.getByRole('button', { name: 'Participar da promoção' }).click()
+    await expect(page).toHaveURL(/\/enviar-fotos-e-videos\/recebido\?promocao=1$/)
+    await expect(page.getByRole('heading', { name: 'Recebemos a sua participação', level: 1 })).toBeVisible()
+    await context.close()
+
+    const found = (await api.get(`/api/envios-midia?where[apelido][equals]=${encodeURIComponent(APELIDO_PROMO)}`)).docs as (Envio & {
+      promocao?: string
+      dataFesta?: string
+    })[]
+    expect(found).toHaveLength(1)
+    expect(found[0]!.promocao).toBe(PROMO_TITULO)
+    expect(found[0]!.dataFesta).toBe('Sábado, 14/11')
+
+    // Marked in the panel list (column) and filterable
+    await loginAsStaff(staffPage)
+    await staffPage.goto(
+      `/admin/collections/envios-midia?where[and][0][promocao][equals]=${encodeURIComponent(PROMO_TITULO)}`,
+    )
+    await expect(staffPage.getByRole('link', { name: APELIDO_PROMO })).toBeVisible()
+    await expect(staffPage.locator('tbody').getByText(PROMO_TITULO).first()).toBeVisible()
+    await api.dispose()
+  })
+
+  test('with the promotion off, ?promocao=1 is ignored: plain page and plain form', async ({ browser, baseURL, request }) => {
+    const api = await staffApi(request)
+    await api.updateGlobal('promocao', PROMO_OFF)
+    await api.dispose()
+    const { context, page } = await visitor(browser, baseURL!)
+    await page.goto('/enviar-fotos-e-videos?promocao=1')
+    await expect(page.getByRole('heading', { name: 'Enviar fotos e vídeos', level: 1 })).toBeVisible()
+    await expect(page.locator('[data-promocao-quadro]')).toHaveCount(0)
+    await expect(page.getByLabel(/^Festa \/ data que pretende ir/)).toHaveCount(0)
+    await expect(page.locator('input[name="promocao"]')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Enviar para a equipe' })).toBeVisible()
+    await context.close()
+  })
+
+  test('the plain page (no parameter) never shows the banner, even with the promotion on', async ({ browser, baseURL, request }) => {
+    const api = await staffApi(request)
+    await api.updateGlobal('promocao', PROMO_ON)
+    await api.dispose()
+    const { context, page } = await visitor(browser, baseURL!)
+    await page.goto('/enviar-fotos-e-videos')
+    await expect(page.locator('[data-promocao-quadro]')).toHaveCount(0)
+    await expect(page.getByLabel(/^Festa \/ data que pretende ir/)).toHaveCount(0)
+    await context.close()
+  })
+})

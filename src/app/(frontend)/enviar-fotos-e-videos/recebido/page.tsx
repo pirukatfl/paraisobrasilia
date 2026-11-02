@@ -16,16 +16,18 @@ export default async function MidiaRecebidaPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const t = await getTextos('enviarMidia')
-  const raw = (await searchParams).falhas
+  const params = await searchParams
+  const raw = params.falhas
+  const participou = params.promocao === '1'
   const falhas = typeof raw === 'string' && /^\d{1,2}$/.test(raw) ? Number(raw) : 0
   return (
     <section aria-labelledby="titulo-enviado">
       <p className="type-eyebrow text-muted"><TextoRico valor={t.enviadoTopo} linha /></p>
       <h1 id="titulo-enviado" className="type-display mt-2">
-        <TextoRico valor={t.enviadoTitulo} linha />
+        <TextoRico valor={participou ? t.promocaoEnviadoTitulo : t.enviadoTitulo} linha />
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted">
-        <TextoRico valor={t.enviadoTexto} linha />
+        <TextoRico valor={participou ? t.promocaoEnviadoTexto : t.enviadoTexto} linha />
       </p>
       {falhas > 0 && (
         <TextoRico valor={t.enviadoFalhas} vars={{ n: falhas }} role="note" className="mt-4 max-w-[680px] text-body" />
