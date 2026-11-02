@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
   if (process.env.SITE_ENV === 'production') {
     const base = (process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000').replace(/\/$/, '')
     return {
-      rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/api', ...MEMBERS_PATHS] },
+      rules: { userAgent: '*', allow: '/', disallow: ['/admin', '/api', '/offline', ...MEMBERS_PATHS] },
       sitemap: `${base}/sitemap.xml`,
     }
   }

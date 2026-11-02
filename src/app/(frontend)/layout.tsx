@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Manrope, Playfair_Display } from 'next/font/google'
 import React from 'react'
 
@@ -6,6 +6,8 @@ import { Footer } from '@/components/Footer'
 import { PromocaoPopup } from '@/components/home/PromocaoPopup'
 import { Header } from '@/components/Header'
 import { RenewalBanner } from '@/components/assinantes/RenewalBanner'
+import { AvisoInstalacao } from '@/components/pwa/AvisoInstalacao'
+import { RegistrarSW } from '@/components/pwa/RegistrarSW'
 import { AgeGate } from '@/lib/age-gate/AgeGate'
 import { AGE_HEAD_SCRIPT } from '@/lib/age-gate/head-script'
 import { TextosGeraisProvider } from '@/lib/textos/TextosGeraisProvider'
@@ -34,6 +36,10 @@ const manrope = Manrope({
 })
 
 const isProduction = process.env.SITE_ENV === 'production'
+// Service worker só em produção/staging (em desenvolvimento atrapalha o hot reload)
+const swAtivo = process.env.NODE_ENV === 'production'
+
+export const viewport: Viewport = { themeColor: '#8B1538' }
 
 // Default title and description come from the panel (textos-geral); the template stays in code
 export async function generateMetadata(): Promise<Metadata> {
@@ -52,6 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Paraíso Brasília' }],
     },
     twitter: { card: 'summary_large_image' },
+    appleWebApp: { capable: true, title: 'Paraíso', statusBarStyle: 'black-translucent' },
     // Staging and development must never be indexed (production flips this on).
     robots: isProduction ? { index: true, follow: true } : { index: false, follow: false },
     other: {
@@ -98,6 +105,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
           </main>
           <Footer />
+          <RegistrarSW ativo={swAtivo} />
+          <AvisoInstalacao />
         </TextosGeraisProvider>
       </body>
     </html>
