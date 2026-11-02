@@ -22,19 +22,19 @@ function SelfDeclarationPrompt({ onVerified, textos }: { onVerified: () => void;
         height={135}
         // Lazy: returning visitors have the gate hidden (display:none), so the logo is never fetched
         loading="lazy"
-        className="mx-auto h-auto w-40 mix-blend-lighten"
+        className="mx-auto h-auto w-40 mix-blend-lighten animate-[overlay-in_300ms_var(--ease-out-expo)_both] motion-reduce:animate-none"
       />
       <h2 id="age-gate-titulo" className="type-heading mt-6">
         <TextoRico valor={textos.titulo} linha />
       </h2>
       <TextoRico id="age-gate-texto" valor={textos.texto} className="mt-4 text-body text-muted" />
-      <button type="button" data-age-primary onClick={onVerified} className="btn-primary mt-8 w-full">
+      <button type="button" data-age-primary onClick={onVerified} className="btn-primary press mt-8 w-full">
         <TextoRico valor={textos.botaoEntrar} linha />
       </button>
       <button
         type="button"
         onClick={() => window.location.assign('https://www.google.com')}
-        className="type-label mt-4 inline-flex min-h-11 min-w-11 items-center justify-center px-6 text-muted underline-offset-4 hover:underline"
+        className="type-label mt-4 inline-flex min-h-11 min-w-11 items-center justify-center px-6 text-muted underline-offset-4 transition-colors duration-150 hover:text-text hover:underline press"
       >
         <TextoRico valor={textos.botaoSair} linha />
       </button>

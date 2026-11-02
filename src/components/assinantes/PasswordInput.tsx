@@ -2,7 +2,8 @@
 
 import { useState, type ComponentProps } from 'react'
 
-const inputClass = 'min-h-11 w-full rounded-lg border border-line bg-surface px-4 pr-12 text-body text-text focus:border-accent'
+// Look comes from the base input styles; only the room for the eye button is local
+const inputClass = 'w-full pr-12'
 
 /** Password input with an eye button that shows/hides the typed value. Falls back to a plain password field without JS. */
 export function PasswordInput(props: Omit<ComponentProps<'input'>, 'type' | 'className'>) {
@@ -17,7 +18,7 @@ export function PasswordInput(props: Omit<ComponentProps<'input'>, 'type' | 'cla
         aria-label={label}
         aria-pressed={visible}
         title={label}
-        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-muted hover:text-text"
+        className="press absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-muted transition-colors duration-[var(--duration-fast)] hover:text-accent focus-visible:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />

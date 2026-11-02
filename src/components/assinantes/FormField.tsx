@@ -51,7 +51,6 @@ export function FormField({
         <input
           {...inputProps}
           type={type}
-          className="min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text focus:border-accent"
         />
       )}
       {hint && !error && (
@@ -60,7 +59,7 @@ export function FormField({
         </p>
       )}
       {error && (
-        <p id={`${id}-erro`} role="alert" className="type-label text-danger">
+        <p id={`${id}-erro`} role="alert" className="type-label text-danger motion-safe:animate-[overlay-in_var(--duration-fast)_ease_both]">
           {error}
         </p>
       )}

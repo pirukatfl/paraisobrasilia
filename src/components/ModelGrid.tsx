@@ -27,13 +27,13 @@ export async function ModelGrid({ models }: { models: ModelCardDTO[] }) {
   return (
     <ul role="list" className="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
       {models.map((model, i) => (
-        <li key={model.id}>
+        <li key={model.id} className={i < 2 ? undefined : 'reveal stagger'} style={i < 2 ? undefined : ({ '--i': i - 2 } as React.CSSProperties)}>
           <Link
             href={`/modelos/${model.slug}`}
             aria-label={`Ver fotos de ${model.name}`}
-            className="block focus-visible:outline-none"
+            className="group press block focus-visible:outline-none"
           >
-            <span className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg border border-line bg-surface hover:border-primary-hover hover:card-glow focus-visible:border-accent">
+            <span className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg border border-line bg-surface card-lift group-hover:border-primary-hover group-focus-visible:border-accent">
               <Image
                 src={model.cover.thumbUrl}
                 alt={model.cover.alt}
@@ -41,10 +41,10 @@ export async function ModelGrid({ models }: { models: ModelCardDTO[] }) {
                 height={model.cover.thumbHeight}
                 sizes={CARD_SIZES}
                 loading={i < 2 ? 'eager' : 'lazy'}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-[400ms] ease-out-expo group-hover:scale-[1.04]"
               />
             </span>
-            <span className="type-label mt-2 block text-text">{model.name}</span>
+            <span className="type-label mt-2 block text-text transition-colors duration-[var(--duration-fast)] group-hover:text-accent">{model.name}</span>
             {(model.photoCount > 1 || model.videoCount > 0) && (
               <span className="type-label block text-muted">{countLabel(model.photoCount, model.videoCount, t)}</span>
             )}

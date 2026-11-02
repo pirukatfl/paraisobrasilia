@@ -80,7 +80,7 @@ export function Lightbox({
   const slide = index !== null ? slides[index] : null
   const counter = index !== null ? <TextoRico valor={t.galeriaContador} vars={{ n: index + 1, total }} linha /> : null
   const iconButton =
-    'inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-surface text-text hover:text-accent'
+    'press inline-flex min-h-11 min-w-11 items-center justify-center rounded-full bg-surface text-text transition-[color,background-color,transform] duration-150 hover:bg-line hover:text-accent'
 
   return (
     <dialog
@@ -119,7 +119,7 @@ export function Lightbox({
                 poster={slide.image.url}
                 src={slide.videoUrl}
                 title={slide.label}
-                className="max-h-[calc(100dvh-128px)] max-w-full"
+                className="max-h-[calc(100dvh-128px)] max-w-full animate-[overlay-in_200ms_var(--ease-out-expo)_both] motion-reduce:animate-none"
               />
             ) : plainImages ? (
               // eslint-disable-next-line @next/next/no-img-element -- private media (T-04-07)
@@ -130,7 +130,7 @@ export function Lightbox({
                 width={slide.image.width}
                 height={slide.image.height}
                 decoding="async"
-                className="max-h-[calc(100dvh-128px)] w-auto max-w-full object-contain"
+                className="max-h-[calc(100dvh-128px)] w-auto max-w-full object-contain animate-[overlay-in_200ms_var(--ease-out-expo)_both] motion-reduce:animate-none"
               />
             ) : fitScreen ? (
               <div className="absolute inset-x-4 inset-y-0 sm:inset-x-16">
@@ -140,7 +140,7 @@ export function Lightbox({
                   alt={slide.image.alt}
                   fill
                   sizes="100vw"
-                  className="object-contain"
+                  className="object-contain animate-[overlay-in_200ms_var(--ease-out-expo)_both] motion-reduce:animate-none"
                 />
               </div>
             ) : (
@@ -151,7 +151,7 @@ export function Lightbox({
                 width={slide.image.width}
                 height={slide.image.height}
                 sizes="100vw"
-                className="max-h-[calc(100dvh-128px)] w-auto max-w-full object-contain"
+                className="max-h-[calc(100dvh-128px)] w-auto max-w-full object-contain animate-[overlay-in_200ms_var(--ease-out-expo)_both] motion-reduce:animate-none"
               />
             )}
             {total > 1 && (

@@ -26,7 +26,7 @@ export async function OwnerAdCard({ ad, canEdit }: { ad: OwnerAdDTO; canEdit: bo
   return (
     <article className="rounded-xl border border-line bg-surface p-5" aria-label={`Anúncio: ${ad.statusLabel}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className={`type-eyebrow ${published ? 'text-accent' : 'text-muted'}`}>
+        <p className={`type-eyebrow transition-colors duration-[var(--duration-fast)] ${published ? 'text-accent' : 'text-muted'}`}>
           {ad.motivo ? `${ad.statusLabel}: ${ad.motivo}` : ad.statusLabel}
         </p>
         <p className="type-label text-muted"><TextoRico valor={t.donoAtualizadoEm} vars={{ data: ad.updatedLabel }} linha /></p>

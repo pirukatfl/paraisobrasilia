@@ -51,7 +51,7 @@ export function PartyGrid({ parties }: { parties: PartyCardDTO[] }) {
       {others.length > 0 && (
         <ul className="mt-10 grid grid-cols-1 items-start gap-5 sm:grid-cols-2 sm:gap-6" role="list">
           {others.map((party, j) => (
-            <li key={party.id}>
+            <li key={party.id} className="reveal stagger" style={{ '--i': j } as React.CSSProperties}>
               <PartyCard party={party} onOpenFlyer={(element) => open(j + 1, element)} />
             </li>
           ))}

@@ -10,22 +10,22 @@ export async function DicaCard({ dica, href, showImage = false }: { dica: DicaCa
   const t = await getTextos('dicasHot')
   const titleId = `dica-${dica.slug}`
   return (
-    <article aria-labelledby={titleId} className="flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
+    <article aria-labelledby={titleId} className="group card-lift flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
       {showImage && dica.capa && (
-        <Link href={href} tabIndex={-1} aria-hidden="true" className="block">
+        <Link href={href} tabIndex={-1} aria-hidden="true" className="block overflow-hidden">
           <Image
             src={dica.capa.url}
             alt={dica.capa.alt}
             width={dica.capa.width}
             height={dica.capa.height}
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="h-auto w-full"
+            className="h-auto w-full transition-transform duration-[400ms] ease-out-expo group-hover:scale-[1.03]"
           />
         </Link>
       )}
       <div className="flex flex-1 flex-col p-5">
         <h2 id={titleId} className="type-heading">
-          <Link href={href} className="hover:text-accent">
+          <Link href={href} className="transition-colors duration-[var(--duration-fast)] group-hover:text-accent hover:text-accent">
             {dica.title}
           </Link>
         </h2>

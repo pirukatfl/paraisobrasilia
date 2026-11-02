@@ -36,7 +36,7 @@ export async function PlanComparison({
         <TextoRico valor={t.comparativoTitulo} linha />
       </Heading>
       <div className="mt-4 overflow-x-auto rounded-xl border border-line bg-surface">
-        <table className="w-full border-collapse text-left text-body">
+        <table className="w-full border-collapse text-left text-body tabular-nums">
           <caption className="sr-only">O que cada tipo de conta pode fazer no ClassiSex</caption>
           <thead>
             <tr className="border-b border-line">
@@ -46,21 +46,21 @@ export async function PlanComparison({
               <th scope="col" className="type-label px-3 py-3 text-text sm:px-4">
                 <TextoRico valor={t.comparativoColunaGratis} linha />
               </th>
-              <th scope="col" className="type-label px-3 py-3 text-accent sm:px-4">
+              <th scope="col" className="type-label border-t border-accent bg-surface-2 px-3 py-3 text-accent sm:px-4">
                 <TextoRico valor={t.comparativoColunaAssinante} linha />
               </th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.key} className="border-b border-line last:border-b-0">
+              <tr key={row.key} className="border-b border-line transition-colors duration-[var(--duration-fast)] last:border-b-0 hover:bg-surface-2">
                 <th scope="row" className="px-3 py-3 align-top font-normal text-text sm:px-4">
                   <TextoRico valor={row.item} linha />
                 </th>
                 <td className="px-3 py-3 align-top text-muted sm:px-4">
                   <TextoRico valor={row.gratis} linha />
                 </td>
-                <td className="px-3 py-3 align-top font-semibold text-text sm:px-4">
+                <td className="bg-surface-2 px-3 py-3 align-top font-semibold text-text sm:px-4">
                   <TextoRico valor={row.assinante} vars={row.vars} linha />
                 </td>
               </tr>
@@ -71,7 +71,7 @@ export async function PlanComparison({
       {(assineLink || signupLink) && (
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           {assineLink && (
-            <Link href="/assine-ja" className="btn-primary">
+            <Link href="/assine-ja" className="btn-primary press">
               <TextoRico valor={t.comparativoBotaoAssine} linha />
             </Link>
           )}

@@ -10,24 +10,27 @@ type Item = { href: string; title: string; dateLabel?: string }
 
 function Quadro({
   id,
+  i,
   titulo,
   children,
   href,
   botao,
 }: {
   id: string
+  /** Position in the row: staggers the scroll reveal */
+  i: number
   titulo: React.ReactNode
   children: React.ReactNode
   href: string
   botao: React.ReactNode
 }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col rounded-xl border border-line bg-surface p-4 lg:p-6">
+    <section aria-labelledby={id} className="reveal stagger flex flex-col rounded-xl border border-line bg-surface p-4 lg:p-6" style={{ '--i': i } as React.CSSProperties}>
       <h2 id={id} className="type-heading">
         {titulo}
       </h2>
       <div className="mt-4 flex-1">{children}</div>
-      <Link href={href} className="btn-secondary mt-6 self-start">
+      <Link href={href} className="btn-secondary press mt-6 self-start">
         {botao}
       </Link>
     </section>
@@ -39,7 +42,7 @@ function Lista({ itens }: { itens: Item[] }) {
     <ul className="flex flex-col gap-3">
       {itens.map((item) => (
         <li key={item.href}>
-          <Link href={item.href} className="type-label font-semibold hover:text-accent">
+          <Link href={item.href} className="type-label font-semibold transition-colors duration-[var(--duration-fast)] hover:text-accent">
             {item.title}
           </Link>
           {item.dateLabel && <span className="type-label ml-2 text-muted">{item.dateLabel}</span>}
@@ -75,6 +78,7 @@ export async function ClassiContosDicas({
       {mostraClassisex && (
         <Quadro
           id="titulo-classisex-home"
+          i={0}
           titulo={<TextoRico valor={t.classisexTitulo} linha />}
           href="/classisex"
           botao={<TextoRico valor={t.classisexBotao} linha />}
@@ -85,6 +89,7 @@ export async function ClassiContosDicas({
       {mostraContos && (
         <Quadro
           id="titulo-contos-home"
+          i={1}
           titulo={<TextoRico valor={t.contosTitulo} linha />}
           href="/contos"
           botao={<TextoRico valor={t.contosBotao} linha />}
@@ -97,6 +102,7 @@ export async function ClassiContosDicas({
       {mostraDicas && (
         <Quadro
           id="titulo-dicas-home"
+          i={2}
           titulo={<TextoRico valor={t.dicasTitulo} linha />}
           href="/dicas-hot"
           botao={<TextoRico valor={t.dicasBotao} linha />}

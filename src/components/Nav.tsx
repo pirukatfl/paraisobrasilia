@@ -16,9 +16,13 @@ import { textoPuro } from '@/lib/textos/rico'
 const EXTERNAL_REL = 'noopener noreferrer nofollow'
 
 const linkClasses = (active: boolean) =>
-  `type-eyebrow inline-flex min-h-11 whitespace-nowrap items-center border-b-2 transition-colors duration-150 hover:text-accent focus-visible:text-accent ${
-    active ? 'border-accent text-text' : 'border-transparent text-muted'
+  `type-eyebrow relative inline-flex min-h-11 whitespace-nowrap items-center border-b-2 border-transparent transition-colors duration-150 hover:text-accent focus-visible:text-accent after:pointer-events-none after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-200 after:ease-[var(--ease-out-expo)] hover:after:scale-x-100 focus-visible:after:scale-x-100 ${
+    active ? 'text-text after:scale-x-100' : 'text-muted after:scale-x-0'
   }`
+
+// Dropdown arrives from 4px above (opacity + translate, 150ms); instant where @starting-style is unsupported
+const dropdownMotion =
+  'transition-[opacity,translate] duration-150 ease-[var(--ease-out-expo)] starting:-translate-y-1 starting:opacity-0 motion-reduce:starting:translate-y-0'
 
 /**
  * Item with submenu: the label stays a link to the parent page, a small button beside it opens the
@@ -78,12 +82,12 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         }
         className="inline-flex min-h-11 min-w-6 cursor-pointer items-center justify-center text-muted hover:text-accent focus-visible:text-accent"
       >
-        <ChevronDownIcon size={16} className={open ? 'rotate-180' : undefined} />
+        <ChevronDownIcon size={16} className={`transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
         <ul
           id={menuId}
-          className="absolute left-0 top-full z-50 min-w-44 rounded-lg border border-line bg-surface py-1 shadow-lg"
+          className={`${dropdownMotion} absolute left-0 top-full z-50 min-w-44 rounded-lg border border-line bg-surface py-1 shadow-lg`}
         >
           {children.map((child) => (
             <li key={child.key}>
@@ -155,10 +159,10 @@ function AccountDropdown({ items, pathname }: { items: NavItem[]; pathname: stri
         className={`${linkClasses(active)} cursor-pointer gap-1`}
       >
         <TextoRico valor={t.menuMinhaConta} linha />
-        <ChevronDownIcon size={16} className={open ? 'rotate-180' : undefined} />
+        <ChevronDownIcon size={16} className={`transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <ul id={menuId} className="absolute right-0 top-full z-50 min-w-44 rounded-lg border border-line bg-surface py-1 shadow-lg">
+        <ul id={menuId} className={`${dropdownMotion} absolute right-0 top-full z-50 min-w-44 rounded-lg border border-line bg-surface py-1 shadow-lg`}>
           {items.map((child) => (
             <li key={child.key}>
               <Link
