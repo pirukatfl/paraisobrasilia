@@ -93,25 +93,23 @@ export function AvisoInstalacao() {
       role="region"
       aria-label="Instalar o site"
       data-aviso-instalacao
-      className="fixed inset-x-4 bottom-4 z-30 mx-auto flex max-w-[460px] items-center gap-3 rounded-xl border border-gold/20 bg-surface px-4 py-3 shadow-lg animate-[dialog-in_var(--duration-overlay)_var(--ease-out-expo)_both] motion-reduce:animate-none"
+      className="fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 mx-auto flex max-w-[460px] flex-col gap-3 rounded-xl border border-gold/20 bg-surface p-4 shadow-[0_8px_24px_-8px_rgb(0_0_0/0.6)] animate-[dialog-in_var(--duration-overlay)_var(--ease-out-expo)_both] motion-reduce:animate-none sm:flex-row sm:items-center"
     >
-      <p className="flex-1 text-sm leading-snug text-text">
+      <p className="text-sm leading-snug text-text sm:flex-1">
         {evento
-          ? 'Instale o Paraíso Brasília no seu celular e abra as festas com um toque.'
-          : 'Para instalar: toque em Compartilhar e depois em “Adicionar à Tela de Início”.'}
+          ? 'Instale o Paraíso Brasília no celular e abra as festas com um toque.'
+          : 'Para instalar, toque em Compartilhar e depois em “Adicionar à Tela de Início”.'}
       </p>
-      {evento && (
-        <button type="button" onClick={() => void instalar()} className="btn-primary min-h-11 shrink-0 px-4">
-          Instalar
+      <div className="flex gap-3">
+        {evento && (
+          <button type="button" onClick={() => void instalar()} className="btn-primary min-h-11 flex-1 px-4 sm:flex-none">
+            Instalar
+          </button>
+        )}
+        <button type="button" onClick={dispensar} className="btn-secondary min-h-11 flex-1 px-4 sm:flex-none">
+          Agora não
         </button>
-      )}
-      <button
-        type="button"
-        onClick={dispensar}
-        className="btn-secondary min-h-11 shrink-0 px-4"
-      >
-        Agora não
-      </button>
+      </div>
     </section>
   )
 }
