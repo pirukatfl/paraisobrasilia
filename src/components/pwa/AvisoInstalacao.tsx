@@ -7,7 +7,8 @@ import { PWA_SEM_AVISO } from '@/lib/pwa/rotas'
 
 const CHAVE = 'pb_pwa_dispensado'
 const SILENCIO_MS = 30 * 24 * 60 * 60 * 1000
-const ATRASO_MS = 30_000
+// Pequena pausa só para o aviso não aparecer junto com a troca de tela da confirmação de idade
+const ATRASO_MS = 1_200
 
 type EventoInstalar = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> }
 
@@ -24,16 +25,18 @@ const jaInstalado = () =>
   window.matchMedia('(display-mode: standalone)').matches ||
   (navigator as Navigator & { standalone?: boolean }).standalone === true
 
+const ehCelular = () => window.matchMedia('(max-width: 767px), (pointer: coarse) and (max-width: 1024px)').matches
+
 const ehIos = () => /iphone|ipad|ipod/i.test(navigator.userAgent)
 
-const rotaSemAviso = (p: string) =>
-  PWA_SEM_AVISO.some((r) => (r === '/' ? p === '/' : p === r || p.startsWith(r + '/')))
+const rotaSemAviso = (p: string) => PWA_SEM_AVISO.some((r) => p === r || p.startsWith(r + '/'))
 
-/** Convite discreto para instalar o site. Nunca disputa com a confirmação 18+ nem com a promoção. */
+/** No celular, convida a instalar o site logo no acesso (home inclusive). Espera a confirmação 18+ e a promoção fecharem. */
 export function AvisoInstalacao() {
   const pathname = usePathname()
   const [evento, setEvento] = useState<EventoInstalar | null>(null)
   const [ios, setIos] = useState(false)
+  const [celular, setCelular] = useState(false)
   const [pronto, setPronto] = useState(false)
   const [livre, setLivre] = useState(false)
   const [fechado, setFechado] = useState(false)
@@ -50,6 +53,7 @@ export function AvisoInstalacao() {
     window.addEventListener('appinstalled', aoInstalar)
     const timer = window.setTimeout(() => {
       setIos(ehIos())
+      setCelular(ehCelular())
       setPronto(true)
     }, ATRASO_MS)
     return () => {
@@ -86,7 +90,7 @@ export function AvisoInstalacao() {
   }
 
   const oferta = evento !== null || ios
-  if (fechado || !pronto || !livre || !oferta || rotaSemAviso(pathname)) return null
+  if (fechado || !pronto || !celular || !livre || !oferta || rotaSemAviso(pathname)) return null
 
   return (
     <section

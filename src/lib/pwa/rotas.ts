@@ -15,5 +15,5 @@ export const PWA_NUNCA_CACHEAR = [
   '/_next/image',
 ] as const
 
-/** Páginas em que o aviso de instalação não aparece. */
-export const PWA_SEM_AVISO = ['/', ...PWA_NUNCA_CACHEAR.filter((r) => r !== '/api' && r !== '/_next/image')] as const
+/** Áreas em que o aviso de instalação não aparece (a home mostra). */
+export const PWA_SEM_AVISO = [...PWA_NUNCA_CACHEAR.filter((r) => r !== '/api' && r !== '/_next/image')] as const
