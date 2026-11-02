@@ -140,6 +140,7 @@ export interface Config {
   globals: {
     contact: Contact;
     'menu-do-site': MenuDoSite;
+    promocao: Promocao;
     'textos-geral': TextosGeral;
     'textos-inicio': TextosInicio;
     'textos-festas': TextosFesta;
@@ -160,6 +161,7 @@ export interface Config {
   globalsSelect: {
     contact: ContactSelect<false> | ContactSelect<true>;
     'menu-do-site': MenuDoSiteSelect<false> | MenuDoSiteSelect<true>;
+    promocao: PromocaoSelect<false> | PromocaoSelect<true>;
     'textos-geral': TextosGeralSelect<false> | TextosGeralSelect<true>;
     'textos-inicio': TextosInicioSelect<false> | TextosInicioSelect<true>;
     'textos-festas': TextosFestasSelect<false> | TextosFestasSelect<true>;
@@ -2136,6 +2138,55 @@ export interface MenuDoSite {
   createdAt?: string | null;
 }
 /**
+ * Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promocao".
+ */
+export interface Promocao {
+  id: number;
+  /**
+   * Desmarque para tirar o pop-up do site sem apagar o texto.
+   */
+  ativa?: boolean | null;
+  /**
+   * Ex.: Promoção de aniversário.
+   */
+  titulo?: string | null;
+  /**
+   * As palavras "contos" e "fotos e vídeos" viram links sozinhas (para enviar contos e para enviar fotos e vídeos), em destaque. No fim do pop-up já aparecem os botões "Enviar contos" e "Enviar fotos e vídeos".
+   */
+  texto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Horário de Brasília. Em branco: vale desde já.
+   */
+  inicio?: string | null;
+  /**
+   * Depois dessa hora o pop-up some sozinho. Em branco: fica até você desligar.
+   */
+  fim?: string | null;
+  /**
+   * Sem nudez explícita: o pop-up aparece na área aberta do site.
+   */
+  imagem?: (number | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Menu do topo, rodapé, confirmação de maioridade (18+), página não encontrada, página de erro, galeria e paginação. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3337,6 +3388,54 @@ export interface TextosInicio {
     [k: string]: unknown;
   } | null;
   dicasBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoBotaoContos?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoBotaoMidia?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  promocaoFechar?: {
     root: {
       type: string;
       children: {
@@ -11335,6 +11434,21 @@ export interface MenuDoSiteSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "promocao_select".
+ */
+export interface PromocaoSelect<T extends boolean = true> {
+  ativa?: T;
+  titulo?: T;
+  texto?: T;
+  inicio?: T;
+  fim?: T;
+  imagem?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-geral_select".
  */
 export interface TextosGeralSelect<T extends boolean = true> {
@@ -11420,6 +11534,9 @@ export interface TextosInicioSelect<T extends boolean = true> {
   contosBotao?: T;
   dicasTitulo?: T;
   dicasBotao?: T;
+  promocaoBotaoContos?: T;
+  promocaoBotaoMidia?: T;
+  promocaoFechar?: T;
   comoChegarTitulo?: T;
   comoChegarBotao?: T;
   comoChegarWhatsapp?: T;

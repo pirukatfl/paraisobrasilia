@@ -1,6 +1,7 @@
 import { AboutTeaser } from '@/components/home/AboutTeaser'
 import { ClassiContosDicas } from '@/components/home/ClassiContosDicas'
 import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
+import { PromocaoPopup } from '@/components/home/PromocaoPopup'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
 import { getLatestContos } from '@/lib/contos/public'
@@ -42,6 +43,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <PromocaoPopup />
       {hasParties ? (
         <section aria-labelledby="titulo-proximas-festas">
           <p className="type-eyebrow text-muted"><TextoRico valor={t.chamadaTopo} linha /></p>

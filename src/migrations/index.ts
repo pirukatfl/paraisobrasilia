@@ -46,6 +46,8 @@ import * as migration_20261101_220922_galeria_categoria from './20261101_220922_
 import * as migration_20261101_221850_menu_do_site from './20261101_221850_menu_do_site';
 import * as migration_20261101_232627_espaco_carrossel from './20261101_232627_espaco_carrossel';
 import * as migration_20261101_232839_quadros_inicio from './20261101_232839_quadros_inicio';
+import * as migration_20261101_233218_promocao from './20261101_233218_promocao';
+import * as migration_20261101_233442_promocao_textos from './20261101_233442_promocao_textos';
 
 export const migrations = [
   {
@@ -286,6 +288,16 @@ export const migrations = [
   {
     up: migration_20261101_232839_quadros_inicio.up,
     down: migration_20261101_232839_quadros_inicio.down,
-    name: '20261101_232839_quadros_inicio'
+    name: '20261101_232839_quadros_inicio',
+  },
+  {
+    up: migration_20261101_233218_promocao.up,
+    down: migration_20261101_233218_promocao.down,
+    name: '20261101_233218_promocao',
+  },
+  {
+    up: migration_20261101_233442_promocao_textos.up,
+    down: migration_20261101_233442_promocao_textos.down,
+    name: '20261101_233442_promocao_textos'
   },
 ];

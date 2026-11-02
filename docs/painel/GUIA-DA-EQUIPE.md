@@ -199,6 +199,20 @@ assinante**, por último, antes do **Sair**. Abre em outra aba. Ele **nunca** ap
 
 ---
 
+## Promoção (pop-up da página inicial)
+
+O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, clicando fora ou com a tecla **Esc**.
+
+1. Menu da esquerda → **Configurações → Promoção**.
+2. Preencha o **Título** e o **Texto**. Opcional: uma **Imagem** (sem nudez explícita) e o período (**Começa em** / **Termina em**; fora do período o pop-up some sozinho).
+3. Marque **Promoção ligada** e **Salvar**. Vale na hora.
+4. Para **tirar do ar**, desmarque **Promoção ligada** e salve. O texto fica guardado para a próxima vez.
+
+No texto, as palavras **contos** e **fotos e vídeos** viram links em destaque (para enviar contos e para enviar fotos e vídeos). No fim do pop-up já aparecem os botões **Enviar contos** e **Enviar fotos e vídeos**. Os textos dos botões ficam em **Textos do site → Página inicial → Pop-up da promoção**.
+Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo na próxima visita.
+
+---
+
 ## Contato e endereço
 
 Endereço, telefone, WhatsApp, e-mail, Instagram e horário aparecem na página **Contato**, no rodapé e na página inicial.

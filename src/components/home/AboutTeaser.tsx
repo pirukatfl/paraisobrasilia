@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { partirTextoComLinks } from '@/lib/site/links'
 import { pathForKey } from '@/lib/pages/keys'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
@@ -12,7 +13,20 @@ export async function AboutTeaser({ intro }: { intro: string | null }) {
       <h2 id="titulo-quem-somos-home" className="type-heading">
         <TextoRico valor={t.quemSomosTitulo} linha />
       </h2>
-      <p className="mt-4 max-w-[680px] text-body">{intro ?? <TextoRico valor={t.quemSomosTextoReserva} linha />}</p>
+      <p className="mt-4 max-w-[680px] text-body">{intro !== null ? (
+          // "contos" and "fotos e vídeos" lead to the send pages, highlighted (same rule as the promotion)
+          partirTextoComLinks(intro).map((trecho, i) =>
+            trecho.href ? (
+              <Link key={i} href={trecho.href} className="font-bold text-accent underline underline-offset-2">
+                {trecho.texto}
+              </Link>
+            ) : (
+              trecho.texto
+            ),
+          )
+        ) : (
+          <TextoRico valor={t.quemSomosTextoReserva} linha />
+        )}</p>
       <Link href={pathForKey('quem-somos')} className="btn-secondary mt-6">
         <TextoRico valor={t.quemSomosBotao} linha />
       </Link>

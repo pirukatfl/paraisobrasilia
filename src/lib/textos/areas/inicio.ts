@@ -101,6 +101,20 @@ export const inicio = definirArea({
     dicasTitulo: { rotulo: 'Título da seção de dicas', padrao: 'Dicas Hot', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
     dicasBotao: { rotulo: 'Botão das dicas', padrao: 'Ver todas as Dicas Hot', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
 
+    // Pop-up da promoção (o texto da promoção fica em Configurações → Promoção)
+    promocaoBotaoContos: { rotulo: 'Pop-up: botão para enviar contos', padrao: 'Enviar contos', secao: 'Pop-up da promoção' },
+    promocaoBotaoMidia: {
+      rotulo: 'Pop-up: botão para enviar fotos e vídeos',
+      padrao: 'Enviar fotos e vídeos',
+      secao: 'Pop-up da promoção',
+    },
+    promocaoFechar: {
+      soTexto: true,
+      rotulo: 'Pop-up: botão de fechar (leitores de tela)',
+      padrao: 'Fechar a promoção',
+      secao: 'Pop-up da promoção',
+    },
+
     // Como chegar
     comoChegarTitulo: { rotulo: 'Título da seção Como chegar', padrao: 'Como chegar', secao: 'Seção Como chegar' },
     comoChegarBotao: { rotulo: 'Botão para a página de contato', padrao: 'Como chegar', secao: 'Seção Como chegar' },

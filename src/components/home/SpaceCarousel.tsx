@@ -111,7 +111,7 @@ export function SpaceCarousel({ photos, labels }: { photos: GalleryImage[]; labe
             role="group"
             aria-roledescription="slide"
             aria-label={`${i + 1} / ${total}`}
-            data-slide={i + 1}
+            data-space-slide={i + 1}
             className="relative aspect-[4/3] w-full shrink-0 snap-center sm:aspect-[16/10]"
           >
             <Image
