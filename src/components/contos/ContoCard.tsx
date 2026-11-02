@@ -5,7 +5,7 @@ import type { ContoCardDTO } from '@/lib/contos/dto'
 import { getTextos } from '@/lib/textos/queries'
 import { juntarComPonto, TextoRico } from '@/components/TextoRico'
 
-/** One conto in a list: optional image, title, date, author nickname and the first lines (open part only). Optional image in a 460 px frame (whole photo, no crop). */
+/** One conto in a list: optional image, title, date, author nickname and the first lines (open part only). Optional image fills a 460 px frame (cover). */
 export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: string }) {
   const t = await getTextos('contos')
   const titleId = `conto-${conto.slug}`
