@@ -54,6 +54,7 @@ import * as migration_20261102_024939_classisex_idade from './20261102_024939_cl
 import * as migration_20261102_032528_promocao_participar from './20261102_032528_promocao_participar';
 import * as migration_20261102_033220_promocao_formulario from './20261102_033220_promocao_formulario';
 import * as migration_20261102_052006_menu_minha_conta from './20261102_052006_menu_minha_conta';
+import * as migration_20261102_054120_promocao_menu from './20261102_054120_promocao_menu';
 
 export const migrations = [
   {
@@ -334,6 +335,11 @@ export const migrations = [
   {
     up: migration_20261102_052006_menu_minha_conta.up,
     down: migration_20261102_052006_menu_minha_conta.down,
-    name: '20261102_052006_menu_minha_conta'
+    name: '20261102_052006_menu_minha_conta',
+  },
+  {
+    up: migration_20261102_054120_promocao_menu.up,
+    down: migration_20261102_054120_promocao_menu.down,
+    name: '20261102_054120_promocao_menu'
   },
 ];

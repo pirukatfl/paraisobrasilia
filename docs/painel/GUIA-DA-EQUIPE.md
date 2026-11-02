@@ -219,6 +219,13 @@ No fim do pop-up aparecem os botões **Participar** (principal) e **Fechar**. O 
 Quem clicar em **Participar** vai para o formulário de fotos e vídeos (veja a seção "Fotos e vídeos enviados pelo público"), e o envio fica marcado com o título desta promoção.
 Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo na próxima visita.
 
+**Item "Promoção" no menu principal.** Enquanto a promoção está **no ar** (ligada e dentro do período), aparece no menu do site, para visitantes e para assinantes, no computador e no celular, o item **Promoção**. Quem clicar nele vê o pop-up de novo, em qualquer página em que estiver (sem sair dela), mesmo que já o tenha fechado. Quando a promoção sai do ar, o item e o pop-up somem sozinhos. Detalhes:
+
+- O item **não aparece no rodapé**.
+- O texto do item é editável em **Textos do site → Geral → Menu: Promoção** (padrão "Promoção").
+- Para esconder o item mesmo com a promoção no ar, use **Configurações → Menu do site** e marque **Promoção** em "Itens escondidos". O pop-up da página inicial continua funcionando.
+- Sem JavaScript no navegador, o item leva para a página inicial, que mostra a promoção como um bloco no topo da página.
+
 ---
 
 ## Fotos e vídeos enviados pelo público (inclui quem participa da promoção)

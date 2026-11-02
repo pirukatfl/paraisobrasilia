@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
+import { headerMenu } from './helpers/menu'
 
 // Promoção (novo planejamento 2026-11-01, item G): pop-up of the home page, edited in the panel.
 test.describe.configure({ mode: 'serial' })
@@ -158,5 +159,126 @@ test('off, expired or not started yet: no pop-up; without JavaScript: none', asy
   await p2.goto('/')
   await expect(p2.getByText('Promoção de Teste')).toHaveCount(0)
   await semJs.close()
+  await context.close()
+})
+
+// Client request 2026-11-02: "Promoção" in the main menu reopens the modal, on any page, while the promotion is on.
+async function itemPromocao(page: Page) {
+  const menu = await headerMenu(page)
+  return menu.getByRole('button', { name: 'Promoção', exact: true })
+}
+
+test('menu item Promoção: on a non-home page it opens the modal without navigating, then returns focus', async ({ browser, baseURL, request }) => {
+  await setPromocao(request, ON)
+  const context = await browser.newContext({ baseURL })
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const page = await context.newPage()
+  await page.goto('/espaco')
+  // never opens by itself outside the home page
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(popup(page)).toHaveCount(0)
+
+  const item = await itemPromocao(page)
+  await expect(item).toHaveAttribute('aria-haspopup', 'dialog')
+  await item.click()
+  await expect(popup(page)).toBeVisible()
+  await expect(page).toHaveURL(/\/espaco$/)
+  await expect(popup(page).getByRole('button', { name: 'Fechar a promoção' })).toBeFocused()
+
+  await page.keyboard.press('Escape')
+  await expect(popup(page)).toHaveCount(0)
+  // the menu toggle on mobile, the item itself on desktop
+  const toggle = page.getByRole('button', { name: 'Abrir menu' })
+  if (await toggle.isVisible()) await expect(toggle).toBeFocused()
+  else await expect(item).toBeFocused()
+  await context.close()
+})
+
+test('menu item Promoção: on the home page it reopens the modal after it was closed (ignores once per session)', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL })
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const page = await context.newPage()
+  await page.goto('/')
+  await expect(popup(page)).toBeVisible()
+  await popup(page).getByRole('button', { name: 'Fechar', exact: true }).click()
+  await expect(popup(page)).toHaveCount(0)
+  await page.reload()
+  await expect(page.getByRole('heading', { name: 'Próximas festas' })).toBeVisible()
+  await expect(popup(page)).toHaveCount(0)
+
+  await (await itemPromocao(page)).click()
+  await expect(popup(page)).toBeVisible()
+  // Participar still leads to the form and the modal is gone there
+  await popup(page).getByRole('link', { name: 'Participar' }).click()
+  await expect(page).toHaveURL(/\/enviar-fotos-e-videos\?promocao=1$/)
+  await expect(popup(page)).toHaveCount(0)
+  await context.close()
+})
+
+test('menu item Promoção: not in the footer; promotion off or hidden by staff: no item, no modal markup', async ({ browser, baseURL, request }) => {
+  const context = await browser.newContext({ baseURL })
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const page = await context.newPage()
+  await page.goto('/contato')
+  await expect(page.getByRole('contentinfo').getByText('Promoção', { exact: true })).toHaveCount(0)
+
+  await setPromocao(request, { ...ON, ativa: false })
+  await page.goto('/contato')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(await itemPromocao(page)).toHaveCount(0)
+  await expect(page.locator('[data-promocao]')).toHaveCount(0)
+
+  const api = await staffApi(request)
+  await setPromocao(request, ON)
+  await api.updateGlobal('menu-do-site', { itensOcultos: ['promocao'] })
+  await page.goto('/contato')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(await itemPromocao(page)).toHaveCount(0)
+  await api.updateGlobal('menu-do-site', { itensOcultos: [] })
+  await api.dispose()
+  await context.close()
+})
+
+test('menu item Promoção without JavaScript: goes to the home page, which shows the promotion as a block', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL, javaScriptEnabled: false })
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const page = await context.newPage()
+  await page.goto('/contato')
+  const nav = page.locator('nav[aria-label="Principal"], nav[aria-label="Menu"]')
+  // no JS: the age gate overlay stays up (its script is off), so submit the form without a pointer click
+  await nav.locator('button[aria-haspopup="dialog"]').first().evaluate((el) => (el as HTMLButtonElement).click())
+  await expect(page).toHaveURL(/\/\?promocao=abrir$/)
+  const bloco = page.locator('[data-promocao-sem-js]')
+  await expect(bloco.getByRole('heading', { name: 'Promoção de Teste' })).toBeVisible()
+  await expect(bloco.getByRole('link', { name: 'Participar' })).toHaveAttribute('href', '/enviar-fotos-e-videos?promocao=1')
+  await context.close()
+})
+
+for (const width of [1280, 1440]) {
+  test(`desktop ${width}px: the public menu with Promoção stays on one row`, async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ baseURL, viewport: { width, height: 800 } })
+    await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+    const page = await context.newPage()
+    await page.goto('/contato')
+    const nav = page.getByRole('navigation', { name: 'Principal' })
+    await expect(nav.getByRole('button', { name: 'Promoção', exact: true })).toBeVisible()
+    const tops = await nav.locator(':scope > ul > li').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
+    expect(tops.length).toBe(11)
+    expect(new Set(tops).size).toBe(1)
+    const box = (await nav.boundingBox())!
+    expect(box.x + box.width).toBeLessThanOrEqual(width)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+    await context.close()
+  })
+}
+
+test('loaded as /?promocao=abrir with JavaScript: the modal opens and the query leaves the address', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL })
+  await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
+  const page = await context.newPage()
+  await page.goto('/?promocao=abrir')
+  await expect(popup(page)).toBeVisible()
+  await expect(page).toHaveURL(baseURL! + '/')
+  await expect(page.locator('[data-promocao-sem-js]')).toHaveCount(0)
   await context.close()
 })
