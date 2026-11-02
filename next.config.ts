@@ -37,6 +37,17 @@ const nextConfig: NextConfig = {
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' }, // T-01-23
         ],
       },
+      // PWA: o service worker nunca fica em cache do navegador (atualizações e kill switch chegam na hora)
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+          { key: 'Content-Security-Policy', value: "default-src 'self'" },
+        ],
+      },
+      { source: '/manifest.webmanifest', headers: [{ key: 'Cache-Control', value: 'public, max-age=3600' }] },
       // Members and auth pages are never indexed, also in production (T-03-05)
       ...['/area-do-assinante', '/area-do-assinante/:path*', '/entrar', '/nova-senha', '/esqueci-senha'].map((source) => ({
         source,
