@@ -100,18 +100,104 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
   )
 }
 
-/** Desktop inline navigation (≥ 1024px). Active item: accent underline + aria-current. */
+/** Account entries of a logged-in subscriber, grouped under "Minha conta" on the desktop menu (the mobile menu lists them all). */
+const ACCOUNT_KEYS = ['meus-anuncios', 'minha-assinatura', 'trocar-senha']
+
+/**
+ * "Minha conta": a button-only trigger (the group has no page of its own; "Minha assinatura" is one of its entries),
+ * opens on hover, on focus and with the button; Esc closes it and returns focus to the button. Holds the account links
+ * and Sair (a form submit button). Only in the DOM while open, like NavDropdown.
+ */
+function AccountDropdown({ items, pathname }: { items: NavItem[]; pathname: string }) {
+  const t = useTextosGerais()
+  const [state, setState] = useState<{ path: string; mode: 'hover' | 'pinned' } | null>(null)
+  const open = state?.path === pathname
+  const menuId = useId()
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const rootRef = useRef<HTMLLIElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      setState(null)
+      if (rootRef.current?.contains(document.activeElement)) buttonRef.current?.focus()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [open])
+
+  const active = items.some((c) => isActivePath(c.href, pathname, c.exact))
+  return (
+    <li
+      ref={rootRef}
+      className="relative flex items-center"
+      onMouseEnter={() => setState((cur) => cur ?? { path: pathname, mode: 'hover' })}
+      onMouseLeave={() => setState((cur) => (cur?.mode === 'hover' ? null : cur))}
+      onFocus={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget) || !event.target.matches(':focus-visible')) return
+        setState((cur) => cur ?? { path: pathname, mode: 'pinned' })
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setState(null)
+      }}
+    >
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls={open ? menuId : undefined}
+        onClick={() =>
+          setState((cur) => (cur?.path === pathname && cur.mode === 'pinned' ? null : { path: pathname, mode: 'pinned' }))
+        }
+        className={`${linkClasses(active)} cursor-pointer gap-1`}
+      >
+        <TextoRico valor={t.menuMinhaConta} linha />
+        <ChevronDownIcon size={16} className={open ? 'rotate-180' : undefined} />
+      </button>
+      {open && (
+        <ul id={menuId} className="absolute right-0 top-full z-50 min-w-44 rounded-lg border border-line bg-surface py-1 shadow-lg">
+          {items.map((child) => (
+            <li key={child.key}>
+              <Link
+                href={child.href}
+                aria-current={isActivePath(child.href, pathname, child.exact) ? 'page' : undefined}
+                className="type-label flex min-h-11 items-center whitespace-nowrap px-4 text-text hover:text-accent focus-visible:text-accent"
+              >
+                <TextoRico valor={child.label} linha />
+              </Link>
+            </li>
+          ))}
+          <li>
+            <form action={sair}>
+              <button
+                type="submit"
+                className="type-label flex min-h-11 w-full cursor-pointer items-center whitespace-nowrap px-4 text-left text-text hover:text-accent focus-visible:text-accent"
+              >
+                <TextoRico valor={t.menuSair} linha />
+              </button>
+            </form>
+          </li>
+        </ul>
+      )}
+    </li>
+  )
+}
+
+/**
+ * Desktop inline navigation (xl and up), always on ONE line. Active item: accent underline + aria-current.
+ * Logged in: the account entries (Meus anúncios, Minha assinatura, Trocar senha) and Sair live in "Minha conta",
+ * the last item; the subscribers' external link stays inline right before it.
+ */
 export function Nav({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
   const pathname = usePathname() ?? '/'
-  const t = useTextosGerais()
+  const principais = logado ? items.filter((item) => !ACCOUNT_KEYS.includes(item.key)) : items
+  const conta = logado ? items.filter((item) => ACCOUNT_KEYS.includes(item.key)) : []
   return (
     <nav aria-label="Principal" className="hidden xl:block">
-      <ul
-        className={
-          logado ? 'flex flex-wrap items-center justify-end gap-x-4 gap-y-0' : 'flex items-center gap-4 xl:gap-5'
-        }
-      >
-        {items.map((item) => {
+      <ul className="flex items-center gap-4 xl:gap-5">
+        {principais.map((item) => {
           if (item.children?.length) return <NavDropdown key={item.key} item={item} pathname={pathname} />
           if (item.external) {
             return (
@@ -131,18 +217,7 @@ export function Nav({ items, logado = false }: { items: NavItem[]; logado?: bool
             </li>
           )
         })}
-        {logado && (
-          <li>
-            <form action={sair}>
-              <button
-                type="submit"
-                className="type-eyebrow inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-muted hover:text-accent"
-              >
-                <TextoRico valor={t.menuSair} linha />
-              </button>
-            </form>
-          </li>
-        )}
+        {logado && <AccountDropdown items={conta} pathname={pathname} />}
       </ul>
     </nav>
   )

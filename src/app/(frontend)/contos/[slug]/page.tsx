@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { AssineJaCta } from '@/components/contos/AssineJaCta'
+import { ContoImagem } from '@/components/contos/ContoImagem'
 import { RichText } from '@/components/RichText'
 import { getPublicConto } from '@/lib/contos/public'
 import { buildPageMetadata } from '@/lib/seo/metadata'
@@ -43,6 +44,7 @@ export default async function ContoPublicPage({ params }: Props) {
           ])}
         </p>
       )}
+      {conto.imagem && <ContoImagem imagem={conto.imagem} />}
       <div className="mt-6">
         <RichText data={conto.open} />
       </div>

@@ -45,6 +45,8 @@ const nextConfig: NextConfig = {
     ]
   },
   images: {
+    // 85: foto do conto (460 px de altura, nítida em tela retina); 75 é o padrão do restante
+    qualities: [75, 85],
     localPatterns: [
       {
         pathname: '/api/media/file/**',

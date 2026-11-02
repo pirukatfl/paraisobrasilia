@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
+import { abrirMinhaConta } from './helpers/menu'
 
 // Menu do site (novo planejamento 2026-11-01): staff hide menu items in the panel, and the external link
 // is a members-only entry: it must never reach the public menu, the footer, the sitemap or the HTML of
@@ -71,9 +72,10 @@ test('logged in: the external link is the last item before Sair, opens a new tab
   const rel = (await link.getAttribute('rel')) ?? ''
   for (const token of ['noopener', 'noreferrer', 'nofollow']) expect(rel).toContain(token)
 
-  // last link of the list; Sair (a button) comes after it
+  // last top-level link; Sair (a button, inside Minha conta on desktop) comes after it
   const hrefs = await menu.locator(':scope > ul > li > a').evaluateAll((els) => els.map((el) => el.getAttribute('href')))
   expect(hrefs[hrefs.length - 1]).toBe(EXTERNAL)
+  await abrirMinhaConta(menu)
   await expect(menu.getByRole('button', { name: 'Sair' })).toBeVisible()
   // still not in the footer
   await expect(page.locator('footer a[href*="redtube"]')).toHaveCount(0)
@@ -86,6 +88,7 @@ test('staff turn the external link off and it leaves the logged-in menu at once'
 
   await loginAsAssinante(page, SUB.email, PASSWORD)
   const menu = await headerMenu(page, isMobile)
+  await abrirMinhaConta(menu)
   await expect(menu.getByRole('button', { name: 'Sair' })).toBeVisible()
   await expect(menu.getByRole('link', { name: /Vídeos pornô/ })).toHaveCount(0)
   await expect(page.locator('a[href*="redtube"]')).toHaveCount(0)

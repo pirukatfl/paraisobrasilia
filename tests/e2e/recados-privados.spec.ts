@@ -2,7 +2,7 @@ import { expect, test, type APIResponse, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginPage, type Who } from './helpers/fase5'
-import { headerMenu } from './helpers/menu'
+import { headerMenu, rotulosNoTopo } from './helpers/menu'
 import {
   ANA,
   APELIDOS,
@@ -66,8 +66,9 @@ test('1. Ana and Beto see the conversation in Recados; there is no Recados menu 
   baseURL,
 }) => {
   const ana = await as(browser, baseURL!, ANA, '/area-do-assinante/classisex')
-  const links = await (await subNav(ana.page)).locator(':scope > ul > li > a').allTextContents()
-  expect(links.map((l) => l.trim().replace(/\s*\d+\+?$/, ''))).toEqual([
+  const menuLogado = await subNav(ana.page)
+  const links = await menuLogado.locator(':scope > ul > li > a').allTextContents()
+  expect(links.map((l) => l.trim().replace(/\s*\d+\+?$/, ''))).toEqual(await rotulosNoTopo(menuLogado, [
     'Festas',
     'Quem somos',
     'Espaço',
@@ -80,7 +81,7 @@ test('1. Ana and Beto see the conversation in Recados; there is no Recados menu 
     'Minha assinatura',
     'Trocar senha',
     'Vídeos pornô grátis',
-  ])
+  ]))
   // no Recados item in the menu (client request): the inbox is opened by its address
   await ana.page.goto(M)
   await expect(ana.page.getByRole('heading', { name: 'Recados', level: 1 })).toBeVisible()

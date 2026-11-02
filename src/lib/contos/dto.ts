@@ -64,8 +64,8 @@ const splitOf = (doc: ContoSource) =>
 
 type SizeName = keyof NonNullable<MediaLike['sizes']>
 
-/** Listing cards: the 4:3 crop at 2x (next/image derives the 1x/2x srcset from it), then older/smaller variants. */
-const CARD_SIZES: SizeName[] = ['thumb2x', 'thumb', 'card']
+/** Listing cards: the whole photo (no crop, shown in a 460 px frame), like the conto page: gallery (1600 px wide), then the original. */
+const CARD_SIZES: SizeName[] = ['gallery']
 
 /**
  * Only a populated, non-pending Media with a url becomes an image (pending ones are never shown).

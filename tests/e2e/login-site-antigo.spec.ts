@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { getTestPayload, seedLegacyAssinante } from '../helpers/seed'
 import { staffApi } from './helpers/api'
+import { clicarSair } from './helpers/menu'
 
 // M-03: members imported from the old site enter with the old WordPress password.
 // Hashes are the PHP-generated synthetic vectors of 06-RESEARCH §1.
@@ -54,7 +55,7 @@ test('$wp$ account: old password logs in and lands on next; the same password wo
   await submitLogin(page, ACC.wp.email, OLD, '/area-do-assinante/meus-anuncios')
   await expect(page).toHaveURL(/\/area-do-assinante\/meus-anuncios/)
   await page.goto('/area-do-assinante')
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await clicarSair(page)
   await expect(page).toHaveURL(/\/$/)
   await submitLogin(page, ACC.wp.email, OLD)
   await expect(page).toHaveURL(/\/area-do-assinante$/)
@@ -82,7 +83,7 @@ test('short old password: creates a new one on the spot', async ({ page }) => {
   await page.getByRole('button', { name: 'Salvar e entrar' }).click()
   await expect(page).toHaveURL(/\/area-do-assinante\?ok=senha/)
 
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await clicarSair(page)
   await submitLogin(page, ACC.curta.email, 'curta7')
   await expect(page).toHaveURL(/\/entrar\?erro=credenciais/)
   await submitLogin(page, ACC.curta.email, 'nova-senha-123')
@@ -98,7 +99,7 @@ test('a staff link (new password) makes the old WordPress password stop working'
   await page.getByLabel('Repita a nova senha').fill('outra-senha-456')
   await page.getByRole('button', { name: 'Salvar e entrar' }).click()
   await expect(page).toHaveURL(/\/area-do-assinante\?ok=senha/)
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await clicarSair(page)
   await submitLogin(page, ACC.link.email, OLD)
   await expect(page).toHaveURL(/\/entrar\?erro=credenciais/)
   await submitLogin(page, ACC.link.email, 'outra-senha-456')

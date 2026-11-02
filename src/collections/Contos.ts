@@ -162,7 +162,7 @@ export const Contos: CollectionConfig = {
       label: 'Imagem',
       admin: {
         description:
-          'Opcional e guardada, mas por enquanto os contos aparecem no site sem foto (pedido do cliente, 2026-11-01). Se voltar a aparecer: sem nudez explícita e sem contatos.',
+          'Opcional. Aparece na lista e na página do conto, com 460 px de altura (a foto inteira, sem cortar), para todo mundo: sem nudez explícita e sem contatos.',
       },
     },
     {

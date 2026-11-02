@@ -2,7 +2,7 @@ import { expect, test, type Browser, type Page } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
-import { headerMenu } from './helpers/menu'
+import { abrirMinhaConta, headerMenu } from './helpers/menu'
 
 // CLAS-03 / CLAS-04 / D-01 / D-02 / D-03: subscribers write their own ads; every write waits for
 // staff approval; nobody but staff uses /api/ads (T-04-04); inactive owners list and delete only.
@@ -71,6 +71,7 @@ test('Meus anúncios starts empty, with the header menu link', async ({ browser,
   const { page, context } = await asSubscriber(browser, baseURL!, BIA)
   await page.goto('/area-do-assinante')
   const nav = await headerMenu(page)
+  await abrirMinhaConta(nav)
   await nav.getByRole('link', { name: 'Meus anúncios' }).click()
   await expect(page).toHaveURL(/\/area-do-assinante\/meus-anuncios$/)
   const main = page.locator('main')

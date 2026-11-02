@@ -1097,7 +1097,7 @@ export interface Conto {
     [k: string]: unknown;
   };
   /**
-   * Opcional e guardada, mas por enquanto os contos aparecem no site sem foto (pedido do cliente, 2026-11-01). Se voltar a aparecer: sem nudez explícita e sem contatos.
+   * Opcional. Aparece na lista e na página do conto, com 460 px de altura (a foto inteira, sem cortar), para todo mundo: sem nudez explícita e sem contatos.
    */
   imagem?: (number | null) | Media;
   /**
@@ -2755,6 +2755,24 @@ export interface TextosGeral {
    * Só aparece para quem está logado.
    */
   menuTrocarSenha?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Só aparece para quem está logado, no menu do computador: agrupa Meus anúncios, Minha assinatura, Trocar senha e Sair.
+   */
+  menuMinhaConta?: {
     root: {
       type: string;
       children: {
@@ -12351,6 +12369,7 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuMeusAnuncios?: T;
   menuMinhaAssinatura?: T;
   menuTrocarSenha?: T;
+  menuMinhaConta?: T;
   menuSair?: T;
   rodapeContatoTitulo?: T;
   rodapeWhatsapp?: T;

@@ -79,6 +79,12 @@ export const geral = definirArea({
       secao: 'Menu',
       ajuda: 'Só aparece para quem está logado.',
     },
+    menuMinhaConta: {
+      rotulo: 'Menu do assinante: Minha conta',
+      padrao: 'Minha conta',
+      secao: 'Menu',
+      ajuda: 'Só aparece para quem está logado, no menu do computador: agrupa Meus anúncios, Minha assinatura, Trocar senha e Sair.',
+    },
     menuSair: {
       rotulo: 'Menu do assinante: Sair',
       padrao: 'Sair',
