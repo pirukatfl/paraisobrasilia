@@ -3,6 +3,7 @@ import { definirArea } from '../tipos'
 const PAGINA = 'Página Enviar fotos e vídeos'
 const FORM = 'Formulário'
 const RECEBIDO = 'Envio recebido'
+const PROMO = 'Participação na promoção'
 
 export const enviarMidia = definirArea({
   slug: 'textos-enviar-midia',
@@ -27,6 +28,34 @@ export const enviarMidia = definirArea({
       padrao:
         'Qualquer pessoa pode enviar, sem cadastro. Só a equipe vê o que você mandar; nada vai para o site sozinho. A equipe pode usar as imagens na galeria depois de conferir, e só com a sua autorização.',
       secao: PAGINA,
+    },
+
+    // Participação na promoção (quando a pessoa chega pelo botão Participar do pop-up)
+    promocaoQuadro: {
+      rotulo: 'Quadro no topo da página',
+      padrao: 'Participando da promoção: {titulo}',
+      secao: PROMO,
+      ajuda: 'Use {titulo} para o título da promoção (Configurações → Promoção).',
+    },
+    promocaoIntro: {
+      bloco: true,
+      rotulo: 'Texto de abertura (no lugar do texto comum)',
+      padrao:
+        'Preencha os dados, escolha as suas fotos e vídeos e envie. A equipe confere tudo e entra em contato. Nada vai para o site sem a sua autorização.',
+      secao: PROMO,
+    },
+    promocaoBotao: { rotulo: 'Botão de envio', padrao: 'Participar da promoção', secao: PROMO },
+    dataFestaRotulo: { rotulo: 'Campo: Festa / data', padrao: 'Festa / data que pretende ir (opcional)', secao: PROMO },
+    dataFestaAjuda: {
+      rotulo: 'Ajuda de Festa / data',
+      padrao: 'Ex.: sábado, 14/11, ou o nome da festa.',
+      secao: PROMO,
+    },
+    promocaoEnviadoTitulo: { rotulo: 'Envio recebido: título', padrao: 'Recebemos a sua participação', secao: PROMO },
+    promocaoEnviadoTexto: {
+      rotulo: 'Envio recebido: texto',
+      padrao: 'Obrigado por participar! A equipe vai olhar os seus dados, fotos e vídeos e falar com você. Nada vai para o site sem a sua autorização.',
+      secao: PROMO,
     },
 
     // Formulário

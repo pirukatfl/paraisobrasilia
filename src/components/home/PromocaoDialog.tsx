@@ -33,21 +33,25 @@ function marcarVista(chave: string) {
  * Home promotion pop-up. Renders nothing on the server (no JS: no pop-up) and nothing until the 18+
  * confirmation exists (html[data-age-ok], set by the head script or by the age gate when the visitor
  * confirms), so it is never on top of the age notice. Once per session per version of the promotion.
- * Closes on the X, the backdrop and Esc; focus is trapped inside and returned on close.
+ * Closes on the X, the "Fechar" button, the backdrop and Esc; focus is trapped inside and returned on close.
  */
 export function PromocaoDialog({
   versao,
   titulo,
   imagem,
   textoFechar,
-  botoes,
+  participar,
+  botaoFechar,
   children,
 }: {
   versao: string
   titulo: string
   imagem: GalleryImage | null
   textoFechar: string
-  botoes: ReactNode
+  /** The "Participar" link (primary), or null when the promotion is informative only */
+  participar: ReactNode
+  /** Label of the secondary "Fechar" button */
+  botaoFechar: ReactNode
   children: ReactNode
 }) {
   const [aberta, setAberta] = useState(false)
@@ -162,7 +166,12 @@ export function PromocaoDialog({
             </h2>
           )}
           <div className={titulo ? 'mt-4' : ''}>{children}</div>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">{botoes}</div>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            {participar}
+            <button type="button" data-promo-botao-fechar onClick={fechar} className="btn-secondary flex-1 text-center">
+              {botaoFechar}
+            </button>
+          </div>
         </div>
       </div>
     </div>

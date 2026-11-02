@@ -1305,6 +1305,14 @@ export interface EnviosMidia {
   contato: string;
   mensagem?: string | null;
   /**
+   * Preenchido pelo site quando a pessoa clicou em Participar: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.
+   */
+  promocao?: string | null;
+  /**
+   * Só aparece em quem participou da promoção.
+   */
+  dataFesta?: string | null;
+  /**
    * Data e hora em que a pessoa confirmou ter 18 anos e autorizar o uso das imagens.
    */
   consentAt?: string | null;
@@ -2118,6 +2126,8 @@ export interface EnviosMidiaSelect<T extends boolean = true> {
   apelido?: T;
   contato?: T;
   mensagem?: T;
+  promocao?: T;
+  dataFesta?: T;
   consentAt?: T;
   observacao?: T;
   arquivos?: T;
@@ -2293,7 +2303,7 @@ export interface MenuDoSite {
   createdAt?: string | null;
 }
 /**
- * Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos.
+ * Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos. Quem quiser entrar na promoção clica em Participar e preenche o formulário.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "promocao".
@@ -2309,7 +2319,7 @@ export interface Promocao {
    */
   titulo?: string | null;
   /**
-   * As palavras "contos" e "fotos e vídeos" viram links sozinhas (para enviar contos e para enviar fotos e vídeos), em destaque. No fim do pop-up já aparecem os botões "Enviar contos" e "Enviar fotos e vídeos".
+   * Quem entrar lê e fecha. No fim do pop-up já aparecem os botões "Participar" e "Fechar".
    */
   texto?: {
     root: {
@@ -2326,6 +2336,11 @@ export interface Promocao {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: o pop-up só informa e tem apenas o botão Fechar.
+   */
+  participarAtivo?: boolean | null;
+  botaoParticipar?: string | null;
   /**
    * Horário de Brasília. Em branco: vale desde já.
    */
@@ -3557,22 +3572,10 @@ export interface TextosInicio {
     };
     [k: string]: unknown;
   } | null;
-  promocaoBotaoContos?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  promocaoBotaoMidia?: {
+  /**
+   * O botão Participar é editado em Configurações → Promoção.
+   */
+  promocaoBotaoFechar?: {
     root: {
       type: string;
       children: {
@@ -10379,6 +10382,114 @@ export interface TextosEnviarMidia {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Use {titulo} para o título da promoção (Configurações → Promoção).
+   */
+  promocaoQuadro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  dataFestaRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  dataFestaAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoEnviadoTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoEnviadoTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   obrigatorio?: {
     root: {
       type: string;
@@ -12203,6 +12314,8 @@ export interface PromocaoSelect<T extends boolean = true> {
   ativa?: T;
   titulo?: T;
   texto?: T;
+  participarAtivo?: T;
+  botaoParticipar?: T;
   inicio?: T;
   fim?: T;
   imagem?: T;
@@ -12297,8 +12410,7 @@ export interface TextosInicioSelect<T extends boolean = true> {
   contosBotao?: T;
   dicasTitulo?: T;
   dicasBotao?: T;
-  promocaoBotaoContos?: T;
-  promocaoBotaoMidia?: T;
+  promocaoBotaoFechar?: T;
   promocaoFechar?: T;
   comoChegarTitulo?: T;
   comoChegarBotao?: T;
@@ -12832,6 +12944,13 @@ export interface TextosEnviarMidiaSelect<T extends boolean = true> {
   topo?: T;
   titulo?: T;
   intro?: T;
+  promocaoQuadro?: T;
+  promocaoIntro?: T;
+  promocaoBotao?: T;
+  dataFestaRotulo?: T;
+  dataFestaAjuda?: T;
+  promocaoEnviadoTitulo?: T;
+  promocaoEnviadoTexto?: T;
   obrigatorio?: T;
   apelidoRotulo?: T;
   apelidoAjuda?: T;

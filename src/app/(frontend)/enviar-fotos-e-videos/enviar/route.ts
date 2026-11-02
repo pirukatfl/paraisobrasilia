@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Open "Enviar fotos e vídeos" form for anyone, no account (client decision 2026-11-01): POST multipart with
- * `apelido`, `contato`, `mensagem`, the declarations `maior18` and `autorizacao`, the honeypot `website` and
+ * `apelido`, `contato`, `mensagem`, optionally `promocao=1` + `dataFesta` (take part in the promotion on right now; its title is read from the global, never from the form), the declarations `maior18` and `autorizacao`, the honeypot `website` and
  * `arquivos` (one or more files). Same shape as /contos/enviar/enviar: no session is read, nothing that
  * decides status comes from the browser, CSRF is covered by src/proxy.ts, a body above one video is refused
  * before it is read. With JavaScript (`Accept: application/json`) the form sends only the first file here and
@@ -20,13 +20,22 @@ export const dynamic = 'force-dynamic'
  */
 const RECEBIDO = '/enviar-fotos-e-videos/recebido'
 const FORM = '/enviar-fotos-e-videos'
+const PROMOCAO = 'promocao=1'
 
 export async function POST(request: Request) {
   const wantsJson = (request.headers.get('accept') ?? '').includes('application/json')
+  // Only a hint to keep the promotion on the next page; the server decides again from the global
+  let quisParticipar = false
   const respond = (failure: Failure) =>
     wantsJson
       ? Response.json({ ok: false, errors: failure.errors }, { status: failure.status, headers: noStore })
-      : new Response(null, { status: 303, headers: { ...noStore, Location: `${FORM}?erro=${encodeURIComponent(failure.code)}` } })
+      : new Response(null, {
+          status: 303,
+          headers: {
+            ...noStore,
+            Location: `${FORM}?erro=${encodeURIComponent(failure.code)}${quisParticipar ? `&${PROMOCAO}` : ''}`,
+          },
+        })
 
   const declared = Number(request.headers.get('content-length') ?? 0)
   if (declared > MAX_BODY_BYTES) return respond(failureOf(new ServiceError('grande', UPLOAD_ERROR_MESSAGES.grande, 413)))
@@ -38,6 +47,8 @@ export async function POST(request: Request) {
     return respond(failureOf(new ServiceError('tipo', UPLOAD_ERROR_MESSAGES.tipo, 400)))
   }
 
+  quisParticipar = text(form, 'promocao') === '1'
+  const recebido = quisParticipar ? `${RECEBIDO}?${PROMOCAO}` : RECEBIDO
   const entries = form.getAll('arquivos').filter((e): e is File => e instanceof File && e.size > 0)
   const files: UploadFile[] = []
   for (const entry of entries) files.push(await toUploadFile(entry))
@@ -54,14 +65,16 @@ export async function POST(request: Request) {
       maior18: text(form, 'maior18') === 'sim',
       autorizacao: text(form, 'autorizacao') === 'sim',
       website: text(form, 'website'),
+      dataFesta: text(form, 'dataFesta'),
+      participarPromocao: quisParticipar,
       files,
       ip,
       now: new Date(),
     })
     // A filled honeypot gets the very same answer (token null: nothing was created)
     return wantsJson
-      ? Response.json({ ok: true, token, redirect: RECEBIDO }, { headers: noStore })
-      : new Response(null, { status: 303, headers: { ...noStore, Location: RECEBIDO } })
+      ? Response.json({ ok: true, token, redirect: recebido }, { headers: noStore })
+      : new Response(null, { status: 303, headers: { ...noStore, Location: recebido } })
   } catch (err) {
     return respond(failureOf(err))
   }

@@ -26,7 +26,7 @@ export const EnviosMidia: CollectionConfig = {
   admin: {
     group: 'Envios do público',
     useAsTitle: 'apelido',
-    defaultColumns: ['apelido', 'status', 'contato', 'createdAt'],
+    defaultColumns: ['apelido', 'status', 'promocao', 'contato', 'createdAt'],
     listSearchableFields: ['apelido', 'contato'],
     description:
       'Fotos e vídeos que o público mandou pelo site. Nada aparece no site sozinho: veja os arquivos aqui, baixe o que for usar e marque o envio como aprovado ou recusado.',
@@ -62,6 +62,23 @@ export const EnviosMidia: CollectionConfig = {
       admin: { description: 'Só a equipe vê.' },
     },
     { name: 'mensagem', type: 'textarea', label: 'Mensagem' },
+    {
+      name: 'promocao',
+      type: 'text',
+      index: true,
+      label: 'Promoção',
+      admin: {
+        readOnly: true,
+        description:
+          'Preenchido pelo site quando a pessoa clicou em Participar: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.',
+      },
+    },
+    {
+      name: 'dataFesta',
+      type: 'text',
+      label: 'Festa / data que pretende ir',
+      admin: { readOnly: true, description: 'Só aparece em quem participou da promoção.' },
+    },
     {
       name: 'consentAt',
       type: 'date',

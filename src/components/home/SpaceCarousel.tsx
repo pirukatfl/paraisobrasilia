@@ -71,16 +71,27 @@ export function SpaceCarousel({ photos, labels }: { photos: GalleryImage[]; labe
     return () => window.clearTimeout(timer)
   }, [autoplay, goTo, index, total])
 
-  // Keep the current slide aligned when the width changes (rotation, resize)
+  // Keep the current slide aligned when the width really changes (rotation, resize). The observer is
+  // created once and reads the index from a ref: re-creating it on every index change fired it at once
+  // (observe() reports the current size) and its instant scroll cut the smooth slide in half, leaving
+  // two photos half visible and flickering while scroll-snap and the next slide fought over it.
+  const indexRef = useRef(index)
+  useEffect(() => {
+    indexRef.current = index
+  }, [index])
   useEffect(() => {
     const track = trackRef.current
     if (!track || total < 2) return
+    let lastWidth = track.clientWidth
     const observer = new ResizeObserver(() => {
-      track.scrollTo({ left: index * track.clientWidth, behavior: 'auto' })
+      const width = track.clientWidth
+      if (width === lastWidth) return
+      lastWidth = width
+      track.scrollTo({ left: indexRef.current * width, behavior: 'auto' })
     })
     observer.observe(track)
     return () => observer.disconnect()
-  }, [index, total])
+  }, [total])
 
   const many = total > 1
 

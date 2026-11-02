@@ -208,19 +208,20 @@ assinante**, por último, antes do **Sair**. Abre em outra aba. Ele **nunca** ap
 
 ## Promoção (pop-up da página inicial)
 
-O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, clicando fora ou com a tecla **Esc**.
+O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, no botão **Fechar**, clicando fora ou com a tecla **Esc**. Quem entra lê e fecha; quem quiser entrar na promoção clica em **Participar** e vai para um formulário (dados, fotos e vídeos).
 
 1. Menu da esquerda → **Configurações → Promoção**.
 2. Preencha o **Título** e o **Texto**. Opcional: uma **Imagem** (sem nudez explícita) e o período (**Começa em** / **Termina em**; fora do período o pop-up some sozinho).
 3. Marque **Promoção ligada** e **Salvar**. Vale na hora.
 4. Para **tirar do ar**, desmarque **Promoção ligada** e salve. O texto fica guardado para a próxima vez.
 
-No texto, as palavras **contos** e **fotos e vídeos** viram links em destaque (para enviar contos e para enviar fotos e vídeos). No fim do pop-up já aparecem os botões **Enviar contos** e **Enviar fotos e vídeos**. Os textos dos botões ficam em **Textos do site → Página inicial → Pop-up da promoção**.
+No fim do pop-up aparecem os botões **Participar** (principal) e **Fechar**. O pop-up não cria links dentro do texto. Para um pop-up só informativo (sem formulário), desmarque **Mostrar o botão Participar**: fica só o **Fechar**. O texto do botão Participar é editado na própria tela da promoção; o texto do botão Fechar fica em **Textos do site → Página inicial → Pop-up da promoção**.
+Quem clicar em **Participar** vai para o formulário de fotos e vídeos (veja a seção "Fotos e vídeos enviados pelo público"), e o envio fica marcado com o título desta promoção.
 Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo na próxima visita.
 
 ---
 
-## Fotos e vídeos enviados pelo público
+## Fotos e vídeos enviados pelo público (inclui quem participa da promoção)
 
 Qualquer pessoa pode mandar fotos e vídeos em **/enviar-fotos-e-videos** (sem cadastro; o link também está nos textos da promoção e da página inicial). **Nada vai para o site sozinho**: só a equipe vê o que chega.
 
@@ -230,9 +231,11 @@ Qualquer pessoa pode mandar fotos e vídeos em **/enviar-fotos-e-videos** (sem c
 4. Se for usar uma imagem na galeria do site, baixe o arquivo e envie pelo painel (**Site → Fotos e vídeos do espaço** ou **Profissionais e amadoras**), como de costume.
 5. Mude a **Situação** para **Aprovado** ou **Recusado** (só organiza a fila: aprovar **não publica**) e, se quiser, escreva uma **Observação da equipe**. **Salvar**.
 
+**Quem clica em Participar** na promoção cai no mesmo formulário, com o quadro "Participando da promoção: (título)" no topo e o campo **Festa / data que pretende ir**. Esses envios ficam marcados: na lista de **Fotos e vídeos enviados** há a coluna **Promoção** (o título da promoção no momento do envio, preenchido pelo site e que não dá para editar) e, em **Filtros**, você escolhe **Promoção** para ver só os participantes. A pessoa vê uma mensagem própria de "Recebemos a sua participação". Se a promoção estiver desligada ou fora do período, o formulário é o comum.
+
 Limites do formulário: até **10 fotos** (JPG, PNG ou WebP, até 15 MB) e **2 vídeos** (MP4 ou MOV, até 100 MB e 60 segundos) por envio. Os arquivos ficam em armazenamento privado, fora da área pública, e entram no backup junto com os arquivos do ClassiSex.
 Para **apagar** um envio (por exemplo, a pessoa pediu para retirar), use **Excluir**: os arquivos dele são apagados juntos.
-Os textos da página (título, avisos, texto da autorização) ficam em **Textos do site → Enviar fotos e vídeos**.
+Os textos da página (título, avisos, texto da autorização) e os da participação na promoção (quadro, botão, campo de festa/data, mensagem de recebido) ficam em **Textos do site → Enviar fotos e vídeos**.
 
 ---
 
