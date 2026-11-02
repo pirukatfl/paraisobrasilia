@@ -3,7 +3,7 @@ type: quick
 slug: novo-planejamento
 date: 2026-11-01
 executor: sonnet
-status: lote 1 completo (lote 2: E, F, G e lote 3: I pendentes)
+status: lotes 1, 2 e 3 completos
 ---
 
 # Resumo: novo planejamento do cliente, lote 1 (A, B, C, D, H)
@@ -34,3 +34,32 @@ Cinco commits na branch `claude/project-thread-gbqc9y`, um por item. Textos novo
 
 - Em Site → Profissionais e amadoras, marcar "Amadora" nas modelos que forem (todas ficaram como Profissional).
 - Em Configurações → Menu do site: esconder itens e editar o link externo (vem ligado, "Vídeos pornô grátis", https://www.redtube.com.br/, só para assinante logado).
+
+## Lote 2 (E, F, G): página inicial
+
+- **E. Conheça o espaço em slide**: `SpaceCarousel` (componente cliente, sem biblioteca), uma foto por vez, setas, pontinhos, troca a cada 5 s, pausa em hover/foco/toque/aba oculta e botão de pausar, sem autoplay com movimento reduzido, até 8 fotos. Migração `espaco_carrossel`.
+- **F. Quadros ClassiSex, Contos e Dicas Hot**: substitui `DicasTeaser`; ClassiSex primeiro; Contos e Dicas mostram os 3 títulos mais recentes; cada quadro some se o item estiver oculto no Menu do site ou vazio. Migração `quadros_inicio`.
+- **G. Promoção em pop-up**: global `promocao` (`ativa`, `titulo`, `texto`, `inicio`/`fim`, `imagem`). Só na home, depois do 18+, uma vez por sessão, acessível (Esc, foco preso e devolvido). "contos" e "fotos e vídeos" viram links em destaque (`src/lib/site/links.ts`), também no texto de abertura de Quem somos da home; dois botões no fim. Migrações `promocao` e `promocao_textos`.
+
+## Lote 3 (I): enviar fotos e vídeos
+
+- Página `/enviar-fotos-e-videos` (+ `/recebido`, noindex): apelido, contato, mensagem, até 10 fotos e 2 vídeos (limites do ClassiSex), 18+ e autorização de imagem (`consentAt`), honeypot, 5 envios/hora por IP e por contato. Primeiro arquivo com o texto, os demais um a um com token assinado de 30 min; sem JS, um POST só.
+- Coleções só da equipe `envios-midia` e `envios-midia-arquivos` (armazenamento privado). Aprovar não publica. Teste de integração prova que nada é legível por anônimo nem por assinante. Migração `envios_midia`.
+- `next.config.ts`: `proxyClientMaxBodySize: '110mb'` (o padrão de 10 MB cortaria uploads grandes, inclusive os do ClassiSex).
+
+## Desvios (lotes 2 e 3)
+
+- Sem e-mail de aviso à equipe (o envio de contos também não tem). Prévia pela rota nativa do Payload (só equipe).
+- `data-slide` do carrossel do espaço virou `data-space-slide` (colidia com o carrossel de festas).
+- `migrate:create` de conferência no fim: "No schema changes detected".
+
+## Resultados do gate (lotes 2 e 3)
+
+- typecheck limpo; lint 0 erros (1 aviso antigo); unit 52 / 556 ok; int 45 / 435 ok; build ok.
+- e2e (mobile e desktop) de enviar-midia, promocao, home-*, age-gate, dicas-hot, seo, shell, contos-envio, menu-do-site, textos: 137 ok, 1 falha corrigida (limite por hora no teste, depois 12/12). `home-carrossel:58` instável no mobile (passa isolado). Suíte completa não repetida.
+
+## Para a equipe do cliente (lotes 2 e 3)
+
+- Configurações → Promoção: ligar/desligar o pop-up e editar título, texto, período e imagem. Tirar o texto da promoção do texto de abertura de Quem somos.
+- Envios do público → Fotos e vídeos enviados: ver, baixar e marcar os envios.
+- Servidor: volume `private_media` montado e no backup.
