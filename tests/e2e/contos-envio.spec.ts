@@ -7,14 +7,11 @@ import { loginAsAssinante } from './helpers/assinante'
 
 // Client decision 2026-10-24: anyone can send a conto (optional image) without an account; it is moderated
 // (draft until staff publish), visitors read only the open part, subscribers all. The photo shows in the list card
-// and on the conto page in a frame exactly 460 px tall (card: whole photo, object-contain; page: fills the frame, object-fit cover, not distorted).
+// and on the conto page in a frame exactly 460 px tall (list and page: the photo fills the frame, object-fit cover, not distorted).
 test.describe.configure({ mode: 'serial' })
 
-/**
- * The image is inside a 460 px tall frame and loaded. Card: whole photo (contain), keeps its proportion.
- * Page: fills the whole frame (cover, full width and height).
- */
-async function expectFoto(scope: Locator, alt: string, fit: 'contain' | 'cover' = 'contain') {
+/** The image is inside a 460 px tall frame, loaded, and fills the whole frame (cover, full width and height). */
+async function expectFoto(scope: Locator, alt: string) {
   const frame = scope.getByTestId('conto-imagem')
   await expect(frame).toHaveCount(1)
   await expect.poll(async () => Math.round((await frame.boundingBox())!.height)).toBe(460)
@@ -25,20 +22,13 @@ async function expectFoto(scope: Locator, alt: string, fit: 'contain' | 'cover' 
     fit: getComputedStyle(el).objectFit,
     w: el.getBoundingClientRect().width,
     h: el.getBoundingClientRect().height,
-    nw: el.naturalWidth,
-    nh: el.naturalHeight,
   }))
-  expect(m.fit).toBe(fit)
-  if (fit === 'cover') {
-    // the image fills the inside of the frame (its 1px border excluded): full width and height
-    const inner = await frame.evaluate((el) => ({ w: el.clientWidth, h: el.clientHeight }))
-    expect(Math.abs(m.w - inner.w)).toBeLessThanOrEqual(1)
-    expect(Math.abs(m.h - inner.h)).toBeLessThanOrEqual(1)
-    expect(inner.h).toBeGreaterThanOrEqual(457)
-  } else {
-    expect(m.h).toBeLessThanOrEqual(460.5)
-    expect(Math.abs(m.w / m.h - m.nw / m.nh)).toBeLessThan(0.02)
-  }
+  expect(m.fit).toBe('cover')
+  // the image fills the inside of the frame (its border excluded): full width and height
+  const inner = await frame.evaluate((el) => ({ w: el.clientWidth, h: el.clientHeight }))
+  expect(Math.abs(m.w - inner.w)).toBeLessThanOrEqual(1)
+  expect(Math.abs(m.h - inner.h)).toBeLessThanOrEqual(1)
+  expect(inner.h).toBeGreaterThanOrEqual(457)
 }
 
 const FIXTURES = path.resolve('tests/fixtures')
@@ -185,7 +175,7 @@ test('published: the list and the page show the 460 px photo, visitors read only
   await page.goto(`/contos/${doc.slug}`)
   const main = page.locator('main')
   await expect(page.getByRole('heading', { name: TITULO, level: 1 })).toBeVisible()
-  await expectFoto(main, `Imagem do conto ${TITULO}`, 'cover')
+  await expectFoto(main, `Imagem do conto ${TITULO}`)
   await expect(main).toContainText('por Casal Verão')
   await expect(main).toContainText('Parágrafo primeiro do conto')
   await expect(main).not.toContainText('Parágrafo quinto do conto')
@@ -208,7 +198,7 @@ test('an active subscriber reads the whole sent conto, with the image', async ({
   await loginAsAssinante(page, SUB.email, SUB.password, `/area-do-assinante/contos/${doc.slug}`)
   const main = page.locator('main')
   await expect(main).toContainText(SENTINELA)
-  await expectFoto(main, `Imagem do conto ${TITULO}`, 'cover')
+  await expectFoto(main, `Imagem do conto ${TITULO}`)
   await page.goto('/area-do-assinante/contos')
   await expectFoto(page.locator('main').getByRole('article').filter({ hasText: TITULO }), `Imagem do conto ${TITULO}`)
   await context.close()
