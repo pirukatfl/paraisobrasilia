@@ -6,6 +6,7 @@ import { useCallback, useRef, useState } from 'react'
 import { PlayIcon } from '@/components/icons'
 import { Lightbox } from '@/components/Lightbox'
 import type { LightboxSlide, SpaceItemDTO } from '@/lib/gallery/types'
+import { hiddenCount, visibleCount } from '@/lib/gallery/limit'
 import { useHydrated } from '@/lib/gallery/use-hydrated'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 import { TextoRico } from '@/components/TextoRico'
@@ -16,12 +17,18 @@ const TILE_SIZES = '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
  * Space gallery grid (UI-SPEC S9): 2 / 3 / 4 columns, square tiles. Before hydration (or without
  * JavaScript) each tile is a link to the large image; afterwards it is a button opening the lightbox.
  */
-export function Gallery({ items }: { items: SpaceItemDTO[] }) {
+export function Gallery({ items, limite }: { items: SpaceItemDTO[]; limite?: number }) {
   const hydrated = useHydrated()
   const t = useTextosGerais()
   const [index, setIndex] = useState<number | null>(null)
   const openers = useRef<(HTMLElement | null)[]>([])
   const openedFrom = useRef<number | null>(null)
+
+  // `limite`: only the first N tiles are rendered (hidden images are never downloaded); the lightbox
+  // still walks the FULL list. Without JS the hidden items are unreachable.
+  const shown = visibleCount(items.length, limite)
+  const hidden = hiddenCount(items.length, limite)
+  const tiles = items.slice(0, shown)
 
   const slides: LightboxSlide[] = items.map((item) => ({
     kind: item.kind,
@@ -40,8 +47,11 @@ export function Gallery({ items }: { items: SpaceItemDTO[] }) {
 
   return (
     <>
-      <ul role="list" className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
-        {items.map((item, i) => {
+      <ul
+        role="list"
+        className={`mt-8 grid grid-cols-2 gap-4 sm:gap-6 ${limite ? 'lg:grid-cols-4' : 'sm:grid-cols-3 lg:grid-cols-4'}`}
+      >
+        {tiles.map((item, i) => {
           const name = item.kind === 'video' ? `Assistir vídeo: ${item.video?.title ?? ''}` : item.image.alt
           const tile = (
             <>
@@ -65,6 +75,14 @@ export function Gallery({ items }: { items: SpaceItemDTO[] }) {
                     </span>
                   </span>
                 </>
+              )}
+              {hidden > 0 && i === shown - 1 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-0 flex items-center justify-center bg-bg/70 text-heading font-semibold text-text"
+                >
+                  +{hidden}
+                </span>
               )}
             </>
           )
@@ -97,6 +115,20 @@ export function Gallery({ items }: { items: SpaceItemDTO[] }) {
           )
         })}
       </ul>
+      {hidden > 0 && hydrated && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            className="press inline-flex min-h-11 items-center justify-center rounded-full border border-line px-6 text-text transition-colors hover:border-accent hover:text-accent focus-visible:border-accent"
+            onClick={() => {
+              openedFrom.current = 0
+              setIndex(0)
+            }}
+          >
+            Ver todas as fotos ({items.length})
+          </button>
+        </div>
+      )}
       <Lightbox slides={slides} index={index} onIndexChange={setIndex} onClose={close} />
     </>
   )
