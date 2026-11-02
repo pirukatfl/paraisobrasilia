@@ -63,3 +63,21 @@ Cinco commits na branch `claude/project-thread-gbqc9y`, um por item. Textos novo
 - Configurações → Promoção: ligar/desligar o pop-up e editar título, texto, período e imagem. Tirar o texto da promoção do texto de abertura de Quem somos.
 - Envios do público → Fotos e vídeos enviados: ver, baixar e marcar os envios.
 - Servidor: volume `private_media` montado e no backup.
+
+## Lote 4 (J, K)
+
+- **J. Formatação igual nas páginas institucionais**: a Introdução das seis páginas (Quem somos, Normas, Regras, Dicas, Termos, Privacidade) virou texto formatado (`editorLinha`: negrito, itálico, sublinhado, riscado), mostrada com `TextoRico` na página e no quadro "Quem somos" da home (mantendo os links de contos e fotos e vídeos). Google/WhatsApp/SEO usam o texto puro (`introTexto`); limite de 200 caracteres no texto visível. O Texto das páginas ganhou sublinhado e riscado. Migração `pages_intro_formatada` (varchar → jsonb, também nas versões; testada up/down/up com dados de borda).
+- **K. Idade no ClassiSex**: campo opcional `idade` (18–99) no anúncio do assinante, no de visitante e no painel; antigos ficam sem idade. Filtro "Idade" por faixa (18–29, 30–39, 40–49, 50+, Todas) só na área do assinante; idade no cartão e na página do anúncio só para assinante. Área aberta intacta (só "Eu sou"; DTO público sem `idade`; `?idade=`/`?cidade=` ignorados; testes unit, int e e2e provam). Migração `classisex_idade`.
+
+### Desvios
+- Uma idade por anúncio (casal mostra a que quiser). A prévia de moderação não mostra idade (é a visão pública).
+- `classisex_idade` também atualiza a linha de "Nada encontrado (área do assinante)" que ainda tinha o texto padrão antigo.
+
+### Gate
+- typecheck limpo; lint 0 erros (1 aviso antigo); unit 563 ok; int 45 / 444 ok; build ok; `migrate:create` de conferência sem mudanças.
+- e2e (mobile e desktop) de 16 specs das áreas tocadas: 164 ok, 9 ignorados, 1 falha instável (`institucional:8` mobile, compilação a frio; passou isolado). Suíte completa não repetida.
+
+### Para a equipe do cliente
+- Site → Páginas: reformatar Introdução e Texto das seis páginas, se quiserem.
+- ClassiSex → Anúncios: preencher a Idade dos anúncios que devem aparecer nas faixas.
+- Deploy: rodar `migrate`.
