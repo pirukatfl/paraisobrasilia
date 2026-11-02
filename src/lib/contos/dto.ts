@@ -21,11 +21,14 @@ type MediaLike = {
   width?: number | null
   height?: number | null
   alt?: string | null
+  focalX?: number | null
+  focalY?: number | null
   pendente?: boolean | null
   sizes?: { thumb?: MediaSize; thumb2x?: MediaSize; card?: MediaSize; gallery?: MediaSize }
 }
 
-export type ContoImageDTO = { url: string; width: number; height: number; alt: string }
+/** focalX/focalY: focal point in percent (Media upload field), when the staff set one; the page frame crops around it */
+export type ContoImageDTO = { url: string; width: number; height: number; alt: string; focalX?: number; focalY?: number }
 
 export type ContoCardDTO = {
   slug: string
@@ -80,7 +83,16 @@ function imageOf(doc: ContoSource, sizes: SizeName[]): ContoImageDTO | null {
   const sized = sizes.map((name) => m.sizes?.[name]).find((size) => size?.url)
   const source = sized?.url ? sized : m.url ? m : null
   if (!source?.url) return null
-  return { url: source.url, width: source.width ?? m.width ?? 0, height: source.height ?? m.height ?? 0, alt: m.alt ?? '' }
+  const pct = (n?: number | null) => (typeof n === 'number' && n >= 0 && n <= 100 ? n : undefined)
+  const focalX = pct(m.focalX)
+  const focalY = pct(m.focalY)
+  return {
+    url: source.url,
+    width: source.width ?? m.width ?? 0,
+    height: source.height ?? m.height ?? 0,
+    alt: m.alt ?? '',
+    ...(focalX !== undefined && focalY !== undefined ? { focalX, focalY } : {}),
+  }
 }
 
 const signedBy = (doc: ContoSource) => doc.assinadoComo?.trim() || null

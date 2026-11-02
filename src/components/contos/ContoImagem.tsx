@@ -9,20 +9,35 @@ const COLUNA_PAGINA = 720
 const COLUNA_CARD = 480
 
 /**
- * Foto do conto na página e no card da lista: quadro de 460 px de altura, foto inteira (sem corte e sem distorção, object-contain)
- * centralizada. A fonte é a maior derivada (1600 px de largura) ou o original, então 460 px a 2x continua nítido;
- * fotos pequenas não são ampliadas (o tamanho natural limita o quadro).
+ * Foto do conto, em dois formatos de quadro com 460 px de altura:
+ * - página (card=false): a foto preenche o quadro inteiro (largura total da coluna, object-fit: cover, centralizada ou no
+ *   ponto de foco da mídia, se houver). Sem distorção; o excedente é cortado, como o cliente aceitou.
+ * - card da lista (card=true): foto inteira (object-contain), sem corte.
+ * A fonte é a maior derivada (1600 px de largura) ou o original, então 460 px a 2x continua nítido.
  */
 export function ContoImagem({ imagem, card = false }: { imagem: ContoImageDTO; card?: boolean }) {
-  const { url, width, height, alt } = imagem
+  const { url, width, height, alt, focalX, focalY } = imagem
+  if (!card) {
+    return (
+      <div data-testid="conto-imagem" className="relative mt-6 h-[460px] w-full overflow-hidden rounded-xl border border-line bg-surface">
+        <Image
+          src={url}
+          alt={alt}
+          fill
+          sizes={`(min-width: 768px) ${COLUNA_PAGINA}px, 100vw`}
+          quality={85}
+          priority
+          className="object-cover"
+          style={focalX !== undefined && focalY !== undefined ? { objectPosition: `${focalX}% ${focalY}%` } : undefined}
+        />
+      </div>
+    )
+  }
   const ratio = width > 0 && height > 0 ? width / height : 4 / 3
   // largura exibida: altura fixa x proporção, limitada pela coluna e pelo tamanho natural
-  const exibida = Math.max(1, Math.round(Math.min(card ? COLUNA_CARD : COLUNA_PAGINA, CONTO_IMAGEM_ALTURA * ratio, width || Infinity)))
+  const exibida = Math.max(1, Math.round(Math.min(COLUNA_CARD, CONTO_IMAGEM_ALTURA * ratio, width || Infinity)))
   return (
-    <div
-      data-testid="conto-imagem"
-      className={`flex h-[460px] w-full items-center justify-center overflow-hidden bg-surface ${card ? 'border-b border-line' : 'mt-6 rounded-xl border border-line'}`}
-    >
+    <div data-testid="conto-imagem" className="flex h-[460px] w-full items-center justify-center overflow-hidden border-b border-line bg-surface">
       <Image
         src={url}
         alt={alt}
@@ -30,8 +45,7 @@ export function ContoImagem({ imagem, card = false }: { imagem: ContoImageDTO; c
         height={height || Math.round(1600 / ratio)}
         sizes={`(min-width: 768px) ${exibida}px, min(100vw, ${exibida}px)`}
         quality={85}
-        priority={!card}
-        loading={card ? 'lazy' : undefined}
+        loading="lazy"
         className="h-auto max-h-full w-auto max-w-full object-contain"
       />
     </div>
