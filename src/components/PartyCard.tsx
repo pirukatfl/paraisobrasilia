@@ -17,18 +17,18 @@ interface Props {
  */
 export function PartyCard({ party, priority = false, onOpenFlyer }: Props) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg border border-line bg-surface transition-[border-color,box-shadow] duration-200 focus-within:border-primary-hover focus-within:card-glow hover:border-primary-hover hover:card-glow">
+    <div className="group card-lift flex flex-col overflow-hidden rounded-lg border border-line bg-surface focus-within:border-primary-hover">
       <button
         type="button"
         aria-label={`Ampliar flyer da festa ${party.title}`}
         onClick={(event) => onOpenFlyer(event.currentTarget)}
-        className="block w-full cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
+        className="press block w-full cursor-zoom-in focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent"
       >
         <FlyerFrame
           flyer={party.flyer}
           sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 560px"
           priority={priority}
-          imageClassName="transition-transform duration-200 group-hover:scale-[1.02]"
+          imageClassName="transition-transform duration-[400ms] ease-out-expo group-hover:scale-[1.03]"
         />
       </button>
       <Link
@@ -40,7 +40,7 @@ export function PartyCard({ party, priority = false, onOpenFlyer }: Props) {
           <CalendarIcon />
           <time dateTime={party.startsAt}>{formatCardDate(party.startsAt)}</time>
         </p>
-        <h2 className="type-heading line-clamp-2">{party.title}</h2>
+        <h2 className="type-heading line-clamp-2 transition-colors duration-[var(--duration-fast)] group-hover:text-accent">{party.title}</h2>
       </Link>
     </div>
   )

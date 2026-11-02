@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { HeaderShell } from '@/components/HeaderShell'
 import { MobileMenu } from '@/components/MobileMenu'
 import { Nav } from '@/components/Nav'
 import { getAssinante } from '@/lib/assinantes/session'
@@ -27,7 +28,7 @@ export async function Header() {
   // The external link exists only in the logged-in list: the public menu is built without it
   const items = logado ? getMemberNavItems(t, menu, opcoes) : getNavItems(t, menu, opcoes)
   return (
-    <header className="header-line relative z-30 bg-bg">
+    <HeaderShell>
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 lg:px-8">
         <Link
           href="/"
@@ -48,6 +49,6 @@ export async function Header() {
         <Nav items={items} logado={logado} />
         <MobileMenu items={items} logado={logado} />
       </div>
-    </header>
+    </HeaderShell>
   )
 }

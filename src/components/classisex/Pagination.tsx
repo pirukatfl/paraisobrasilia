@@ -27,15 +27,15 @@ export async function Pagination({
   return (
     <nav aria-label="Paginação" className="mt-8 flex flex-wrap items-center gap-4">
       {page > 1 && (
-        <Link href={href(page - 1)} className="btn-secondary">
+        <Link href={href(page - 1)} className="btn-secondary press">
           <TextoRico valor={t.paginacaoAnteriores} linha />
         </Link>
       )}
-      <p className="type-label text-muted">
+      <p aria-current="page" className="type-label tabular-nums text-text">
         <TextoRico valor={t.paginacaoPagina} vars={{ pagina: Math.min(page, totalPages), total: totalPages }} linha />
       </p>
       {page < totalPages && (
-        <Link href={href(page + 1)} className="btn-secondary">
+        <Link href={href(page + 1)} className="btn-secondary press">
           <TextoRico valor={t.paginacaoProximos} linha />
         </Link>
       )}

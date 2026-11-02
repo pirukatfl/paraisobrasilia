@@ -31,7 +31,7 @@ export async function RenewalBanner() {
   if (!notice) return null
   const t = await getTextos('areaAssinante')
   return (
-    <div role="status" data-testid="aviso-renovacao" className="bg-ruby text-text">
+    <div role="status" data-testid="aviso-renovacao" className="bg-ruby text-text motion-safe:animate-[reveal-up_var(--duration-base)_var(--ease-out-expo)_both]">
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-2 lg:px-8">
         <p className="type-label">
           {notice.kind === 'expired' ? (
@@ -40,7 +40,7 @@ export async function RenewalBanner() {
             <TextoRico valor={t.renovVence} vars={{ data: notice.validUntilLabel, quando: quandoTexto(notice, t) }} linha />
           )}
         </p>
-        <Link href="/assine-ja" className="type-label inline-flex min-h-11 items-center font-semibold text-gold underline underline-offset-4">
+        <Link href="/assine-ja" className="type-label inline-flex min-h-11 items-center font-semibold text-gold underline underline-offset-4 transition-colors duration-[var(--duration-fast)] hover:text-text">
           <TextoRico valor={t.renovBotao} linha />
         </Link>
       </div>

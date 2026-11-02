@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 
 import { CloseIcon, MenuIcon } from '@/components/icons'
 import { sair } from '@/lib/assinantes/actions'
@@ -13,6 +13,11 @@ import { TextoRico } from '@/components/TextoRico'
 
 // Without JavaScript the panel is shown inline (UI-SPEC: no-JS fallback).
 const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:static!important}[data-mobile-menu-button]{display:none!important}'
+
+// Entries rise in one after another (--i, capped at 240ms of delay) when the panel opens
+const itemMotion =
+  'transition-[opacity,translate] duration-[240ms] ease-[var(--ease-out-expo)] starting:translate-y-1 starting:opacity-0 motion-reduce:starting:translate-y-0'
+const stagger = (i: number) => ({ '--i': i, transitionDelay: 'min(calc(var(--i) * 40ms), 240ms)' }) as CSSProperties
 
 /** Disclosure menu for < 1024px (UI-SPEC Global — Header navigation). */
 export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado?: boolean }) {
@@ -68,12 +73,12 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
         id={panelId}
         data-mobile-menu-panel
         hidden={!open}
-        className="absolute inset-x-0 top-full z-40 border-b border-line bg-surface px-4 py-2 transition-opacity duration-150"
+        className="absolute inset-x-0 top-full z-40 border-b border-line bg-surface px-4 py-2 transition-[clip-path,opacity] duration-[240ms] ease-[var(--ease-out-expo)] [clip-path:inset(0)] starting:opacity-0 starting:[clip-path:inset(0_0_100%_0)] motion-reduce:starting:[clip-path:inset(0)]"
       >
         <nav aria-label="Menu">
           <ul className="divide-y divide-line">
-            {items.map((item) => (
-              <li key={item.key}>
+            {items.map((item, i) => (
+              <li key={item.key} className={itemMotion} style={stagger(i)}>
                 {item.acao === 'promocao' ? (
                   <PromocaoMenuButton
                     className="type-eyebrow flex min-h-11 w-full cursor-pointer items-center text-left text-text hover:text-accent"
@@ -125,7 +130,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
               </li>
             ))}
             {logado && (
-              <li>
+              <li className={itemMotion} style={stagger(items.length)}>
                 <form action={sair}>
                   <button
                     type="submit"

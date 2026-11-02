@@ -28,7 +28,7 @@ export async function SubscriptionStatus({
     </ExternalLink>
   )
   return (
-    <div className="max-w-[560px] rounded-xl border border-line bg-surface p-6">
+    <div className="max-w-[560px] rounded-xl border border-line bg-surface p-6 tabular-nums">
       {title && <h2 className="type-heading mb-4">{title}</h2>}
       {access.state === 'ativa' && (
         <>

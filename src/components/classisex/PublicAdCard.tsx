@@ -13,7 +13,7 @@ import { TextoRico } from '@/components/TextoRico'
 export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Textos<'classisex'> }) {
   const titleId = `previa-${ad.id}`
   return (
-    <article aria-labelledby={titleId} className="flex flex-col rounded-xl border border-line bg-surface p-5">
+    <article aria-labelledby={titleId} className="group card-lift flex flex-col rounded-xl border border-line bg-surface p-5">
       {ad.foto ? (
         // eslint-disable-next-line @next/next/no-img-element -- cover card, served as is
         <img
@@ -30,7 +30,7 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
           <TextoRico valor={t.cardSemFoto} linha />
         </div>
       )}
-      <h2 id={titleId} className="type-heading mt-4">
+      <h2 id={titleId} className="type-heading mt-4 transition-colors duration-[var(--duration-fast)] group-hover:text-accent">
         {ad.apelido}
       </h2>
       <p className="type-label mt-1 text-muted">

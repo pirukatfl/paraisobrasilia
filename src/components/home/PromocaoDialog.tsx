@@ -10,6 +10,7 @@ import { PROMOCAO_ABRIR_EVENTO, type PromocaoAbrirDetalhe } from '@/lib/site/pro
 
 const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 const STORAGE_KEY = 'pb_promo_vista'
+const SAIDA_MS = 180
 const [ABRIR_NOME, ABRIR_VALOR] = PROMOCAO_ABRIR_QUERY.split('=')
 
 // Fallback when sessionStorage is blocked: once per page load is the best we can do
@@ -72,6 +73,8 @@ export function PromocaoDialog({
   const rootRef = useRef<HTMLDivElement>(null)
   const opener = useRef<HTMLElement | null>(null)
   const chave = versao || 'v0'
+  const [saindo, setSaindo] = useState(false)
+  const saidaTimer = useRef<number | null>(null)
 
   // Wait for the age confirmation, then open once (home page only)
   useEffect(() => {
@@ -121,11 +124,31 @@ export function PromocaoDialog({
     return () => window.clearTimeout(timer)
   }, [pathname, chave])
 
-  const fechar = useCallback(() => {
+  const fecharDeVez = useCallback(() => {
+    saidaTimer.current = null
+    setSaindo(false)
     setAbertaEm(null)
     const alvo = opener.current
     if (alvo && document.contains(alvo)) alvo.focus()
   }, [])
+
+  // Exit animation (faster than the entrance) before the real close; reduced motion closes at once
+  const fechar = useCallback(() => {
+    if (saidaTimer.current !== null) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      fecharDeVez()
+      return
+    }
+    setSaindo(true)
+    saidaTimer.current = window.setTimeout(fecharDeVez, SAIDA_MS)
+  }, [fecharDeVez])
+
+  useEffect(
+    () => () => {
+      if (saidaTimer.current !== null) window.clearTimeout(saidaTimer.current)
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!aberta) return
@@ -167,7 +190,9 @@ export function PromocaoDialog({
     <div
       ref={rootRef}
       data-promocao
-      className="fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-bg/80 px-4 py-8 backdrop-blur-sm"
+      className={`fixed inset-0 z-40 flex items-center justify-center overflow-y-auto bg-bg/80 px-4 py-8 backdrop-blur-sm transition-opacity duration-[180ms] ease-in ${
+        saindo ? 'opacity-0' : 'animate-[overlay-in_var(--duration-overlay)_var(--ease-out-expo)_both] motion-reduce:animate-none'
+      }`}
       onClick={(event) => {
         if (event.target === event.currentTarget) fechar()
       }}
@@ -177,14 +202,16 @@ export function PromocaoDialog({
         aria-modal="true"
         aria-labelledby={titulo ? 'promocao-titulo' : undefined}
         aria-label={titulo ? undefined : textoFechar}
-        className="card-glow relative w-full max-w-[520px] rounded-xl border border-gold/20 bg-surface"
+        className={`card-glow relative w-full max-w-[520px] rounded-xl border border-gold/20 bg-surface transition-transform duration-[180ms] ease-in ${
+          saindo ? 'scale-[0.98]' : 'animate-[dialog-in_var(--duration-overlay)_var(--ease-out-expo)_both] motion-reduce:animate-none'
+        }`}
       >
         <button
           type="button"
           data-promo-fechar
           onClick={fechar}
           aria-label={textoFechar}
-          className="absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg/80 text-text hover:border-accent focus-visible:border-accent"
+          className="absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg/80 text-text transition-[color,border-color,transform] duration-150 hover:rotate-90 hover:border-accent hover:text-accent focus-visible:border-accent press motion-reduce:hover:rotate-0"
         >
           <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M4 4l10 10M14 4 4 14" />

@@ -22,7 +22,7 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
   const cover = ad.fotos[0]
   const badge = mediaBadge(t, ad.fotos.length, ad.videos.length)
   return (
-    <article aria-labelledby={titleId} className="flex flex-col rounded-xl border border-line bg-surface p-5">
+    <article aria-labelledby={titleId} className="group card-lift flex flex-col rounded-xl border border-line bg-surface p-5">
       {cover ? (
         // eslint-disable-next-line @next/next/no-img-element -- private media (T-04-07)
         <img
@@ -39,7 +39,7 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
           <TextoRico valor={t.cardSemFoto} linha />
         </div>
       )}
-      <h2 id={titleId} className="type-heading">
+      <h2 id={titleId} className="type-heading transition-colors duration-[var(--duration-fast)] group-hover:text-accent">
         {ad.apelido} · {ad.euSou}
         {ad.cidade ? ` · ${ad.cidade}` : ''}
         {ad.idade ? <> · <TextoRico valor={t.idadeAnos} vars={{ idade: ad.idade }} linha /></> : null}

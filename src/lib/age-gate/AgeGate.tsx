@@ -71,7 +71,7 @@ export function AgeGate({ textos }: { textos: AgeGateTextos }) {
       finish()
     } else {
       setState('closing')
-      window.setTimeout(finish, 150)
+      window.setTimeout(finish, 420)
     }
   }, [])
 
@@ -83,8 +83,9 @@ export function AgeGate({ textos }: { textos: AgeGateTextos }) {
       <div
         ref={ref}
         data-age-gate
-        className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg/75 px-4 py-8 backdrop-blur-[24px] transition-opacity duration-150 ${
-          state === 'closing' ? 'opacity-0' : 'opacity-100'
+        // Closing: a curtain draws in from both sides (clip-path) while it fades; the markup is untouched until it ends
+        className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-bg/75 px-4 py-8 backdrop-blur-[24px] transition-[clip-path,opacity] duration-[420ms] ease-[var(--ease-in-quick,cubic-bezier(.4,0,1,1))] ${
+          state === 'closing' ? 'pointer-events-none opacity-0 [clip-path:inset(0_50%_0_50%)]' : 'opacity-100 [clip-path:inset(0)]'
         }`}
       >
         <Prompt onVerified={onVerified} textos={textos} />

@@ -20,16 +20,16 @@ export async function ThreadView({ thread }: { thread: ThreadDTO }) {
         </p>
       )}
       <ol aria-label="Recados" className="flex flex-col gap-3">
-        {thread.mensagens.map((m) => (
+        {thread.mensagens.map((m, i) => (
           <li
             key={m.id}
             className={`flex max-w-[85%] flex-col rounded-xl border border-line p-3 ${
               m.minha ? 'self-end bg-surface' : 'self-start'
-            }`}
+            } ${i === thread.mensagens.length - 1 ? 'motion-safe:animate-[overlay-in_var(--duration-base)_ease_both]' : ''}`}
           >
             <span className="type-eyebrow text-muted">{m.minha ? <TextoRico valor={t.voce} linha /> : thread.outroApelido}</span>
             <span className="mt-1 whitespace-pre-line text-body">{m.texto}</span>
-            <span className="type-label mt-1 text-muted">{m.quando}</span>
+            <span className="type-label mt-1 text-muted tabular-nums">{m.quando}</span>
           </li>
         ))}
       </ol>

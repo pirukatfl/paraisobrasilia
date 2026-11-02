@@ -10,7 +10,7 @@ export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: st
   const t = await getTextos('contos')
   const titleId = `conto-${conto.slug}`
   return (
-    <article aria-labelledby={titleId} className="flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
+    <article aria-labelledby={titleId} className="group card-lift flex flex-col overflow-hidden rounded-xl border border-line bg-surface">
       {conto.imagem && (
         <Link href={href} tabIndex={-1} aria-hidden="true" className="block">
           <ContoImagem imagem={conto.imagem} card />
@@ -18,7 +18,7 @@ export async function ContoCard({ conto, href }: { conto: ContoCardDTO; href: st
       )}
       <div className="flex flex-1 flex-col p-5">
         <h2 id={titleId} className="type-heading">
-          <Link href={href} className="hover:text-accent">
+          <Link href={href} className="transition-colors duration-[var(--duration-fast)] group-hover:text-accent hover:text-accent">
             {conto.title}
           </Link>
         </h2>
