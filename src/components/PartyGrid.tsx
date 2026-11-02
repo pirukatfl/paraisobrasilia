@@ -7,15 +7,15 @@ import { formatCardDate } from '@/lib/format/date'
 import type { LightboxSlide } from '@/lib/gallery/types'
 import type { PartyCardDTO } from '@/lib/parties/types'
 
-import { PartyMiniCard } from './PartyMiniCard'
+import { PartyCard } from './PartyCard'
 import { PartyCarousel } from './PartyCarousel'
 
 export function PartyGrid({ parties }: { parties: PartyCardDTO[] }) {
-  // Every upcoming party slides in the carousel; the 2 parties after the first also get a small card below
-  // (side by side, also on the phone), so the next ones are easy to find without waiting for the slide.
-  const next = parties.slice(1, 3)
+  // Every upcoming party slides in the carousel; the ones after the first also stay in a grid of smaller cards
+  // below (2 per row on the phone, 3 from desktop), so each party is easy to find without waiting for the slide.
+  const [, ...others] = parties
   const [index, setIndex] = useState<number | null>(null)
-  // Remember the button that opened the lightbox, to return focus to it
+  // The carousel and the grid both have a button for the same party: remember the one actually clicked
   const opener = useRef<HTMLElement | null>(null)
 
   // One slide per party, in carousel order; the flyer opens big and links to the party page
@@ -48,11 +48,11 @@ export function PartyGrid({ parties }: { parties: PartyCardDTO[] }) {
   return (
     <div className="mt-6">
       <PartyCarousel parties={parties} onOpenFlyer={open} />
-      {next.length > 0 && (
-        <ul className="mt-8 grid grid-cols-2 items-stretch gap-3 sm:gap-6" role="list" aria-label="Também em breve" data-mini-parties>
-          {next.map((party, j) => (
+      {others.length > 0 && (
+        <ul className="mt-8 grid grid-cols-2 items-start gap-3 sm:gap-5 lg:grid-cols-3" role="list" aria-label="Próximas festas" data-other-parties>
+          {others.map((party, j) => (
             <li key={party.id} className="reveal stagger" style={{ '--i': j } as React.CSSProperties}>
-              <PartyMiniCard party={party} />
+              <PartyCard party={party} onOpenFlyer={(element) => open(j + 1, element)} />
             </li>
           ))}
         </ul>

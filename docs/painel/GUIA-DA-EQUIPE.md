@@ -20,10 +20,10 @@ Cada pessoa da equipe tem o seu próprio usuário.
 
 ## Como a página inicial é montada
 
-De cima para baixo: **carrossel das próximas festas** → **2 festas pequenas** → **Conheça o espaço** (4 fotos) → **Galeria** (4 fotos) → ClassiSex, Contos e Dicas Hot → Como chegar. O bloco "Quem somos" **não aparece mais** na página inicial (a página **Quem somos** continua no menu e no rodapé).
+De cima para baixo: **carrossel das próximas festas** → **lista das próximas festas** → **Conheça o espaço** (4 fotos) → **Galeria** (4 fotos) → ClassiSex, Contos e Dicas Hot → Como chegar. O bloco "Quem somos" **não aparece mais** na página inicial (a página **Quem somos** continua no menu e no rodapé).
 
 - **Carrossel das festas**: troca sozinho a cada 6 segundos assim que a página abre, mesmo com o mouse em cima. Só para enquanto a pessoa usa o teclado dentro dele ou segura o dedo na tela, e quem quiser pode parar no botão de pausa. Quem tem "reduzir movimento" ligado no aparelho não recebe a troca automática.
-- **2 festas pequenas**: são as duas festas seguintes à primeira do carrossel (flyer pequeno, data e nome; o clique leva à página da festa). Com uma festa só, essa linha some.
+- **Lista das próximas festas**: logo abaixo do carrossel ficam **todas** as festas seguintes à primeira, em cartões menores (2 por linha no celular, 3 no computador), cada um com flyer, data e nome. Clicar no flyer amplia; clicar na data ou no nome leva à página da festa. Com uma festa só, a lista some.
 - **Galeria**: mostra a foto de capa das **4 primeiras modelos publicadas** (na ordem definida no painel), cada uma levando à página da modelo, e o link "Ver toda a galeria". Some se não houver modelos publicadas ou se **Galeria** estiver em **Configurações → Menu do site → Itens escondidos**. O título "Galeria" e o link dessa linha são fixos (não têm campo em Textos do site).
 
 ## Fotos e vídeos do espaço

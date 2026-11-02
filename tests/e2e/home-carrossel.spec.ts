@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 
-// Home: carousel of ALL upcoming parties (slider like the old site, automatic from the first second), 2 small cards below.
+// Home: carousel of ALL upcoming parties (slider like the old site, automatic from the first second), list of the other parties (smaller cards) below.
 test.describe.configure({ mode: 'serial' })
 
 test.beforeEach(async ({ context, baseURL }) => {
@@ -148,32 +148,47 @@ test('each flyer keeps its own proportion inside the slide (landscape is not cro
   await expect(landscape.locator('img')).toHaveCSS('object-fit', 'contain')
 })
 
-test('two small cards of the next parties sit side by side under the carousel (also on mobile)', async ({ page }) => {
+test('all other upcoming parties are listed under the carousel as smaller cards (2 per row on mobile, 3 on desktop)', async ({ page }) => {
   await page.goto('/')
-  const row = page.locator('[data-mini-parties]')
-  const cards = row.locator('[data-mini-party]')
-  await expect(cards).toHaveCount(2)
-  await cards.last().scrollIntoViewIfNeeded()
-  // the 2 parties after the first slide, each one link to its page with flyer, date and title
-  const second = await slides(page).nth(1).getByRole('link').getAttribute('href')
-  const third = await slides(page).nth(2).getByRole('link').getAttribute('href')
-  await expect(cards.nth(0)).toHaveAttribute('href', second!)
-  await expect(cards.nth(1)).toHaveAttribute('href', third!)
-  for (const i of [0, 1]) {
-    await expect(cards.nth(i).locator('img')).toHaveCount(1)
-    await expect(cards.nth(i).locator('time')).toHaveCount(1)
+  const list = page.locator('[data-other-parties]')
+  const items = list.locator('> li')
+  const total = await slides(page).count()
+  await expect(items).toHaveCount(total - 1) // every party after the first
+  await items.last().scrollIntoViewIfNeeded()
+  // each card links to its party page, in carousel order, with flyer, date and title
+  for (let i = 0; i < total - 1; i++) {
+    const href = await slides(page).nth(i + 1).getByRole('link').getAttribute('href')
+    expect(href).toMatch(/^\/festas\//)
+    await expect(items.nth(i).getByRole('link', { name: /^Ver detalhes da festa/ })).toHaveAttribute('href', href!)
+    await expect(items.nth(i).locator('img')).toHaveCount(1)
+    await expect(items.nth(i).locator('time')).toHaveCount(1)
   }
-  const boxes = await cards.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()))
-  expect(Math.abs(boxes[0]!.top - boxes[1]!.top)).toBeLessThan(4) // same row
+  const boxes = await items.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()))
   const vw = page.viewportSize()!.width
-  expect(boxes[0]!.width).toBeLessThan(vw / 2) // small: not the big cards of before
-  expect(boxes[1]!.right).toBeLessThanOrEqual(vw)
-  // under the carousel, not beside it
+  const perRow = boxes.filter((b) => Math.abs(b.top - boxes[0]!.top) < 4).length
+  expect(perRow).toBe(Math.min(boxes.length, vw < 1024 ? 2 : 3))
+  // smaller than the main carousel flyer
   const carouselBox = (await page.locator('[data-party-carousel]').boundingBox())!
+  expect(boxes[0]!.width).toBeLessThan(carouselBox.width / 2)
+  expect(boxes[0]!.right).toBeLessThanOrEqual(vw)
+  // under the carousel, not beside it
   expect(boxes[0]!.top).toBeGreaterThanOrEqual(carouselBox.y + carouselBox.height - 1)
-  // the carousel flyer still enlarges in the lightbox
+})
+
+test('a list card flyer opens the lightbox on that party, and the carousel flyer still enlarges', async ({ page }) => {
+  await page.goto('/')
+  const card = page.locator('[data-other-parties] > li').first()
+  const title = (await card.getByRole('link', { name: /^Ver detalhes da festa/ }).getAttribute('aria-label'))!.replace('Ver detalhes da festa ', '')
+  const flyerButton = card.getByRole('button', { name: `Ampliar flyer da festa ${title}` })
+  await flyerButton.click()
+  const dialog = page.getByRole('dialog', { name: 'Flyers das festas' })
+  await expect(dialog).toBeVisible()
+  await expect(dialog.getByText(title).first()).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toBeHidden()
+  await expect(flyerButton).toBeFocused()
   await page.getByRole('button', { name: 'Ampliar flyer da festa Festa de Teste' }).first().click()
-  await expect(page.getByRole('dialog', { name: 'Flyers das festas' })).toBeVisible()
+  await expect(dialog).toBeVisible()
 })
 
 test.describe('a single upcoming party', () => {
@@ -202,6 +217,6 @@ test.describe('a single upcoming party', () => {
     await expect(page.getByRole('button', { name: 'Festa anterior' })).toHaveCount(0)
     await expect(page.getByRole('button', { name: /^Ir para a festa/ })).toHaveCount(0)
     await expect(page.locator('[data-party-carousel]')).toHaveAttribute('data-autoplay', 'off')
-    await expect(page.locator('[data-mini-parties]')).toHaveCount(0) // nothing after the first: no row
+    await expect(page.locator('[data-other-parties]')).toHaveCount(0) // nothing after the first: no list
   })
 })
