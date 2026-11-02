@@ -3,7 +3,7 @@ import { expect, test, type Browser } from '@playwright/test'
 import { daysLeft, validUntilLabel } from '../../src/lib/assinantes/periods'
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
-import { headerMenu } from './helpers/menu'
+import { abrirMinhaConta, headerMenu } from './helpers/menu'
 
 // ASS-03 / ASS-04: subscribers see until when they have access; restricted content only while
 // a period is active (no restricted markup otherwise, T-03-05).
@@ -75,6 +75,7 @@ test('active subscription shows the valid-until date and opens the restricted pa
   await expect(main).toContainText(`Faltam ${daysLeft(ativaEndsAt, new Date())} dias`)
 
   const nav = await headerMenu(page)
+  await abrirMinhaConta(nav)
   await expect(nav.getByRole('link', { name: 'Minha assinatura' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'ClassiSex' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'Meus anúncios' })).toBeVisible()

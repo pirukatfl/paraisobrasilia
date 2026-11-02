@@ -2,7 +2,7 @@ import { expect, test, type Browser } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
-import { headerMenu } from './helpers/menu'
+import { headerMenu, rotulosNoTopo } from './helpers/menu'
 
 // REC-02 / D-02 / D-04: private messages between subscribers, started from an ad ("Enviar recado", R-01),
 // with an unread counter in the members menu (T-05-05, T-05-06, T-05-10, T-05-18).
@@ -62,8 +62,9 @@ async function login(browser: Browser, baseURL: string, who: typeof ANA, next = 
 
 test('the header menu has no Recados item; own content has no Enviar recado', async ({ browser, baseURL }) => {
   const ana = await login(browser, baseURL!, ANA, `/area-do-assinante/classisex/${adId}`)
-  const labels = await (await headerMenu(ana.page)).locator(':scope > ul > li > a').allTextContents()
-  expect(labels.map((l) => l.trim())).toEqual([
+  const menuLogado = await headerMenu(ana.page)
+  const labels = await menuLogado.locator(':scope > ul > li > a').allTextContents()
+  expect(labels.map((l) => l.trim())).toEqual(await rotulosNoTopo(menuLogado, [
     'Festas',
     'Quem somos',
     'Espaço',
@@ -76,7 +77,7 @@ test('the header menu has no Recados item; own content has no Enviar recado', as
     'Minha assinatura',
     'Trocar senha',
     'Vídeos pornô grátis',
-  ])
+  ]))
   await expect(ana.page.getByRole('heading', { name: /AnaBSB/, level: 1 })).toBeVisible()
   await expect(ana.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
   await ana.page.goto(`${BASE}/nova?anuncio=${adId}`)

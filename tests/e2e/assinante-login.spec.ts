@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 import { loginAsStaff } from './helpers/staff'
+import { clicarSair } from './helpers/menu'
 
 // ASS-01: subscriber login on /entrar, 30-day session, logout; members pages guarded,
 // private and noindex (T-03-04, T-03-05, T-03-08).
@@ -86,7 +87,7 @@ test('members pages are private, never cached and not indexed', async ({ page })
 
 test('Sair ends the session', async ({ page }) => {
   await loginAsAssinante(page, EMAIL, PASSWORD)
-  await page.getByRole('button', { name: 'Sair' }).click()
+  await clicarSair(page)
   await expect(page).toHaveURL(/\/$/)
   await page.goto('/area-do-assinante')
   await expect(page).toHaveURL(/\/entrar\?next=/)

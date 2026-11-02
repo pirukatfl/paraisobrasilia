@@ -2,6 +2,7 @@ import { expect, test, type Browser, type Page } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
+import { abrirMinhaConta } from './helpers/menu'
 
 // quick menu-logado: a logged-in subscriber gets ONE header menu (members entries + Sair) in place of
 // the public one, on every page; logged out nothing changes.
@@ -24,6 +25,9 @@ const LABELS = [
   'Trocar senha',
   'Vídeos pornô grátis',
 ]
+// Desktop (xl+): one row; the account entries sit inside "Minha conta", after the external link
+const ACCOUNT = ['Meus anúncios', 'Minha assinatura', 'Trocar senha']
+const ACCOUNT_HREFS = ['/area-do-assinante/meus-anuncios', '/area-do-assinante', '/area-do-assinante/senha']
 const HREFS = [
   '/',
   '/quem-somos',
@@ -64,9 +68,15 @@ async function freshPage(browser: Browser, baseURL: string, viewport?: { width: 
 async function expectMemberMenu(page: Page, name: 'Principal' | 'Menu') {
   const nav = page.getByRole('navigation', { name })
   await expect(nav).toHaveCount(1)
-  expect((await nav.getByRole('link').allTextContents()).map((t) => t.trim().replace(/\s*\d+\+?$/, ''))).toEqual(LABELS)
+  const desktop = name === 'Principal'
+  if (desktop) await abrirMinhaConta(nav)
+  const labels = desktop ? [...LABELS.filter((l) => !ACCOUNT.includes(l)), ...ACCOUNT] : LABELS
+  const hrefsEsperados = desktop
+    ? [...HREFS.filter((h) => !ACCOUNT_HREFS.includes(h)), ...ACCOUNT_HREFS]
+    : HREFS
+  expect((await nav.getByRole('link').allTextContents()).map((t) => t.trim().replace(/\s*\d+\+?$/, ''))).toEqual(labels)
   const hrefs = await nav.getByRole('link').evaluateAll((els) => els.map((el) => el.getAttribute('href')))
-  expect(hrefs).toEqual(HREFS)
+  expect(hrefs).toEqual(hrefsEsperados)
   await expect(nav.getByRole('button', { name: 'Sair' })).toBeVisible()
   await expect(nav.getByRole('link', { name: 'Assine Já' })).toHaveCount(0)
   await expect(nav.getByRole('link', { name: /Recados/ })).toHaveCount(0)
@@ -122,7 +132,9 @@ test('mobile: the menu button opens the same logged-in list', async ({ browser, 
 test('Sair returns to the home page and the public menu is back without a reload', async ({ browser, baseURL }) => {
   const { context, page } = await freshPage(browser, baseURL!)
   await loginAsAssinante(page, SUB.email, PASSWORD)
-  await page.getByRole('navigation', { name: 'Principal' }).getByRole('button', { name: 'Sair' }).click()
+  const nav0 = page.getByRole('navigation', { name: 'Principal' })
+  await abrirMinhaConta(nav0)
+  await nav0.getByRole('button', { name: 'Sair' }).click()
   await expect(page).toHaveURL(baseURL! + '/')
   const nav = page.getByRole('navigation', { name: 'Principal' })
   await expect(nav.getByRole('link', { name: 'Assine Já' })).toBeVisible()
@@ -130,3 +142,37 @@ test('Sair returns to the home page and the public menu is back without a reload
   await expect(nav.getByRole('button', { name: 'Sair' })).toHaveCount(0)
   await context.close()
 })
+
+for (const width of [1280, 1440]) {
+  test(`desktop ${width}px: the logged-in menu is one single row, nothing overflows, Minha conta groups the account`, async ({ browser, baseURL }) => {
+    const { context, page } = await freshPage(browser, baseURL!, { width, height: 800 })
+    await loginAsAssinante(page, SUB.email, PASSWORD)
+    const nav = page.getByRole('navigation', { name: 'Principal' })
+    await expect(nav).toBeVisible()
+    // every top-level entry (links, dropdown triggers, Minha conta) shares the same row
+    const tops = await nav.locator(':scope > ul > li').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
+    expect(tops.length).toBe(10)
+    expect(new Set(tops).size).toBe(1)
+    // the external link is inline, right before Minha conta, and Sair is not on the main row
+    const lis = nav.locator(':scope > ul > li')
+    await expect(lis.nth(8).getByRole('link', { name: 'Vídeos pornô grátis' })).toBeVisible()
+    await expect(lis.nth(9).getByRole('button', { name: 'Minha conta' })).toBeVisible()
+    await expect(nav.getByRole('button', { name: 'Sair' })).toHaveCount(0)
+    for (const label of ACCOUNT) await expect(nav.getByRole('link', { name: label })).toHaveCount(0)
+    // no horizontal overflow, nav inside the viewport
+    const box = (await nav.boundingBox())!
+    expect(box.x).toBeGreaterThanOrEqual(0)
+    expect(box.x + box.width).toBeLessThanOrEqual(width)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
+    // the dropdown: aria-expanded, links, Sair as a button; Esc closes it
+    const trigger = nav.getByRole('button', { name: 'Minha conta' })
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    await trigger.click()
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true')
+    for (const label of ACCOUNT) await expect(nav.getByRole('link', { name: label })).toBeVisible()
+    await expect(nav.getByRole('button', { name: 'Sair' })).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    await context.close()
+  })
+}

@@ -3,6 +3,7 @@ import { expect, test, type Browser } from '@playwright/test'
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 import { loginAsStaff } from './helpers/staff'
+import { clicarSair } from './helpers/menu'
 
 // ASS-02 substitute (D-04): temporary password set by staff, self change, sessions revoked.
 test.describe.configure({ mode: 'serial' })
@@ -69,7 +70,7 @@ test('temporary password: banner, validation, change, other sessions logged out'
   await other.context.close()
 
   // Old password fails, new one works
-  await page.locator('nav[aria-label="Área do assinante"]').getByRole('button', { name: 'Sair' }).click()
+  await clicarSair(page)
   await page.goto('/entrar')
   await page.getByLabel('E-mail').fill(CAIO.email)
   await page.getByLabel('Senha', { exact: true }).fill(TEMP)

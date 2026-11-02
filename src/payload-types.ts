@@ -2770,6 +2770,24 @@ export interface TextosGeral {
     [k: string]: unknown;
   } | null;
   /**
+   * Só aparece para quem está logado, no menu do computador: agrupa Meus anúncios, Minha assinatura, Trocar senha e Sair.
+   */
+  menuMinhaConta?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
    * Só aparece para quem está logado.
    */
   menuSair?: {
@@ -12351,6 +12369,7 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuMeusAnuncios?: T;
   menuMinhaAssinatura?: T;
   menuTrocarSenha?: T;
+  menuMinhaConta?: T;
   menuSair?: T;
   rodapeContatoTitulo?: T;
   rodapeWhatsapp?: T;
