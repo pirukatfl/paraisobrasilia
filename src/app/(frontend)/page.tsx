@@ -1,7 +1,7 @@
 import { ClassiContosDicas } from '@/components/home/ClassiContosDicas'
 import { DirectionsTeaser } from '@/components/home/DirectionsTeaser'
 import { GaleriaTeaser } from '@/components/home/GaleriaTeaser'
-import { PromocaoSemJs } from '@/components/home/PromocaoPopup'
+import { PromocaoHome } from '@/components/home/PromocaoHome'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
 import { getLatestContos } from '@/lib/contos/public'
@@ -28,9 +28,7 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
   }
 }
 
-export default async function HomePage({ searchParams }: { searchParams: Promise<{ promocao?: string | string[] }> }) {
-  // `/?promocao=abrir`: where the menu item "Promoção" lands without JavaScript (with JS the modal opens instead)
-  const abrirPromocao = (await searchParams).promocao === 'abrir'
+export default async function HomePage() {
   const [parties, spaceItems, models, contact, dicas, contos, menu, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
     optional(() => getSpaceItems()), // all items: the lightbox walks them, only 4 tiles are rendered
@@ -45,7 +43,6 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      {abrirPromocao && <PromocaoSemJs />}
       {hasParties ? (
         <section aria-labelledby="titulo-proximas-festas">
           <p className="type-eyebrow text-muted"><TextoRico valor={t.chamadaTopo} linha /></p>
@@ -71,6 +68,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
       <SpaceTeaser items={spaceItems ?? []} abaixoDaDobra={hasParties} />
       {!estaOculto('galeria', menu.ocultos) && <GaleriaTeaser models={models ?? []} />}
       <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} ocultos={menu.ocultos} />
+      <PromocaoHome ocultos={menu.ocultos} />
       {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
     </>
   )

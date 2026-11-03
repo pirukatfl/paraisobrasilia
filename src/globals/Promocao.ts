@@ -10,7 +10,7 @@ const revalidatePromocao: GlobalAfterChangeHook = ({ doc }) => {
 }
 
 /**
- * Promoção (novo planejamento 2026-11-01): the pop-up of the home page. Staff turn it on and off, write
+ * Promoção (novo planejamento 2026-11-01): the section of the home page, directly above "Como chegar". Staff turn it on and off, write
  * it, set an optional period and image. Public by nature (it is shown to every visitor).
  */
 export const Promocao: GlobalConfig = {
@@ -19,7 +19,7 @@ export const Promocao: GlobalConfig = {
   admin: {
     group: 'Configurações',
     description:
-      'Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos. Quem quiser entrar na promoção clica em Participar e preenche o formulário.',
+      'Seção da página inicial, logo acima de "Como chegar" (não é mais pop-up nem item do menu). Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Quem quiser entrar na promoção clica em Participar e preenche o formulário.',
   },
   access: {
     read: () => true,
@@ -34,7 +34,7 @@ export const Promocao: GlobalConfig = {
       type: 'checkbox',
       defaultValue: false,
       label: 'Promoção ligada',
-      admin: { description: 'Desmarque para tirar o pop-up do site sem apagar o texto.' },
+      admin: { description: 'Desmarque para tirar a seção do site sem apagar o texto.' },
     },
     {
       name: 'titulo',
@@ -49,7 +49,7 @@ export const Promocao: GlobalConfig = {
       label: 'Texto',
       admin: {
         description:
-          'Quem entrar lê e fecha. No fim do pop-up já aparecem os botões "Participar" e "Fechar".',
+          'Aparece abaixo do título. No fim da seção já aparece o botão "Participar" (se estiver marcado).',
       },
     },
     {
@@ -62,7 +62,7 @@ export const Promocao: GlobalConfig = {
           label: 'Mostrar o botão Participar',
           admin: {
             description:
-              'Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: o pop-up só informa e tem apenas o botão Fechar.',
+              'Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: a seção só informa, sem botão.',
           },
         },
         {
@@ -90,7 +90,7 @@ export const Promocao: GlobalConfig = {
           type: 'date',
           label: 'Termina em (opcional)',
           admin: {
-            description: 'Depois dessa hora o pop-up some sozinho. Em branco: fica até você desligar.',
+            description: 'Depois dessa hora a seção some sozinha. Em branco: fica até você desligar.',
             date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' },
           },
           validate: (value: unknown, { siblingData }: { siblingData?: { inicio?: string | null } }) => {
@@ -109,7 +109,7 @@ export const Promocao: GlobalConfig = {
       type: 'upload',
       relationTo: 'media',
       label: 'Imagem (opcional)',
-      admin: { description: 'Sem nudez explícita: o pop-up aparece na área aberta do site.' },
+      admin: { description: 'Sem nudez explícita: a seção aparece na área aberta do site.' },
     },
   ],
 }

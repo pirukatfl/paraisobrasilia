@@ -1,11 +1,11 @@
 /**
  * Where visitors send contos and photos/videos (novo planejamento 2026-11-01). One constant per
- * destination, used by the promotion pop-up and the home "Quem somos" opening text.
+ * destination, used by the promotion section on the home and the home "Quem somos" opening text.
  * No Next, no Payload: pure, unit-testable.
  */
 export const ENVIO_CONTOS_HREF = '/contos/enviar'
 export const ENVIO_MIDIA_HREF = '/enviar-fotos-e-videos'
-/** "Participar" of the promotion pop-up: the same form, with the promotion shown on top */
+/** "Participar" of the home promotion section: the same form, with the promotion shown on top */
 export const ENVIO_PROMOCAO_PARAM = 'promocao'
 export const ENVIO_PROMOCAO_HREF = `${ENVIO_MIDIA_HREF}?${ENVIO_PROMOCAO_PARAM}=1`
 

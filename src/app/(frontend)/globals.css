@@ -420,12 +420,8 @@
 
 /* Overlays (entrance only; components own their exit) */
 @media (prefers-reduced-motion: no-preference) {
-  [data-age-gate],
-  [data-promocao] {
+  [data-age-gate] {
     animation: overlay-in var(--duration-overlay) ease both;
-  }
-  [data-promocao] [role='dialog'] {
-    animation: dialog-in var(--duration-overlay) var(--ease-out-expo) both;
   }
 
   .lightbox,

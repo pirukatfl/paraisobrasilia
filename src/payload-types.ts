@@ -2304,7 +2304,7 @@ export interface MenuDoSite {
   createdAt?: string | null;
 }
 /**
- * Pop-up da página inicial. Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Aparece uma vez por visita, depois da confirmação de 18 anos. Quem quiser entrar na promoção clica em Participar e preenche o formulário.
+ * Seção da página inicial, logo acima de "Como chegar" (não é mais pop-up nem item do menu). Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Quem quiser entrar na promoção clica em Participar e preenche o formulário.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "promocao".
@@ -2312,7 +2312,7 @@ export interface MenuDoSite {
 export interface Promocao {
   id: number;
   /**
-   * Desmarque para tirar o pop-up do site sem apagar o texto.
+   * Desmarque para tirar a seção do site sem apagar o texto.
    */
   ativa?: boolean | null;
   /**
@@ -2320,7 +2320,7 @@ export interface Promocao {
    */
   titulo?: string | null;
   /**
-   * Quem entrar lê e fecha. No fim do pop-up já aparecem os botões "Participar" e "Fechar".
+   * Aparece abaixo do título. No fim da seção já aparece o botão "Participar" (se estiver marcado).
    */
   texto?: {
     root: {
@@ -2338,7 +2338,7 @@ export interface Promocao {
     [k: string]: unknown;
   } | null;
   /**
-   * Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: o pop-up só informa e tem apenas o botão Fechar.
+   * Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: a seção só informa, sem botão.
    */
   participarAtivo?: boolean | null;
   botaoParticipar?: string | null;
@@ -2347,11 +2347,11 @@ export interface Promocao {
    */
   inicio?: string | null;
   /**
-   * Depois dessa hora o pop-up some sozinho. Em branco: fica até você desligar.
+   * Depois dessa hora a seção some sozinha. Em branco: fica até você desligar.
    */
   fim?: string | null;
   /**
-   * Sem nudez explícita: o pop-up aparece na área aberta do site.
+   * Sem nudez explícita: a seção aparece na área aberta do site.
    */
   imagem?: (number | null) | Media;
   updatedAt?: string | null;
@@ -2681,7 +2681,7 @@ export interface TextosGeral {
     [k: string]: unknown;
   } | null;
   /**
-   * Só aparece no menu enquanto a promoção está no ar. Abre o pop-up da promoção; não aparece no rodapé.
+   * Só aparece quando a promoção não tem título. Não é mais item do menu: a promoção fica na página inicial, acima de Como chegar.
    */
   menuPromocao?: {
     root: {
@@ -3610,7 +3610,7 @@ export interface TextosInicio {
     [k: string]: unknown;
   } | null;
   /**
-   * O botão Participar é editado em Configurações → Promoção.
+   * Não aparece mais no site. A promoção agora é editada em Configurações → Promoção.
    */
   promocaoBotaoFechar?: {
     root: {
@@ -3628,7 +3628,7 @@ export interface TextosInicio {
     [k: string]: unknown;
   } | null;
   /**
-   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   * Não aparece mais no site. Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
    */
   promocaoFechar?: {
     root: {

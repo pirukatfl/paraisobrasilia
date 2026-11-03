@@ -30,7 +30,7 @@ export const enviarMidia = definirArea({
       secao: PAGINA,
     },
 
-    // Participação na promoção (quando a pessoa chega pelo botão Participar do pop-up)
+    // Participação na promoção (quando a pessoa chega pelo botão Participar da seção na página inicial)
     promocaoQuadro: {
       rotulo: 'Quadro no topo da página',
       padrao: 'Participando da promoção: {titulo}',

@@ -8,7 +8,6 @@ import { CloseIcon, MenuIcon } from '@/components/icons'
 import { sair } from '@/lib/assinantes/actions'
 import { isActivePath, type NavItem } from '@/lib/site/nav'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
-import { PromocaoMenuButton } from '@/components/PromocaoMenuButton'
 import { TextoRico } from '@/components/TextoRico'
 
 // Without JavaScript the panel is shown inline (UI-SPEC: no-JS fallback).
@@ -79,15 +78,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
           <ul className="divide-y divide-line">
             {items.map((item, i) => (
               <li key={item.key} className={itemMotion} style={stagger(i)}>
-                {item.acao === 'promocao' ? (
-                  <PromocaoMenuButton
-                    className="type-eyebrow flex min-h-11 w-full cursor-pointer items-center text-left text-text hover:text-accent"
-                    retorno={() => buttonRef.current}
-                    aoAbrir={() => setOpen(false)}
-                  >
-                    <TextoRico valor={item.label} linha />
-                  </PromocaoMenuButton>
-                ) : item.external ? (
+                {item.external ? (
                   <a
                     href={item.href}
                     target="_blank"
