@@ -4,7 +4,7 @@ export const classisex = definirArea({
   slug: 'textos-classisex',
   rotulo: 'ClassiSex',
   descricao:
-    'Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões e denúncia.',
+    'Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões, denúncia e comentários.',
   campos: {
     // Página pública /classisex
     publicoGoogleTitulo: { soTexto: true, rotulo: 'Título no Google (ClassiSex aberto)', padrao: 'ClassiSex', secao: 'ClassiSex aberto (/classisex)' },

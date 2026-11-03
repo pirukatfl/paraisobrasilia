@@ -33,9 +33,9 @@ const media = [
 ]
 
 describe('toPublicAdDTO (PREV-01, D-04)', () => {
-  it('has exactly id, apelido, tipo, city, text and one photo', () => {
+  it('has exactly id, apelido, tipo, city, text, one photo and the comment count', () => {
     const dto = toPublicAdDTO(doc, { euSouLabel: 'Casal', media })
-    expect(Object.keys(dto).sort()).toEqual(['apelido', 'cidade', 'euSou', 'foto', 'id', 'texto'])
+    expect(Object.keys(dto).sort()).toEqual(['apelido', 'cidade', 'comentarios', 'euSou', 'foto', 'id', 'texto'])
     expect(dto.apelido).toBe('Casal BSB')
     expect(dto.euSou).toBe('Casal')
     expect(dto.cidade).toBe('Brasília')

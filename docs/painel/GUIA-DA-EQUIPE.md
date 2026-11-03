@@ -140,7 +140,7 @@ descrição que aparecem no Google (estes dois, sem formatação).
 | Assine Já e planos | tabela Grátis × Assinante, planos, como assinar |
 | Entrar, cadastro e senha | entrar, criar conta grátis, confirmar e-mail, esqueci a senha |
 | Área do assinante | início da área, trocar senha, painel da assinatura, aviso de renovação |
-| ClassiSex | página aberta, filtros, cartões, anúncio completo, denúncia, anunciar sem conta |
+| ClassiSex | página aberta, filtros, cartões, anúncio completo, denúncia, comentários, anunciar sem conta |
 | Meus anúncios | lista, novo anúncio, editar, fotos e vídeos |
 | Enviar conto | formulário e página de conto recebido |
 | Contos | lista e página de cada conto |
