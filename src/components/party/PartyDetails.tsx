@@ -1,4 +1,4 @@
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import { RichText } from '@/components/RichText'
 
 import type { PartyDetailDTO } from '@/lib/parties/types'
 import { getTextos } from '@/lib/textos/queries'
@@ -60,8 +60,7 @@ export async function PartyDetails({ party }: { party: PartyDetailDTO }) {
         <Section id="secao-sobre" title={<TextoRico valor={t.tituloSobre} linha />}>
           <RichText
             data={party.details}
-            disableContainer
-            className="text-body [&_a]:text-accent [&_a]:underline [&_ol]:list-decimal [&_ol]:pl-6 [&_p+p]:mt-4 [&_ul]:list-disc [&_ul]:pl-6"
+            className="mt-0"
           />
         </Section>
       )}

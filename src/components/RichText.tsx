@@ -18,13 +18,16 @@ const converters: JSXConvertersFunction = ({ defaultConverters }) => ({
   autolink: renderLinkNode as JSXConverter<SerializedAutoLinkNode>,
 })
 
-/** Institutional page text (UI-SPEC Phase 2 typography via the `.rich-text` class in globals.css). */
+/**
+ * Institutional page text (UI-SPEC Phase 2 typography via the `.rich-text` class in globals.css).
+ * The container must stay on: without it the class is dropped and Tailwind's preflight flattens
+ * headings, lists and bold, so the admin formatting never shows on the site.
+ */
 export function RichText({ data, className = '' }: { data: RichTextState; className?: string }) {
   return (
     <LexicalRichText
       data={data}
       converters={converters}
-      disableContainer
       className={`rich-text ${className}`.trim()}
     />
   )
