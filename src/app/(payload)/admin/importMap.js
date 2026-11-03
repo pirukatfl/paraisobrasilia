@@ -28,6 +28,7 @@ import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
+import { default as default_e430a9520844866bb6a7969ae8ed2dfd } from '../../../components/admin/MostrarSenhaLogin'
 import { Vencimentos as Vencimentos_1f1ae1b3e16b6364b3c888af76c92816 } from '../../../components/admin/assinantes/Vencimentos'
 import { RevisarSiteAntigo as RevisarSiteAntigo_695020af97f38537beffe66d553edc6e } from '../../../components/admin/assinantes/RevisarSiteAntigo'
 import { FilaClassisex as FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2 } from '../../../components/admin/classisex/FilaClassisex'
@@ -65,6 +66,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
+  "/components/admin/MostrarSenhaLogin#default": default_e430a9520844866bb6a7969ae8ed2dfd,
   "/components/admin/assinantes/Vencimentos#Vencimentos": Vencimentos_1f1ae1b3e16b6364b3c888af76c92816,
   "/components/admin/assinantes/RevisarSiteAntigo#RevisarSiteAntigo": RevisarSiteAntigo_695020af97f38537beffe66d553edc6e,
   "/components/admin/classisex/FilaClassisex#FilaClassisex": FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2,
