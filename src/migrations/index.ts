@@ -55,6 +55,7 @@ import * as migration_20261102_032528_promocao_participar from './20261102_03252
 import * as migration_20261102_033220_promocao_formulario from './20261102_033220_promocao_formulario';
 import * as migration_20261102_052006_menu_minha_conta from './20261102_052006_menu_minha_conta';
 import * as migration_20261102_054120_promocao_menu from './20261102_054120_promocao_menu';
+import * as migration_20261103_172502_classisex_comentarios from './20261103_172502_classisex_comentarios';
 
 export const migrations = [
   {
@@ -340,6 +341,11 @@ export const migrations = [
   {
     up: migration_20261102_054120_promocao_menu.up,
     down: migration_20261102_054120_promocao_menu.down,
-    name: '20261102_054120_promocao_menu'
+    name: '20261102_054120_promocao_menu',
+  },
+  {
+    up: migration_20261103_172502_classisex_comentarios.up,
+    down: migration_20261103_172502_classisex_comentarios.down,
+    name: '20261103_172502_classisex_comentarios'
   },
 ];

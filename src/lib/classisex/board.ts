@@ -6,6 +6,7 @@
 import type { Payload, Where } from 'payload'
 
 import { tierFromAccessUntil, type Tier } from '../assinantes/tier'
+import { countCommentsByAd } from './comentarios/service'
 import { MAX_AD_PHOTOS, MAX_AD_VIDEOS } from './media-messages'
 import {
   relId,
@@ -122,12 +123,16 @@ export async function authorTiersByAd(payload: Payload, docs: AdDocLike[], now: 
 export async function findMemberAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<MemberAdDTO>> {
   const { items, labels, ...rest } = await findVisibleAdDocs(payload, filters, now)
   // One query for the media of the whole page (no N+1)
-  const [media, tiers] = await Promise.all([
+  const [media, tiers, comentarios] = await Promise.all([
     mediaByAd(
       payload,
       items.map((d) => d.id),
     ),
     authorTiersByAd(payload, items, now),
+    countCommentsByAd(
+      payload,
+      items.map((d) => d.id),
+    ),
   ])
   return {
     ...rest,
@@ -136,6 +141,7 @@ export async function findMemberAds(payload: Payload, filters: BoardFilters, now
         euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
         media: media.get(doc.id),
         authorTier: tiers.get(doc.id) ?? 'gratis',
+        comentarios: comentarios.get(doc.id) ?? 0,
       }),
     ),
   }
@@ -158,16 +164,39 @@ export async function findVisibleAdDoc(payload: Payload, id: number | string, no
 export async function findMemberAd(payload: Payload, id: number | string, now: Date): Promise<MemberAdDTO | null> {
   const doc = await findVisibleAdDoc(payload, id, now)
   if (!doc) return null
-  const [labels, media, tiers] = await Promise.all([
+  const [labels, media, tiers, comentarios] = await Promise.all([
     categoryLabels(payload),
     mediaByAd(payload, [doc.id]),
     authorTiersByAd(payload, [doc], now),
+    countCommentsByAd(payload, [doc.id]),
   ])
   return toMemberAdDTO(doc, {
     euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
     media: media.get(doc.id),
     authorTier: tiers.get(doc.id) ?? 'gratis',
+    comentarios: comentarios.get(doc.id) ?? 0,
   })
+}
+
+/** Media of public cards: only id/kind/order are read (never filenames). */
+async function publicMediaByAd(payload: Payload, ids: number[]): Promise<Map<number, AdMediaDocLike[]>> {
+  const byAd = new Map<number, AdMediaDocLike[]>()
+  if (ids.length === 0) return byAd
+  const { docs } = await payload.find({
+    collection: 'ad-media',
+    where: { ad: { in: ids } },
+    select: { ad: true, kind: true, order: true },
+    sort: 'order',
+    depth: 0,
+    limit: ids.length * (MAX_AD_PHOTOS + MAX_AD_VIDEOS),
+    pagination: false,
+    overrideAccess: true,
+  })
+  for (const doc of docs as unknown as AdMediaDocLike[]) {
+    const adId = relId(doc.ad)
+    if (adId !== null) byAd.set(adId, [...(byAd.get(adId) ?? []), doc])
+  }
+  return byAd
 }
 
 /**
@@ -179,27 +208,31 @@ export async function findPublicAds(payload: Payload, filters: BoardFilters, now
   // City and age are members-only: the open area never filters by them
   const { items, labels, ...rest } = await findVisibleAdDocs(payload, { ...filters, cidade: undefined, idade: undefined }, now)
   const ids = items.map((d) => d.id)
-  const byAd = new Map<number, AdMediaDocLike[]>()
-  if (ids.length) {
-    const { docs } = await payload.find({
-      collection: 'ad-media',
-      where: { ad: { in: ids } },
-      select: { ad: true, kind: true, order: true },
-      sort: 'order',
-      depth: 0,
-      limit: ids.length * (MAX_AD_PHOTOS + MAX_AD_VIDEOS),
-      pagination: false,
-      overrideAccess: true,
-    })
-    for (const doc of docs as unknown as AdMediaDocLike[]) {
-      const adId = relId(doc.ad)
-      if (adId !== null) byAd.set(adId, [...(byAd.get(adId) ?? []), doc])
-    }
-  }
+  const [comentarios, byAd] = await Promise.all([countCommentsByAd(payload, ids), publicMediaByAd(payload, ids)])
   return {
     ...rest,
     items: items.map((doc) =>
-      toPublicAdDTO(doc, { euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '', media: byAd.get(doc.id) }),
+      toPublicAdDTO(doc, {
+        euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
+        media: byAd.get(doc.id),
+        comentarios: comentarios.get(doc.id) ?? 0,
+      }),
     ),
   }
+}
+
+/** One visible ad as the open area shows it (the page /classisex/anuncio/[id]), or null. */
+export async function findPublicAd(payload: Payload, id: number | string, now: Date): Promise<PublicAdDTO | null> {
+  const doc = await findVisibleAdDoc(payload, id, now)
+  if (!doc) return null
+  const [labels, byAd, comentarios] = await Promise.all([
+    categoryLabels(payload),
+    publicMediaByAd(payload, [doc.id]),
+    countCommentsByAd(payload, [doc.id]),
+  ])
+  return toPublicAdDTO(doc, {
+    euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
+    media: byAd.get(doc.id),
+    comentarios: comentarios.get(doc.id) ?? 0,
+  })
 }

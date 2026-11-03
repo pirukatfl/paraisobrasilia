@@ -12,6 +12,7 @@ import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
 import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
+import { deleteCommentsWhere } from '../lib/classisex/comentarios/cascade'
 import { SEM_DATA_LABEL } from '../lib/assinantes/site-antigo-label'
 import { expire } from '../lib/cache/expire'
 import { emailEnabled } from '../lib/email/config'
@@ -56,6 +57,7 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
         accessUntil: _a,
         staffNotes: _s,
         mensagensSuspensas: _m,
+        comentariosBloqueados: _c,
         mustChangePassword: _p,
         _verificationToken: _t,
         wpUserId: _w,
@@ -64,7 +66,7 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
         revisarAssinaturaAntiga: _r,
         ...rest
       } = input
-      void [_a, _s, _m, _p, _t, _w, _l, _i, _r]
+      void [_a, _s, _m, _c, _p, _t, _w, _l, _i, _r]
       createArgs.data = {
         ...rest,
         _verified: false,
@@ -116,6 +118,8 @@ const guardOperations: CollectionBeforeOperationHook = ({ args, operation, req }
  * an ad cascades to its media files and detaches its reports.
  */
 const removePeriods: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  // LGPD: the account's comments go first (they point at ads and at the account), replies before roots
+  await deleteCommentsWhere(req, { author: { equals: id } })
   // Reports made by this account stay for the record, without the reporter (04-08)
   await withRequestState(req, () =>
     req.payload.update({
@@ -220,6 +224,7 @@ const FIELD_LABELS: Record<string, string> = {
   accessUntil: 'acesso até',
   apelido: 'apelido',
   mensagensSuspensas: 'mensagens suspensas',
+  comentariosBloqueados: 'comentários bloqueados',
   _verified: 'e-mail confirmado',
   origem: 'origem da conta',
   declaracao18Em: 'declaração de 18+',
@@ -519,6 +524,17 @@ export const Assinantes: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description: 'Marcado pela equipe após denúncia. Desmarque para liberar de novo.',
+      },
+    },
+    {
+      name: 'comentariosBloqueados',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Comentários bloqueados',
+      access: staffOnlyField,
+      admin: {
+        position: 'sidebar',
+        description: 'Marque para impedir esta conta de comentar nos anúncios. Os comentários que já existem ficam; oculte ou apague em Comentários.',
       },
     },
     {
