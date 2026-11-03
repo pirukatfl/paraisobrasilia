@@ -934,7 +934,7 @@ export interface Party {
    */
   startsAt: string;
   /**
-   * Opcional. Se vazio, a festa sai da página inicial 10 horas depois do início.
+   * Opcional. Precisa ser depois do início. Se vazio, a festa sai da página inicial 10 horas depois do início.
    */
   endsAt?: string | null;
   /**
