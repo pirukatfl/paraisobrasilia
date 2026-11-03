@@ -7,6 +7,7 @@ import type { Payload } from 'payload'
 
 import { spDate, spMidnight } from '../../assinantes/periods'
 import { accessStatusFor } from '../../assinantes/status'
+import { allowAttempt } from '../../email/rate-limit'
 import { relId } from '../dto'
 import { ServiceError } from '../service'
 import { visibleAdsWhere } from '../visibility'
@@ -14,8 +15,12 @@ import { toComentarioDTOs, type ComentarioDocLike, type ComentarioDTO } from './
 import {
   COMENTARIOS_POR_ANUNCIO_MAX,
   COMENTARIO_MESSAGES,
+  DIA_MS,
+  HORA_MS,
   LIMITE_DIARIO,
   QUEM_COMENTA,
+  VISITANTE_LIMITE_DIA,
+  VISITANTE_LIMITE_HORA,
   comentarioApelidoError,
   comentarioTextoError,
   normaliseApelido,
@@ -42,39 +47,55 @@ async function findVisibleAd(payload: Payload, adId: number, now: Date): Promise
 }
 
 export type CreateCommentInput = {
-  assinanteId: number
+  /** Logged-in account (from the session). Omitted or null: a visitor, who needs `ip`. */
+  assinanteId?: number | null
   adId: number | string
   parentId?: number | string | null
   apelido?: string
   texto: string
   now: Date
+  /** Visitor only: client address, used for the in-memory limit and never stored. */
+  ip?: string
+  /** Visitor only: honeypot field, people leave it empty. */
+  website?: string
 }
 
-export async function createComment(payload: Payload, input: CreateCommentInput): Promise<{ id: number }> {
-  const { assinanteId, now } = input
+/** Creates the comment. `id: null` for a honeypot hit (nothing created, the caller answers like a success). */
+export async function createComment(payload: Payload, input: CreateCommentInput): Promise<{ id: number | null }> {
+  const { now } = input
+  const assinanteId = input.assinanteId ?? null
+  const visitante = assinanteId === null
+  if (visitante) {
+    // Without an account: the honeypot answers neutrally, and the writing rule must allow everyone
+    if ((input.website ?? '').trim() !== '') return { id: null }
+    if (QUEM_COMENTA !== 'todos') throw new ServiceError('entrar', COMENTARIO_MESSAGES.entrar, 401)
+  }
   const adId = positiveId(input.adId)
   const ad = adId === null ? null : await findVisibleAd(payload, adId, now)
   if (!ad) throw new ServiceError('nao-encontrado', COMENTARIO_MESSAGES.anuncio, 404)
 
-  const account = (await payload.findByID({
-    collection: 'assinantes',
-    id: assinanteId,
-    depth: 0,
-    overrideAccess: true,
-    disableErrors: true,
-  })) as { apelido?: string | null; comentariosBloqueados?: boolean | null } | null
-  if (!account) throw new ServiceError('nao-encontrado', 'Conta não encontrada.', 404)
-  if (account.comentariosBloqueados) throw new ServiceError('bloqueada', COMENTARIO_MESSAGES.bloqueada, 403)
-  if (QUEM_COMENTA === 'assinante') {
-    const access = await accessStatusFor(payload, assinanteId, now)
-    if (access.state !== 'ativa') throw new ServiceError('assinatura', COMENTARIO_MESSAGES.assinatura, 403)
+  let account: { apelido?: string | null; comentariosBloqueados?: boolean | null } | null = null
+  if (assinanteId !== null) {
+    account = (await payload.findByID({
+      collection: 'assinantes',
+      id: assinanteId,
+      depth: 0,
+      overrideAccess: true,
+      disableErrors: true,
+    })) as { apelido?: string | null; comentariosBloqueados?: boolean | null } | null
+    if (!account) throw new ServiceError('nao-encontrado', 'Conta não encontrada.', 404)
+    if (account.comentariosBloqueados) throw new ServiceError('bloqueada', COMENTARIO_MESSAGES.bloqueada, 403)
+    if (QUEM_COMENTA === 'assinante') {
+      const access = await accessStatusFor(payload, assinanteId, now)
+      if (access.state !== 'ativa') throw new ServiceError('assinatura', COMENTARIO_MESSAGES.assinatura, 403)
+    }
   }
 
   const texto = normaliseComentario(typeof input.texto === 'string' ? input.texto : '')
   const textoProblem = comentarioTextoError(texto)
   if (textoProblem) throw new ServiceError('invalido', textoProblem, 400, { texto: textoProblem })
   const given = normaliseApelido(typeof input.apelido === 'string' ? input.apelido : '')
-  const apelido = given || account.apelido?.trim() || ''
+  const apelido = given || account?.apelido?.trim() || ''
   const apelidoProblem = comentarioApelidoError(apelido)
   if (apelidoProblem) throw new ServiceError('invalido', apelidoProblem, 400, { apelido: apelidoProblem })
 
@@ -108,30 +129,44 @@ export async function createComment(payload: Payload, input: CreateCommentInput)
     if (!root || root.status !== 'publicado') throw new ServiceError('resposta', COMENTARIO_MESSAGES.resposta, 400)
   }
 
-  const today = await payload.count({
-    collection: 'ad-comments',
-    where: {
-      and: [{ author: { equals: assinanteId } }, { createdAt: { greater_than_equal: spMidnight(spDate(now)).toISOString() } }],
-    },
-    overrideAccess: true,
-  })
-  if (today.totalDocs >= LIMITE_DIARIO) throw new ServiceError('limite', COMENTARIO_MESSAGES.limite, 429)
+  if (assinanteId !== null) {
+    const today = await payload.count({
+      collection: 'ad-comments',
+      where: {
+        and: [{ author: { equals: assinanteId } }, { createdAt: { greater_than_equal: spMidnight(spDate(now)).toISOString() } }],
+      },
+      overrideAccess: true,
+    })
+    if (today.totalDocs >= LIMITE_DIARIO) throw new ServiceError('limite', COMENTARIO_MESSAGES.limite, 429)
+  } else {
+    // Per IP, in memory (no address in the database); counted once the comment is valid
+    const ip = (input.ip ?? '').trim() || 'desconhecido'
+    const nowMs = now.getTime()
+    if (
+      !allowAttempt(`comentario-visitante-ip-hora:${ip}`, nowMs, VISITANTE_LIMITE_HORA, HORA_MS) ||
+      !allowAttempt(`comentario-visitante-ip-dia:${ip}`, nowMs, VISITANTE_LIMITE_DIA, DIA_MS)
+    ) {
+      throw new ServiceError('limite', COMENTARIO_MESSAGES.limiteVisitante, 429)
+    }
+  }
 
   const created = await payload.create({
     collection: 'ad-comments',
     data: {
       ad: ad.id,
+      // A visitor has no author and never gets the advertiser badge
       author: assinanteId,
+      semConta: visitante,
       parent: rootId,
       apelido,
       texto,
-      doAnunciante: ad.author !== null && ad.author === assinanteId,
+      doAnunciante: !visitante && ad.author !== null && ad.author === assinanteId,
       status: 'publicado',
       createdAt: now.toISOString(),
     },
     overrideAccess: true,
   })
-  if (given && given !== account.apelido) {
+  if (assinanteId !== null && given && given !== account?.apelido) {
     await payload.update({
       collection: 'assinantes',
       id: assinanteId,
@@ -175,7 +210,7 @@ export async function listComments(
   const { docs } = await payload.find({
     collection: 'ad-comments',
     where: { and: [{ ad: { equals: id } }, { status: { equals: 'publicado' } }] },
-    select: { apelido: true, texto: true, doAnunciante: true, parent: true, createdAt: true },
+    select: { apelido: true, texto: true, doAnunciante: true, semConta: true, parent: true, createdAt: true },
     sort: ['createdAt', 'id'] as unknown as string,
     depth: 0,
     limit: COMENTARIOS_POR_ANUNCIO_MAX,

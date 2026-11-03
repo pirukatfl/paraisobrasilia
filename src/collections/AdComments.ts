@@ -124,7 +124,7 @@ const dateAdmin = {
 /**
  * Comentários e conversa em cada anúncio do ClassiSex (pedido do cliente 2026-11-03). Staff-only
  * for every REST/GraphQL operation: the author is sensitive and contacts written here must never be
- * served raw. Members write only through src/lib/classisex/comentarios/service.ts after the session
+ * served raw. Members and visitors write only through src/lib/classisex/comentarios/service.ts after the session
  * guard; the site reads through the same service, which redacts contacts for everyone who is not an
  * active subscriber. Staff hide, show or delete a comment from the admin.
  */
@@ -134,10 +134,10 @@ export const AdComments: CollectionConfig = {
   admin: {
     group: 'ClassiSex',
     useAsTitle: 'resumo',
-    defaultColumns: ['resumo', 'ad', 'status', 'createdAt'],
+    defaultColumns: ['resumo', 'ad', 'semConta', 'status', 'createdAt'],
     listSearchableFields: ['resumo', 'apelido', 'texto'],
     description:
-      'Comentários dos anúncios. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.',
+      'Comentários dos anúncios. Qualquer pessoa pode comentar, com ou sem conta: quem não tem conta aparece como "Sem conta" e se identifica com o nome que digitou. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.',
   },
   defaultSort: '-createdAt',
   access: {
@@ -173,10 +173,25 @@ export const AdComments: CollectionConfig = {
       name: 'author',
       type: 'relationship',
       relationTo: 'assinantes',
-      required: true,
       index: true,
       label: 'Quem escreveu',
-      admin: { readOnly: true, description: 'Só a equipe vê. No site aparece só o apelido.' },
+      admin: {
+        readOnly: true,
+        description: 'Só a equipe vê. No site aparece só o apelido. Vazio quando o comentário foi escrito sem conta.',
+      },
+    },
+    {
+      name: 'semConta',
+      type: 'checkbox',
+      defaultValue: false,
+      index: true,
+      label: 'Sem conta',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        description:
+          'Marcado pelo sistema: escrito por visitante, sem login. O nome é o que a pessoa digitou. Oculte ou apague como os demais.',
+      },
     },
     {
       name: 'parent',

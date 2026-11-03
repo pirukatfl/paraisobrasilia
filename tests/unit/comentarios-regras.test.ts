@@ -4,7 +4,11 @@ import { toComentarioDTOs, marcarMeus, quandoLabel } from '../../src/lib/classis
 import {
   COMENTARIO_MAX,
   COMENTARIO_MESSAGES,
+  DIA_MS,
+  HORA_MS,
   QUEM_COMENTA,
+  VISITANTE_LIMITE_DIA,
+  VISITANTE_LIMITE_HORA,
   comentarioApelidoError,
   comentarioResumo,
   comentarioTextoError,
@@ -15,8 +19,21 @@ import { REDACTED_LABEL } from '../../src/lib/classisex/redact'
 const NOW = new Date('2026-11-03T18:00:00.000Z') // 15:00 em Brasília
 
 describe('regras dos comentários', () => {
-  it('por padrão qualquer conta comenta', () => {
-    expect(QUEM_COMENTA).toBe('conta')
+  it('por padrão qualquer pessoa comenta, com ou sem conta', () => {
+    expect(QUEM_COMENTA).toBe('todos')
+  })
+
+  it('limites por IP do visitante: 10 por hora e 30 por dia', () => {
+    expect(VISITANTE_LIMITE_HORA).toBe(10)
+    expect(VISITANTE_LIMITE_DIA).toBe(30)
+    expect(HORA_MS).toBe(3_600_000)
+    expect(DIA_MS).toBe(24 * HORA_MS)
+  })
+
+  it('o nome do visitante segue a regra do apelido: sem contato, sem vazio', () => {
+    expect(comentarioApelidoError('Zé do Plano')).toBeNull()
+    expect(comentarioApelidoError('')).not.toBeNull()
+    expect(comentarioApelidoError('me chama 61 99988-7766')).not.toBeNull()
   })
 
   it('normaliza: aparas, quebras de linha do Windows e 3 ou mais quebras seguidas', () => {
@@ -76,7 +93,7 @@ describe('DTO dos comentários', () => {
     expect(json).not.toContain('@rui_bsb')
     expect(json).not.toContain('99988')
     expect(json).toContain(REDACTED_LABEL)
-    expect(Object.keys(out[0]).sort()).toEqual(['apelido', 'doAnunciante', 'id', 'meu', 'quando', 'respostas', 'texto'])
+    expect(Object.keys(out[0]).sort()).toEqual(['apelido', 'doAnunciante', 'id', 'meu', 'quando', 'respostas', 'semConta', 'texto'])
     expect(json).not.toMatch(/author|email/i)
   })
 
@@ -92,6 +109,18 @@ describe('DTO dos comentários', () => {
       now: NOW,
     })
     expect(out[0].apelido).toBe(REDACTED_LABEL)
+  })
+
+  it('visitante: marca semConta e nunca leva o selo do anunciante', () => {
+    const out = toComentarioDTOs(
+      [
+        { id: 1, apelido: 'Qualquer', texto: 'oi', createdAt: '2026-11-03T17:00:00.000Z', semConta: true, doAnunciante: true },
+        { id: 2, apelido: 'Dona', texto: 'oi', createdAt: '2026-11-03T17:01:00.000Z', doAnunciante: true },
+      ],
+      { verContatos: false, now: NOW },
+    )
+    expect(out[0]).toMatchObject({ semConta: true, doAnunciante: false })
+    expect(out[1]).toMatchObject({ semConta: false, doAnunciante: true })
   })
 
   it('marca os comentários do próprio leitor sem mexer na cópia compartilhada', () => {

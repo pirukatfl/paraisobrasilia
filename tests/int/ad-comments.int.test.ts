@@ -3,7 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { findMemberAds, findPublicAds } from '../../src/lib/classisex/board'
 import { createComment, deleteOwnComment, listComments } from '../../src/lib/classisex/comentarios/service'
-import { LIMITE_DIARIO } from '../../src/lib/classisex/comentarios/rules'
+import { LIMITE_DIARIO, QUEM_COMENTA, VISITANTE_LIMITE_DIA, VISITANTE_LIMITE_HORA } from '../../src/lib/classisex/comentarios/rules'
 import { REDACTED_LABEL } from '../../src/lib/classisex/redact'
 import { graphql, rest, tokenFor } from '../helpers/rest'
 import {
@@ -59,8 +59,23 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
     paying = await account('assina@teste.local', 'Assina', true)
   })
 
-  const comment = (over: Partial<Parameters<typeof createComment>[1]> = {}) =>
-    createComment(payload, { assinanteId: free.id, adId, apelido: 'Lua', texto: 'Que anúncio simpático!', now: NOW, ...over })
+  type CommentInput = Partial<Parameters<typeof createComment>[1]>
+  const comment = async (over: CommentInput = {}): Promise<{ id: number }> => {
+    const res = await createComment(payload, { assinanteId: free.id, adId, apelido: 'Lua', texto: 'Que anúncio simpático!', now: NOW, ...over })
+    return { id: res.id as number }
+  }
+  let ipSeq = 0
+  /** A visitor (no account); each call gets its own address unless one is given. */
+  const visitor = (over: CommentInput = {}) =>
+    createComment(payload, {
+      assinanteId: null,
+      adId,
+      apelido: 'Visitante Teste',
+      texto: 'Passando para dizer oi.',
+      now: NOW,
+      ip: `198.51.100.${++ipSeq}`,
+      ...over,
+    })
   const rows = async (where: Record<string, unknown> = {}) =>
     (await payload.find({ collection: 'ad-comments', where: where as never, depth: 0, limit: 100, overrideAccess: true, sort: 'id' }))
       .docs as unknown as Array<Record<string, unknown> & { id: number }>
@@ -201,7 +216,7 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
       expect(json).toContain(REDACTED_LABEL)
       expect(json).not.toContain('gratis@teste.local')
       expect(json).not.toMatch(/"author"/)
-      expect(Object.keys(pub![0]).sort()).toEqual(['apelido', 'doAnunciante', 'id', 'meu', 'quando', 'respostas', 'texto'])
+      expect(Object.keys(pub![0]).sort()).toEqual(['apelido', 'doAnunciante', 'id', 'meu', 'quando', 'respostas', 'semConta', 'texto'])
 
       const member = await listComments(payload, adId, { verContatos: true, meId: paying.id, now: NOW })
       expect(member![0].texto).toBe('Zap 61 99988-7766 ou dona@exemplo.com ou @dona_bsb')
@@ -278,6 +293,138 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
       await comment({ assinanteId: paying.id, parentId: keep.id, texto: 'Resposta dela' })
       await payload.delete({ collection: 'assinantes', id: free.id, overrideAccess: true, context: { skipAudit: true } })
       expect((await rows()).map((r) => r.texto)).toEqual(['Fica', 'Resposta dela'])
+    })
+  })
+
+  describe('sem conta (ajuste do cliente 2026-11-03)', () => {
+    it('o padrão é "todos" e o visitante comenta com o nome que quiser: sem autora, semConta true', async () => {
+      expect(QUEM_COMENTA).toBe('todos')
+      const res = await visitor({ apelido: 'Zé do Plano', texto: 'Adorei a ideia!' })
+      expect(res.id).toBeGreaterThan(0)
+      const [row] = await rows({ id: { equals: res.id } })
+      expect(row.author ?? null).toBeNull()
+      expect(row.semConta).toBe(true)
+      expect(row.apelido).toBe('Zé do Plano')
+      expect(row.doAnunciante).toBe(false)
+      expect(row.status).toBe('publicado')
+      // nenhum endereço guardado no banco
+      expect(JSON.stringify(row)).not.toContain('198.51.100')
+    })
+
+    it('nome com contato ou vazio é recusado e nada é gravado', async () => {
+      for (const apelido of ['fala 61 99988-7766', 'eu@exemplo.com', '@fulano', 'www.site.com', '   ']) {
+        const err = (await visitor({ apelido }).catch((e) => e)) as { status: number; errors?: Record<string, string> }
+        expect(err.status).toBe(400)
+        expect(err.errors?.apelido).toBeTruthy()
+      }
+      expect(await rows()).toHaveLength(0)
+    })
+
+    it('comentário vazio é recusado', async () => {
+      expect(((await visitor({ texto: '   ' }).catch((e) => e)) as { status: number }).status).toBe(400)
+    })
+
+    it('anúncio que não está visível responde como inexistente', async () => {
+      const pending = await seedAd(payload, { author: owner.id, status: 'pendente' })
+      expect(((await visitor({ adId: pending.id }).catch((e) => e)) as { status: number }).status).toBe(404)
+      expect(((await visitor({ adId: 999_999 }).catch((e) => e)) as { status: number }).status).toBe(404)
+    })
+
+    it('honeypot preenchido: sucesso neutro (id null) e nada gravado', async () => {
+      const res = await visitor({ website: 'http://spam.example' })
+      expect(res.id).toBeNull()
+      expect(await rows()).toHaveLength(0)
+    })
+
+    it('limite por IP: por hora e por dia, só para visitantes e sem tocar o banco', async () => {
+      const ip = '203.0.113.7'
+      for (let i = 0; i < VISITANTE_LIMITE_HORA; i++) await visitor({ ip, texto: `Comentário ${i}` })
+      const err = (await visitor({ ip }).catch((e) => e)) as { status: number; code?: string }
+      expect(err.status).toBe(429)
+      expect(await rows()).toHaveLength(VISITANTE_LIMITE_HORA)
+      // outro endereço não é afetado, e quem tem conta também não
+      await visitor({ ip: '203.0.113.8' })
+      await comment()
+      // uma hora depois a janela da hora reabre
+      const later = new Date(NOW.getTime() + 61 * 60_000)
+      await visitor({ ip, now: later })
+    })
+
+    it('limite diário por IP', async () => {
+      const ip = '203.0.113.9'
+      for (let i = 0; i < VISITANTE_LIMITE_DIA; i++) {
+        // 1 a cada 15 minutos: nunca passa de 4 por hora
+        await visitor({ ip, now: new Date(NOW.getTime() + i * 15 * 60_000), texto: `Dia ${i}` })
+      }
+      const err = (await visitor({ ip, now: new Date(NOW.getTime() + VISITANTE_LIMITE_DIA * 15 * 60_000) }).catch((e) => e)) as { status: number }
+      expect(err.status).toBe(429)
+    })
+
+    it('visitante nunca ganha o selo do anunciante, nem usando o apelido do anúncio', async () => {
+      const ad = (await payload.findByID({ collection: 'ads', id: adId, depth: 0, overrideAccess: true })) as { apelido: string }
+      const res = await visitor({ apelido: ad.apelido })
+      const [row] = await rows({ id: { equals: res.id } })
+      expect(row.doAnunciante).toBe(false)
+      // a dona logada continua com o selo
+      const mine = await comment({ assinanteId: owner.id, apelido: ad.apelido })
+      expect((await rows({ id: { equals: mine.id } }))[0].doAnunciante).toBe(true)
+      // e o DTO não deixa um registro antigo ou editado levar o selo junto com semConta
+      const thread = await listComments(payload, adId, { verContatos: false, now: NOW })
+      expect(thread!.find((c) => c.id === res.id)).toMatchObject({ doAnunciante: false, semConta: true })
+    })
+
+    it('visitante responde a um comentário (um nível só) e a resposta vai para o principal', async () => {
+      const root = await comment({ texto: 'Raiz' })
+      const reply = await visitor({ parentId: root.id, texto: 'Resposta de visitante' })
+      const again = await visitor({ parentId: reply.id, texto: 'Resposta da resposta' })
+      const [row] = await rows({ id: { equals: again.id } })
+      expect((row.parent as number) ?? null).toBe(root.id)
+      expect(((await visitor({ parentId: 999_999 }).catch((e) => e)) as { status: number }).status).toBe(400)
+      const other = await seedVisibleAd(payload, { authorEmail: 'outra2@teste.local', now: NOW })
+      const foreign = await comment({ adId: other.ad.id, texto: 'Em outro anúncio' })
+      expect(((await visitor({ parentId: foreign.id }).catch((e) => e)) as { status: number }).status).toBe(400)
+    })
+
+    it('DTO público do visitante: sem contato no texto nem no nome, sem dado de autoria, só a marca "semConta"', async () => {
+      await visitor({ apelido: 'Lua', texto: 'Zap 61 99988-7766 e lua@exemplo.com' })
+      const pub = await listComments(payload, adId, { verContatos: false, now: NOW })
+      const json = JSON.stringify(pub)
+      expect(json).not.toContain('99988')
+      expect(json).not.toContain('lua@exemplo.com')
+      expect(json).toContain(REDACTED_LABEL)
+      expect(json).not.toMatch(/"author"/)
+      expect(pub![0].semConta).toBe(true)
+      const member = await listComments(payload, adId, { verContatos: true, meId: paying.id, now: NOW })
+      expect(member![0].texto).toBe('Zap 61 99988-7766 e lua@exemplo.com')
+    })
+
+    it('visitante não apaga: nem o próprio comentário (sem identidade) nem o de outras pessoas', async () => {
+      const res = await visitor()
+      expect(((await deleteOwnComment(payload, free.id, res.id as number).catch((e) => e)) as { status: number }).status).toBe(404)
+      expect(await rows({ id: { equals: res.id } })).toHaveLength(1)
+    })
+
+    it('REST e GraphQL seguem fechados para o comentário do visitante', async () => {
+      const res = await visitor({ texto: 'Escrito sem conta' })
+      const list = await rest('GET', ['ad-comments'])
+      const one = await rest('GET', ['ad-comments', String(res.id)])
+      const create = await rest('POST', ['ad-comments'], { body: { ad: adId, apelido: 'X', texto: 'y', semConta: true } })
+      for (const r of [list, one, create]) {
+        expect([401, 403, 404]).toContain(r.status)
+        expect(r.text).not.toContain('Escrito sem conta')
+      }
+      const gql = await graphql('{ AdComments { docs { id texto } } }')
+      expect(gql.text).not.toContain('Escrito sem conta')
+    })
+
+    it('a equipe oculta e apaga o comentário sem conta (registro sem conta de assinante)', async () => {
+      const res = await visitor({ texto: 'Para moderar' })
+      await payload.update({ collection: 'ad-comments', id: res.id as number, data: { status: 'oculto' }, overrideAccess: false, user: staffReq.user as never, req: staffReq })
+      expect(await listComments(payload, adId, { verContatos: true, now: NOW })).toEqual([])
+      expect((await audit('comentario-ocultado')).length).toBe(1)
+      await payload.delete({ collection: 'ad-comments', id: res.id as number, overrideAccess: false, user: staffReq.user as never, req: staffReq })
+      expect(await rows()).toHaveLength(0)
+      expect((await audit('comentario-apagado')).length).toBe(1)
     })
   })
 
