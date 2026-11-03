@@ -78,6 +78,8 @@ export default buildConfig({
         '/components/admin/assinantes/RevisarSiteAntigo#RevisarSiteAntigo',
         '/components/admin/classisex/FilaClassisex#FilaClassisex',
       ],
+      // Eye button on the login password field
+      afterLogin: ['/components/admin/MostrarSenhaLogin'],
       graphics: {
         Logo: '/components/admin/Logo',
         Icon: '/components/admin/Icon',
