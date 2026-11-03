@@ -101,18 +101,20 @@ export const inicio = definirArea({
     dicasTitulo: { rotulo: 'Título da seção de dicas', padrao: 'Dicas Hot', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
     dicasBotao: { rotulo: 'Botão das dicas', padrao: 'Ver todas as Dicas Hot', secao: 'Quadros ClassiSex, Contos e Dicas Hot' },
 
-    // Pop-up da promoção (o texto da promoção fica em Configurações → Promoção)
+    // Sem uso: o pop-up da promoção foi removido (a promoção agora é uma seção da página inicial).
+    // Os campos ficam só para não mexer no banco; podem ser removidos numa próxima migração.
     promocaoBotaoFechar: {
-      rotulo: 'Pop-up: botão Fechar',
+      rotulo: '(Sem uso) Antigo pop-up: botão Fechar',
       padrao: 'Fechar',
-      secao: 'Pop-up da promoção',
-      ajuda: 'O botão Participar é editado em Configurações → Promoção.',
+      secao: 'Pop-up da promoção (sem uso)',
+      ajuda: 'Não aparece mais no site. A promoção agora é editada em Configurações → Promoção.',
     },
     promocaoFechar: {
       soTexto: true,
-      rotulo: 'Pop-up: botão de fechar (leitores de tela)',
+      rotulo: '(Sem uso) Antigo pop-up: botão de fechar',
       padrao: 'Fechar a promoção',
-      secao: 'Pop-up da promoção',
+      secao: 'Pop-up da promoção (sem uso)',
+      ajuda: 'Não aparece mais no site.',
     },
 
     // Como chegar

@@ -63,10 +63,10 @@ export function AvisoInstalacao() {
     }
   }, [])
 
-  // Só mostra com a idade confirmada e sem promoção aberta
+  // Só mostra com a idade confirmada
   useEffect(() => {
     const checar = () =>
-      setLivre(document.documentElement.dataset.ageOk === '1' && !document.querySelector('[data-promocao]'))
+      setLivre(document.documentElement.dataset.ageOk === '1')
     checar()
     const obs = new MutationObserver(checar)
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-age-ok'] })

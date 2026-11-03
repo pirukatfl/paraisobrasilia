@@ -13,7 +13,7 @@ import type { CollectionBeforeChangeHook, CollectionConfig, FieldHook } from 'pa
 
 import { isStaff, staffOrPublished } from '../access/roles'
 import { revalidatePartyAfterChange, revalidatePartyAfterDelete } from '../lib/parties/revalidate'
-import { defaultEndsAt } from '../lib/parties/visibility'
+import { defaultEndsAt, validateEndsAt } from '../lib/parties/visibility'
 
 /** "Festa do Branco — Edição 10" → "festa-do-branco-edicao-10" */
 export function slugify(input: string): string {
@@ -98,8 +98,10 @@ export const Parties: CollectionConfig = {
       name: 'endsAt',
       type: 'date',
       label: 'Data e hora de término',
+      validate: (value: unknown, { siblingData }: { siblingData: Partial<{ startsAt: unknown }> }) =>
+        validateEndsAt(value, siblingData?.startsAt),
       admin: {
-        description: 'Opcional. Se vazio, a festa sai da página inicial 10 horas depois do início.',
+        description: 'Opcional. Precisa ser depois do início. Se vazio, a festa sai da página inicial 10 horas depois do início.',
         date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' },
       },
     },

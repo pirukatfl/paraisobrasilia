@@ -166,7 +166,7 @@ test('staff open the submission in the panel and see the file with its preview',
   await expect(page.locator('.relationship-table tbody tr')).toHaveCount(2)
 })
 
-// Promoção (2026-11-02): "Participar" in the home pop-up leads here with ?promocao=1
+// Promoção (2026-11-02): "Participar" in the home Promoção section leads here with ?promocao=1
 const PROMO_TITULO = `Promoção Participar ${RUN}`
 const PROMO_ON = { ativa: true, titulo: PROMO_TITULO, texto: null, inicio: null, fim: null, imagem: null }
 const PROMO_OFF = { ...PROMO_ON, ativa: false, titulo: '' }

@@ -1,5 +1,5 @@
 /**
- * Promoção (pop-up da página inicial, novo planejamento 2026-11-01, item G). Pure module: the DTO and the
+ * Promoção (seção da página inicial, novo planejamento 2026-11-01, item G). Pure module: the DTO and the
  * "is it on right now" rule, testable without a database.
  */
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical'
@@ -14,10 +14,10 @@ export type PromocaoDTO = {
   inicio: string | null
   fim: string | null
   imagem: GalleryImage | null
-  /** false: the pop-up is informative only (just "Fechar") */
+  /** false: the section is informative only (no button) */
   participarAtivo: boolean
   botaoParticipar: string
-  /** Changes whenever staff save the promotion: a new edit shows the pop-up again in a session */
+  /** Changes whenever staff save the promotion */
   versao: string
 }
 

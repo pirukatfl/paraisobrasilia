@@ -43,23 +43,12 @@ describe('Menu do site: itens escondidos e link externo', () => {
     expect(estaOculto('contato', ['quem-somos'])).toBe(false)
   })
 
-  it('Promoção exists only while the promotion is on air, after Contato, and staff can hide it', () => {
+  it('Promoção is not a menu item (it is a home section); staff can still hide the section by its key', () => {
     expect(keys(getNavItems(t))).not.toContain('promocao')
     expect(keys(getMemberNavItems(t))).not.toContain('promocao')
-
-    const publico = getNavItems(t, MENU_VAZIO, { promocao: true })
-    expect(keys(publico).indexOf('promocao')).toBe(keys(publico).indexOf('contato') + 1)
-    expect(publico.find((i) => i.key === 'promocao')).toMatchObject({ acao: 'promocao', href: '/?promocao=abrir' })
-    expect(textoPuro(publico.find((i) => i.key === 'promocao')!.label)).toBe('Promoção')
-
-    // logged in: before the account group and the external link, so the desktop row stays on one line
-    const logado = keys(getMemberNavItems(t, toMenuConfig(null), { promocao: true }))
-    expect(logado.indexOf('promocao')).toBe(logado.indexOf('contato') + 1)
-    expect(logado.indexOf('promocao')).toBeLessThan(logado.indexOf('link-externo'))
-
-    expect(keys(getNavItems(t, { ...MENU_VAZIO, ocultos: ['promocao'] }, { promocao: true }))).not.toContain('promocao')
-    expect(keys(getMemberNavItems(t, { ...MENU_VAZIO, ocultos: ['promocao'] }, { promocao: true }))).not.toContain('promocao')
+    expect(getNavItems(t).some((i) => 'acao' in i)).toBe(false)
     expect(toMenuConfig({ itensOcultos: ['promocao'] }).ocultos).toEqual(['promocao'])
+    expect(estaOculto('promocao', ['promocao'])).toBe(true)
   })
 
   it('nothing hidden by default; unknown keys are ignored', () => {

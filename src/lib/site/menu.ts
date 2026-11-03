@@ -20,7 +20,7 @@ export const MENU_ITENS = [
   { value: 'contos', label: 'Contos' },
   { value: 'dicas-hot', label: 'Dicas Hot' },
   { value: 'contato', label: 'Contato' },
-  { value: 'promocao', label: 'Promoção (só aparece com a promoção no ar)' },
+  { value: 'promocao', label: 'Promoção (seção da página inicial, só aparece com a promoção no ar)' },
   { value: 'assine-ja', label: 'Assine Já (só visitantes)' },
   { value: 'area-do-assinante', label: 'Área do assinante (só visitantes)' },
   { value: 'meus-anuncios', label: 'Menu do assinante → Meus anúncios' },

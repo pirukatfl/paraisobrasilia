@@ -34,12 +34,12 @@ const cachedPromocao = cached(
   () => ['promocao'],
 )
 
-/** The promotion as staff saved it (tag 'promocao'). Never throws: without a database there is no pop-up. */
+/** The promotion as staff saved it (tag 'promocao'). Never throws: without a database there is no promotion section. */
 export async function getPromocao(): Promise<PromocaoDTO | null> {
   try {
     return await cachedPromocao()
   } catch (err) {
-    console.error('[promocao] unavailable, no pop-up:', err instanceof Error ? err.message : err)
+    console.error('[promocao] unavailable, no promotion:', err instanceof Error ? err.message : err)
     return null
   }
 }

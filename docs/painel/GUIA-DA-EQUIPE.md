@@ -20,7 +20,7 @@ Cada pessoa da equipe tem o seu próprio usuário.
 
 ## Como a página inicial é montada
 
-De cima para baixo: **carrossel das próximas festas** → **lista das próximas festas** → **Conheça o espaço** (4 fotos) → **Galeria** (4 fotos) → ClassiSex, Contos e Dicas Hot → Como chegar. O bloco "Quem somos" **não aparece mais** na página inicial (a página **Quem somos** continua no menu e no rodapé).
+De cima para baixo: **carrossel das próximas festas** → **lista das próximas festas** → **Conheça o espaço** (4 fotos) → **Galeria** (4 fotos) → ClassiSex, Contos e Dicas Hot → **Promoção** (só quando está no ar) → Como chegar. O bloco "Quem somos" **não aparece mais** na página inicial (a página **Quem somos** continua no menu e no rodapé).
 
 - **Carrossel das festas**: troca sozinho a cada 6 segundos assim que a página abre, mesmo com o mouse em cima. Só para enquanto a pessoa usa o teclado dentro dele ou segura o dedo na tela, e quem quiser pode parar no botão de pausa. Quem tem "reduzir movimento" ligado no aparelho não recebe a troca automática.
 - **Lista das próximas festas**: logo abaixo do carrossel ficam **todas** as festas seguintes à primeira, em cartões menores (2 por linha no celular, 3 no computador), cada um com flyer, data e nome. Clicar no flyer amplia; clicar na data ou no nome leva à página da festa. Com uma festa só, a lista some.
@@ -207,6 +207,7 @@ Para esconder ou mostrar um item do menu **sem mexer em mais nada** (a página c
 2. Em **Itens escondidos**, escolha os itens que devem **sumir**. Eles somem do menu do topo, do menu do celular **e do rodapé**.
    Esconder **Quem somos** esconde também Normas, Regras e Dicas; esconder **Galeria** esconde Profissionais e Amadoras.
    Os itens "Menu do assinante" valem só para quem está logado.
+   A opção **Promoção (seção da página inicial)** não é item de menu: esconde a seção da promoção na página inicial.
 3. **Salvar**. Vale na hora. Para mostrar de novo, tire o item da lista e salve.
 
 **Link externo para assinantes** (mais abaixo, na mesma página): é um item extra que aparece **só no menu de quem está logado como
@@ -217,25 +218,21 @@ assinante**, por último, antes do **Sair**. Abre em outra aba. Ele **nunca** ap
 
 ---
 
-## Promoção (pop-up da página inicial)
+## Promoção (seção da página inicial)
 
-O pop-up da promoção aparece na **página inicial**, **depois** que o visitante confirma que tem 18 anos (nunca em cima do aviso), **uma vez por visita**, e fecha no **X**, no botão **Fechar**, clicando fora ou com a tecla **Esc**. Quem entra lê e fecha; quem quiser entrar na promoção clica em **Participar** e vai para um formulário (dados, fotos e vídeos).
+A promoção é uma **seção da página inicial**, logo **acima de "Como chegar"**, com título, texto, imagem (se houver) e o botão **Participar**. Não existe mais pop-up na primeira visita, nem o item "Promoção" no menu: quem rolar a página inicial encontra a seção. Quem quiser entrar na promoção clica em **Participar** e vai para um formulário (dados, fotos e vídeos).
 
 1. Menu da esquerda → **Configurações → Promoção**.
-2. Preencha o **Título** e o **Texto**. Opcional: uma **Imagem** (sem nudez explícita) e o período (**Começa em** / **Termina em**; fora do período o pop-up some sozinho).
+2. Preencha o **Título** e o **Texto**. Opcional: uma **Imagem** (sem nudez explícita) e o período (**Começa em** / **Termina em**; fora do período a seção some sozinha).
 3. Marque **Promoção ligada** e **Salvar**. Vale na hora.
 4. Para **tirar do ar**, desmarque **Promoção ligada** e salve. O texto fica guardado para a próxima vez.
 
-No fim do pop-up aparecem os botões **Participar** (principal) e **Fechar**. O pop-up não cria links dentro do texto. Para um pop-up só informativo (sem formulário), desmarque **Mostrar o botão Participar**: fica só o **Fechar**. O texto do botão Participar é editado na própria tela da promoção; o texto do botão Fechar fica em **Textos do site → Página inicial → Pop-up da promoção**.
+Na seção aparece o botão **Participar**. Para uma promoção só informativa (sem formulário), desmarque **Mostrar o botão Participar**: a seção fica só com o texto. O texto do botão Participar é editado na própria tela da promoção. Se a promoção não tiver título, a seção usa o título de **Textos do site → Geral → Título da seção Promoção (página inicial)** (padrão "Promoção").
 Quem clicar em **Participar** vai para o formulário de fotos e vídeos (veja a seção "Fotos e vídeos enviados pelo público"), e o envio fica marcado com o título desta promoção.
-Quando você salva a promoção de novo, quem já fechou o pop-up volta a vê-lo na próxima visita.
 
-**Item "Promoção" no menu principal.** Enquanto a promoção está **no ar** (ligada e dentro do período), aparece no menu do site, para visitantes e para assinantes, no computador e no celular, o item **Promoção**. Quem clicar nele vê o pop-up de novo, em qualquer página em que estiver (sem sair dela), mesmo que já o tenha fechado. Quando a promoção sai do ar, o item e o pop-up somem sozinhos. Detalhes:
+**Esconder a seção** mesmo com a promoção no ar: **Configurações → Menu do site** e marque **Promoção (seção da página inicial...)** em "Itens escondidos".
 
-- O item **não aparece no rodapé**.
-- O texto do item é editável em **Textos do site → Geral → Menu: Promoção** (padrão "Promoção").
-- Para esconder o item mesmo com a promoção no ar, use **Configurações → Menu do site** e marque **Promoção** em "Itens escondidos". O pop-up da página inicial continua funcionando.
-- Sem JavaScript no navegador, o item leva para a página inicial, que mostra a promoção como um bloco no topo da página.
+Os campos antigos do pop-up em **Textos do site → Página inicial → Pop-up da promoção (sem uso)** não aparecem mais no site e podem ser ignorados.
 
 ---
 

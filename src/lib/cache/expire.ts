@@ -3,7 +3,7 @@ import { revalidateTag } from 'next/cache.js'
 
 /**
  * Cache tags: 'parties' — home list, sitemap, static params; 'party:{slug}' — one party page;
- * 'contact' — contact global (02-01); 'promocao' — home pop-up; 'menu' — Menu do site; 'pages' + 'page:{key}' (02-02); 'space' (02-03); 'models' (02-04);
+ * 'contact' — contact global (02-01); 'promocao' — home section; 'menu' — Menu do site; 'pages' + 'page:{key}' (02-02); 'space' (02-03); 'models' (02-04);
  * 'plans' — Assine Já plans (03-02); 'ads' — ClassiSex public preview (04-07), expired by ads,
  * Eu sou options, ad media and subscription changes.
  * 'contos' (lists, sitemap) and 'conto:{slug}' (one conto) — 05-02/05-03.

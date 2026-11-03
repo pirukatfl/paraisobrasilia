@@ -177,28 +177,23 @@ for (const width of [1280, 1440]) {
   })
 }
 
-// Promoção on air adds one more item; the desktop row must still be a single line
-for (const width of [1280, 1440]) {
-  test(`desktop ${width}px with the promotion on air: still one row, Promoção before the external link`, async ({ browser, baseURL, request }) => {
+// Promoção (2026-11-03): it is a home section, never a menu item, not even for subscribers while it is on air
+for (const [nome, viewport] of [['desktop', { width: 1280, height: 800 }], ['mobile', { width: 390, height: 844 }]] as const) {
+  test(`${nome}: the logged-in menu has no Promoção item while the promotion is on air`, async ({ browser, baseURL, request }) => {
     const api = await staffApi(request)
     await api.updateGlobal('promocao', { ativa: true, titulo: 'Promoção de Teste', texto: null, inicio: null, fim: null, imagem: null })
-    const { context, page } = await freshPage(browser, baseURL!, { width, height: 800 })
+    const { context, page } = await freshPage(browser, baseURL!, viewport)
     try {
       await loginAsAssinante(page, SUB.email, PASSWORD)
-      const nav = page.getByRole('navigation', { name: 'Principal' })
+      if (nome === 'mobile') await page.getByRole('button', { name: 'Abrir menu' }).click()
+      const nav = page.getByRole('navigation', { name: nome === 'mobile' ? 'Menu' : 'Principal' })
       await expect(nav).toBeVisible()
-      const tops = await nav.locator(':scope > ul > li').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
-      expect(tops.length).toBe(11)
-      expect(new Set(tops).size).toBe(1)
-      const lis = nav.locator(':scope > ul > li')
-      await expect(lis.nth(8).getByRole('button', { name: 'Promoção' })).toBeVisible()
-      await expect(lis.nth(9).getByRole('link', { name: 'Vídeos pornô grátis' })).toBeVisible()
-      await expect(lis.nth(10).getByRole('button', { name: 'Minha conta' })).toBeVisible()
-      const box = (await nav.boundingBox())!
-      expect(box.x + box.width).toBeLessThanOrEqual(width)
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true)
-      await lis.nth(8).getByRole('button', { name: 'Promoção' }).click()
-      await expect(page.getByRole('dialog', { name: 'Promoção de Teste' })).toBeVisible()
+      await expect(nav.getByText('Promoção', { exact: true })).toHaveCount(0)
+      if (nome === 'desktop') {
+        const tops = await nav.locator(':scope > ul > li').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
+        expect(tops.length).toBe(10)
+        expect(new Set(tops).size).toBe(1)
+      }
     } finally {
       await api.updateGlobal('promocao', { ativa: false, titulo: '', texto: null, inicio: null, fim: null, imagem: null })
       await api.dispose()
@@ -206,20 +201,3 @@ for (const width of [1280, 1440]) {
     }
   })
 }
-
-test('mobile: the logged-in menu has Promoção and it opens the modal', async ({ browser, baseURL, request }) => {
-  const api = await staffApi(request)
-  await api.updateGlobal('promocao', { ativa: true, titulo: 'Promoção de Teste', texto: null, inicio: null, fim: null, imagem: null })
-  const { context, page } = await freshPage(browser, baseURL!, { width: 390, height: 844 })
-  try {
-    await loginAsAssinante(page, SUB.email, PASSWORD)
-    await page.getByRole('button', { name: 'Abrir menu' }).click()
-    await page.getByRole('navigation', { name: 'Menu' }).getByRole('button', { name: 'Promoção' }).click()
-    await expect(page.getByRole('dialog', { name: 'Promoção de Teste' })).toBeVisible()
-    await expect(page.getByRole('navigation', { name: 'Menu' })).toBeHidden()
-  } finally {
-    await api.updateGlobal('promocao', { ativa: false, titulo: '', texto: null, inicio: null, fim: null, imagem: null })
-    await api.dispose()
-    await context.close()
-  }
-})
