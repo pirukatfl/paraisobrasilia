@@ -536,6 +536,30 @@ Para parar de usar uma opção, **desative**; **não apague** uma opção que j�
   **ClassiSex → Mídias de anúncios → ⋯ → Excluir**, ou **Excluir o anúncio inteiro**. Na dúvida, remova.
 - Quando a pessoa pede para apagar a conta, **Excluir** a conta do assinante apaga também os anúncios, as fotos e os vídeos.
 
+### Comentários
+
+Desde 03/11/2026 cada anúncio tem uma **conversa**. **Qualquer pessoa lê** (visitantes também, na página do anúncio na área
+aberta, `/classisex/anuncio/…`); **qualquer conta logada comenta** (gratuita ou assinante) e responde a um comentário
+(a conversa tem um nível só). O anunciante que comenta no próprio anúncio ganha o selo **Anunciante**.
+
+- **Contatos nos comentários só aparecem para assinante ativo.** Se alguém escrever telefone, e-mail, @ ou link num
+  comentário, visitantes e contas gratuitas veem `[contato só para assinantes]`. O texto fica guardado como foi escrito;
+  o site esconde na hora de mostrar. Como no anúncio, truques (número por extenso, foto de contato) a máquina não pega.
+- Limite: **1000 caracteres** por comentário e **30 comentários por conta por dia**.
+- **Onde moderar:** **ClassiSex → Comentários**. A lista mostra o resumo (apelido e começo do texto), o anúncio, a situação
+  e a data; filtre por **Situação** para ver os ocultos.
+- **Ocultar:** abra o comentário, mude **Situação** para **Oculto** e salve. Sai do site na hora (as respostas dele somem
+  junto). Para voltar, mude para **Publicado**. Se quiser, anote o **Motivo** (só a equipe vê).
+- **Apagar:** menu **⋯ → Excluir** no comentário. Apaga de vez, com as respostas dele. Excluir um **anúncio** ou uma **conta**
+  também apaga os comentários.
+- **Bloquear uma conta de comentar:** abra o assinante, marque **Comentários bloqueados** (na lateral) e salve. A pessoa
+  continua entrando e lendo, mas vê o aviso no lugar do formulário. Os comentários antigos ficam; oculte ou apague em
+  **Comentários**. Para liberar, desmarque.
+- **Quem escreveu:** o painel mostra a conta de quem comentou (só a equipe vê). Ocultar, reexibir e apagar ficam no
+  **Registro de ações**.
+- Os textos do formulário, do aviso de contatos e do selo ficam em **Textos do site → ClassiSex** (seção "Comentários").
+- O comentário **não** tem botão "Denunciar" no site: a equipe modera pelo painel.
+
 ### Testar como assinante
 
 Sempre numa **janela anônima** (no celular: aba anônima/privada), como em "Testar o login de um assinante". Entre em
