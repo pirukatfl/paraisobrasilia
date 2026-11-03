@@ -7,8 +7,10 @@ import { EnviarRecadoLink } from '@/components/mensagens/EnviarRecadoLink'
 import { ContactLinks } from '@/components/classisex/ContactLinks'
 import { InactivePanel } from '@/components/classisex/InactivePanel'
 import { MediaGallery } from '@/components/classisex/MediaGallery'
+import { Comentarios } from '@/components/classisex/Comentarios'
 import { ReportForm } from '@/components/classisex/ReportForm'
 import { requireActiveSubscription } from '@/lib/assinantes/session'
+import { getComentarios, getViewer } from '@/lib/classisex/comentarios/queries'
 import { getMemberAd, isOwnAd } from '@/lib/classisex/queries'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
@@ -42,6 +44,9 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
   if (!ad) notFound()
   // Only a boolean reaches the client component, never the author (T-04-12)
   const canReport = !(await isOwnAd(check.assinante.id, id))
+  // Active subscriber: the conversation comes with contacts as written (uncached, decided on the server)
+  const sessao = await getViewer()
+  const comentarios = await getComentarios(ad.id, { verContatos: true, assinanteId: check.assinante.id })
   return (
     <article aria-labelledby="titulo-anuncio" className="max-w-[720px]">
       <PasswordBanner mustChangePassword={check.assinante.mustChangePassword} />
@@ -70,6 +75,16 @@ export default async function AnuncioPage({ params }: { params: Promise<{ id: st
             <EnviarRecadoLink id={ad.id} />
           ))}
       </section>
+      {comentarios && (
+        <Comentarios
+          adId={ad.id}
+          comentarios={comentarios}
+          viewer={sessao.viewer}
+          verContatos
+          entrarHref="/entrar"
+          textos={t}
+        />
+      )}
       {canReport && (
         <ReportForm
           adId={ad.id}
