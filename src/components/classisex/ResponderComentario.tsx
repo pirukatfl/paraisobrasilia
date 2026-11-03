@@ -12,11 +12,14 @@ export function ResponderComentario({
   comentarioId,
   apelidoInicial,
   textos: t,
+  visitante = false,
 }: {
   adId: number
   comentarioId: number
   apelidoInicial: string
   textos: ComentarioFormTextos & Pick<Textos<'classisex'>, 'comentarioResponder'>
+  /** Without an account: the inline form asks for a name. */
+  visitante?: boolean
 }) {
   const [aberto, setAberto] = useState(false)
   const painel = useId()
@@ -42,6 +45,7 @@ export function ResponderComentario({
             textos={t}
             onSent={() => setAberto(false)}
             onCancel={() => setAberto(false)}
+            entrarHref={visitante ? '' : undefined}
           />
         </div>
       )}

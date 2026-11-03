@@ -2,10 +2,11 @@
 
 import config from '@payload-config'
 import { revalidatePath } from 'next/cache'
+import { headers } from 'next/headers'
 import { unstable_rethrow } from 'next/navigation'
 import { getPayload } from 'payload'
 
-import { requireActiveSubscription, requireAssinante } from '../../assinantes/session'
+import { getAssinante, requireActiveSubscription, requireAssinante } from '../../assinantes/session'
 import { mensagemAmigavel } from '../../errors'
 import { registrarErro } from '../../errors/server'
 import { ServiceError } from '../service'
@@ -37,26 +38,45 @@ function refresh(adId: number) {
   revalidatePath(`/area-do-assinante/classisex/${adId}`)
 }
 
+/** Same way the other open forms read the client address (kept in memory for the limit, never stored). */
+const clientIp = async () => {
+  const h = await headers()
+  return (h.get('x-forwarded-for')?.split(',')[0] ?? h.get('x-real-ip') ?? 'desconhecido').trim()
+}
+
 /**
- * Comentar / Responder. Only adId, parentId, apelido and texto are read from the form: the author
- * is the session's account and the status is always "publicado" (set by the service).
+ * Comentar / Responder. Only adId, parentId, apelido, texto and the honeypot are read from the form.
+ * With a session the author is the session's account; without one the comment is a visitor's
+ * (no author, the name is whatever was typed). The status is always "publicado" (set by the service).
  */
 export async function comentar(_prev: ComentarioState, formData: FormData): Promise<ComentarioState> {
   const adId = idField(formData, 'anuncio')
   const parentId = idField(formData, 'resposta')
   const values = { apelido: field(formData, 'apelido'), texto: field(formData, 'texto') }
   const path = `/classisex/anuncio/${adId || ''}`
-  let assinanteId: number
+  let assinanteId: number | null = null
   if (QUEM_COMENTA === 'assinante') {
     const check = await requireActiveSubscription(path)
     if (check.inactive) return { ok: false, message: COMENTARIO_MESSAGES.assinatura, values }
     assinanteId = check.assinante.id
-  } else {
+  } else if (QUEM_COMENTA === 'conta') {
     assinanteId = (await requireAssinante(path)).id
+  } else {
+    assinanteId = (await getAssinante())?.id ?? null
   }
   const payload = await getPayload({ config })
   try {
-    await createComment(payload, { assinanteId, adId, parentId: parentId || null, apelido: values.apelido, texto: values.texto, now: new Date() })
+    const result = await createComment(payload, {
+      assinanteId,
+      adId,
+      parentId: parentId || null,
+      apelido: values.apelido,
+      texto: values.texto,
+      now: new Date(),
+      ...(assinanteId === null ? { ip: await clientIp(), website: field(formData, 'website') } : {}),
+    })
+    // Honeypot hit: the same answer as a success, nothing was saved
+    if (result.id === null) return { ok: true, message: '', sent: Date.now() }
   } catch (err) {
     if (err instanceof ServiceError) return { ok: false, message: err.message, values }
     unstable_rethrow(err)

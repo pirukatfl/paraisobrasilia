@@ -686,7 +686,7 @@ export interface AdReport {
   createdAt: string;
 }
 /**
- * Comentários dos anúncios. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.
+ * Comentários dos anúncios. Qualquer pessoa pode comentar, com ou sem conta: quem não tem conta aparece como "Sem conta" e se identifica com o nome que digitou. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ad-comments".
@@ -699,9 +699,13 @@ export interface AdComment {
   resumo?: string | null;
   ad: number | Ad;
   /**
-   * Só a equipe vê. No site aparece só o apelido.
+   * Só a equipe vê. No site aparece só o apelido. Vazio quando o comentário foi escrito sem conta.
    */
-  author: number | Assinante;
+  author?: (number | null) | Assinante;
+  /**
+   * Marcado pelo sistema: escrito por visitante, sem login. O nome é o que a pessoa digitou. Oculte ou apague como os demais.
+   */
+  semConta?: boolean | null;
   /**
    * Preenchido quando este comentário é uma resposta. Fica vazio nos comentários principais.
    */
@@ -1838,6 +1842,7 @@ export interface AdCommentsSelect<T extends boolean = true> {
   resumo?: T;
   ad?: T;
   author?: T;
+  semConta?: T;
   parent?: T;
   apelido?: T;
   texto?: T;
@@ -8338,7 +8343,7 @@ export interface TextosClassisex {
     };
     [k: string]: unknown;
   } | null;
-  comentarioEntrarTexto?: {
+  comentarioRotuloNome?: {
     root: {
       type: string;
       children: {
@@ -8353,7 +8358,7 @@ export interface TextosClassisex {
     };
     [k: string]: unknown;
   } | null;
-  comentarioEntrarBotao?: {
+  comentarioAvisoVisitante?: {
     root: {
       type: string;
       children: {
@@ -8368,7 +8373,37 @@ export interface TextosClassisex {
     };
     [k: string]: unknown;
   } | null;
-  comentarioCadastroBotao?: {
+  comentarioMarcadorVisitante?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioTemConta?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioTemContaLink?: {
     root: {
       type: string;
       children: {
@@ -13279,9 +13314,11 @@ export interface TextosClassisexSelect<T extends boolean = true> {
   comentarioApagarPergunta?: T;
   comentarioApagarConfirmar?: T;
   comentarioSeloAnunciante?: T;
-  comentarioEntrarTexto?: T;
-  comentarioEntrarBotao?: T;
-  comentarioCadastroBotao?: T;
+  comentarioRotuloNome?: T;
+  comentarioAvisoVisitante?: T;
+  comentarioMarcadorVisitante?: T;
+  comentarioTemConta?: T;
+  comentarioTemContaLink?: T;
   comentarioBloqueado?: T;
   comentarioSoAssinantes?: T;
   comentarioCardVer?: T;

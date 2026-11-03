@@ -12,6 +12,8 @@ export type ComentarioDocLike = {
   texto?: string | null
   createdAt: string
   doAnunciante?: boolean | null
+  /** Written without an account (a flag only, never who). */
+  semConta?: boolean | null
   /** Root comment id (or the populated doc); null for a root. */
   parent?: unknown
 }
@@ -23,6 +25,8 @@ export type ComentarioDTO = {
   /** "Hoje, 14:32", "Ontem, 21:05" or "25/10/2026" (Brasília time). */
   quando: string
   doAnunciante: boolean
+  /** Written by someone without an account: shows the "visitante" marker. */
+  semConta: boolean
   /** The viewer wrote it (shows "Apagar"). Filled outside the shared cache. */
   meu: boolean
   respostas: ComentarioDTO[]
@@ -76,7 +80,9 @@ export function toComentarioDTOs(
       apelido: verContatos ? apelido : redactContacts(apelido).text,
       texto: verContatos ? texto : redactContacts(texto).text,
       quando: quandoLabel(doc.createdAt, now),
-      doAnunciante: Boolean(doc.doAnunciante),
+      // A visitor can never carry the advertiser badge, whatever is stored
+      doAnunciante: Boolean(doc.doAnunciante) && !doc.semConta,
+      semConta: Boolean(doc.semConta),
       meu: meusIds?.has(doc.id) ?? false,
       respostas: [],
     }

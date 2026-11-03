@@ -4,8 +4,8 @@ import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 import { loginAsStaff } from './helpers/staff'
 
-// Comentários nos anúncios do ClassiSex (pedido do cliente 2026-11-03): todos leem, qualquer conta logada
-// comenta, e os contatos escritos nos comentários só aparecem para assinante ativo. A redação é feita no
+// Comentários nos anúncios do ClassiSex (pedido do cliente 2026-11-03): todos leem e comentam, com ou sem
+// conta (quem não está logado se identifica com o nome que quiser), e os contatos escritos nos comentários só aparecem para assinante ativo. A redação é feita no
 // servidor: o HTML e o payload da página aberta nunca carregam o contato nem o autor.
 test.describe.configure({ mode: 'serial' })
 
@@ -58,7 +58,7 @@ test.afterAll(async ({ request }) => {
   await api.dispose()
 })
 
-test('visitante vê a conversa vazia e o convite para entrar, sem formulário; a página não é indexada', async ({ browser, baseURL }) => {
+test('visitante vê a conversa vazia e o formulário com campo de nome, sem precisar entrar; a página não é indexada', async ({ browser, baseURL }) => {
   const { context, page } = await ctx(browser, baseURL!)
   await page.goto('/classisex')
   const card = page.getByRole('article').filter({ hasText: APELIDO_ANUNCIO })
@@ -69,10 +69,15 @@ test('visitante vê a conversa vazia e o convite para entrar, sem formulário; a
   await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', /noindex/)
   await expect(secao(page).getByRole('heading', { name: 'Comentários' })).toBeVisible()
   await expect(secao(page)).toContainText('Ainda não há comentários. Comece a conversa.')
-  await expect(secao(page)).toContainText('Entre ou crie sua conta grátis para comentar.')
-  await expect(secao(page).getByRole('link', { name: 'Entrar' })).toHaveAttribute('href', `/entrar?next=%2Fclassisex%2Fanuncio%2F${adId}`)
-  await expect(secao(page).getByRole('link', { name: 'Criar conta grátis' })).toHaveAttribute('href', '/cadastro')
-  await expect(page.locator('textarea')).toHaveCount(0)
+  await expect(secao(page)).not.toContainText('Entre ou crie sua conta')
+  await expect(secao(page).getByLabel('Seu nome ou apelido')).toHaveValue('')
+  await expect(secao(page).getByLabel('Seu comentário')).toBeVisible()
+  await expect(secao(page)).toContainText('Não escreva telefone, e-mail ou links: só assinantes veriam.')
+  await expect(secao(page)).toContainText('Tem conta?')
+  await expect(secao(page).getByRole('link', { name: 'Entre para comentar com seu apelido' })).toHaveAttribute(
+    'href',
+    `/entrar?next=%2Fclassisex%2Fanuncio%2F${adId}`,
+  )
   await context.close()
 })
 
@@ -90,7 +95,7 @@ test('anúncio em análise ou inexistente: 404', async ({ browser, baseURL }) =>
 test('conta gratuita volta para o anúncio depois de entrar, comenta, responde e apaga', async ({ browser, baseURL }) => {
   const { context, page } = await ctx(browser, baseURL!)
   await page.goto(`/classisex/anuncio/${adId}`)
-  await secao(page).getByRole('link', { name: 'Entrar' }).click()
+  await secao(page).getByRole('link', { name: 'Entre para comentar com seu apelido' }).click()
   await page.getByLabel('E-mail').fill(GRATIS.email)
   await page.getByLabel('Senha', { exact: true }).fill(GRATIS.password)
   await page.getByRole('button', { name: 'Entrar' }).click()
@@ -138,7 +143,6 @@ test('visitante vê o comentário sem contato e sem dados da autora, no HTML e n
   await expect(primeiro).toContainText('Gratis Lua')
   await expect(primeiro).toContainText(REDIGIDO)
   await expect(primeiro.getByText('Apagar', { exact: true })).toHaveCount(0)
-  await expect(page.locator('textarea')).toHaveCount(0)
   const html = await page.content()
   const raw = await (await request.get(`/classisex/anuncio/${adId}`)).text()
   for (const body of [html, raw]) for (const secret of SECRETS) expect(body, secret).not.toContain(secret)
@@ -219,5 +223,61 @@ test('conta bloqueada pela equipe vê o aviso e nenhum formulário', async ({ br
   await expect(secao(page).getByRole('button', { name: 'Responder' })).toHaveCount(0)
   // os comentários que ela já tinha continuam visíveis e ainda dá para apagá-los
   await expect(secao(page).getByRole('listitem').first()).toContainText('Gratis Lua')
+  await context.close()
+})
+
+const VISITANTE = 'Visitante Aberto'
+const VISITANTE_RESPOSTA = 'Resposta de quem não tem conta.'
+const VISITANTE_CONTATO = 'chama no zap 61 97766-5544 ou visita.contato@exemplo.com'
+
+test('visitante sem login comenta e responde na página aberta e vê o marcador "visitante"; o contato fica escondido', async ({
+  browser,
+  baseURL,
+  request,
+}) => {
+  const { context, page } = await ctx(browser, baseURL!)
+  await page.goto(`/classisex/anuncio/${adId}`)
+
+  // nome com contato é recusado e o texto digitado volta no formulário
+  await secao(page).getByLabel('Seu nome ou apelido').fill('fala 61 99999-8888')
+  await secao(page).getByLabel('Seu comentário').fill('Teste de nome inválido')
+  await secao(page).getByRole('button', { name: 'Comentar' }).click()
+  await expect(secao(page).getByRole('alert')).toBeVisible()
+  await expect(secao(page).getByLabel('Seu comentário')).toHaveValue('Teste de nome inválido')
+
+  await secao(page).getByLabel('Seu nome ou apelido').fill(VISITANTE)
+  await secao(page).getByLabel('Seu comentário').fill(`Oi, passei por aqui! ${VISITANTE_CONTATO}`)
+  await secao(page).getByRole('button', { name: 'Comentar' }).click()
+  const meu = secao(page).getByRole('listitem').filter({ hasText: VISITANTE }).first()
+  await expect(meu).toContainText('Oi, passei por aqui!')
+  await expect(meu).toContainText('visitante')
+  await expect(meu).toContainText(REDIGIDO)
+  await expect(meu).not.toContainText('97766')
+  await expect(meu).not.toContainText('Anunciante')
+  // visitante não apaga (sem identidade)
+  await expect(meu.getByText('Apagar', { exact: true })).toHaveCount(0)
+
+  // responde sem conta, no mesmo formulário inline
+  await meu.getByRole('button', { name: 'Responder' }).click()
+  await meu.getByLabel('Seu nome ou apelido').fill('Outro Visitante')
+  await meu.getByLabel('Seu comentário').fill(VISITANTE_RESPOSTA)
+  await meu.getByRole('button', { name: 'Responder', exact: true }).click()
+  await expect(meu.getByRole('listitem').filter({ hasText: VISITANTE_RESPOSTA })).toContainText('visitante')
+
+  // o conteúdo bruto da página não carrega o contato
+  const raw = await (await request.get(`/classisex/anuncio/${adId}`)).text()
+  expect(raw).not.toContain('97766')
+  expect(raw).not.toContain('visita.contato@exemplo.com')
+  await context.close()
+})
+
+test('o contato escrito por visitante aparece para assinante ativo na área do assinante', async ({ browser, baseURL }) => {
+  const { context, page } = await ctx(browser, baseURL!)
+  await loginAsAssinante(page, PAGO.email, PAGO.password)
+  await page.goto(`/area-do-assinante/classisex/${adId}`)
+  const item = secao(page).getByRole('listitem').filter({ hasText: VISITANTE }).first()
+  await expect(item).toContainText(VISITANTE_CONTATO)
+  await expect(item).not.toContainText(REDIGIDO)
+  await expect(item).toContainText('visitante')
   await context.close()
 })
