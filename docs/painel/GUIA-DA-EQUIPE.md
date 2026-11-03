@@ -539,8 +539,19 @@ Para parar de usar uma opção, **desative**; **não apague** uma opção que j�
 ### Comentários
 
 Desde 03/11/2026 cada anúncio tem uma **conversa**. **Qualquer pessoa lê** (visitantes também, na página do anúncio na área
-aberta, `/classisex/anuncio/…`); **qualquer conta logada comenta** (gratuita ou assinante) e responde a um comentário
-(a conversa tem um nível só). O anunciante que comenta no próprio anúncio ganha o selo **Anunciante**.
+aberta, `/classisex/anuncio/…`); **qualquer pessoa comenta e responde, com ou sem conta** (a conversa tem um nível só).
+O anunciante que comenta no próprio anúncio, logado na conta dona do anúncio, ganha o selo **Anunciante**.
+
+- **Sem conta (ajuste de 03/11/2026):** quem não está logado vê o formulário direto, com o campo **Seu nome ou apelido**
+  (obrigatório, sem telefone, e-mail, @ ou link). O comentário publica na hora, com o nome que a pessoa digitou, e
+  aparece com o marcador **visitante** ao lado do nome. Visitante **nunca** ganha o selo Anunciante, mesmo usando o
+  apelido do anúncio, e **não apaga** o próprio comentário (não há como saber quem é): quem remove é a equipe.
+- **Freio contra spam:** no máximo **10 comentários por hora e 30 por dia por endereço (IP)** para quem não tem conta,
+  mais um campo escondido que barra robôs. O endereço fica só na memória do site, **não é guardado**. Quem tem conta
+  continua com o limite de 30 por dia.
+- **Moderar sem conta:** em **ClassiSex → Comentários** a coluna **Sem conta** mostra quais vieram de visitante (dá para
+  filtrar por ela). Ocultar e apagar funcionam como nos demais; como não há conta, não existe "bloquear": se um visitante
+  incomodar, oculte ou apague os comentários dele.
 
 - **Contatos nos comentários só aparecem para assinante ativo.** Se alguém escrever telefone, e-mail, @ ou link num
   comentário, visitantes e contas gratuitas veem `[contato só para assinantes]`. O texto fica guardado como foi escrito;
@@ -555,9 +566,9 @@ aberta, `/classisex/anuncio/…`); **qualquer conta logada comenta** (gratuita o
 - **Bloquear uma conta de comentar:** abra o assinante, marque **Comentários bloqueados** (na lateral) e salve. A pessoa
   continua entrando e lendo, mas vê o aviso no lugar do formulário. Os comentários antigos ficam; oculte ou apague em
   **Comentários**. Para liberar, desmarque.
-- **Quem escreveu:** o painel mostra a conta de quem comentou (só a equipe vê). Ocultar, reexibir e apagar ficam no
+- **Quem escreveu:** o painel mostra a conta de quem comentou (só a equipe vê); em comentário sem conta o campo fica vazio. Ocultar, reexibir e apagar ficam no
   **Registro de ações**.
-- Os textos do formulário, do aviso de contatos e do selo ficam em **Textos do site → ClassiSex** (seção "Comentários").
+- Os textos do formulário, do campo de nome, do aviso de contatos, do marcador "visitante" e do selo ficam em **Textos do site → ClassiSex** (seção "Comentários").
 - O comentário **não** tem botão "Denunciar" no site: a equipe modera pelo painel.
 
 ### Testar como assinante
