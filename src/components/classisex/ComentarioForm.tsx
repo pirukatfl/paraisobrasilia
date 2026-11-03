@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useEffect, useId, useRef, useState } from 'react'
 
 import { comentar } from '@/lib/classisex/comentarios/actions'
@@ -16,6 +17,10 @@ export type ComentarioFormTextos = Pick<
   | 'comentarioBotaoResponder'
   | 'comentarioBotaoEnviando'
   | 'comentarioBotaoCancelar'
+  | 'comentarioRotuloNome'
+  | 'comentarioAvisoVisitante'
+  | 'comentarioTemConta'
+  | 'comentarioTemContaLink'
 >
 
 const inputClass = 'min-h-11 rounded-lg border border-line bg-surface px-4 text-body text-text'
@@ -24,7 +29,8 @@ const inputClass = 'min-h-11 rounded-lg border border-line bg-surface px-4 text-
  * "Comentar" (new thread) and "Responder" (inline under a comment). Validation runs on the server
  * (comentar): the typed values come back on an error, and the form clears itself on success.
  * The author is the session's account; only the ad, the comment answered, the nickname and the text
- * are sent.
+ * are sent. For someone without an account (`entrarHref` set) the name starts empty, a hidden
+ * honeypot is added and a short notice explains that contacts only show to subscribers.
  */
 export function ComentarioForm({
   adId,
@@ -33,6 +39,7 @@ export function ComentarioForm({
   textos: t,
   onSent,
   onCancel,
+  entrarHref,
 }: {
   adId: number
   /** Id of the root comment being answered (omitted for a new comment). */
@@ -41,12 +48,15 @@ export function ComentarioForm({
   textos: ComentarioFormTextos
   onSent?: () => void
   onCancel?: () => void
+  /** Set only for a visitor: `/entrar?next=…`. Shows the "Tem conta?" line under the button of a new comment. */
+  entrarHref?: string
 }) {
   const [state, formAction, pending] = useActionState(comentar, null)
   const formRef = useRef<HTMLFormElement>(null)
   const uid = useId()
   const [length, setLength] = useState(0)
   const reply = respostaA !== undefined
+  const visitante = entrarHref !== undefined
   const erro = state && !state.ok ? state.message : null
 
   useEffect(() => {
@@ -64,7 +74,7 @@ export function ComentarioForm({
       {reply && <input type="hidden" name="resposta" value={respostaA} />}
       <div className="flex flex-col gap-2">
         <label htmlFor={`${uid}-apelido`} className="type-label text-text">
-          <TextoRico valor={t.comentarioRotuloApelido} linha />
+          <TextoRico valor={visitante ? t.comentarioRotuloNome : t.comentarioRotuloApelido} linha />
         </label>
         <input
           id={`${uid}-apelido`}
@@ -79,6 +89,13 @@ export function ComentarioForm({
         />
         <TextoRico id={`${uid}-apelido-ajuda`} valor={t.comentarioApelidoAjuda} className="type-label font-normal text-muted" />
       </div>
+      {visitante && (
+        // Honeypot: people never see or fill it
+        <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+          <label htmlFor={`${uid}-website`}>Não preencha este campo</label>
+          <input id={`${uid}-website`} name="website" type="text" tabIndex={-1} autoComplete="off" />
+        </div>
+      )}
       <div className="flex flex-col gap-2">
         <label htmlFor={`${uid}-texto`} className="type-label text-text">
           <TextoRico valor={t.comentarioRotuloTexto} linha />
@@ -98,6 +115,7 @@ export function ComentarioForm({
         <p className="type-label font-normal text-muted" data-numeric aria-live="off">
           {length}/{COMENTARIO_MAX}
         </p>
+        {visitante && <TextoRico valor={t.comentarioAvisoVisitante} className="type-label font-normal text-muted" />}
       </div>
       {erro && (
         <p id={`${uid}-erro`} role="alert" className="text-body text-danger">
@@ -118,6 +136,14 @@ export function ComentarioForm({
           </button>
         )}
       </div>
+      {visitante && !reply && (
+        <p className="type-label font-normal text-muted">
+          <TextoRico valor={t.comentarioTemConta} linha />{' '}
+          <Link href={entrarHref} className="font-semibold text-accent underline underline-offset-4">
+            <TextoRico valor={t.comentarioTemContaLink} linha />
+          </Link>
+        </p>
+      )}
     </form>
   )
 }
