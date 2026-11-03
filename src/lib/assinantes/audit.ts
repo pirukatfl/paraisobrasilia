@@ -29,6 +29,10 @@ export type AuditAction =
   // Message safety (Phase 5)
   | 'denuncia-mensagem-resolvida'
   | 'mensagens-suspensas'
+  // ClassiSex comments (quick classisex-comentarios)
+  | 'comentario-ocultado'
+  | 'comentario-reexibido'
+  | 'comentario-apagado'
 
 export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Conta criada', value: 'conta-criada' },
@@ -53,6 +57,9 @@ export const AUDIT_ACTIONS: { label: string; value: AuditAction }[] = [
   { label: 'Recado despublicado', value: 'recado-despublicado' },
   { label: 'Denúncia de mensagem resolvida', value: 'denuncia-mensagem-resolvida' },
   { label: 'Mensagens suspensas', value: 'mensagens-suspensas' },
+  { label: 'Comentário ocultado', value: 'comentario-ocultado' },
+  { label: 'Comentário reexibido', value: 'comentario-reexibido' },
+  { label: 'Comentário apagado', value: 'comentario-apagado' },
 ]
 
 /** Never copied into the log (T-03-10). */

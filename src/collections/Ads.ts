@@ -9,6 +9,7 @@ import {
 import { isStaff } from '../access/roles'
 import { withRequestState } from '../lib/assinantes/context'
 import { expire } from '../lib/cache/expire'
+import { deleteCommentsWhere } from '../lib/classisex/comentarios/cascade'
 import { adEndpoints } from '../lib/classisex/endpoints'
 import { IDADE_MAX, IDADE_MESSAGE, IDADE_MIN, lerIdade } from '../lib/classisex/idade'
 import {
@@ -151,9 +152,11 @@ const computeDerived: CollectionBeforeChangeHook = async ({ data, originalDoc, r
 
 /**
  * Photos and video go with the ad (Payload deletes each file; AdMedia removes old blurred twins).
- * Its reports stay for the record: they only lose the link (the snapshot keeps the summary).
+ * Its comments go too. Its reports stay for the record: they only lose the link (the snapshot keeps the summary).
  */
 const removeMedia: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  // The conversation goes with the ad (comments.ad is required)
+  await deleteCommentsWhere(req, { ad: { equals: id } })
   await withRequestState(req, () =>
     req.payload.update({
       collection: 'ad-reports',

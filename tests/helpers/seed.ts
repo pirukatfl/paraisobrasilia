@@ -60,6 +60,7 @@ const RESET_ORDER = [
   // ClassiSex (Phase 4): reports and media before ads, ads before their Eu sou options and authors
   'envios-midia-arquivos',
   'envios-midia',
+  'ad-comments',
   'ad-reports',
   'ad-media',
   'ads',

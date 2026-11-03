@@ -11,6 +11,7 @@ import { AdCategories } from './collections/AdCategories'
 import { EnviosMidia } from './collections/EnviosMidia'
 import { EnviosMidiaArquivos } from './collections/EnviosMidiaArquivos'
 import { AdMedia } from './collections/AdMedia'
+import { AdComments } from './collections/AdComments'
 import { AdReports } from './collections/AdReports'
 import { Ads } from './collections/Ads'
 import { Assinantes } from './collections/Assinantes'
@@ -98,6 +99,7 @@ export default buildConfig({
     Ads,
     { ...AdMedia, upload: { ...(typeof AdMedia.upload === 'object' ? AdMedia.upload : {}), staticDir: privateDir } },
     AdReports,
+    AdComments,
     Recados,
     Conversations,
     Messages,

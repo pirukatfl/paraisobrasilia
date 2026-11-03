@@ -77,6 +77,7 @@ export interface Config {
     ads: Ad;
     'ad-media': AdMedia;
     'ad-reports': AdReport;
+    'ad-comments': AdComment;
     recados: Recado;
     conversations: Conversation;
     messages: Message;
@@ -120,6 +121,7 @@ export interface Config {
     ads: AdsSelect<false> | AdsSelect<true>;
     'ad-media': AdMediaSelect<false> | AdMediaSelect<true>;
     'ad-reports': AdReportsSelect<false> | AdReportsSelect<true>;
+    'ad-comments': AdCommentsSelect<false> | AdCommentsSelect<true>;
     recados: RecadosSelect<false> | RecadosSelect<true>;
     conversations: ConversationsSelect<false> | ConversationsSelect<true>;
     messages: MessagesSelect<false> | MessagesSelect<true>;
@@ -305,6 +307,10 @@ export interface Assinante {
    */
   mensagensSuspensas?: boolean | null;
   /**
+   * Marque para impedir esta conta de comentar nos anúncios. Os comentários que já existem ficam; oculte ou apague em Comentários.
+   */
+  comentariosBloqueados?: boolean | null;
+  /**
    * Calculado pelos períodos de assinatura. O acesso termina às 00h deste dia (Brasília).
    */
   accessUntil?: string | null;
@@ -447,7 +453,10 @@ export interface AuditLog {
     | 'recado-recusado'
     | 'recado-despublicado'
     | 'denuncia-mensagem-resolvida'
-    | 'mensagens-suspensas';
+    | 'mensagens-suspensas'
+    | 'comentario-ocultado'
+    | 'comentario-reexibido'
+    | 'comentario-apagado';
   actorType: 'equipe' | 'assinante' | 'sistema';
   actor?: (number | null) | User;
   actorLabel?: string | null;
@@ -673,6 +682,52 @@ export interface AdReport {
   resolvidaPor?: (number | null) | User;
   resolvidaEm?: string | null;
   nota?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Comentários dos anúncios. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-comments".
+ */
+export interface AdComment {
+  id: number;
+  /**
+   * Calculado: apelido — início do texto.
+   */
+  resumo?: string | null;
+  ad: number | Ad;
+  /**
+   * Só a equipe vê. No site aparece só o apelido.
+   */
+  author: number | Assinante;
+  /**
+   * Preenchido quando este comentário é uma resposta. Fica vazio nos comentários principais.
+   */
+  parent?: (number | null) | AdComment;
+  /**
+   * O que aparece no site. Sem telefone, e-mail, @ ou link.
+   */
+  apelido: string;
+  /**
+   * Até 1000 caracteres. Guardado como foi escrito: o site esconde os contatos de quem não é assinante.
+   */
+  texto: string;
+  /**
+   * Marcado pelo sistema: mostra o selo "Anunciante".
+   */
+  doAnunciante?: boolean | null;
+  /**
+   * Oculto sai do site na hora. Dá para voltar a Publicado.
+   */
+  status: 'publicado' | 'oculto';
+  ocultadoEm?: string | null;
+  ocultadoPor?: (number | null) | User;
+  /**
+   * Opcional. Anote por que o comentário foi ocultado.
+   */
+  motivo?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1425,6 +1480,10 @@ export interface PayloadLockedDocument {
         value: number | AdReport;
       } | null)
     | ({
+        relationTo: 'ad-comments';
+        value: number | AdComment;
+      } | null)
+    | ({
         relationTo: 'recados';
         value: number | Recado;
       } | null)
@@ -1579,6 +1638,7 @@ export interface AssinantesSelect<T extends boolean = true> {
   emailStatus?: T;
   staffNotes?: T;
   mensagensSuspensas?: T;
+  comentariosBloqueados?: T;
   accessUntil?: T;
   periodos?: T;
   historico?: T;
@@ -1767,6 +1827,25 @@ export interface AdReportsSelect<T extends boolean = true> {
   resolvidaPor?: T;
   resolvidaEm?: T;
   nota?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ad-comments_select".
+ */
+export interface AdCommentsSelect<T extends boolean = true> {
+  resumo?: T;
+  ad?: T;
+  author?: T;
+  parent?: T;
+  apelido?: T;
+  texto?: T;
+  doAnunciante?: T;
+  status?: T;
+  ocultadoEm?: T;
+  ocultadoPor?: T;
+  motivo?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -6866,7 +6945,7 @@ export interface TextosAreaAssinante {
   createdAt?: string | null;
 }
 /**
- * Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões e denúncia. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
+ * Anúncios abertos ao público, anúncio sem conta, quadro e anúncio completo da área do assinante, filtros, cartões, denúncia e comentários. Selecione palavras para negrito, itálico, sublinhado ou riscado. Para voltar ao texto original, apague o campo e salve.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "textos-classisex".
@@ -8005,6 +8084,387 @@ export interface TextosClassisex {
     [k: string]: unknown;
   } | null;
   denunciarBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentariosTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentariosVazio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentariosAvisoContato?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentariosAssineLink?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioRotuloApelido?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioApelidoAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioRotuloTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioBotaoResponder?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioBotaoEnviando?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioBotaoCancelar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioResponder?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioApagar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioApagarPergunta?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioApagarConfirmar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioSeloAnunciante?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioEntrarTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioEntrarBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioCadastroBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioBloqueado?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioSoAssinantes?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Mantenha {n}: é o número de comentários.
+   */
+  comentarioCardVer?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioCardComentar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Aqui a formatação não aparece (o texto é usado pelo Google, dentro de um campo, pelo navegador ou dentro de outra frase): vale só o texto.
+   */
+  comentarioPaginaGoogleTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  comentarioVerCompleto?: {
     root: {
       type: string;
       children: {
@@ -12803,6 +13263,31 @@ export interface TextosClassisexSelect<T extends boolean = true> {
   motivoOutro?: T;
   denunciarDetalhes?: T;
   denunciarBotao?: T;
+  comentariosTitulo?: T;
+  comentariosVazio?: T;
+  comentariosAvisoContato?: T;
+  comentariosAssineLink?: T;
+  comentarioRotuloApelido?: T;
+  comentarioApelidoAjuda?: T;
+  comentarioRotuloTexto?: T;
+  comentarioBotao?: T;
+  comentarioBotaoResponder?: T;
+  comentarioBotaoEnviando?: T;
+  comentarioBotaoCancelar?: T;
+  comentarioResponder?: T;
+  comentarioApagar?: T;
+  comentarioApagarPergunta?: T;
+  comentarioApagarConfirmar?: T;
+  comentarioSeloAnunciante?: T;
+  comentarioEntrarTexto?: T;
+  comentarioEntrarBotao?: T;
+  comentarioCadastroBotao?: T;
+  comentarioBloqueado?: T;
+  comentarioSoAssinantes?: T;
+  comentarioCardVer?: T;
+  comentarioCardComentar?: T;
+  comentarioPaginaGoogleTitulo?: T;
+  comentarioVerCompleto?: T;
   anunciarGoogleTitulo?: T;
   anunciarTopo?: T;
   anunciarTitulo?: T;

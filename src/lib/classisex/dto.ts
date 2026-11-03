@@ -217,13 +217,20 @@ export type MemberAdDTO = {
   videos: MemberVideoDTO[]
   /** Author is a free account: no "Enviar recado" (G-02). No author identity here. */
   autorGratuito: boolean
+  /** Published comments (the card link "Comentários (N)"). */
+  comentarios: number
 }
 
 export const WHATSAPP_GREETING = 'Olá! Vi seu anúncio no ClassiSex do Paraíso.'
 
 export function toMemberAdDTO(
   doc: AdDocLike,
-  { euSouLabel, media = [], authorTier }: { euSouLabel: string; media?: AdMediaDocLike[]; authorTier: Tier },
+  {
+    euSouLabel,
+    media = [],
+    authorTier,
+    comentarios = 0,
+  }: { euSouLabel: string; media?: AdMediaDocLike[]; authorTier: Tier; comentarios?: number },
 ): MemberAdDTO {
   const c = contatoOf(doc)
   const shown = visibleMediaFor(authorTier, media)
@@ -258,6 +265,7 @@ export function toMemberAdDTO(
     fotos,
     videos,
     autorGratuito: authorTier === 'gratis',
+    comentarios,
   }
 }
 
@@ -277,6 +285,8 @@ export type PublicAdDTO = {
   texto: string
   /** One photo (the cover, sharp) or null; the open area shows no video, contact or author. */
   foto: { previewUrl: string } | null
+  /** Published comments (the card link "Comentários (N)"); only the count, never the text. */
+  comentarios: number
 }
 
 export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
@@ -290,7 +300,7 @@ export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
  */
 export function toPublicAdDTO(
   doc: AdDocLike,
-  { euSouLabel, media = [] }: { euSouLabel: string; media?: AdMediaDocLike[] },
+  { euSouLabel, media = [], comentarios = 0 }: { euSouLabel: string; media?: AdMediaDocLike[]; comentarios?: number },
 ): PublicAdDTO {
   // The same file as the members board and the media route (coverOf)
   const cover = coverOf(media)
@@ -302,5 +312,6 @@ export function toPublicAdDTO(
     cidade: cidade || null,
     texto: redactContacts(doc.texto ?? '').text,
     foto: cover ? { previewUrl: previewUrl(cover.id) } : null,
+    comentarios,
   }
 }

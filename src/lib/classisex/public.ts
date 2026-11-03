@@ -4,7 +4,7 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import { cached } from '../cache/cached'
-import { findPublicAds, type BoardFilters, type BoardPage } from './board'
+import { findPublicAd, findPublicAds, type BoardFilters, type BoardPage } from './board'
 import type { PublicAdDTO } from './dto'
 
 /**
@@ -19,7 +19,8 @@ export const getPublicAds = cached(
     return findPublicAds(payload, filters, new Date())
   },
   ['classisex-public'],
-  () => ['ads'],
+  // 'ad-comments': the card shows how many comments the ad has
+  () => ['ads', 'ad-comments'],
 )
 
 export type PublicCategory = { id: number; name: string }
@@ -40,4 +41,14 @@ export const getPublicAdFilters = cached(
   },
   ['classisex-public-filters'],
   () => ['ads'],
+)
+
+/** One ad for the open page /classisex/anuncio/[id]; null when it is not visible (404). */
+export const getPublicAd = cached(
+  async (id: number): Promise<PublicAdDTO | null> => {
+    const payload = await getPayload({ config })
+    return findPublicAd(payload, id, new Date())
+  },
+  ['classisex-public-ad'],
+  () => ['ads', 'ad-comments'],
 )

@@ -322,7 +322,7 @@ describe('public preview read model (PREV-01, D-04, D-07)', () => {
     const page = await findPublicAds(payload, {}, NOW_P)
     expect(page.items.map((i) => i.id)).toEqual([recent.id, old.id, stays.id])
     // Revisão 2026-10-22: the open view carries the whole text and the city, never a contact
-    expect(Object.keys(page.items[0]).sort()).toEqual(['apelido', 'cidade', 'euSou', 'foto', 'id', 'texto'])
+    expect(Object.keys(page.items[0]).sort()).toEqual(['apelido', 'cidade', 'comentarios', 'euSou', 'foto', 'id', 'texto'])
     expect(page.items[0]!.texto).toBe('Chama no [contato só para assinantes] agora.')
     expect(page.items[1]).toMatchObject({ cidade: 'Taguatinga', texto: 'Casal simpático procura amigos para a próxima festa.' })
     expect(JSON.stringify(page)).not.toContain('99988')
