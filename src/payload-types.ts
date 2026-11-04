@@ -993,6 +993,10 @@ export interface Party {
    */
   startsAt: string;
   /**
+   * Define a ordem no site: 1 aparece primeiro, 2 depois, e assim por diante. Festas sem número ficam no fim, por data.
+   */
+  displayOrder?: number | null;
+  /**
    * Opcional. Precisa ser depois do início. Se vazio, a festa sai da página inicial 10 horas depois do início.
    */
   endsAt?: string | null;
@@ -2058,6 +2062,7 @@ export interface PartiesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   startsAt?: T;
+  displayOrder?: T;
   endsAt?: T;
   flyer?: T;
   flyerFormat?: T;

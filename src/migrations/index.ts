@@ -58,6 +58,7 @@ import * as migration_20261102_052006_menu_minha_conta from './20261102_052006_m
 import * as migration_20261102_054120_promocao_menu from './20261102_054120_promocao_menu';
 import * as migration_20261103_172502_classisex_comentarios from './20261103_172502_classisex_comentarios';
 import * as migration_20261103_210621_classisex_comentarios_sem_conta from './20261103_210621_classisex_comentarios_sem_conta';
+import * as migration_20261104_193000_festas_ordem from './20261104_193000_festas_ordem';
 
 export const migrations = [
   {
@@ -359,5 +360,10 @@ export const migrations = [
     up: migration_20261104_071800_modelos_contato.up,
     down: migration_20261104_071800_modelos_contato.down,
     name: '20261104_071800_modelos_contato',
+  },
+  {
+    up: migration_20261104_193000_festas_ordem.up,
+    down: migration_20261104_193000_festas_ordem.down,
+    name: '20261104_193000_festas_ordem',
   },
 ];
