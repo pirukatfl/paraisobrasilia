@@ -16,6 +16,10 @@ export type SpaceItemDTO = {
   caption: string | null
   image: GalleryImage
   video: { url: string; title: string } | null
+  /** Model photos only: media id, used for the blurred copy served to non-subscribers. */
+  mediaId?: number
+  /** Set on the server for viewers without access: shown as a blurred tile, not openable. */
+  locked?: boolean
 }
 
 /** One tile of a model page: same shape as the /espaco tiles, so Gallery and Lightbox are reused. */

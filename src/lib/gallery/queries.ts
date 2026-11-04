@@ -82,11 +82,15 @@ export const MAX_MODEL_VIDEOS = 3
 export const modelAltFallback = (name: string) => `${name} — modelo do Paraíso Brasília`
 
 /** Valid photos of a model (media with a file), in panel order, capped at the collection limit. */
-function modelPhotos(doc: Model, name: string): GalleryImage[] {
+function modelPhotos(doc: Model, name: string): (GalleryImage & { mediaId: number })[] {
   return (doc.photos ?? [])
     .slice(0, MAX_MODEL_PHOTOS)
-    .map((row) => toGalleryImage(row.image, modelAltFallback(name)))
-    .filter((p): p is GalleryImage => p !== null)
+    .map((row) => {
+      const image = toGalleryImage(row.image, modelAltFallback(name))
+      const media = asMedia(row.image)
+      return image && media ? { ...image, mediaId: media.id } : null
+    })
+    .filter((p): p is GalleryImage & { mediaId: number } => p !== null)
 }
 
 /** Valid videos of a model (file and poster present), in panel order, capped at the collection limit. */
@@ -133,7 +137,7 @@ export function toModelPageDTO(doc: Model): ModelPageDTO | null {
     hasContact: Boolean(doc.contact?.trim()),
     items: [
       ...videos,
-      ...photos.map((image, i): GalleryItemDTO => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null })),
+      ...photos.map(({ mediaId, ...image }, i): GalleryItemDTO => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null, mediaId })),
     ],
     cover,
     ogImage:
@@ -179,15 +183,40 @@ async function fetchPublishedModel(slug: string): Promise<ModelPageDTO | null> {
 /** One published model page by slug, or null (draft, unknown, malformed). Tag 'models'. */
 export const getPublishedModel = cached(fetchPublishedModel, ['gallery:model'], () => ['models'])
 
+/** True only for a logged-in subscriber whose access is active right now (session-based, never cached). */
+export async function viewerIsActiveSubscriber(): Promise<boolean> {
+  const assinante = await getAssinante()
+  if (!assinante) return false
+  return (await getAccessStatus(assinante.id, new Date())).state === 'ativa'
+}
+
+/**
+ * Model gallery for a viewer who is not an active subscriber: the first photo stays as is, every other
+ * photo is replaced by a tiny blurred copy made on the server (/foto-borrada/{id}), so the sharp files'
+ * URLs are never sent to the browser. Subscribers get the items untouched.
+ */
+export function lockModelItems(items: GalleryItemDTO[], unlocked: boolean): GalleryItemDTO[] {
+  if (unlocked) return items
+  let firstPhotoSeen = false
+  return items.map((item) => {
+    if (item.kind !== 'photo') return { ...item, locked: true, video: null }
+    if (!firstPhotoSeen) {
+      firstPhotoSeen = true
+      return item
+    }
+    const url = `/foto-borrada/${item.mediaId}`
+    const image = { url, width: 24, height: 30, alt: 'Foto exclusiva para assinantes', thumbUrl: url, thumbWidth: 24, thumbHeight: 30 }
+    return { ...item, image, locked: true }
+  })
+}
+
 /**
  * Contact of a published model, for ACTIVE subscribers only (else null). Read per request, never from the
  * shared cache; the field is staff-only in the collection, so REST/GraphQL never expose it.
  */
 export async function getModelContactForViewer(slug: string): Promise<string | null> {
   if (!SLUG_RE.test(slug)) return null
-  const assinante = await getAssinante()
-  if (!assinante) return null
-  if ((await getAccessStatus(assinante.id, new Date())).state !== 'ativa') return null
+  if (!(await viewerIsActiveSubscriber())) return null
   const payload = await getPayload({ config })
   const { docs } = await payload.find({
     collection: 'models',
