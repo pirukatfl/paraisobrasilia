@@ -1,11 +1,11 @@
 import Link from 'next/link'
 
-import { ModelGrid } from '@/components/ModelGrid'
+import { GaleriaSlider } from '@/components/home/GaleriaSlider'
 import type { ModelCardDTO } from '@/lib/gallery/types'
 
 /**
- * Home "Galeria": cover photo of the first 4 published models (same cards and data as /modelos), each
- * linking to its page. The texts are fixed here: adding editable ones would need a database migration.
+ * Home "Galeria": slider with the first photo of each published model (up to 12), each linking to
+ * its page; "Ver toda a galeria" goes to /modelos. The texts are fixed here: adding editable ones would need a database migration.
  * Hidden when there are no models (the page also hides it when staff hid "Galeria" in Menu do site).
  */
 export function GaleriaTeaser({ models }: { models: ModelCardDTO[] }) {
@@ -20,7 +20,7 @@ export function GaleriaTeaser({ models }: { models: ModelCardDTO[] }) {
           Ver toda a galeria
         </Link>
       </div>
-      <ModelGrid models={models.slice(0, 4)} abaixoDaDobra />
+      <GaleriaSlider models={models.slice(0, 12)} />
     </section>
   )
 }
