@@ -85,7 +85,8 @@ const DONE: Record<string, string> = {
 }
 
 export function ModeracaoPanel() {
-  const { id } = useDocumentInfo()
+  // lastUpdateTime changes after "Salvar": reload the preview so it shows the saved text right away
+  const { id, lastUpdateTime } = useDocumentInfo()
   const { config } = useConfig()
   const { dispatchFields, setModified } = useForm()
   const modified = useFormModified()
@@ -124,7 +125,7 @@ export function ModeracaoPanel() {
     }
     // dispatchFields/setModified are stable form callbacks; reload only when the ad or version changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [api, id, version])
+  }, [api, id, version, lastUpdateTime])
 
   if (!id) return null // create screen: nothing to moderate yet
 
