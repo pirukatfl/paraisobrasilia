@@ -33,9 +33,9 @@ test('home with a party and 6 space photos ≤ 600 KB', async ({ page, request }
   expect(w.total).toBeLessThanOrEqual(600 * KB)
 })
 
-test('/contato ≤ 400 KB without the Google Maps iframe', async ({ page }) => {
+test('/contato ≤ 400 KB without the OpenStreetMap iframe', async ({ page }) => {
   await page.goto('/contato')
-  const w = await measureWeight(page, { excludeHosts: ['maps.google.com', 'www.google.com', 'maps.gstatic.com', 'www.gstatic.com', 'fonts.gstatic.com'] })
+  const w = await measureWeight(page, { excludeHosts: ['www.openstreetmap.org', 'tile.openstreetmap.org'] })
   console.log(`[budget] /contato ${Math.round(w.total / KB)} KB`, w.byType)
   expect(w.total).toBeLessThanOrEqual(400 * KB)
 })

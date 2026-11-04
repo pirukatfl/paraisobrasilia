@@ -7,7 +7,7 @@ export type PageWeight = { total: number; scripts: number; byType: Record<string
  * The local e2e server is `next dev`, whose JavaScript is unminified and carries dev tooling,
  * so scripts are reported separately (`scripts`) and left out of `total`; production JS weight
  * is checked against `next build && next start` (see 02-05 summary).
- * Cross-origin entries (e.g. the Google Maps iframe) report 0 bytes and can be excluded by host.
+ * Cross-origin entries (e.g. the OpenStreetMap iframe) report 0 bytes and can be excluded by host.
  */
 export async function measureWeight(page: Page, opts: { excludeHosts?: string[] } = {}): Promise<PageWeight> {
   await page.waitForLoadState('load')

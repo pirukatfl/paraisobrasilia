@@ -5,7 +5,7 @@ test.beforeEach(async ({ context, baseURL }) => {
   await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
 })
 
-test('contato shows the address, directions, WhatsApp and the Google Maps map', async ({ page }) => {
+test('contato shows the address, directions, WhatsApp and the OpenStreetMap map', async ({ page }) => {
   await page.goto('/contato')
   await expect(page.getByRole('heading', { name: 'Contato e como chegar', level: 1 })).toBeVisible()
 
@@ -30,7 +30,7 @@ test('contato shows the address, directions, WhatsApp and the Google Maps map', 
   const map = page.locator('iframe[title="Mapa com a localização do Paraíso Brasília"]')
   await expect(map).toHaveCount(1)
   const src = await map.getAttribute('src')
-  expect(new URL(src!).host).toBe('maps.google.com')
+  expect(new URL(src!).host).toBe('www.openstreetmap.org')
 
   // D-04: no Facebook anywhere and no Instagram while the handle is empty
   const html = await page.content()
