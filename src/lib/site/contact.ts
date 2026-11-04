@@ -61,6 +61,11 @@ export function osmLargeMapUrl(lat: number, lng: number): string {
   return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`
 }
 
+/** Google Maps embed (no API key needed): same map on every device. */
+export function googleMapsEmbedUrl(lat: number, lng: number): string {
+  return `https://maps.google.com/maps?q=${lat},${lng}&z=16&hl=pt-BR&output=embed`
+}
+
 /** Instagram profile URL, or null when no handle is set (D-04: hidden when empty). */
 export function instagramUrl(handle: string | null | undefined): string | null {
   const clean = (handle ?? '').trim().replace(/^@/, '')

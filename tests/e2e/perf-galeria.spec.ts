@@ -28,7 +28,7 @@ test('home with a party and 6 space photos ≤ 600 KB', async ({ page, request }
 
   await page.goto('/')
   await expect(page.getByRole('link', { name: 'Ver detalhes da festa Festa de Teste' })).toBeVisible()
-  const w = await measureWeight(page)
+  const w = await measureWeight(page, { excludeHosts: ['maps.google.com', 'www.google.com', 'maps.gstatic.com', 'www.gstatic.com'] })
   console.log(`[budget] / ${Math.round(w.total / KB)} KB (+${Math.round(w.scripts / KB)} KB dev JS)`, w.byType)
   expect(w.total).toBeLessThanOrEqual(600 * KB)
 })

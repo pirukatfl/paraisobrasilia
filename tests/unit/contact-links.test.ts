@@ -4,6 +4,7 @@ import {
   type ContactDTO,
   fullAddress,
   googleMapsUrl,
+  googleMapsEmbedUrl,
   instagramUrl,
   osmEmbedUrl,
   osmLargeMapUrl,
@@ -71,5 +72,13 @@ describe('contact link builders (INST-02, INST-03)', () => {
     expect(instagramUrl(null)).toBeNull()
     expect(instagramUrl('')).toBeNull()
     expect(instagramUrl('paraiso.bsb')).toBe('https://www.instagram.com/paraiso.bsb/')
+  })
+})
+
+describe('Google Maps embed (home)', () => {
+  it('builds the keyless embed url', () => {
+    expect(googleMapsEmbedUrl(-15.5936421, -47.9771526)).toBe(
+      'https://maps.google.com/maps?q=-15.5936421,-47.9771526&z=16&hl=pt-BR&output=embed',
+    )
   })
 })
