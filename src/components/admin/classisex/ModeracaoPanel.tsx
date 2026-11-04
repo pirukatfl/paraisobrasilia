@@ -1,6 +1,6 @@
 'use client'
 
-import { useConfig, useDocumentInfo, useForm, useFormModified } from '@payloadcms/ui'
+import { useConfig, useDocumentInfo, useField, useForm, useFormModified } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
@@ -89,6 +89,7 @@ export function ModeracaoPanel() {
   const { config } = useConfig()
   const { dispatchFields, setModified } = useForm()
   const modified = useFormModified()
+  const textoField = useField<string>({ path: 'texto' })
   const router = useRouter()
   const api = `${config.serverURL ?? ''}${config.routes.api}/ads/${id}`
 
@@ -200,6 +201,29 @@ export function ModeracaoPanel() {
                   : 'Visitantes e contas gratuitas leem o apelido, o tipo, a cidade e o texto, com a foto de capa, nítida. Confira a capa (é a foto que todo visitante de 18 anos ou mais vê) e se não há contato escrito de outro jeito antes de aprovar.'}
             </p>
           </div>
+
+          {s !== 'aprovado' && (
+            <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
+              <label
+                htmlFor="moderacao-texto"
+                style={{ display: 'flex', flexDirection: 'column', gap: 4, fontWeight: 600 }}
+              >
+                Texto do anúncio (edite aqui para tirar o que for desnecessário)
+                <textarea
+                  id="moderacao-texto"
+                  rows={6}
+                  value={textoField.value ?? ''}
+                  onChange={(e) => textoField.setValue(e.target.value)}
+                  disabled={busy}
+                  style={{ ...inputStyle, fontWeight: 400 }}
+                />
+              </label>
+              <p style={{ margin: 'calc(var(--base) * 0.25) 0 0', opacity: 0.8 }}>
+                {(textoField.value ?? '').length} caracteres. Depois de editar, clique em <strong>Salvar</strong> e só então
+                em <strong>Aprovar</strong>. O quadro acima mostra o resultado já salvo.
+              </p>
+            </div>
+          )}
 
           <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
             <h4 style={{ margin: 0 }}>Contatos (só assinantes veem)</h4>
