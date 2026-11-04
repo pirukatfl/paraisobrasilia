@@ -84,6 +84,14 @@ const DONE: Record<string, string> = {
   despublicar: 'Anúncio despublicado.',
 }
 
+/** Scrolls to an edit field of the ad form and focuses it, so staff find where the text is edited */
+function irParaCampo(id: string) {
+  const el = document.getElementById(id)
+  if (!el) return
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  el.focus({ preventScroll: true })
+}
+
 export function ModeracaoPanel() {
   const { id } = useDocumentInfo()
   const { config } = useConfig()
@@ -200,6 +208,24 @@ export function ModeracaoPanel() {
                   : 'Visitantes e contas gratuitas leem o apelido, o tipo, a cidade e o texto, com a foto de capa, nítida. Confira a capa (é a foto que todo visitante de 18 anos ou mais vê) e se não há contato escrito de outro jeito antes de aprovar.'}
             </p>
           </div>
+
+          {s !== 'aprovado' && (
+            <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
+              <h4 style={{ margin: 0 }}>Tirar partes do texto</h4>
+              <p style={{ margin: 'calc(var(--base) * 0.25) 0 0', opacity: 0.8 }}>
+                Edite o campo <strong>Texto</strong> (ou o <strong>Apelido</strong>) logo abaixo deste quadro, apague o que
+                for desnecessário, clique em <strong>Salvar</strong> e só depois em <strong>Aprovar</strong>.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(var(--base) * 0.5)', marginTop: 'calc(var(--base) * 0.5)' }}>
+                <button type="button" onClick={() => irParaCampo('field-texto')} style={buttonStyle('secondary', false)}>
+                  Ir para o campo Texto
+                </button>
+                <button type="button" onClick={() => irParaCampo('field-apelido')} style={buttonStyle('secondary', false)}>
+                  Ir para o campo Apelido
+                </button>
+              </div>
+            </div>
+          )}
 
           <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
             <h4 style={{ margin: 0 }}>Contatos (só assinantes veem)</h4>
