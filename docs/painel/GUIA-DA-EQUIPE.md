@@ -453,7 +453,7 @@ sobem logo depois de enviar o formulário e chegam para você na mesma fila de a
    assinantes]", mas **leia o texto procurando contato escrito de outro jeito** (número por extenso, letras separadas) e, se
    achar, edite o texto ou recuse. O **apelido** não pode ter contato: o site recusa ao salvar, mas confira mesmo assim.
    Confira também as fotos e os vídeos em **Fotos e vídeos**.
-3. Se estiver tudo certo, clique em **Aprovar**. Você pode corrigir o apelido ou o texto antes de aprovar (para tirar frases desnecessárias, por exemplo): edite o campo **Texto** (logo abaixo do quadro Moderação; o botão **Ir para o campo Texto** leva até ele), clique em **Salvar** e só então em **Aprovar**. Se esquecer de salvar, o quadro avisa e não aprova.
+3. Se estiver tudo certo, clique em **Aprovar**. Você pode corrigir o apelido ou o texto antes de aprovar (para tirar frases desnecessárias, por exemplo): edite a caixa **Texto do anúncio** dentro do próprio quadro Moderação (é o mesmo campo Texto do anúncio), clique em **Salvar** e só então em **Aprovar**. Se esquecer de salvar, o quadro avisa e não aprova.
 4. **Recusar** (anúncio em análise) e **Despublicar** (anúncio que já está no ar) pedem sempre um **motivo**, e o
    anunciante lê esse motivo em Meus anúncios. Escreva de forma simples: "Telefone escrito no texto", "Foto de outra pessoa".
 5. Tudo o que você faz fica no **Registro de ações**.

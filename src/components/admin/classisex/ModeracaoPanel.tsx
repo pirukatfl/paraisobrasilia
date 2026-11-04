@@ -1,6 +1,6 @@
 'use client'
 
-import { useConfig, useDocumentInfo, useForm, useFormModified } from '@payloadcms/ui'
+import { useConfig, useDocumentInfo, useField, useForm, useFormModified } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
@@ -84,19 +84,12 @@ const DONE: Record<string, string> = {
   despublicar: 'Anúncio despublicado.',
 }
 
-/** Scrolls to an edit field of the ad form and focuses it, so staff find where the text is edited */
-function irParaCampo(id: string) {
-  const el = document.getElementById(id)
-  if (!el) return
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  el.focus({ preventScroll: true })
-}
-
 export function ModeracaoPanel() {
   const { id } = useDocumentInfo()
   const { config } = useConfig()
   const { dispatchFields, setModified } = useForm()
   const modified = useFormModified()
+  const textoField = useField<string>({ path: 'texto' })
   const router = useRouter()
   const api = `${config.serverURL ?? ''}${config.routes.api}/ads/${id}`
 
@@ -211,19 +204,24 @@ export function ModeracaoPanel() {
 
           {s !== 'aprovado' && (
             <div style={{ marginTop: 'calc(var(--base) * 0.75)' }}>
-              <h4 style={{ margin: 0 }}>Tirar partes do texto</h4>
+              <label
+                htmlFor="moderacao-texto"
+                style={{ display: 'flex', flexDirection: 'column', gap: 4, fontWeight: 600 }}
+              >
+                Texto do anúncio (edite aqui para tirar o que for desnecessário)
+                <textarea
+                  id="moderacao-texto"
+                  rows={6}
+                  value={textoField.value ?? ''}
+                  onChange={(e) => textoField.setValue(e.target.value)}
+                  disabled={busy}
+                  style={{ ...inputStyle, fontWeight: 400 }}
+                />
+              </label>
               <p style={{ margin: 'calc(var(--base) * 0.25) 0 0', opacity: 0.8 }}>
-                Edite o campo <strong>Texto</strong> (ou o <strong>Apelido</strong>) logo abaixo deste quadro, apague o que
-                for desnecessário, clique em <strong>Salvar</strong> e só depois em <strong>Aprovar</strong>.
+                {(textoField.value ?? '').length} caracteres. Depois de editar, clique em <strong>Salvar</strong> e só então
+                em <strong>Aprovar</strong>. O quadro acima mostra o resultado já salvo.
               </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'calc(var(--base) * 0.5)', marginTop: 'calc(var(--base) * 0.5)' }}>
-                <button type="button" onClick={() => irParaCampo('field-texto')} style={buttonStyle('secondary', false)}>
-                  Ir para o campo Texto
-                </button>
-                <button type="button" onClick={() => irParaCampo('field-apelido')} style={buttonStyle('secondary', false)}>
-                  Ir para o campo Apelido
-                </button>
-              </div>
             </div>
           )}
 
