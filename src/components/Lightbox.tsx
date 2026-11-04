@@ -29,6 +29,7 @@ export function Lightbox({
   plainImages = false,
   fitScreen = false,
   contact,
+  contactConvite = false,
 }: {
   slides: LightboxSlide[]
   index: number | null
@@ -39,6 +40,8 @@ export function Lightbox({
   fitScreen?: boolean
   /** Optional contact line shown under the photo (model galleries). */
   contact?: string | null
+  /** Contact exists but the viewer is not an active subscriber: show an invitation instead. */
+  contactConvite?: boolean
 }) {
   const t = useTextosGerais()
   const ref = useRef<HTMLDialogElement>(null)
@@ -189,6 +192,14 @@ export function Lightbox({
                 ) : (
                   <span className="text-text">{contact}</span>
                 )}
+              </p>
+            )}
+            {!contact && contactConvite && (
+              <p className="type-label mt-1 text-center text-muted">
+                Contato só para assinantes.{' '}
+                <Link href="/assine-ja" className="inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent">
+                  Assine já
+                </Link>
               </p>
             )}
             {slide.href && (

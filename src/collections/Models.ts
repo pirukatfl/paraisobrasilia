@@ -1,6 +1,6 @@
 import { ValidationError, type CollectionBeforeValidateHook, type CollectionConfig } from 'payload'
 
-import { isStaff, staffOrPublished } from '../access/roles'
+import { isStaff, staffOnlyField, staffOrPublished } from '../access/roles'
 import { imageAuthorization } from '../fields/imageAuthorization'
 import { withRequestState } from '../lib/assinantes/context'
 import { redactContacts } from '../lib/classisex/redact'
@@ -66,7 +66,7 @@ const prepareModel: CollectionBeforeValidateHook = async ({ data, originalDoc, r
 
 /**
  * House models (MIDIA-02, MIDIA-06/07, G-01..G-06): artistic name, short description and 1–30 photos,
- * one public page per model; optional contact shown on that page (client 2026-11-04). Videos are off for now (client, 2026-10-23).
+ * one public page per model; optional contact shown to active subscribers only (client 2026-11-04). Videos are off for now (client, 2026-10-23).
  * Image authorization is recommended, never required to publish (D-09).
  */
 export const Models: CollectionConfig = {
@@ -78,7 +78,7 @@ export const Models: CollectionConfig = {
     defaultColumns: ['name', 'categoria', 'slug', 'photos', 'imageAuthorization.date', '_status'],
     listSearchableFields: ['name', 'slug'],
     description:
-      'Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e aparece na página.',
+      'Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e só assinantes o veem.',
   },
   versions: { drafts: true, maxPerDoc: 20 },
   access: {
@@ -163,9 +163,11 @@ export const Models: CollectionConfig = {
       type: 'text',
       maxLength: 120,
       label: 'Contato',
+      // Subscribers-only: kept out of the public REST/GraphQL; the site reads it on the server for active subscribers
+      access: staffOnlyField,
       admin: {
         description:
-          'Aparece na página da profissional, aberta ao público. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.',
+          'Só assinantes com acesso ativo veem este contato, na página da profissional. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.',
       },
     },
     {

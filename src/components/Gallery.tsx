@@ -18,7 +18,7 @@ const TILE_SIZES = '(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw'
  * JavaScript) each tile is a link to the large image; afterwards it is a button opening the lightbox.
  * `abaixoDaDobra`: every image loads lazily (home sections below the fold).
  */
-export function Gallery({ items, limite, abaixoDaDobra = false, contact }: { items: SpaceItemDTO[]; limite?: number; abaixoDaDobra?: boolean; contact?: string | null }) {
+export function Gallery({ items, limite, abaixoDaDobra = false, contact, contactConvite = false }: { items: SpaceItemDTO[]; limite?: number; abaixoDaDobra?: boolean; contact?: string | null; contactConvite?: boolean }) {
   const hydrated = useHydrated()
   const t = useTextosGerais()
   const [index, setIndex] = useState<number | null>(null)
@@ -130,7 +130,7 @@ export function Gallery({ items, limite, abaixoDaDobra = false, contact }: { ite
           </button>
         </div>
       )}
-      <Lightbox slides={slides} index={index} onIndexChange={setIndex} onClose={close} contact={contact} />
+      <Lightbox slides={slides} index={index} onIndexChange={setIndex} onClose={close} contact={contact} contactConvite={contactConvite} />
     </>
   )
 }

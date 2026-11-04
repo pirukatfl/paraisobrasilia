@@ -42,7 +42,8 @@ export type ModelPageDTO = {
   slug: string
   name: string
   description: string | null
-  contact: string | null
+  /** Whether a contact is registered; the contact itself is read per request, for subscribers only. */
+  hasContact: boolean
   items: GalleryItemDTO[]
   cover: GalleryImage
   ogImage: { url: string; width: number; height: number; alt: string } | null
