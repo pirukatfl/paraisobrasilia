@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import { Gallery } from '@/components/Gallery'
 import { contactHref } from '@/lib/gallery/contact'
 import { countLabel } from '@/components/ModelGrid'
-import { getPublishedModel } from '@/lib/gallery/queries'
+import { getModelContactForViewer, getPublishedModel } from '@/lib/gallery/queries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import { preencher } from '@/lib/textos/mesclar'
 import { getTextos } from '@/lib/textos/queries'
@@ -30,11 +30,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-/** MIDIA-07: one page per published model — name, short description, optional contact and the photo gallery. */
+/** MIDIA-07: one page per published model — name, short description, optional contact (active subscribers only) and the photo gallery. */
 export default async function ModelPage({ params }: Props) {
   const model = await getPublishedModel((await params).slug)
   if (!model) notFound()
-  const t = await getTextos('modelos')
+  const [t, contact] = await Promise.all([getTextos('modelos'), getModelContactForViewer(model.slug)])
+  const convite = !contact && model.hasContact
   return (
     <article aria-labelledby="titulo-modelo">
       <p className="type-eyebrow text-muted">
@@ -49,24 +50,24 @@ export default async function ModelPage({ params }: Props) {
       {model.description && (
         <p className="mt-4 max-w-[680px] whitespace-pre-line text-body text-muted">{model.description}</p>
       )}
-      {model.contact && (
+      {contact && (
         <p className="mt-4 text-body">
           <span className="type-label text-muted">Contato: </span>
-          {contactHref(model.contact) ? (
+          {contactHref(contact) ? (
             <a
-              href={contactHref(model.contact) ?? undefined}
+              href={contactHref(contact) ?? undefined}
               target="_blank"
               rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-accent"
             >
-              {model.contact}
+              {contact}
             </a>
           ) : (
-            <span>{model.contact}</span>
+            <span>{contact}</span>
           )}
         </p>
       )}
-      <Gallery items={model.items} contact={model.contact} />
+      <Gallery items={model.items} contact={contact} />
       <p className="mt-12">
         <Link href="/modelos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
           <TextoRico valor={t.linkVerTodas} linha />

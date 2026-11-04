@@ -4,6 +4,8 @@ import config from '@payload-config'
 import { getPayload } from 'payload'
 
 import type { Media, Model, SpaceItem, Video } from '../../payload-types'
+import { getAccessStatus } from '../assinantes/access'
+import { getAssinante } from '../assinantes/session'
 import { cached } from '../cache/cached'
 import { SLUG_RE } from '../contos/excerpt'
 import { MODEL_VIDEOS_ENABLED } from './flags'
@@ -128,7 +130,7 @@ export function toModelPageDTO(doc: Model): ModelPageDTO | null {
     slug: doc.slug,
     name,
     description: doc.description?.trim() || null,
-    contact: doc.contact?.trim() || null,
+    hasContact: Boolean(doc.contact?.trim()),
     items: [
       ...videos,
       ...photos.map((image, i): GalleryItemDTO => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null })),
@@ -176,6 +178,29 @@ async function fetchPublishedModel(slug: string): Promise<ModelPageDTO | null> {
 
 /** One published model page by slug, or null (draft, unknown, malformed). Tag 'models'. */
 export const getPublishedModel = cached(fetchPublishedModel, ['gallery:model'], () => ['models'])
+
+/**
+ * Contact of a published model, for ACTIVE subscribers only (else null). Read per request, never from the
+ * shared cache; the field is staff-only in the collection, so REST/GraphQL never expose it.
+ */
+export async function getModelContactForViewer(slug: string): Promise<string | null> {
+  if (!SLUG_RE.test(slug)) return null
+  const assinante = await getAssinante()
+  if (!assinante) return null
+  if ((await getAccessStatus(assinante.id, new Date())).state !== 'ativa') return null
+  const payload = await getPayload({ config })
+  const { docs } = await payload.find({
+    collection: 'models',
+    where: { and: [{ slug: { equals: slug } }, { _status: { equals: 'published' } }] },
+    draft: false,
+    depth: 0,
+    limit: 1,
+    pagination: false,
+    select: { contact: true },
+    overrideAccess: true,
+  })
+  return docs[0]?.contact?.trim() || null
+}
 
 /** Whether the Modelos section exists (nav, footer, sitemap, /modelos). Same tag 'models'. */
 export async function hasPublishedModels(): Promise<boolean> {
