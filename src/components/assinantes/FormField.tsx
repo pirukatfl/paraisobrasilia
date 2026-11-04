@@ -51,6 +51,7 @@ export function FormField({
         <input
           {...inputProps}
           type={type}
+          className="w-full"
         />
       )}
       {hint && !error && (

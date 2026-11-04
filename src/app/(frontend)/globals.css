@@ -134,6 +134,20 @@
       background-color var(--duration-fast) ease,
       box-shadow var(--duration-fast) ease;
   }
+  /* Visible field boundary on the dark canvas: text-like controls get a border,
+     a lifted surface and padding by default. Component classes still override. */
+  :where(
+    input:not([type='hidden'], [type='checkbox'], [type='radio'], [type='file'], [type='range'], [type='submit'], [type='button'], [type='color']),
+    select,
+    textarea
+  ) {
+    min-height: 2.75rem;
+    border: 1px solid #8f6a78;
+    border-radius: 0.5rem;
+    background-color: var(--color-surface-2);
+    color: var(--color-text);
+    padding: 0.5rem 1rem;
+  }
   :where(input, textarea)::placeholder {
     color: var(--color-muted);
     opacity: 1;
