@@ -106,6 +106,7 @@ export function toModelCardDTO(doc: Model): ModelCardDTO | null {
     slug: doc.slug,
     name,
     categoria: toCategoria(doc.categoria),
+    description: doc.description?.trim() || null,
     cover: photos[0],
     photoCount: photos.length,
     videoCount: modelVideos(doc, name).length,
