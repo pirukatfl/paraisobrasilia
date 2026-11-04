@@ -45,6 +45,9 @@ export async function ModelGrid({ models, abaixoDaDobra = false }: { models: Mod
               />
             </span>
             <span className="type-label mt-2 block text-text transition-colors duration-[var(--duration-fast)] group-hover:text-accent">{model.name}</span>
+            {model.description && (
+              <span className="mt-1 line-clamp-3 block text-sm leading-snug text-muted">{model.description}</span>
+            )}
             {(model.photoCount > 1 || model.videoCount > 0) && (
               <span className="type-label block text-muted">{countLabel(model.photoCount, model.videoCount, t)}</span>
             )}

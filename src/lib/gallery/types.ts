@@ -29,6 +29,7 @@ export type ModelCardDTO = {
   slug: string
   name: string
   categoria: ModelCategoria
+  description: string | null
   cover: GalleryImage
   photoCount: number
   videoCount: number
