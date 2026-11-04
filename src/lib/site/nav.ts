@@ -29,6 +29,14 @@ export type NavItem = {
   external?: boolean
 }
 
+/** Link to the previous (WordPress) site: always the last menu item, public and logged-in, new tab. Not hideable in "Menu do site". */
+export const VERSAO_ANTERIOR_ITEM: NavItem = {
+  key: 'versao-anterior',
+  href: 'https://anterior.swingbrasilia.com.br/',
+  label: textoParaRico('Acessar versão anterior'),
+  external: true,
+}
+
 export function getNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): NavItem[] {
   const items: NavItem[] = [
     { key: 'festas', href: '/', label: t.menuFestas },
