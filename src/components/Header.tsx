@@ -5,7 +5,7 @@ import { MobileMenu } from '@/components/MobileMenu'
 import { Nav } from '@/components/Nav'
 import { getAssinante } from '@/lib/assinantes/session'
 import { getMenuConfig } from '@/lib/site/menu-queries'
-import { getMemberNavItems, getNavItems } from '@/lib/site/nav'
+import { getMemberNavItems, getNavItems, VERSAO_ANTERIOR_ITEM } from '@/lib/site/nav'
 import { getTextos } from '@/lib/textos/queries'
 
 async function isLoggedIn(): Promise<boolean> {
@@ -22,7 +22,8 @@ export async function Header() {
   const logado = await isLoggedIn()
   const [t, menu] = await Promise.all([getTextos('geral'), getMenuConfig()])
   // The external link exists only in the logged-in list: the public menu is built without it
-  const items = logado ? getMemberNavItems(t, menu) : getNavItems(t, menu)
+  // Link to the previous site: last item of the menu, for everyone (desktop and mobile), opens in a new tab
+  const items = [...(logado ? getMemberNavItems(t, menu) : getNavItems(t, menu)), VERSAO_ANTERIOR_ITEM]
   return (
     <HeaderShell>
       <div className="mx-auto flex max-w-[1200px] items-center justify-between gap-4 px-4 py-2 lg:px-8">
