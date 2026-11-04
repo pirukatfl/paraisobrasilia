@@ -49,16 +49,14 @@ export function wazeUrl(c: ContactDTO): string {
     : `https://waze.com/ul?q=${encodeURIComponent(fullAddress(c))}&navigate=yes`
 }
 
-const round = (n: number) => Number(n.toFixed(6))
-
-/** OpenStreetMap embed (no key, no Google cookies — D-02). */
-export function osmEmbedUrl(lat: number, lng: number): string {
-  const bbox = [round(lng - 0.01), round(lat - 0.006), round(lng + 0.01), round(lat + 0.006)].join(',')
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`
+/** Google Maps embed (no API key needed): same map on every device. */
+export function googleMapsEmbedUrl(lat: number, lng: number): string {
+  return `https://maps.google.com/maps?q=${lat},${lng}&z=16&hl=pt-BR&output=embed`
 }
 
-export function osmLargeMapUrl(lat: number, lng: number): string {
-  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}`
+/** Opens the venue pin in Google Maps (large map). */
+export function googleMapsLargeUrl(lat: number, lng: number): string {
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
 }
 
 /** Instagram profile URL, or null when no handle is set (D-04: hidden when empty). */
