@@ -50,7 +50,7 @@ async function fetchUpcomingParties(nowIso: string): Promise<PartyCardDTO[]> {
       and: [{ _status: { equals: 'published' } }, { endsAt: { greater_than: now.toISOString() } }],
     },
     draft: false,
-    sort: ['displayOrder', 'startsAt'],
+    sort: ['_order', 'startsAt'],
     depth: 1,
     limit: UPCOMING_LIMIT,
   })
