@@ -66,7 +66,7 @@ const prepareModel: CollectionBeforeValidateHook = async ({ data, originalDoc, r
 
 /**
  * House models (MIDIA-02, MIDIA-06/07, G-01..G-06): artistic name, short description and 1–30 photos,
- * one public page per model, no contact. Videos are off for now (client, 2026-10-23).
+ * one public page per model; optional contact shown on that page (client 2026-11-04). Videos are off for now (client, 2026-10-23).
  * Image authorization is recommended, never required to publish (D-09).
  */
 export const Models: CollectionConfig = {
@@ -78,7 +78,7 @@ export const Models: CollectionConfig = {
     defaultColumns: ['name', 'categoria', 'slug', 'photos', 'imageAuthorization.date', '_status'],
     listSearchableFields: ['name', 'slug'],
     description:
-      'Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita e sem contato: esta galeria é aberta ao público.',
+      'Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e aparece na página.',
   },
   versions: { drafts: true, maxPerDoc: 20 },
   access: {
@@ -156,6 +156,16 @@ export const Models: CollectionConfig = {
       validate: (value: unknown) => {
         if (typeof value === 'string' && value.length > 300) return 'Use no máximo 300 caracteres.'
         return noContact(value)
+      },
+    },
+    {
+      name: 'contact',
+      type: 'text',
+      maxLength: 120,
+      label: 'Contato',
+      admin: {
+        description:
+          'Aparece na página da profissional, aberta ao público. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.',
       },
     },
     {

@@ -1292,7 +1292,7 @@ export interface SpaceItem {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita e sem contato: esta galeria é aberta ao público.
+ * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e aparece na página.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "models".
@@ -1312,6 +1312,10 @@ export interface Model {
    * Até 300 caracteres. Aparece na página da modelo e nas prévias do Google e do WhatsApp. Sem telefone, WhatsApp, e-mail, @ ou links.
    */
   description?: string | null;
+  /**
+   * Aparece na página da profissional, aberta ao público. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.
+   */
+  contact?: string | null;
   /**
    * De 1 a 30 fotos. A primeira é a capa: arraste para mudar a ordem.
    */
@@ -2178,6 +2182,7 @@ export interface ModelsSelect<T extends boolean = true> {
   categoria?: T;
   slug?: T;
   description?: T;
+  contact?: T;
   photos?:
     | T
     | {

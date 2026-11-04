@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { Gallery } from '@/components/Gallery'
+import { contactHref } from '@/lib/gallery/contact'
 import { countLabel } from '@/components/ModelGrid'
 import { getPublishedModel } from '@/lib/gallery/queries'
 import { buildPageMetadata } from '@/lib/seo/metadata'
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-/** MIDIA-07: one page per published model — name, short description and the photo gallery. No contact. */
+/** MIDIA-07: one page per published model — name, short description, optional contact and the photo gallery. */
 export default async function ModelPage({ params }: Props) {
   const model = await getPublishedModel((await params).slug)
   if (!model) notFound()
@@ -47,6 +48,23 @@ export default async function ModelPage({ params }: Props) {
       <p className="type-label mt-2 text-muted">{countLabel(model.photoCount, model.videoCount, t)}</p>
       {model.description && (
         <p className="mt-4 max-w-[680px] whitespace-pre-line text-body text-muted">{model.description}</p>
+      )}
+      {model.contact && (
+        <p className="mt-4 text-body">
+          <span className="type-label text-muted">Contato: </span>
+          {contactHref(model.contact) ? (
+            <a
+              href={contactHref(model.contact) ?? undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4 hover:text-accent"
+            >
+              {model.contact}
+            </a>
+          ) : (
+            <span>{model.contact}</span>
+          )}
+        </p>
       )}
       <Gallery items={model.items} />
       <p className="mt-12">

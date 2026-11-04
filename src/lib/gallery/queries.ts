@@ -127,6 +127,7 @@ export function toModelPageDTO(doc: Model): ModelPageDTO | null {
     slug: doc.slug,
     name,
     description: doc.description?.trim() || null,
+    contact: doc.contact?.trim() || null,
     items: [
       ...videos,
       ...photos.map((image, i): GalleryItemDTO => ({ id: `${doc.id}-p${i}`, kind: 'photo', caption: null, image, video: null })),
