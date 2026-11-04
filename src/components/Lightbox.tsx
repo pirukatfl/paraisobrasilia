@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef } from 'react'
 
 import { ChevronLeftIcon, ChevronRightIcon, CloseIcon } from '@/components/icons'
+import { contactHref } from '@/lib/gallery/contact'
 import type { LightboxSlide } from '@/lib/gallery/types'
 import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 import { TextoRico } from '@/components/TextoRico'
@@ -27,6 +28,7 @@ export function Lightbox({
   label = 'Galeria de fotos',
   plainImages = false,
   fitScreen = false,
+  contact,
 }: {
   slides: LightboxSlide[]
   index: number | null
@@ -35,6 +37,8 @@ export function Lightbox({
   label?: string
   plainImages?: boolean
   fitScreen?: boolean
+  /** Optional contact line shown under the photo (model galleries). */
+  contact?: string | null
 }) {
   const t = useTextosGerais()
   const ref = useRef<HTMLDialogElement>(null)
@@ -170,6 +174,23 @@ export function Lightbox({
 
           <div className="flex flex-col items-center px-4 pb-2 pt-4">
             <p className="type-label text-center">{slide.label}</p>
+            {contact && (
+              <p className="type-label mt-1 text-center text-muted">
+                Contato:{' '}
+                {contactHref(contact) ? (
+                  <a
+                    href={contactHref(contact) ?? undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent"
+                  >
+                    {contact}
+                  </a>
+                ) : (
+                  <span className="text-text">{contact}</span>
+                )}
+              </p>
+            )}
             {slide.href && (
               <Link
                 href={slide.href}

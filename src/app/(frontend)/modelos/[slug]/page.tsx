@@ -66,7 +66,7 @@ export default async function ModelPage({ params }: Props) {
           )}
         </p>
       )}
-      <Gallery items={model.items} />
+      <Gallery items={model.items} contact={model.contact} />
       <p className="mt-12">
         <Link href="/modelos" className="type-label text-muted underline underline-offset-4 hover:text-accent">
           <TextoRico valor={t.linkVerTodas} linha />
