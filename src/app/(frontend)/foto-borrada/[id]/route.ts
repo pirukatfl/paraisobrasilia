@@ -35,7 +35,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     depth: 0,
     limit: 1,
     pagination: false,
-    select: { id: true },
+    select: { id: true } as never, // id is implicit in the generated select type
     overrideAccess: true,
   })
   if (used.docs.length === 0) return notFound()
