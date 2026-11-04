@@ -2,6 +2,7 @@ import * as migration_20261017_202602_initial from './20261017_202602_initial';
 import * as migration_20261017_203909_party_details from './20261017_203909_party_details';
 import * as migration_20261017_204209_seo_and_og from './20261017_204209_seo_and_og';
 import * as migration_20261017_204729_party_drafts from './20261017_204729_party_drafts';
+import * as migration_20261104_071800_modelos_contato from './20261104_071800_modelos_contato';
 import * as migration_20261019_023755_contact_global from './20261019_023755_contact_global';
 import * as migration_20261019_025904_pages from './20261019_025904_pages';
 import * as migration_20261019_031103_space_gallery from './20261019_031103_space_gallery';
@@ -352,6 +353,11 @@ export const migrations = [
   {
     up: migration_20261103_210621_classisex_comentarios_sem_conta.up,
     down: migration_20261103_210621_classisex_comentarios_sem_conta.down,
-    name: '20261103_210621_classisex_comentarios_sem_conta'
+    name: '20261103_210621_classisex_comentarios_sem_conta',
+  },
+  {
+    up: migration_20261104_071800_modelos_contato.up,
+    down: migration_20261104_071800_modelos_contato.down,
+    name: '20261104_071800_modelos_contato',
   },
 ];

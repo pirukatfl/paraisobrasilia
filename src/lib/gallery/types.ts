@@ -41,6 +41,7 @@ export type ModelPageDTO = {
   slug: string
   name: string
   description: string | null
+  contact: string | null
   items: GalleryItemDTO[]
   cover: GalleryImage
   ogImage: { url: string; width: number; height: number; alt: string } | null
