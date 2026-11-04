@@ -1,6 +1,6 @@
 'use client'
 
-import { useConfig, useDocumentInfo, useForm } from '@payloadcms/ui'
+import { useConfig, useDocumentInfo, useForm, useFormModified } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
@@ -88,6 +88,7 @@ export function ModeracaoPanel() {
   const { id } = useDocumentInfo()
   const { config } = useConfig()
   const { dispatchFields, setModified } = useForm()
+  const modified = useFormModified()
   const router = useRouter()
   const api = `${config.serverURL ?? ''}${config.routes.api}/ads/${id}`
 
@@ -127,6 +128,12 @@ export function ModeracaoPanel() {
   if (!id) return null // create screen: nothing to moderate yet
 
   const act = async (kind: 'aprovar' | 'recusar' | 'despublicar') => {
+    // Approving uses the saved text, and the reload below would drop unsaved edits: make staff save first
+    if (modified) {
+      setStatus(null)
+      setError('Você alterou o anúncio e ainda não salvou. Clique em Salvar (no topo da tela) e depois em ' + (kind === 'aprovar' ? 'Aprovar' : kind === 'recusar' ? 'Recusar' : 'Despublicar') + '.')
+      return
+    }
     setBusy(true)
     setError(null)
     setStatus(null)
@@ -277,6 +284,11 @@ export function ModeracaoPanel() {
             </button>
           </div>
             </>
+          )}
+          {modified && (
+            <p role="note" style={{ margin: 'calc(var(--base) * 0.75) 0 0', opacity: 0.8 }}>
+              Alterações ainda não salvas: clique em Salvar antes de aprovar, para o texto editado ir ao ar.
+            </p>
           )}
           {status && (
             <p role="status" style={{ margin: 'calc(var(--base) * 0.75) 0 0' }}>
