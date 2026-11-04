@@ -43,7 +43,7 @@ export const Parties: CollectionConfig = {
   labels: { singular: 'Festa', plural: 'Festas' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'startsAt', '_status'],
+    defaultColumns: ['title', 'displayOrder', 'startsAt', '_status'],
     listSearchableFields: ['title'],
     description:
       'Crie a festa, envie o flyer e clique em Publicar. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.',
@@ -92,6 +92,18 @@ export const Parties: CollectionConfig = {
       admin: {
         description: 'Horário de Brasília.',
         date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd/MM/yyyy HH:mm' },
+      },
+    },
+    {
+      name: 'displayOrder',
+      type: 'number',
+      label: 'Posição na lista',
+      min: 0,
+      admin: {
+        position: 'sidebar',
+        step: 1,
+        description:
+          'Define a ordem no site: 1 aparece primeiro, 2 depois, e assim por diante. Festas sem número ficam no fim, por data.',
       },
     },
     {
