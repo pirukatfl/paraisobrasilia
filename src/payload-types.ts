@@ -973,13 +973,14 @@ export interface Video {
   focalY?: number | null;
 }
 /**
- * Crie a festa, envie o flyer e clique em Publicar. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
+ * Crie a festa, envie o flyer e clique em Publicar. Para mudar a ordem, arraste as festas pela alça na lista. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "parties".
  */
 export interface Party {
   id: number;
+  _order?: string | null;
   /**
    * Nome da festa como aparece no site.
    */
@@ -1292,7 +1293,7 @@ export interface SpaceItem {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e aparece na página.
+ * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e só assinantes o veem.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "models".
@@ -1313,7 +1314,7 @@ export interface Model {
    */
   description?: string | null;
   /**
-   * Aparece na página da profissional, aberta ao público. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.
+   * Só assinantes com acesso ativo veem este contato, na página da profissional. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.
    */
   contact?: string | null;
   /**
@@ -2055,6 +2056,7 @@ export interface VideosSelect<T extends boolean = true> {
  * via the `definition` "parties_select".
  */
 export interface PartiesSelect<T extends boolean = true> {
+  _order?: T;
   title?: T;
   slug?: T;
   startsAt?: T;
