@@ -31,7 +31,8 @@ export function Gallery({ items, limite, abaixoDaDobra = false, contact, contact
   const hidden = hiddenCount(items.length, limite)
   const tiles = items.slice(0, shown)
 
-  const slides: LightboxSlide[] = items.map((item) => ({
+  // Locked tiles (blurred, not for this viewer) are never opened: the lightbox walks only the others
+  const slides: LightboxSlide[] = items.filter((item) => !item.locked).map((item) => ({
     kind: item.kind,
     image: item.image,
     videoUrl: item.video?.url,
@@ -45,6 +46,7 @@ export function Gallery({ items, limite, abaixoDaDobra = false, contact, contact
     setIndex(null)
     if (from !== null) openers.current[from]?.focus()
   }, [])
+  const slideOf = (i: number) => items.slice(0, i).filter((item) => !item.locked).length
 
   return (
     <>
@@ -89,6 +91,27 @@ export function Gallery({ items, limite, abaixoDaDobra = false, contact, contact
           )
           const tileClass =
             'group card-lift relative block aspect-square w-full overflow-hidden rounded-lg border border-line bg-surface focus-visible:border-accent'
+          if (item.locked) {
+            return (
+              <li key={item.id} className={i < 2 ? undefined : 'reveal stagger'} style={i < 2 ? undefined : ({ '--i': i - 2 } as React.CSSProperties)}>
+                <a href="/assine-ja" aria-label="Foto exclusiva para assinantes. Assine já" className={tileClass}>
+                  <Image
+                    src={item.image.thumbUrl}
+                    alt=""
+                    width={item.image.thumbWidth}
+                    height={item.image.thumbHeight}
+                    sizes={TILE_SIZES}
+                    unoptimized
+                    loading="lazy"
+                    className="h-full w-full scale-110 object-cover blur-md"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center bg-bg/40 p-2 text-center">
+                    <span className="type-label rounded-full bg-surface px-3 py-1 text-text">Só assinantes</span>
+                  </span>
+                </a>
+              </li>
+            )
+          }
           return (
             <li key={item.id} className={i < 2 ? undefined : 'reveal stagger'} style={i < 2 ? undefined : ({ '--i': i - 2 } as React.CSSProperties)}>
               {hydrated ? (
@@ -101,7 +124,7 @@ export function Gallery({ items, limite, abaixoDaDobra = false, contact, contact
                   className={tileClass}
                   onClick={() => {
                     openedFrom.current = i
-                    setIndex(i)
+                    setIndex(slideOf(i))
                   }}
                 >
                   {tile}
