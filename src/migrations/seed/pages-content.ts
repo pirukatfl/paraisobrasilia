@@ -167,7 +167,7 @@ Marca, logotipo, textos, fotos e vídeos do site pertencem ao Paraíso Brasília
 
 ## 8. Links externos
 
-O site pode ter links para serviços de terceiros (WhatsApp, Google Maps, Waze, OpenStreetMap, Instagram). Esses serviços têm termos e políticas próprios.
+O site pode ter links para serviços de terceiros (WhatsApp, Google Maps, Waze, Instagram). Esses serviços têm termos e políticas próprios.
 
 ## 9. Responsabilidade
 
@@ -221,7 +221,7 @@ Informações sobre vida sexual são **dados pessoais sensíveis** pela LGPD (ar
 
 Somente com prestadores necessários para o site funcionar, sob dever de confidencialidade: hospedagem do site e do banco de dados (servidor VPS da Hostinger [VALIDAR: localização do servidor e transferência internacional, art. 33]) e, quando houver, serviço de envio de e-mails. Também compartilhamos dados quando a lei ou uma autoridade exigir.
 
-Os mapas e botões "Como chegar", WhatsApp e Instagram abrem serviços de terceiros (OpenStreetMap, Google Maps, Waze, WhatsApp, Instagram), que seguem suas próprias políticas. O mapa da página de Contato é carregado do OpenStreetMap.
+Os mapas e botões "Como chegar", WhatsApp e Instagram abrem serviços de terceiros (Google Maps, Waze, WhatsApp, Instagram), que seguem suas próprias políticas. O mapa da página de Contato é carregado do Google Maps.
 
 ## 6. Cookies
 

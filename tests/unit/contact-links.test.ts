@@ -4,10 +4,9 @@ import {
   type ContactDTO,
   fullAddress,
   googleMapsUrl,
-  googleMapsEmbedUrl,
   instagramUrl,
-  osmEmbedUrl,
-  osmLargeMapUrl,
+  googleMapsEmbedUrl,
+  googleMapsLargeUrl,
   telUrl,
   wazeUrl,
   whatsappUrl,
@@ -59,12 +58,12 @@ describe('contact link builders (INST-02, INST-03)', () => {
     )
   })
 
-  it('OpenStreetMap embed and large map', () => {
-    const url = osmEmbedUrl(-15.5936421, -47.9771526)
-    expect(url.startsWith('https://www.openstreetmap.org/export/embed.html?bbox=')).toBe(true)
-    expect(url).toContain('&marker=-15.5936421,-47.9771526')
-    expect(osmLargeMapUrl(-15.5936421, -47.9771526)).toBe(
-      'https://www.openstreetmap.org/?mlat=-15.5936421&mlon=-47.9771526#map=16/-15.5936421/-47.9771526',
+  it('Google Maps embed and large map', () => {
+    expect(googleMapsEmbedUrl(-15.5936421, -47.9771526)).toBe(
+      'https://maps.google.com/maps?q=-15.5936421,-47.9771526&z=16&hl=pt-BR&output=embed',
+    )
+    expect(googleMapsLargeUrl(-15.5936421, -47.9771526)).toBe(
+      'https://www.google.com/maps/search/?api=1&query=-15.5936421,-47.9771526',
     )
   })
 
@@ -72,13 +71,5 @@ describe('contact link builders (INST-02, INST-03)', () => {
     expect(instagramUrl(null)).toBeNull()
     expect(instagramUrl('')).toBeNull()
     expect(instagramUrl('paraiso.bsb')).toBe('https://www.instagram.com/paraiso.bsb/')
-  })
-})
-
-describe('Google Maps embed (home)', () => {
-  it('builds the keyless embed url', () => {
-    expect(googleMapsEmbedUrl(-15.5936421, -47.9771526)).toBe(
-      'https://maps.google.com/maps?q=-15.5936421,-47.9771526&z=16&hl=pt-BR&output=embed',
-    )
   })
 })

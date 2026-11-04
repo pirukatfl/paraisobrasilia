@@ -28,14 +28,14 @@ test('home with a party and 6 space photos ≤ 600 KB', async ({ page, request }
 
   await page.goto('/')
   await expect(page.getByRole('link', { name: 'Ver detalhes da festa Festa de Teste' })).toBeVisible()
-  const w = await measureWeight(page, { excludeHosts: ['maps.google.com', 'www.google.com', 'maps.gstatic.com', 'www.gstatic.com'] })
+  const w = await measureWeight(page)
   console.log(`[budget] / ${Math.round(w.total / KB)} KB (+${Math.round(w.scripts / KB)} KB dev JS)`, w.byType)
   expect(w.total).toBeLessThanOrEqual(600 * KB)
 })
 
-test('/contato ≤ 400 KB without the OpenStreetMap iframe', async ({ page }) => {
+test('/contato ≤ 400 KB without the Google Maps iframe', async ({ page }) => {
   await page.goto('/contato')
-  const w = await measureWeight(page, { excludeHosts: ['www.openstreetmap.org', 'tile.openstreetmap.org'] })
+  const w = await measureWeight(page, { excludeHosts: ['maps.google.com', 'www.google.com', 'maps.gstatic.com', 'www.gstatic.com', 'fonts.gstatic.com'] })
   console.log(`[budget] /contato ${Math.round(w.total / KB)} KB`, w.byType)
   expect(w.total).toBeLessThanOrEqual(400 * KB)
 })
