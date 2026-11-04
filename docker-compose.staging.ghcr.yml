@@ -35,7 +35,7 @@ services:
     env_file: .env.staging
     environment:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
-      SITE_ENV: staging
+      SITE_ENV: ${SITE_ENV:-staging}
     depends_on:
       db:
         condition: service_healthy
@@ -48,7 +48,7 @@ services:
     env_file: .env.staging
     environment:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
-      SITE_ENV: staging
+      SITE_ENV: ${SITE_ENV:-staging}
       MEDIA_DIR: /app/media
       PRIVATE_MEDIA_DIR: /app/private-media
     volumes:

@@ -545,3 +545,80 @@ Se o DNS do domínio estiver em outro lugar (ex.: Cloudflare), os mesmos registr
   Se ligar também o firewall do hPanel (VPS → **Firewall**), libere as mesmas portas 22, 80 e 443.
 - O site roda como usuário comum (`node`), não como `root`, dentro do container.
 - Recomendado: entrar no servidor só por chave SSH e desligar o login por senha.
+
+---
+
+## 12. Domínio oficial (swingbrasilia.com.br)
+
+Objetivo: o site novo passa a abrir em **https://swingbrasilia.com.br**. Os endereços **www.swingbrasilia.com.br** e
+**novo.swingbrasilia.com.br** continuam funcionando, mas só levam (redirecionam) para o endereço oficial. O site antigo
+(WordPress) fica em **anterior.swingbrasilia.com.br**, na hospedagem antiga, e não é mexido por aqui.
+
+Faça os passos **nesta ordem**. É seguro fazer o passo C antes do DNS propagar: o Caddy (o "porteiro") só consegue o
+cadeado HTTPS depois que o DNS aponta para o servidor, mas ele **fica tentando sozinho** até conseguir.
+
+### A. GitHub: avisar o site qual é o endereço oficial
+
+1. No GitHub, no repositório do site: **Settings → Secrets and variables → Actions → aba Variables**.
+2. Crie (ou edite) duas variáveis:
+   - `STAGING_URL` = `https://swingbrasilia.com.br`
+   - `SITE_ENV` = `production` (libera as páginas públicas para o Google; `staging` bloqueia tudo)
+3. Vá em **Actions → deploy-staging → Run workflow** e espere ficar **verde**. O site precisa ser montado de novo porque o
+   endereço fica gravado dentro dele.
+
+### B. DNS no hPanel (Domínios → swingbrasilia.com.br → DNS)
+
+| Tipo | Nome | Aponta para | Observação |
+|---|---|---|---|
+| A | `@` | `187.77.246.132` | endereço oficial, para o servidor novo |
+| A | `www` | `187.77.246.132` | (ou CNAME `www` → `swingbrasilia.com.br`) |
+| A | `novo` | `187.77.246.132` | já existe; mantenha |
+| A | `anterior` | IP da hospedagem antiga | para o site antigo continuar acessível |
+
+- **Apague** qualquer registro **AAAA** de `@` e de `www` que aponte para a hospedagem antiga (senão quem tem IPv6 cai no site antigo).
+- **Não mexa** nos registros **MX** nem **TXT**: é por eles que o e-mail `suporte@swingbrasilia.com.br` continua funcionando.
+- Deixe o **TTL em 300** (5 minutos) e o **CDN da Hostinger desligado** para este domínio.
+- A mudança pode levar de minutos a algumas horas para valer em todo lugar.
+
+### C. Servidor: aplicar o domínio oficial
+
+No Terminal do navegador (hPanel → VPS → Terminal), cole **o bloco inteiro** e aperte Enter (o token não aparece enquanto
+você digita; é o mesmo token da seção 7.3). As senhas, o banco e as fotos são mantidos; o script guarda uma cópia do
+`.env.staging` antes de trocar o domínio.
+
+```bash
+read -rsp 'Cole o token do GitHub e aperte Enter: ' GH_TOKEN; echo
+curl -fsSL -H "Authorization: token $GH_TOKEN" -o /root/bootstrap-vps.sh \
+  https://raw.githubusercontent.com/pirukatfl/paraisobrasilia/main/scripts/deploy/bootstrap-vps.sh
+DOMAIN=swingbrasilia.com.br ALIAS_DOMAINS="www.swingbrasilia.com.br novo.swingbrasilia.com.br" SITE_ENV=production GHCR_USER=pirukatfl GHCR_TOKEN="$GH_TOKEN" bash /root/bootstrap-vps.sh
+unset GH_TOKEN
+```
+
+Se o DNS ainda não propagou, o script avisa em amarelo/vermelho ("atenção") e termina assim mesmo; é só esperar e conferir (passo D).
+
+### D. Conferir
+
+No Terminal do servidor (ou de qualquer computador):
+
+```bash
+curl -sI https://swingbrasilia.com.br/        | head -1    # HTTP/2 200
+curl -sI https://www.swingbrasilia.com.br/x?a=1 | grep -iE '^(HTTP|location)'   # 301 e location: https://swingbrasilia.com.br/x?a=1
+curl -sI https://novo.swingbrasilia.com.br/x?a=1 | grep -iE '^(HTTP|location)'  # 301 e location: https://swingbrasilia.com.br/x?a=1
+curl -s https://swingbrasilia.com.br/robots.txt              # mostra "Allow: /" e "Sitemap: https://swingbrasilia.com.br/sitemap.xml"
+```
+
+Depois, numa **janela anônima** do navegador, abra https://swingbrasilia.com.br, confirme os 18 anos e entre com uma
+conta de assinante: o login deve funcionar e a área do assinante abrir. Entre também no painel (`/admin`) com um usuário
+da equipe. Se o `robots.txt` ainda mostrar `Disallow: /`, o passo A não foi concluído (workflow verde com as duas variáveis).
+
+### E. Voltar atrás (rollback)
+
+1. Rode o mesmo bloco do passo C trocando só a linha do `DOMAIN=`:
+
+   ```bash
+   DOMAIN=novo.swingbrasilia.com.br ALIAS_DOMAINS="" SITE_ENV=staging GHCR_USER=pirukatfl GHCR_TOKEN="$GH_TOKEN" bash /root/bootstrap-vps.sh
+   ```
+
+   (`ALIAS_DOMAINS=""` apaga os redirecionamentos guardados; se a variável nem for escrita, o valor guardado é mantido.)
+2. No GitHub, volte `STAGING_URL` para `https://novo.swingbrasilia.com.br` e `SITE_ENV` para `staging`, e rode o workflow de novo.
+3. No hPanel, aponte de volta `@` e `www` para a hospedagem antiga.

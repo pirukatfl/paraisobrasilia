@@ -6,8 +6,12 @@
 #   ghcr.io/<owner>/<repo>:staging            ghcr.io/<owner>/<repo>:sha-<commit>          (runner: the site)
 #   ghcr.io/<owner>/<repo>:migrate-staging    ghcr.io/<owner>/<repo>:migrate-sha-<commit>  (migrate: payload migrate)
 #
-# Required repository variable (Settings → Secrets and variables → Actions → Variables):
-#   STAGING_URL = https://novo.swingbrasilia.com.br   (baked into the build: og:image, sitemap)
+# Repository variables (Settings → Secrets and variables → Actions → Variables):
+#   STAGING_URL = address the site is served at, baked into the build (og:image, sitemap, e-mail links).
+#                 Default https://novo.swingbrasilia.com.br; official domain: https://swingbrasilia.com.br
+#   SITE_ENV    = staging (default: blocks all crawlers) or production (opens public pages to Google).
+#                 Baked into the site image only; the migrate image does not use it.
+# After changing a variable, run this workflow again (Actions → deploy-staging → Run workflow).
 name: deploy-staging
 
 on:
@@ -72,7 +76,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_SERVER_URL=${{ steps.meta.outputs.url }}
             NEXT_PUBLIC_AGE_GATE_PROVIDER=self-declaration
-            SITE_ENV=staging
+            SITE_ENV=${{ vars.SITE_ENV || 'staging' }}
           tags: |
             ${{ steps.meta.outputs.image }}:sha-${{ steps.meta.outputs.sha }}
           labels: |

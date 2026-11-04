@@ -16,6 +16,14 @@
 # Pergunta só duas coisas: o domínio do staging e o token do GHCR.
 # Sem perguntas (opcional): DOMAIN=novo.exemplo.com.br GHCR_TOKEN=ghp_... bash bootstrap-vps.sh
 #
+# Opções (todas opcionais; sem elas, um servidor já configurado continua exatamente como está):
+#   DOMAIN         domínio principal. Se mudar em relação ao salvo, o .env.staging é atualizado
+#                  (com cópia de segurança .env.staging.bak-<data>) e as senhas são mantidas.
+#   ALIAS_DOMAINS  outros endereços que redirecionam (301) para o principal, separados por espaço
+#                  ou vírgula (ex.: "www.exemplo.com.br novo.exemplo.com.br"). ALIAS_DOMAINS=""
+#                  apaga os apelidos salvos; sem a variável, o valor salvo é mantido.
+#   SITE_ENV       staging (Google bloqueado) ou production (páginas públicas liberadas para o Google).
+#
 # Docs: docs/deploy/STAGING.md. Alternativa por SSH: scripts/deploy/deploy-staging.sh.
 set -euo pipefail
 
@@ -116,7 +124,7 @@ services:
     env_file: .env.staging
     environment:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
-      SITE_ENV: staging
+      SITE_ENV: ${SITE_ENV:-staging}
     depends_on:
       db:
         condition: service_healthy
@@ -129,7 +137,7 @@ services:
     env_file: .env.staging
     environment:
       DATABASE_URI: postgres://paraiso:${POSTGRES_PASSWORD}@db:5432/paraiso
-      SITE_ENV: staging
+      SITE_ENV: ${SITE_ENV:-staging}
       MEDIA_DIR: /app/media
       PRIVATE_MEDIA_DIR: /app/private-media
     volumes:
@@ -166,28 +174,70 @@ volumes:
   caddy_config:
 PARAISO_COMPOSE
 
-# Same content as Caddyfile in the repo
-cat >Caddyfile <<'PARAISO_CADDY'
-# Caddy: automatic HTTPS (Let's Encrypt) for the staging domain, proxy to the Next app.
-# STAGING_DOMAIN comes from .env.staging (passed to the caddy container by compose).
-{$STAGING_DOMAIN} {
-	encode zstd gzip
-	# Outer guard for uploads (ClassiSex videos up to 100 MB, T-04-09)
-	request_body {
-		max_size 110MB
-	}
-	header Strict-Transport-Security "max-age=31536000"
-	reverse_proxy app:3000
-}
-PARAISO_CADDY
-ok "docker-compose.yml e Caddyfile"
+ok "docker-compose.yml"
 
 # ---------------------------------------------------------------------------
 say "3/6 Configuração e senhas (.env.staging)"
 ENV_FILE="$APP_DIR/.env.staging"
+HOST_RE='^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$'
+# "https://Exemplo.com.br/x" -> "exemplo.com.br"
+norm_host() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed -e 's|^https\?://||' -e 's|/.*$||' -e 's/[[:space:]]//g'
+}
+# Space/comma separated list -> validated, deduplicated, space separated list
+norm_hosts() {
+  local out="" h
+  for h in $(printf '%s' "$1" | tr ',' ' '); do
+    h="$(norm_host "$h")"
+    [ -n "$h" ] || continue
+    printf '%s' "$h" | grep -Eq "$HOST_RE" || die "domínio inválido: '$h'"
+    case " $out " in *" $h "*) ;; *) out="${out:+$out }$h" ;; esac
+  done
+  printf '%s' "$out"
+}
+# Set KEY=value in .env.staging (replace the line or append it)
+env_set() {
+  if grep -q "^$1=" "$ENV_FILE"; then
+    sed -i "s|^$1=.*|$1=$2|" "$ENV_FILE"
+  else
+    printf '%s=%s\n' "$1" "$2" >>"$ENV_FILE"
+  fi
+}
+SITE_ENV_IN="$(printf '%s' "${SITE_ENV:-}" | tr '[:upper:]' '[:lower:]')"
+case "$SITE_ENV_IN" in
+  '' | staging | production) ;;
+  *) die "SITE_ENV inválido: '$SITE_ENV' (use staging ou production)." ;;
+esac
+
 if [ -f "$ENV_FILE" ]; then
-  DOMAIN="$(sed -n 's/^STAGING_DOMAIN=//p' "$ENV_FILE" | head -1)"
-  ok "já existe; senhas mantidas (domínio: $DOMAIN)"
+  STORED_DOMAIN="$(sed -n 's/^STAGING_DOMAIN=//p' "$ENV_FILE" | head -1)"
+  DOMAIN_IN="$(norm_host "${DOMAIN:-}")"
+  if [ -n "$DOMAIN_IN" ] && [ "$DOMAIN_IN" != "$STORED_DOMAIN" ]; then
+    printf '%s' "$DOMAIN_IN" | grep -Eq "$HOST_RE" || die "domínio inválido: '$DOMAIN_IN'"
+    BACKUP="$ENV_FILE.bak-$(date +%Y%m%d-%H%M%S)"
+    cp -p "$ENV_FILE" "$BACKUP"
+    chmod 600 "$BACKUP"
+    env_set STAGING_DOMAIN "$DOMAIN_IN"
+    env_set NEXT_PUBLIC_SERVER_URL "https://$DOMAIN_IN"
+    ok "domínio mudou de $STORED_DOMAIN para $DOMAIN_IN (cópia de segurança: $BACKUP)"
+    DOMAIN="$DOMAIN_IN"
+  else
+    DOMAIN="$STORED_DOMAIN"
+    ok "já existe; senhas mantidas (domínio: $DOMAIN)"
+  fi
+  # Aliases: ALIAS_DOMAINS in the environment (even empty) replaces the stored value; unset keeps it
+  if [ -n "${ALIAS_DOMAINS+x}" ]; then
+    ALIAS_DOMAINS="$(norm_hosts "$ALIAS_DOMAINS")"
+    env_set ALIAS_DOMAINS "$ALIAS_DOMAINS"
+  else
+    ALIAS_DOMAINS="$(sed -n 's/^ALIAS_DOMAINS=//p' "$ENV_FILE" | head -1)"
+  fi
+  # SITE_ENV: only changes when passed
+  if [ -n "$SITE_ENV_IN" ]; then
+    env_set SITE_ENV "$SITE_ENV_IN"
+  fi
+  SITE_ENV="$(sed -n 's/^SITE_ENV=//p' "$ENV_FILE" | head -1)"
+  SITE_ENV="${SITE_ENV:-staging}"
   # Keep the image name current
   if grep -q '^GHCR_IMAGE=' "$ENV_FILE"; then
     sed -i "s|^GHCR_IMAGE=.*|GHCR_IMAGE=$GHCR_IMAGE|" "$ENV_FILE"
@@ -203,12 +253,13 @@ if [ -f "$ENV_FILE" ]; then
 else
   DOMAIN="${DOMAIN:-}"
   while [ -z "$DOMAIN" ]; do
-    DOMAIN="$(ask 'Domínio do staging (ex.: novo.swingbrasilia.com.br): ')"
+    DOMAIN="$(ask 'Domínio do site (ex.: novo.swingbrasilia.com.br): ')"
     [ -r /dev/tty ] || break
   done
-  DOMAIN="$(printf '%s' "$DOMAIN" | tr '[:upper:]' '[:lower:]' | sed -e 's|^https\?://||' -e 's|/.*$||' -e 's/[[:space:]]//g')"
-  printf '%s' "$DOMAIN" | grep -Eq '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$' ||
-    die "domínio inválido: '$DOMAIN'"
+  DOMAIN="$(norm_host "$DOMAIN")"
+  printf '%s' "$DOMAIN" | grep -Eq "$HOST_RE" || die "domínio inválido: '$DOMAIN'"
+  ALIAS_DOMAINS="$(norm_hosts "${ALIAS_DOMAINS:-}")"
+  SITE_ENV="${SITE_ENV_IN:-staging}"
   umask 077
   cat >"$ENV_FILE" <<EOF
 # Gerado por bootstrap-vps.sh em $(date -u +%Y-%m-%dT%H:%M:%SZ). Não compartilhe este arquivo.
@@ -216,7 +267,10 @@ POSTGRES_PASSWORD=$(openssl rand -hex 24)
 PAYLOAD_SECRET=$(openssl rand -hex 32)
 NEXT_PUBLIC_SERVER_URL=https://$DOMAIN
 STAGING_DOMAIN=$DOMAIN
-SITE_ENV=staging
+# Endereços que redirecionam (301) para STAGING_DOMAIN, separados por espaço
+ALIAS_DOMAINS=$ALIAS_DOMAINS
+# staging = Google bloqueado; production = páginas públicas liberadas para o Google
+SITE_ENV=$SITE_ENV
 AGE_GATE_PROVIDER=self-declaration
 NEXT_PUBLIC_AGE_GATE_PROVIDER=self-declaration
 TZ=America/Sao_Paulo
@@ -238,16 +292,62 @@ EOF
 fi
 chmod 600 "$ENV_FILE"
 
+# Caddyfile. Same content as the repo's Caddyfile (the template, with the alias block only as a comment); the real alias block
+# (301 to the main domain) is appended only when ALIAS_DOMAINS is not empty.
+cat >Caddyfile <<'PARAISO_CADDY'
+# Caddy: automatic HTTPS (Let's Encrypt) for the staging domain, proxy to the Next app.
+# STAGING_DOMAIN comes from .env.staging (passed to the caddy container by compose).
+{$STAGING_DOMAIN} {
+	encode zstd gzip
+	# Outer guard for uploads (ClassiSex videos up to 100 MB, T-04-09)
+	request_body {
+		max_size 110MB
+	}
+	header Strict-Transport-Security "max-age=31536000"
+	reverse_proxy app:3000
+}
+
+# Other addresses (www, novo, ...) can redirect permanently to the main domain, keeping path and query.
+# scripts/deploy/bootstrap-vps.sh writes this block by itself when ALIAS_DOMAINS is set (no need to edit):
+# www.exemplo.com.br, novo.exemplo.com.br {
+# 	redir https://{$STAGING_DOMAIN}{uri} permanent
+# }
+PARAISO_CADDY
+# Aliases equal to the main domain are dropped
+ALIASES=""
+for h in $ALIAS_DOMAINS; do
+  [ "$h" = "$DOMAIN" ] || ALIASES="${ALIASES:+$ALIASES }$h"
+done
+ALIAS_DOMAINS="$ALIASES"
+if [ -n "$ALIAS_DOMAINS" ]; then
+  cat >>Caddyfile <<PARAISO_ALIAS
+
+# Other addresses: permanent redirect to the main domain, keeping path and query
+$(printf '%s' "$ALIAS_DOMAINS" | sed 's/ /, /g') {
+	redir https://{\$STAGING_DOMAIN}{uri} permanent
+}
+PARAISO_ALIAS
+fi
+ok "Caddyfile${ALIAS_DOMAINS:+ (redireciona: $ALIAS_DOMAINS)}"
+
 # DNS check (warning only: Caddy keeps retrying the certificate)
 SERVER_IP="$(ip -4 route get 1.1.1.1 2>/dev/null | sed -n 's/.* src \([0-9.]*\).*/\1/p' | head -1)"
-DNS_IP="$(getent ahostsv4 "$DOMAIN" 2>/dev/null | awk 'NR==1 {print $1}')"
-if [ -z "$DNS_IP" ]; then
-  warn "$DOMAIN ainda não aponta para nenhum IP. Crie o registro A → ${SERVER_IP:-IP deste servidor} no hPanel (Domínios → DNS)."
-elif [ -n "$SERVER_IP" ] && [ "$DNS_IP" != "$SERVER_IP" ]; then
-  warn "$DOMAIN aponta para $DNS_IP, mas este servidor é $SERVER_IP. O HTTPS só funciona quando apontar para cá."
-else
-  ok "DNS: $DOMAIN → $DNS_IP"
-fi
+SERVER_IP6="$(ip -6 route get 2606:4700:4700::1111 2>/dev/null | sed -n 's/.* src \([0-9a-f:]*\).*/\1/p' | head -1)"
+for h in $DOMAIN $ALIAS_DOMAINS; do
+  DNS_IP="$(getent ahostsv4 "$h" 2>/dev/null | awk 'NR==1 {print $1}')"
+  if [ -z "$DNS_IP" ]; then
+    warn "$h ainda não aponta para nenhum IP. Crie o registro A → ${SERVER_IP:-IP deste servidor} no hPanel (Domínios → DNS)."
+  elif [ -n "$SERVER_IP" ] && [ "$DNS_IP" != "$SERVER_IP" ]; then
+    warn "$h aponta para $DNS_IP, mas este servidor é $SERVER_IP. O HTTPS só funciona quando apontar para cá."
+  else
+    ok "DNS: $h → $DNS_IP"
+  fi
+  # AAAA (IPv6): visitors and Let's Encrypt may be sent to another host. ::ffff: = IPv4 mapped, not a real AAAA.
+  DNS_IP6="$(getent ahostsv6 "$h" 2>/dev/null | awk '$1 !~ /^::ffff:/ {print $1; exit}')"
+  if [ -n "$DNS_IP6" ] && [ "$DNS_IP6" != "$SERVER_IP6" ]; then
+    warn "$h tem registro AAAA (IPv6) $DNS_IP6 que não é deste servidor. Apague o AAAA no hPanel, senão parte dos visitantes cai no site antigo."
+  fi
+done
 
 # ---------------------------------------------------------------------------
 say "4/6 Acesso às imagens (ghcr.io)"
@@ -349,7 +449,7 @@ docker compose --env-file "$ENV_FILE" exec -T caddy caddy reload --config /etc/c
 sleep 5
 if ! docker compose --env-file "$ENV_FILE" exec -T app node -e \
   "fetch('http://127.0.0.1:3000/').then(r=>r.text()).then(t=>process.exit(t.includes('https://$DOMAIN/')?0:1)).catch(()=>process.exit(2))"; then
-  warn "a imagem foi gerada para outro endereço. No GitHub, ajuste a variável STAGING_URL para https://$DOMAIN e rode o workflow deploy-staging de novo."
+  warn "a imagem foi gerada para outro endereço. No GitHub (Settings → Secrets and variables → Actions → Variables), ajuste a variável STAGING_URL para https://$DOMAIN (e SITE_ENV=$SITE_ENV) e rode o workflow deploy-staging de novo."
 fi
 
 printf 'Esperando o HTTPS de https://%s ' "$DOMAIN"
@@ -368,10 +468,21 @@ else
   warn "Logs: cd $APP_DIR && docker compose --env-file .env.staging logs --tail=100 caddy app"
 fi
 
+# Aliases must answer with a permanent redirect to the main domain (non-fatal)
+for h in $ALIAS_DOMAINS; do
+  res="$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 10 "https://$h/" || true)"
+  case "$res" in
+    "301 https://$DOMAIN/" | "308 https://$DOMAIN/") ok "https://$h/ → $res" ;;
+    *) warn "https://$h/ não redirecionou para https://$DOMAIN/ (resposta: ${res:-nenhuma}). Se o DNS é novo, espere alguns minutos e confira de novo." ;;
+  esac
+done
+
 cat <<EOF
 
 Pronto.
   Site:    https://$DOMAIN/
   Painel:  https://$DOMAIN/admin   (o primeiro acesso cria o usuário da equipe)
+  Redirecionam para o site: ${ALIAS_DOMAINS:-(nenhum)}
+  Modo:    $SITE_ENV
   Atualização automática: a cada 5 minutos (journalctl -u paraiso-update -n 50 para ver)
 EOF

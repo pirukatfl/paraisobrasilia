@@ -9,3 +9,9 @@
 	header Strict-Transport-Security "max-age=31536000"
 	reverse_proxy app:3000
 }
+
+# Other addresses (www, novo, ...) can redirect permanently to the main domain, keeping path and query.
+# scripts/deploy/bootstrap-vps.sh writes this block by itself when ALIAS_DOMAINS is set (no need to edit):
+# www.exemplo.com.br, novo.exemplo.com.br {
+# 	redir https://{$STAGING_DOMAIN}{uri} permanent
+# }

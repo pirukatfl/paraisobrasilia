@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -239,7 +239,11 @@ ask() { echo "ASKED" >&2; exit 9; }
 ${block}
 echo "DOMAIN_OUT=$DOMAIN"`
       for (let run = 0; run < 2; run++) {
-        const res = spawnSync('bash', ['-c', harness], { encoding: 'utf8', env: { ...process.env, DOMAIN: 'outro.exemplo.com' } })
+        const env = { ...process.env }
+        delete env.DOMAIN
+        delete env.ALIAS_DOMAINS
+        delete env.SITE_ENV
+        const res = spawnSync('bash', ['-c', harness], { encoding: 'utf8', env })
         expect(res.status, res.stderr).toBe(0)
         expect(res.stdout).toContain('DOMAIN_OUT=novo.swingbrasilia.com.br')
       }
@@ -249,6 +253,51 @@ echo "DOMAIN_OUT=$DOMAIN"`
       expect(after).toContain('STAGING_DOMAIN=novo.swingbrasilia.com.br')
       expect(after).toContain('GHCR_IMAGE=ghcr.io/pirukatfl/paraisobrasilia')
       expect(after.match(/^GHCR_IMAGE=/gm)).toHaveLength(1)
+    })
+
+    it('changes domain, aliases and SITE_ENV in place when passed, keeping secrets and a backup', () => {
+      const start = script.indexOf('ENV_FILE="$APP_DIR/.env.staging"')
+      const end = script.indexOf('chmod 600 "$ENV_FILE"')
+      const block = script.slice(start, end)
+      const dir = mkdtempSync(path.join(tmpdir(), 'bootstrap-'))
+      const envPath = path.join(dir, '.env.staging')
+      writeFileSync(
+        envPath,
+        'PAYLOAD_SECRET=segredo\nNEXT_PUBLIC_SERVER_URL=https://novo.swingbrasilia.com.br\nSTAGING_DOMAIN=novo.swingbrasilia.com.br\nSITE_ENV=staging\n',
+      )
+      const harness = `set -euo pipefail
+APP_DIR='${dir}'
+GHCR_IMAGE='ghcr.io/x/y'
+ok() { echo "OK: $*"; }
+die() { echo "DIE: $*" >&2; exit 1; }
+ask() { exit 9; }
+${block}
+echo "OUT=$DOMAIN|$ALIAS_DOMAINS|$SITE_ENV"`
+      const run = (extra: Record<string, string>) => {
+        const env = { ...process.env, ...extra }
+        for (const k of ['DOMAIN', 'ALIAS_DOMAINS', 'SITE_ENV']) if (!(k in extra)) delete env[k]
+        return spawnSync('bash', ['-c', harness], { encoding: 'utf8', env })
+      }
+      let res = run({ DOMAIN: 'SwingBrasilia.com.br', ALIAS_DOMAINS: 'www.swingbrasilia.com.br, novo.swingbrasilia.com.br', SITE_ENV: 'production' })
+      expect(res.status, res.stderr).toBe(0)
+      expect(res.stdout).toContain('mudou de novo.swingbrasilia.com.br para swingbrasilia.com.br')
+      expect(res.stdout).toContain('OUT=swingbrasilia.com.br|www.swingbrasilia.com.br novo.swingbrasilia.com.br|production')
+      let after = readFileSync(envPath, 'utf8')
+      expect(after).toContain('STAGING_DOMAIN=swingbrasilia.com.br')
+      expect(after).toContain('NEXT_PUBLIC_SERVER_URL=https://swingbrasilia.com.br')
+      expect(after).toContain('SITE_ENV=production')
+      expect(after).toContain('PAYLOAD_SECRET=segredo')
+      expect(readdirSync(dir).filter((f) => f.startsWith('.env.staging.bak-'))).toHaveLength(1)
+      // Nothing passed: stored values stay
+      res = run({})
+      expect(res.stdout).toContain('OUT=swingbrasilia.com.br|www.swingbrasilia.com.br novo.swingbrasilia.com.br|production')
+      // Empty ALIAS_DOMAINS clears them
+      res = run({ ALIAS_DOMAINS: '' })
+      expect(res.stdout).toContain('OUT=swingbrasilia.com.br||production')
+      after = readFileSync(envPath, 'utf8')
+      expect(after).toMatch(/^ALIAS_DOMAINS=$/m)
+      res = run({ SITE_ENV: 'nope' })
+      expect(res.status).not.toBe(0)
     })
 
     it('reloads Caddy after the rewritten Caddyfile (bind mount is not recreated by compose)', () => {
