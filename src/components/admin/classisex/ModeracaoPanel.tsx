@@ -2,7 +2,7 @@
 
 import { useConfig, useDocumentInfo, useField, useForm, useFormModified } from '@payloadcms/ui'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { mensagemDaResposta, mensagemDeExcecao } from '../../../lib/errors'
 
 /**
@@ -91,6 +91,9 @@ export function ModeracaoPanel() {
   const { dispatchFields, setModified } = useForm()
   const modified = useFormModified()
   const textoField = useField<string>({ path: 'texto' })
+  // Read inside the async load below: a reload must never wipe what staff are typing or switch Salvar off
+  const modifiedRef = useRef(modified)
+  modifiedRef.current = modified
   const router = useRouter()
   const api = `${config.serverURL ?? ''}${config.routes.api}/ads/${id}`
 
@@ -111,10 +114,12 @@ export function ModeracaoPanel() {
         setView(data)
         setLoadError(null)
         // Keep the document form in sync so a later "Salvar" does not send the old situation back
-        for (const [path, value] of Object.entries(data.fields)) {
-          dispatchFields({ type: 'UPDATE', path, value, initialValue: value })
+        if (!modifiedRef.current) {
+          for (const [path, value] of Object.entries(data.fields)) {
+            dispatchFields({ type: 'UPDATE', path, value, initialValue: value })
+          }
+          setModified(false)
         }
-        setModified(false)
       },
       (err: Error) => {
         if (!cancelled) setLoadError(`Não foi possível carregar a moderação: ${mensagemDeExcecao(err)}`)
