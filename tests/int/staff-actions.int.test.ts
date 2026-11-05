@@ -200,3 +200,31 @@ describe('liberar / renovar / encerrar (PAINEL-05, D-05, D-06, T-03-06, T-03-15)
     })
   })
 })
+
+describe('e-mail já cadastrado (equipe)', () => {
+  let payload: Payload
+  let staffReq: PayloadRequest
+
+  beforeAll(async () => {
+    payload = await getTestPayload()
+  })
+
+  beforeEach(async () => {
+    await resetDatabase(payload)
+    const u = await seedStaffUser(payload, { email: 'staff-dup@teste.local', password: 'senha-equipe-123' })
+    staffReq = await createLocalReq({ user: { ...(u as unknown as Record<string, unknown>), collection: 'users' } as never }, payload)
+    await seedAssinante(payload, { email: 'maria@teste.local', password: 'senha-maria-1234', name: 'Maria' })
+  })
+
+  it('mostra erro claro no campo e-mail, ignorando caixa e espaços', async () => {
+    await expect(
+      payload.create({
+        collection: 'assinantes',
+        data: { email: '  MARIA@Teste.local ', password: 'senha-nova-1234', name: 'Outra' },
+        req: staffReq,
+        user: staffReq.user,
+        overrideAccess: false,
+      }),
+    ).rejects.toMatchObject({ data: { errors: [{ path: 'email', message: expect.stringContaining('Já existe um assinante') }] } })
+  })
+})

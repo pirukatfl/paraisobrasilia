@@ -11,6 +11,7 @@ import {
 import { isAssinante, isStaff, staffOnlyField } from '../access/roles'
 import { assinanteLabel, diffForAudit, writeAudit } from '../lib/assinantes/audit'
 import { withRequestState } from '../lib/assinantes/context'
+import { avisarEmailJaCadastrado } from '../lib/assinantes/email-duplicado'
 import { assinanteEndpoints } from '../lib/assinantes/endpoints'
 import { deleteCommentsWhere } from '../lib/classisex/comentarios/cascade'
 import { SEM_DATA_LABEL } from '../lib/assinantes/site-antigo-label'
@@ -353,6 +354,7 @@ export const Assinantes: CollectionConfig = {
   endpoints: assinanteEndpoints,
   hooks: {
     beforeOperation: [guardOperations],
+    beforeValidate: [avisarEmailJaCadastrado],
     beforeDelete: [removePeriods],
     afterChange: [auditAccount, expireAdsOnAccessChange],
     afterDelete: [auditAccountDeleted],
