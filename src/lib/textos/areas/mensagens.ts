@@ -21,14 +21,14 @@ export const mensagens = definirArea({
       bloco: true,
       rotulo: 'Texto quando não há recados',
       padrao:
-        'Para mandar um recado, abra um anúncio do ClassiSex e toque em Enviar recado. Aqui aparecem só os recados que você mandou ou recebeu.',
+        'Para mandar um recado, abra um anúncio do ClassiSex e toque em Comente. Aqui aparecem só os recados que você mandou ou recebeu.',
       secao: 'Lista de recados',
     },
     vazioBotao: { rotulo: 'Botão quando não há recados', padrao: 'Ver ClassiSex', secao: 'Lista de recados' },
     novaMarca: { rotulo: 'Marca de recado novo', padrao: 'Nova', secao: 'Lista de recados' },
     enviarRecadoLink: {
-      rotulo: 'Botão "Enviar recado" no anúncio',
-      padrao: 'Enviar recado',
+      rotulo: 'Botão "Comente" no anúncio',
+      padrao: 'Comente',
       secao: 'Lista de recados',
       ajuda: 'Aparece nos anúncios do ClassiSex.',
     },

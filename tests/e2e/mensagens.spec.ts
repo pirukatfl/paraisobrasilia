@@ -4,7 +4,7 @@ import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
 import { headerMenu, rotulosNoTopo } from './helpers/menu'
 
-// REC-02 / D-02 / D-04: private messages between subscribers, started from an ad ("Enviar recado", R-01),
+// REC-02 / D-02 / D-04: private messages between subscribers, started from an ad ("Comente", R-01),
 // with an unread counter in the members menu (T-05-05, T-05-06, T-05-10, T-05-18).
 test.describe.configure({ mode: 'serial' })
 
@@ -60,7 +60,7 @@ async function login(browser: Browser, baseURL: string, who: typeof ANA, next = 
 }
 
 
-test('the header menu has no Recados item; own content has no Enviar recado', async ({ browser, baseURL }) => {
+test('the header menu has no Recados item; own content has no Comente', async ({ browser, baseURL }) => {
   const ana = await login(browser, baseURL!, ANA, `/area-do-assinante/classisex/${adId}`)
   const menuLogado = await headerMenu(ana.page)
   const labels = await menuLogado.locator(':scope > ul > li > a').allTextContents()
@@ -79,7 +79,7 @@ test('the header menu has no Recados item; own content has no Enviar recado', as
     'Vídeos pornô grátis',
   ]))
   await expect(ana.page.getByRole('heading', { name: /AnaBSB/, level: 1 })).toBeVisible()
-  await expect(ana.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+  await expect(ana.page.getByRole('link', { name: 'Comente' })).toHaveCount(0)
   await ana.page.goto(`${BASE}/nova?anuncio=${adId}`)
   await expect(ana.page.getByText('Este anúncio é seu.')).toBeVisible()
   await expect(ana.page.getByRole('button', { name: 'Enviar' })).toHaveCount(0)
@@ -89,7 +89,7 @@ test('the header menu has no Recados item; own content has no Enviar recado', as
 test('Beto writes to Ana from her ad; empty text keeps the apelido; the thread opens', async ({ browser, baseURL }) => {
   const beto = await login(browser, baseURL!, BETO, `/area-do-assinante/classisex/${adId}`)
   const { page } = beto
-  await page.getByRole('link', { name: 'Enviar recado' }).click()
+  await page.getByRole('link', { name: 'Comente' }).click()
   await expect(page).toHaveURL(new RegExp(`/mensagens/nova\\?anuncio=${adId}$`))
   await expect(page.getByRole('heading', { name: 'Recado para AnaBSB', level: 1 })).toBeVisible()
   await expect(page.getByLabel('Recado', { exact: true })).toHaveAttribute('maxlength', '2000')

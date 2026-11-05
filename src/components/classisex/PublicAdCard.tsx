@@ -8,7 +8,7 @@ import { TextoRico } from '@/components/TextoRico'
 /**
  * One ad in the open view (visitors and free accounts; PREV-01, revisão 2026-10-22): apelido, tipo,
  * city and the whole text with the contacts already removed on the server, a single sharp cover photo
- * (/classisex/previa/…, plain <img>), the call to subscribe and a locked "Enviar recado" (same on every
+ * (/classisex/previa/…, plain <img>), the call to subscribe and a locked "Comente" (same on every
  * card). No video, contact or author.
  */
 export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Textos<'classisex'> }) {
@@ -58,7 +58,7 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
         {/* Locked on EVERY card, whoever pays: nothing here says which advertisers are subscribers (I-1, T-RP-05) */}
         <Link
           href="/assine-ja"
-          aria-label="Enviar recado: só para assinantes"
+          aria-label="Comente: só para assinantes"
           className="btn-secondary inline-flex items-center justify-center gap-2"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">

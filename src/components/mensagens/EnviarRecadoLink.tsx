@@ -4,7 +4,7 @@ import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
 
 /**
- * "Enviar recado" on the ad of a paying member (R-02). The target id is public; the recipient is
+ * "Comente" on the ad of a paying member (R-02). The target id is public; the recipient is
  * derived on the server and canSend decides again there.
  */
 export async function EnviarRecadoLink({ id }: { id: number }) {

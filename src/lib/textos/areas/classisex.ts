@@ -100,7 +100,7 @@ export const classisex = definirArea({
       padrao: 'Assine para ver o contato, todas as fotos e os vídeos',
       secao: 'Cartões dos anúncios',
     },
-    cardEnviarRecado: { rotulo: 'Cartão aberto: botão Enviar recado', padrao: 'Enviar recado', secao: 'Cartões dos anúncios' },
+    cardEnviarRecado: { rotulo: 'Cartão aberto: botão Comente', padrao: 'Comente', secao: 'Cartões dos anúncios' },
     cardRecadosNota: {
       rotulo: 'Cartão aberto: nota sobre recados',
       padrao: 'Recados privados só entre assinantes.',
