@@ -192,12 +192,11 @@ describe('fotos e vídeos enviados sem conta', () => {
       await setPromocao({ ativa: false })
     })
 
-    it('stores the title read from the global, and the party/date, while the promotion is on', async () => {
+    it('stores the title read from the global while the promotion is on', async () => {
       await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
-      const res = await send({ participarPromocao: true, dataFesta: 'Sábado, 14/11' })
+      const res = await send({ participarPromocao: true })
       expect(res.promocao).toBe('Promoção de Novembro')
-      const envio = await doc(res.id!)
-      expect(envio).toMatchObject({ promocao: 'Promoção de Novembro', dataFesta: 'Sábado, 14/11' })
+      expect(await doc(res.id!)).toMatchObject({ promocao: 'Promoção de Novembro' })
     })
 
     it('the title is never taken from the request: extra fields in the params are ignored', async () => {
@@ -214,11 +213,11 @@ describe('fotos e vídeos enviados sem conta', () => {
       expect(await countEnvios()).toBe(0)
     })
 
-    it('without participating, the submission is a plain one (no promotion, no party/date)', async () => {
+    it('without participating, the submission is a plain one (no promotion)', async () => {
       await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
-      const res = await send({ dataFesta: 'Sábado, 14/11' })
+      const res = await send()
       expect(res.promocao).toBeNull()
-      expect(await doc(res.id!)).toMatchObject({ promocao: null, dataFesta: null })
+      expect(await doc(res.id!)).toMatchObject({ promocao: null })
     })
 
     it.each([
@@ -227,21 +226,14 @@ describe('fotos e vídeos enviados sem conta', () => {
       ['not started', { ativa: true, titulo: 'X', inicio: '2999-01-01T00:00:00.000Z' }],
     ])('asking to participate while the promotion is %s is ignored (plain submission)', async (_name, data) => {
       await setPromocao(data)
-      const res = await send({ participarPromocao: true, dataFesta: 'Sábado' })
+      const res = await send({ participarPromocao: true })
       expect(res.promocao).toBeNull()
-      expect(await doc(res.id!)).toMatchObject({ promocao: null, dataFesta: null })
-    })
-
-    it('a long party/date is refused only when participating', async () => {
-      await setPromocao({ ativa: true, titulo: 'P' })
-      const err = await send({ participarPromocao: true, dataFesta: 'x'.repeat(81) }).catch((e: unknown) => e)
-      expect((err as ServiceError).errors).toHaveProperty('dataFesta')
-      expect(await countEnvios()).toBe(0)
+      expect(await doc(res.id!)).toMatchObject({ promocao: null })
     })
 
     it('what was submitted for the promotion is still unreadable for the public, even by filtering on it', async () => {
       await setPromocao({ ativa: true, titulo: 'Promoção Secreta' })
-      const { id } = await send({ participarPromocao: true, dataFesta: 'Festa Reservada' })
+      const { id } = await send({ participarPromocao: true, mensagem: 'Festa Reservada' })
       for (const res of [
         await rest('GET', ['envios-midia']),
         await rest('GET', ['envios-midia'], { query: '?where[promocao][equals]=Promo%C3%A7%C3%A3o%20Secreta' }),

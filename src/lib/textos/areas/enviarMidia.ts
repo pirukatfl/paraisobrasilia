@@ -51,12 +51,6 @@ export const enviarMidia = definirArea({
       secao: PROMO,
     },
     promocaoBotao: { rotulo: 'Botão de envio', padrao: 'Participar da promoção', secao: PROMO },
-    dataFestaRotulo: { rotulo: 'Campo: Festa / data', padrao: 'Festa / data que pretende ir (opcional)', secao: PROMO },
-    dataFestaAjuda: {
-      rotulo: 'Ajuda de Festa / data',
-      padrao: 'Ex.: sábado, 14/11, ou o nome da festa.',
-      secao: PROMO,
-    },
     promocaoEnviadoTitulo: { rotulo: 'Envio recebido: título', padrao: 'Recebemos a sua participação', secao: PROMO },
     promocaoEnviadoTexto: {
       rotulo: 'Envio recebido: texto',

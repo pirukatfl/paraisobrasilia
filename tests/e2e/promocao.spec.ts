@@ -109,7 +109,8 @@ test('the two buttons lead to the forms with the promotion on top and the e-mail
   await expect(page).toHaveURL(/\/enviar-fotos-e-videos\?promocao=1$/)
   await expect(page.getByRole('heading', { name: 'Enviar fotos e vídeos', level: 1 })).toBeVisible()
   await expect(page.locator('[data-promocao-quadro]')).toHaveText('Participando da promoção: Promoção de Teste')
-  await expect(page.getByLabel(/^Festa \/ data que pretende ir/)).toBeVisible()
+  await expect(page.getByLabel(/^Seu e-mail/)).toBeVisible()
+  await expect(page.getByLabel(/^Festa \/ data/)).toHaveCount(0)
 
   await setPromocao(request, { ...ON, participarAtivo: false })
   await page.goto('/')

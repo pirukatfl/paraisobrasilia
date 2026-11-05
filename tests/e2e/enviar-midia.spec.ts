@@ -196,7 +196,7 @@ test.describe('participar da promoção', () => {
     // in the promotion the contact is the e-mail, required
     await expect(page.getByLabel(/^Seu e-mail ou WhatsApp/)).toHaveCount(0)
     await page.getByLabel(/^Seu e-mail/).fill(`promo.${RUN}@teste.local`)
-    await page.getByLabel(/^Festa \/ data que pretende ir/).fill('Sábado, 14/11')
+    await expect(page.getByLabel(/^Festa \/ data/)).toHaveCount(0)
     await page.setInputFiles('input[name="arquivos"]', path.join(FIXTURES, 'flyer-square.jpg'))
     await page.getByLabel(/^Tenho 18 anos ou mais/).check()
     await page.getByLabel(/^Autorizo o Paraíso Brasília a usar/).check()
@@ -207,11 +207,9 @@ test.describe('participar da promoção', () => {
 
     const found = (await api.get(`/api/envios-midia?where[apelido][equals]=${encodeURIComponent(APELIDO_PROMO)}`)).docs as (Envio & {
       promocao?: string
-      dataFesta?: string
     })[]
     expect(found).toHaveLength(1)
     expect(found[0]!.promocao).toBe(PROMO_TITULO)
-    expect(found[0]!.dataFesta).toBe('Sábado, 14/11')
 
     // Marked in the panel list (column) and filterable
     await loginAsStaff(staffPage)

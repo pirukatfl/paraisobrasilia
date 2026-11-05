@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Open "Enviar fotos e vídeos" form for anyone, no account (client decision 2026-11-01): POST multipart with
- * `apelido`, `contato`, `mensagem`, optionally `promocao=1` + `dataFesta` (take part in the promotion on right now; its title is read from the global, never from the form), the declarations `maior18` and `autorizacao`, the honeypot `website` and
+ * `apelido`, `contato`, `mensagem`, optionally `promocao=1` (take part in the promotion on right now; its title is read from the global, never from the form), the declarations `maior18` and `autorizacao`, the honeypot `website` and
  * `arquivos` (one or more files). Same shape as /contos/enviar/enviar: no session is read, nothing that
  * decides status comes from the browser, CSRF is covered by src/proxy.ts, a body above one video is refused
  * before it is read. With JavaScript (`Accept: application/json`) the form sends only the first file here and
@@ -65,7 +65,6 @@ export async function POST(request: Request) {
       maior18: text(form, 'maior18') === 'sim',
       autorizacao: text(form, 'autorizacao') === 'sim',
       website: text(form, 'website'),
-      dataFesta: text(form, 'dataFesta'),
       participarPromocao: quisParticipar,
       files,
       ip,

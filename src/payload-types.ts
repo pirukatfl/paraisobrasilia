@@ -1373,11 +1373,11 @@ export interface EnviosMidia {
   contato: string;
   mensagem?: string | null;
   /**
-   * Preenchido pelo site quando a pessoa clicou em Participar: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.
+   * Preenchido pelo site quando a pessoa enviou pela promoção da página inicial: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.
    */
   promocao?: string | null;
   /**
-   * Só aparece em quem participou da promoção.
+   * Preenchido só em envios antigos da promoção: o formulário não pergunta mais.
    */
   dataFesta?: string | null;
   /**
@@ -11053,36 +11053,6 @@ export interface TextosEnviarMidia {
     };
     [k: string]: unknown;
   } | null;
-  dataFestaRotulo?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  dataFestaAjuda?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
   promocaoEnviadoTitulo?: {
     root: {
       type: string;
@@ -13605,8 +13575,6 @@ export interface TextosEnviarMidiaSelect<T extends boolean = true> {
   promocaoContatoRotulo?: T;
   promocaoContatoAjuda?: T;
   promocaoBotao?: T;
-  dataFestaRotulo?: T;
-  dataFestaAjuda?: T;
   promocaoEnviadoTitulo?: T;
   promocaoEnviadoTexto?: T;
   obrigatorio?: T;

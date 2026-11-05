@@ -70,14 +70,19 @@ export const EnviosMidia: CollectionConfig = {
       admin: {
         readOnly: true,
         description:
-          'Preenchido pelo site quando a pessoa clicou em Participar: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.',
+          'Preenchido pelo site quando a pessoa enviou pela promoção da página inicial: é o título da promoção no momento do envio. Em branco: envio comum. Use o filtro da lista para ver só quem participou.',
       },
     },
     {
       name: 'dataFesta',
       type: 'text',
       label: 'Festa / data que pretende ir',
-      admin: { readOnly: true, description: 'Só aparece em quem participou da promoção.' },
+      admin: {
+        readOnly: true,
+        // The form no longer asks for it; only older promotion submissions have it
+        condition: (data) => Boolean(data?.dataFesta),
+        description: 'Preenchido só em envios antigos da promoção: o formulário não pergunta mais.',
+      },
     },
     {
       name: 'consentAt',
