@@ -58,7 +58,9 @@ export function ComentarioForm({
   const reply = respostaA !== undefined
   const visitante = entrarHref !== undefined
   const erro = state && !state.ok ? state.message : null
-  const enviado = state?.ok && state.message ? state.message : null
+  // The notice goes away once the person starts typing again (dismissed = the `sent` stamp it belonged to)
+  const [dispensado, setDispensado] = useState<number | null>(null)
+  const enviado = state?.ok && state.message && dispensado !== state.sent ? state.message : null
 
   useEffect(() => {
     if (state?.ok) {
@@ -108,7 +110,10 @@ export function ComentarioForm({
           required
           maxLength={COMENTARIO_MAX}
           defaultValue={state?.values?.texto ?? ''}
-          onChange={(e) => setLength(e.target.value.length)}
+          onChange={(e) => {
+            setLength(e.target.value.length)
+            setDispensado(state?.sent ?? null)
+          }}
           aria-invalid={erro ? true : undefined}
           aria-describedby={erro ? `${uid}-erro` : undefined}
           className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text"
@@ -124,7 +129,7 @@ export function ComentarioForm({
         </p>
       )}
       {enviado && (
-        <p role="status" className="text-body text-text">
+        <p role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text">
           {enviado}
         </p>
       )}
