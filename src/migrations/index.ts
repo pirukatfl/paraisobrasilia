@@ -60,6 +60,7 @@ import * as migration_20261103_172502_classisex_comentarios from './20261103_172
 import * as migration_20261103_210621_classisex_comentarios_sem_conta from './20261103_210621_classisex_comentarios_sem_conta';
 import * as migration_20261104_193000_festas_ordem from './20261104_193000_festas_ordem';
 import * as migration_20261104_200500_festas_arrastar from './20261104_200500_festas_arrastar';
+import * as migration_20261105_013500_comente_texto from './20261105_013500_comente_texto';
 
 export const migrations = [
   {
@@ -371,5 +372,10 @@ export const migrations = [
     up: migration_20261104_200500_festas_arrastar.up,
     down: migration_20261104_200500_festas_arrastar.down,
     name: '20261104_200500_festas_arrastar',
+  },
+  {
+    up: migration_20261105_013500_comente_texto.up,
+    down: migration_20261105_013500_comente_texto.down,
+    name: '20261105_013500_comente_texto',
   },
 ];
