@@ -5,6 +5,9 @@ import { TextoRico } from '@/components/TextoRico'
 import { getTextos } from '@/lib/textos/queries'
 import { textoPuro } from '@/lib/textos/rico'
 
+// O layout lê cookies (sessão); sem isto o Next pré-renderiza a página no build e dá erro 500 em produção.
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('enviarMidia')
   return { title: textoPuro(t.enviadoGoogleTitulo), robots: { index: false, follow: false } }
