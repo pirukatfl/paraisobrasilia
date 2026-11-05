@@ -23,7 +23,12 @@ export const getPublicAds = cached(
   () => ['ads', 'ad-comments'],
 )
 
-export type PublicCategory = { id: number; name: string }
+/** The newest approved ad (home ClassiSex card teaser), contact-redacted. Same cache as the open board. */
+export async function getLatestPublicAd(): Promise<PublicAdDTO | null> {
+  return (await getPublicAds({ page: 1 })).items[0] ?? null
+}
+
+export type PublicCategory ={ id: number; name: string }
 
 /** Active Eu sou options for the public filter. */
 export const getPublicAdFilters = cached(
