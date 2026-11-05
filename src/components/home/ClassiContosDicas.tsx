@@ -40,14 +40,14 @@ function Quadro({
 
 const TRECHO_MAX = 110
 
-/** Latest approved ad as bait: cover photo, apelido, type/city and a short, already contact-redacted excerpt. */
+/** Latest approved ad as bait (flat inside the frame, no nested card): cover photo, apelido, type/city and a short, already contact-redacted excerpt. */
 function AnuncioChamariz({ ad }: { ad: PublicAdDTO }) {
   const texto = ad.texto.replace(/\s+/g, ' ').trim()
   const trecho = texto.length > TRECHO_MAX ? `${texto.slice(0, TRECHO_MAX).trimEnd()}…` : texto
   return (
     <Link
       href={`/classisex/anuncio/${ad.id}`}
-      className="group mt-4 flex gap-3 rounded-lg border border-line p-3 transition-colors duration-[var(--duration-fast)] hover:border-accent"
+      className="group mt-4 flex gap-3 border-t border-line pt-4"
     >
       {ad.foto ? (
         // eslint-disable-next-line @next/next/no-img-element -- cover thumb, served as is
