@@ -212,21 +212,21 @@ export function MidiaEnvioForm({
 
         <div className="flex flex-col gap-2">
           <label htmlFor="contato" className="type-label text-text">
-            <TextoRico valor={t.contatoRotulo} linha /> <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
+            <TextoRico valor={participando ? t.promocaoContatoRotulo : t.contatoRotulo} linha /> <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
           </label>
           <input
             id="contato"
             name="contato"
-            type="text"
+            type={participando ? 'email' : 'text'}
             inputMode="email"
-            autoComplete="off"
+            autoComplete={participando ? 'email' : 'off'}
             maxLength={254}
             defaultValue={values.contato}
             aria-describedby={described('contato', 'ajuda-contato')}
             className={inputClass}
           />
           <p id="ajuda-contato" className="type-label text-muted">
-            <TextoRico valor={t.contatoAjuda} linha />
+            <TextoRico valor={participando ? t.promocaoContatoAjuda : t.contatoAjuda} linha />
           </p>
           <FieldError id="erro-contato" message={errors.contato} />
         </div>

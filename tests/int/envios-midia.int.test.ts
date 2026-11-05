@@ -206,6 +206,14 @@ describe('fotos e vídeos enviados sem conta', () => {
       expect((await doc(res.id!)).promocao).toBe('Título do servidor')
     })
 
+    it('in the promotion the e-mail is required: a WhatsApp number is refused and nothing is created', async () => {
+      await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
+      const err = await send({ participarPromocao: true, contato: '(61) 99988-9772' }).catch((e: unknown) => e)
+      expect((err as ServiceError).code).toBe('invalido')
+      expect((err as ServiceError).errors).toHaveProperty('contato')
+      expect(await countEnvios()).toBe(0)
+    })
+
     it('without participating, the submission is a plain one (no promotion, no party/date)', async () => {
       await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
       const res = await send({ dataFesta: 'Sábado, 14/11' })

@@ -140,6 +140,37 @@ describe('conto sent without an account', () => {
     expect((await payload.count({ collection: 'media', overrideAccess: true })).totalDocs).toBe(0)
   })
 
+  describe('participação na promoção', () => {
+    const setPromocao = (data: Record<string, unknown>) =>
+      payload.updateGlobal({ slug: 'promocao', data: { titulo: '', texto: null, inicio: null, fim: null, ...data } as never, overrideAccess: true })
+
+    afterEach(async () => {
+      await setPromocao({ ativa: false })
+    })
+
+    it('records the title read from the global (never from the request) while the promotion is on', async () => {
+      await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
+      const res = await send({ participarPromocao: true, ...({ promocao: 'Título forjado' } as object) })
+      expect(res.promocao).toBe('Promoção de Novembro')
+      expect((await conto(res.id!)).promocao).toBe('Promoção de Novembro')
+    })
+
+    it('requires the e-mail while taking part, and creates nothing without it', async () => {
+      await setPromocao({ ativa: true, titulo: 'Promoção de Novembro' })
+      const err = await send({ participarPromocao: true, email: '' }).catch((e: unknown) => e)
+      expect(err).toBeInstanceOf(ServiceError)
+      expect((err as ServiceError).errors).toHaveProperty('email')
+      expect(await countContos()).toBe(0)
+    })
+
+    it('with the promotion off the request is ignored: a plain conto, e-mail optional again', async () => {
+      await setPromocao({ ativa: false, titulo: 'X' })
+      const res = await send({ participarPromocao: true, email: '' })
+      expect(res.promocao).toBeNull()
+      expect((await conto(res.id!)).promocao ?? null).toBeNull()
+    })
+  })
+
   it(`rate-limits per IP after ${CONTO_MAX_PER_HOUR} valid submissions in an hour`, async () => {
     const ip = '198.51.100.250'
     for (let i = 0; i < CONTO_MAX_PER_HOUR; i += 1) await send({ ip, withImage: false })

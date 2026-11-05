@@ -166,7 +166,7 @@ test('staff open the submission in the panel and see the file with its preview',
   await expect(page.locator('.relationship-table tbody tr')).toHaveCount(2)
 })
 
-// Promoção (2026-11-02): "Participar" in the home Promoção section leads here with ?promocao=1
+// Promoção (2026-11-02): "Mande sua foto/vídeo" in the home Promoção section leads here with ?promocao=1
 const PROMO_TITULO = `Promoção Participar ${RUN}`
 const PROMO_ON = { ativa: true, titulo: PROMO_TITULO, texto: null, inicio: null, fim: null, imagem: null }
 const PROMO_OFF = { ...PROMO_ON, ativa: false, titulo: '' }
@@ -193,7 +193,9 @@ test.describe('participar da promoção', () => {
     await page.goto('/enviar-fotos-e-videos?promocao=1')
     await expect(page.locator('[data-promocao-quadro]')).toHaveText(`Participando da promoção: ${PROMO_TITULO}`)
     await page.getByLabel(/^Apelido/).fill(APELIDO_PROMO)
-    await page.getByLabel(/^Seu e-mail ou WhatsApp/).fill(`promo.${RUN}@teste.local`)
+    // in the promotion the contact is the e-mail, required
+    await expect(page.getByLabel(/^Seu e-mail ou WhatsApp/)).toHaveCount(0)
+    await page.getByLabel(/^Seu e-mail/).fill(`promo.${RUN}@teste.local`)
     await page.getByLabel(/^Festa \/ data que pretende ir/).fill('Sábado, 14/11')
     await page.setInputFiles('input[name="arquivos"]', path.join(FIXTURES, 'flyer-square.jpg'))
     await page.getByLabel(/^Tenho 18 anos ou mais/).check()

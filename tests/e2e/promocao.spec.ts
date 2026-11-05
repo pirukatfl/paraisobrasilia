@@ -8,7 +8,7 @@ test.describe.configure({ mode: 'serial' })
 
 const DIALOG_NAME = 'Conteúdo para maiores de 18 anos'
 const ENTER = 'Tenho 18 anos ou mais — Entrar'
-const OFF = { ativa: false, participarAtivo: true, botaoParticipar: 'Participar', titulo: '', texto: null, inicio: null, fim: null, imagem: null }
+const OFF = { ativa: false, participarAtivo: true, botaoConto: 'Envie seu conto', botaoMidia: 'Mande sua foto/vídeo', titulo: '', texto: null, inicio: null, fim: null, imagem: null }
 
 const lexical = (text: string) => ({
   root: {
@@ -65,8 +65,9 @@ test('on: section on the home, directly above Como chegar, and no modal even on 
   const bloco = secao(page)
   await expect(bloco.getByRole('heading', { name: 'Promoção de Teste', level: 2 })).toBeVisible()
   await expect(bloco.getByText('Mande seus contos ou fotos e vídeos da festa.')).toBeVisible()
-  await expect(bloco.getByRole('link')).toHaveCount(1)
-  await expect(bloco.getByRole('link', { name: 'Participar' })).toHaveAttribute('href', '/enviar-fotos-e-videos?promocao=1')
+  await expect(bloco.getByRole('link')).toHaveCount(2)
+  await expect(bloco.getByRole('link', { name: 'Envie seu conto' })).toHaveAttribute('href', '/contos/enviar?promocao=1')
+  await expect(bloco.getByRole('link', { name: 'Mande sua foto/vídeo' })).toHaveAttribute('href', '/enviar-fotos-e-videos?promocao=1')
 
   // order in the document: promotion, then Como chegar (when the contact has an address)
   if (await comoChegar(page).count()) {
@@ -87,29 +88,38 @@ test('works without JavaScript: the section is server-rendered', async ({ browse
   const page = await context.newPage()
   await page.goto('/')
   await expect(secao(page).getByRole('heading', { name: 'Promoção de Teste' })).toBeAttached()
-  await expect(secao(page).getByRole('link', { name: 'Participar' })).toHaveAttribute('href', '/enviar-fotos-e-videos?promocao=1')
+  await expect(secao(page).getByRole('link', { name: 'Envie seu conto' })).toHaveAttribute('href', '/contos/enviar?promocao=1')
+  await expect(secao(page).getByRole('link', { name: 'Mande sua foto/vídeo' })).toHaveAttribute('href', '/enviar-fotos-e-videos?promocao=1')
   await context.close()
 })
 
-test('Participar leads to the form with the promotion on top; switched off it is informative only', async ({ browser, baseURL, request }) => {
+test('the two buttons lead to the forms with the promotion on top and the e-mail required; switched off it is informative only', async ({ browser, baseURL, request }) => {
   const context = await browser.newContext({ baseURL })
   await context.addCookies([{ name: 'pb_age_ok', value: '1', url: baseURL! }])
   const page = await context.newPage()
   await page.goto('/')
-  await secao(page).getByRole('link', { name: 'Participar' }).click()
+  await secao(page).getByRole('link', { name: 'Envie seu conto' }).click()
+  await expect(page).toHaveURL(/\/contos\/enviar\?promocao=1$/)
+  await expect(page.locator('[data-promocao-quadro]')).toHaveText('Participando da promoção: Promoção de Teste')
+  await expect(page.getByLabel(/^Seu e-mail/)).toBeVisible()
+  await expect(page.getByText('(obrigatório)').last()).toBeVisible()
+
+  await page.goto('/')
+  await secao(page).getByRole('link', { name: 'Mande sua foto/vídeo' }).click()
   await expect(page).toHaveURL(/\/enviar-fotos-e-videos\?promocao=1$/)
   await expect(page.getByRole('heading', { name: 'Enviar fotos e vídeos', level: 1 })).toBeVisible()
   await expect(page.locator('[data-promocao-quadro]')).toHaveText('Participando da promoção: Promoção de Teste')
   await expect(page.getByLabel(/^Festa \/ data que pretende ir/)).toBeVisible()
 
-  await setPromocao(request, { ...ON, participarAtivo: false, botaoParticipar: 'Quero' })
+  await setPromocao(request, { ...ON, participarAtivo: false })
   await page.goto('/')
   await expect(secao(page).getByRole('heading', { name: 'Promoção de Teste' })).toBeVisible()
   await expect(secao(page).getByRole('link')).toHaveCount(0)
 
-  await setPromocao(request, { ...ON, botaoParticipar: 'Quero entrar' })
+  await setPromocao(request, { ...ON, botaoConto: 'Quero mandar um conto', botaoMidia: 'Quero mandar fotos' })
   await page.goto('/')
-  await expect(secao(page).getByRole('link', { name: 'Quero entrar' })).toBeVisible()
+  await expect(secao(page).getByRole('link', { name: 'Quero mandar um conto' })).toBeVisible()
+  await expect(secao(page).getByRole('link', { name: 'Quero mandar fotos' })).toBeVisible()
   await setPromocao(request, ON)
   await context.close()
 })

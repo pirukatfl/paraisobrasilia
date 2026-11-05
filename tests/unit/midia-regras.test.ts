@@ -47,4 +47,12 @@ describe('normalizarContato', () => {
     expect(normalizarContato('a@b')).toBeNull()
     expect(normalizarContato('')).toBeNull()
   })
+
+  it('in the promotion the contact must be an e-mail (a WhatsApp is not enough)', () => {
+    const r = validarEnvioMidia({ ...ok, contato: '(61) 99988-9772', exigirEmail: true })
+    expect(r.ok).toBe(false)
+    if (!r.ok) expect(r.errors.contato).toBe(ENVIO_MIDIA_MESSAGES.contatoPromocao)
+    expect(validarEnvioMidia({ ...ok, contato: '(61) 99988-9772' }).ok).toBe(true)
+    expect(validarEnvioMidia({ ...ok, exigirEmail: true }).ok).toBe(true)
+  })
 })

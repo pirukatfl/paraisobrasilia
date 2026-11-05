@@ -44,6 +44,12 @@ export const enviarMidia = definirArea({
         'Preencha os dados, escolha as suas fotos e vídeos e envie. A equipe confere tudo e entra em contato. Nada vai para o site sem a sua autorização.',
       secao: PROMO,
     },
+    promocaoContatoRotulo: { rotulo: 'Campo: e-mail (obrigatório na promoção)', padrao: 'Seu e-mail', secao: PROMO },
+    promocaoContatoAjuda: {
+      rotulo: 'Ajuda do e-mail na promoção',
+      padrao: 'Obrigatório na promoção: é por ele que a equipe fala com você e libera o acesso à plataforma se você ganhar. Só a equipe vê.',
+      secao: PROMO,
+    },
     promocaoBotao: { rotulo: 'Botão de envio', padrao: 'Participar da promoção', secao: PROMO },
     dataFestaRotulo: { rotulo: 'Campo: Festa / data', padrao: 'Festa / data que pretende ir (opcional)', secao: PROMO },
     dataFestaAjuda: {
