@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { TextoRico } from '@/components/TextoRico'
+import type { PublicAdDTO } from '@/lib/classisex/dto'
 import type { ContoCardDTO } from '@/lib/contos/dto'
 import type { DicaCardDTO } from '@/lib/dicas/dto'
 import { estaOculto } from '@/lib/site/menu'
@@ -37,6 +38,41 @@ function Quadro({
   )
 }
 
+const TRECHO_MAX = 110
+
+/** Latest approved ad as bait: cover photo, apelido, type/city and a short, already contact-redacted excerpt. */
+function AnuncioChamariz({ ad }: { ad: PublicAdDTO }) {
+  const texto = ad.texto.replace(/\s+/g, ' ').trim()
+  const trecho = texto.length > TRECHO_MAX ? `${texto.slice(0, TRECHO_MAX).trimEnd()}…` : texto
+  return (
+    <Link
+      href={`/classisex/anuncio/${ad.id}`}
+      className="group mt-4 flex gap-3 rounded-lg border border-line p-3 transition-colors duration-[var(--duration-fast)] hover:border-accent"
+    >
+      {ad.foto ? (
+        // eslint-disable-next-line @next/next/no-img-element -- cover thumb, served as is
+        <img
+          src={ad.foto.previewUrl}
+          alt=""
+          width={96}
+          height={96}
+          loading="lazy"
+          decoding="async"
+          className="size-24 shrink-0 rounded-md object-cover"
+        />
+      ) : null}
+      <span className="min-w-0">
+        <span className="type-label block font-semibold group-hover:text-accent">{ad.apelido}</span>
+        <span className="type-label block text-muted">
+          {ad.euSou}
+          {ad.cidade ? ` · ${ad.cidade}` : ''}
+        </span>
+        {trecho && <span className="mt-1 block break-words text-body">{trecho}</span>}
+      </span>
+    </Link>
+  )
+}
+
 function Lista({ itens }: { itens: Item[] }) {
   return (
     <ul className="flex flex-col gap-3">
@@ -60,10 +96,13 @@ function Lista({ itens }: { itens: Item[] }) {
 export async function ClassiContosDicas({
   contos,
   dicas,
+  anuncio = null,
   ocultos,
 }: {
   contos: ContoCardDTO[]
   dicas: DicaCardDTO[]
+  /** Newest approved ad, shown as a teaser in the ClassiSex frame */
+  anuncio?: PublicAdDTO | null
   ocultos: readonly string[]
 }) {
   const mostraClassisex = !estaOculto('classisex', ocultos)
@@ -84,6 +123,7 @@ export async function ClassiContosDicas({
           botao={<TextoRico valor={t.classisexBotao} linha />}
         >
           <TextoRico valor={t.classisexTexto} className="text-body" />
+          {anuncio && <AnuncioChamariz ad={anuncio} />}
         </Quadro>
       )}
       {mostraContos && (

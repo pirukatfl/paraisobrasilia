@@ -4,6 +4,7 @@ import { GaleriaTeaser } from '@/components/home/GaleriaTeaser'
 import { PromocaoHome } from '@/components/home/PromocaoHome'
 import { SpaceTeaser } from '@/components/home/SpaceTeaser'
 import { PartyGrid } from '@/components/PartyGrid'
+import { getLatestPublicAd } from '@/lib/classisex/public'
 import { getLatestContos } from '@/lib/contos/public'
 import { getLatestDicas } from '@/lib/dicas/public'
 import { getPublishedModels, getSpaceItems } from '@/lib/gallery/queries'
@@ -29,13 +30,14 @@ async function optional<T>(load: () => Promise<T>): Promise<T | null> {
 }
 
 export default async function HomePage() {
-  const [parties, spaceItems, models, contact, dicas, contos, menu, t] = await Promise.all([
+  const [parties, spaceItems, models, contact, dicas, contos, anuncio, menu, t] = await Promise.all([
     getUpcomingParties(new Date()), // errors here keep the Phase 1 error screen
     optional(() => getSpaceItems()), // all items: the lightbox walks them, only 4 tiles are rendered
     optional(() => getPublishedModels()),
     optional(() => getContact()),
     optional(() => getLatestDicas(3)),
     optional(() => getLatestContos(3)),
+    optional(() => getLatestPublicAd()),
     getMenuConfig(), // never throws
     getTextos('inicio'),
   ])
@@ -67,7 +69,7 @@ export default async function HomePage() {
 
       <SpaceTeaser items={spaceItems ?? []} abaixoDaDobra={hasParties} />
       {!estaOculto('galeria', menu.ocultos) && <GaleriaTeaser models={models ?? []} />}
-      <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} ocultos={menu.ocultos} />
+      <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} anuncio={anuncio} ocultos={menu.ocultos} />
       <PromocaoHome ocultos={menu.ocultos} />
       {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
     </>
