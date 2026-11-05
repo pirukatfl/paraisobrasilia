@@ -8,7 +8,6 @@ import { TextoRico } from '@/components/TextoRico'
 import { CLIENT_MESSAGES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from '@/lib/classisex/media-messages'
 import {
   APELIDO_MAX,
-  DATA_FESTA_MAX,
   ENVIO_MIDIA_MESSAGES,
   MAX_FOTOS,
   MAX_FOTO_BYTES,
@@ -35,8 +34,8 @@ const isVideo = (file: File) => VIDEO_MIME_TYPES.includes(typeOf(file))
 
 const megabytes = (bytes: number) => `${(bytes / 1_000_000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`
 
-type Values = { apelido: string; contato: string; mensagem: string; dataFesta: string }
-const EMPTY: Values = { apelido: '', contato: '', mensagem: '', dataFesta: '' }
+type Values = { apelido: string; contato: string; mensagem: string }
+const EMPTY: Values = { apelido: '', contato: '', mensagem: '' }
 
 const field = (form: FormData, name: string) => {
   const value = form.get(name)
@@ -55,7 +54,7 @@ export function MidiaEnvioForm({
 }: {
   erro?: string
   textos: Textos<'enviarMidia'>
-  /** Arrived through "Participar" and the promotion is on: shows the party/date field and tells the server (which checks again) */
+  /** Arrived through the home promotion and it is on: the contact must be an e-mail and the server is told (which checks again) */
   participando?: boolean
 }) {
   const router = useRouter()
@@ -127,7 +126,6 @@ export function MidiaEnvioForm({
           apelido: field(data, 'apelido'),
           contato: field(data, 'contato'),
           mensagem: field(data, 'mensagem'),
-          dataFesta: field(data, 'dataFesta'),
         })
         const next = json.errors ?? { form: 'Não foi possível enviar agora. Tente de novo.' }
         setErrors(next)
@@ -230,28 +228,6 @@ export function MidiaEnvioForm({
           </p>
           <FieldError id="erro-contato" message={errors.contato} />
         </div>
-
-        {participando && (
-          <div className="flex flex-col gap-2">
-            <label htmlFor="dataFesta" className="type-label text-text">
-              <TextoRico valor={t.dataFestaRotulo} linha />
-            </label>
-            <input
-              id="dataFesta"
-              name="dataFesta"
-              type="text"
-              maxLength={DATA_FESTA_MAX}
-              autoComplete="off"
-              defaultValue={values.dataFesta}
-              aria-describedby={described('dataFesta', 'ajuda-dataFesta')}
-              className={inputClass}
-            />
-            <p id="ajuda-dataFesta" className="type-label text-muted">
-              <TextoRico valor={t.dataFestaAjuda} linha />
-            </p>
-            <FieldError id="erro-dataFesta" message={errors.dataFesta} />
-          </div>
-        )}
 
         <div className="flex flex-col gap-2">
           <label htmlFor="mensagem" className="type-label text-text">

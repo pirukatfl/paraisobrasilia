@@ -6,7 +6,7 @@ const ok = { apelido: ' Casal  BSB ', contato: 'Fulano@Exemplo.com', mensagem: '
 
 describe('validarEnvioMidia', () => {
   it('normalises a valid submission', () => {
-    expect(validarEnvioMidia(ok)).toEqual({ ok: true, value: { apelido: 'Casal BSB', contato: 'fulano@exemplo.com', mensagem: null, dataFesta: null } })
+    expect(validarEnvioMidia(ok)).toEqual({ ok: true, value: { apelido: 'Casal BSB', contato: 'fulano@exemplo.com', mensagem: null } })
   })
 
   it('requires both declarations, a nickname and a contact', () => {
@@ -21,17 +21,6 @@ describe('validarEnvioMidia', () => {
   it('limits the message', () => {
     expect(validarEnvioMidia({ ...ok, mensagem: 'a'.repeat(1001) }).ok).toBe(false)
     expect(validarEnvioMidia({ ...ok, mensagem: 'a'.repeat(1000) }).ok).toBe(true)
-  })
-})
-
-describe('dataFesta (promotion)', () => {
-  it('is optional, trimmed and limited to 80 characters', () => {
-    const v = validarEnvioMidia({ ...ok, dataFesta: '  Sábado,   14/11 ' })
-    expect(v.ok && v.value.dataFesta).toBe('Sábado, 14/11')
-    expect(validarEnvioMidia({ ...ok, dataFesta: 'a'.repeat(80) }).ok).toBe(true)
-    const r = validarEnvioMidia({ ...ok, dataFesta: 'a'.repeat(81) })
-    expect(r.ok).toBe(false)
-    if (!r.ok) expect(r.errors.dataFesta).toBe(ENVIO_MIDIA_MESSAGES.dataFesta)
   })
 })
 

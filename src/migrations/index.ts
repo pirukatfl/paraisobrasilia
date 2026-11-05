@@ -61,6 +61,7 @@ import * as migration_20261103_210621_classisex_comentarios_sem_conta from './20
 import * as migration_20261104_193000_festas_ordem from './20261104_193000_festas_ordem';
 import * as migration_20261104_200500_festas_arrastar from './20261104_200500_festas_arrastar';
 import * as migration_20261105_130000_promocao_botoes_conto from './20261105_130000_promocao_botoes_conto';
+import * as migration_20261105_213000_promocao_sem_data_festa from './20261105_213000_promocao_sem_data_festa';
 
 export const migrations = [
   {
@@ -377,5 +378,10 @@ export const migrations = [
     up: migration_20261105_130000_promocao_botoes_conto.up,
     down: migration_20261105_130000_promocao_botoes_conto.down,
     name: '20261105_130000_promocao_botoes_conto',
+  },
+  {
+    up: migration_20261105_213000_promocao_sem_data_festa.up,
+    down: migration_20261105_213000_promocao_sem_data_festa.down,
+    name: '20261105_213000_promocao_sem_data_festa',
   },
 ];

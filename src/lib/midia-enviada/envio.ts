@@ -27,8 +27,6 @@ export type EnvioMidiaParams = {
   mensagem: string
   maior18: boolean
   autorizacao: boolean
-  /** Party / date the person plans to attend (only kept when taking part in the promotion) */
-  dataFesta?: string
   /** The visitor asked to take part in the promotion; the server checks the global and decides (the title is never taken from here) */
   participarPromocao?: boolean
   /** Honeypot: real people leave it empty */
@@ -74,7 +72,7 @@ export async function criarEnvioMidia(
   const promocao = params.participarPromocao ? await promocaoVigente(payload, now) : null
 
   // (2) form rules (the declarations are the proof of consent)
-  const checked = validarEnvioMidia({ ...params, dataFesta: promocao ? params.dataFesta : '', exigirEmail: promocao !== null })
+  const checked = validarEnvioMidia({ ...params, exigirEmail: promocao !== null })
   if (!checked.ok) throw new ServiceError('invalido', 'Confira os campos destacados.', 400, checked.errors as Record<string, string>)
   if (files.length === 0) {
     throw new ServiceError('invalido', 'Confira os campos destacados.', 400, { arquivos: ENVIO_MIDIA_MESSAGES.semArquivo })
@@ -100,7 +98,7 @@ export async function criarEnvioMidia(
       mensagem: value.mensagem,
       status: 'novo',
       consentAt: now.toISOString(),
-      ...(promocao ? { promocao, dataFesta: value.dataFesta } : {}),
+      ...(promocao ? { promocao } : {}),
     },
     overrideAccess: true,
   })
