@@ -67,9 +67,9 @@ export default async function HomePage() {
         </>
       )}
 
+      <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} anuncio={anuncio} ocultos={menu.ocultos} />
       <SpaceTeaser items={spaceItems ?? []} abaixoDaDobra={hasParties} />
       {!estaOculto('galeria', menu.ocultos) && <GaleriaTeaser models={models ?? []} />}
-      <ClassiContosDicas contos={contos ?? []} dicas={dicas ?? []} anuncio={anuncio} ocultos={menu.ocultos} />
       <PromocaoHome ocultos={menu.ocultos} />
       {contact && contact.addressLine && <DirectionsTeaser contact={contact} />}
     </>
