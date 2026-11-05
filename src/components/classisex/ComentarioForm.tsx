@@ -46,7 +46,7 @@ export function ComentarioForm({
   respostaA?: number
   apelidoInicial: string
   textos: ComentarioFormTextos
-  onSent?: () => void
+  onSent?: (message: string) => void
   onCancel?: () => void
   /** Set only for a visitor: `/entrar?next=…`. Shows the "Tem conta?" line under the button of a new comment. */
   entrarHref?: string
@@ -58,11 +58,12 @@ export function ComentarioForm({
   const reply = respostaA !== undefined
   const visitante = entrarHref !== undefined
   const erro = state && !state.ok ? state.message : null
+  const enviado = state?.ok && state.message ? state.message : null
 
   useEffect(() => {
     if (state?.ok) {
       formRef.current?.reset()
-      onSent?.()
+      onSent?.(state.message)
     }
     // `sent` changes on every success; onSent is a stable closure of the parent
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,6 +121,11 @@ export function ComentarioForm({
       {erro && (
         <p id={`${uid}-erro`} role="alert" className="text-body text-danger">
           {erro}
+        </p>
+      )}
+      {enviado && (
+        <p role="status" className="text-body text-text">
+          {enviado}
         </p>
       )}
       <div className="flex flex-wrap items-center gap-3">

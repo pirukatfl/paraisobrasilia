@@ -38,6 +38,7 @@ export const COMENTARIO_MESSAGES = {
   limiteVisitante: 'Muitos comentários enviados daqui em pouco tempo. Tente de novo mais tarde.',
   entrar: 'Entre na sua conta para comentar.',
   naoEncontrado: 'Comentário não encontrado.',
+  enviado: 'Comentário enviado. Ele aparece depois que a equipe aprovar.',
 } as const
 
 export const normaliseApelido = (value: string) => value.replace(/\s+/g, ' ').trim()

@@ -47,7 +47,7 @@ const clientIp = async () => {
 /**
  * Comentar / Responder. Only adId, parentId, apelido, texto and the honeypot are read from the form.
  * With a session the author is the session's account; without one the comment is a visitor's
- * (no author, the name is whatever was typed). The status is always "publicado" (set by the service).
+ * (no author, the name is whatever was typed). The comment is created "pendente" (set by the service) and goes public only after staff approve it.
  */
 export async function comentar(_prev: ComentarioState, formData: FormData): Promise<ComentarioState> {
   const adId = idField(formData, 'anuncio')
@@ -84,7 +84,7 @@ export async function comentar(_prev: ComentarioState, formData: FormData): Prom
     return { ok: false, message: `Não foi possível enviar o comentário: ${mensagemAmigavel(err)}`, values }
   }
   refresh(adId)
-  return { ok: true, message: '', sent: Date.now() }
+  return { ok: true, message: COMENTARIO_MESSAGES.enviado, sent: Date.now() }
 }
 
 /** Apagar o próprio comentário: the comment id is the only identifier read from the form. */

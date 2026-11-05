@@ -2,7 +2,7 @@ import { createLocalReq, type Payload, type PayloadRequest } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import { findMemberAds, findPublicAds } from '../../src/lib/classisex/board'
-import { createComment, deleteOwnComment, listComments } from '../../src/lib/classisex/comentarios/service'
+import { countCommentsByAd, createComment, deleteOwnComment, listComments } from '../../src/lib/classisex/comentarios/service'
 import { LIMITE_DIARIO, QUEM_COMENTA, VISITANTE_LIMITE_DIA, VISITANTE_LIMITE_HORA } from '../../src/lib/classisex/comentarios/rules'
 import { REDACTED_LABEL } from '../../src/lib/classisex/redact'
 import { graphql, rest, tokenFor } from '../helpers/rest'
@@ -60,14 +60,20 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
   })
 
   type CommentInput = Partial<Parameters<typeof createComment>[1]>
+  /** What staff do in the admin: "Em análise" → "Publicado". */
+  const approve = async (id: number | null) => {
+    if (id !== null) await payload.update({ collection: 'ad-comments', id, data: { status: 'publicado' }, overrideAccess: true, context: { skipAudit: true } })
+  }
+  /** A comment already approved (the service itself creates it "pendente"). */
   const comment = async (over: CommentInput = {}): Promise<{ id: number }> => {
     const res = await createComment(payload, { assinanteId: free.id, adId, apelido: 'Lua', texto: 'Que anúncio simpático!', now: NOW, ...over })
+    await approve(res.id)
     return { id: res.id as number }
   }
   let ipSeq = 0
   /** A visitor (no account); each call gets its own address unless one is given. */
-  const visitor = (over: CommentInput = {}) =>
-    createComment(payload, {
+  const visitor = async (over: CommentInput = {}) => {
+    const res = await createComment(payload, {
       assinanteId: null,
       adId,
       apelido: 'Visitante Teste',
@@ -76,6 +82,9 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
       ip: `198.51.100.${++ipSeq}`,
       ...over,
     })
+    await approve(res.id)
+    return res
+  }
   const rows = async (where: Record<string, unknown> = {}) =>
     (await payload.find({ collection: 'ad-comments', where: where as never, depth: 0, limit: 100, overrideAccess: true, sort: 'id' }))
       .docs as unknown as Array<Record<string, unknown> & { id: number }>
@@ -111,6 +120,26 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
       const res = await rest('GET', ['ad-comments'], { token: staffToken })
       expect(res.status).toBe(200)
       expect((res.json as { totalDocs: number }).totalDocs).toBe(1)
+    })
+  })
+
+  describe('moderação', () => {
+    it('comentário novo (com ou sem conta) nasce "pendente" e não aparece até a equipe aprovar', async () => {
+      const mine = await createComment(payload, { assinanteId: free.id, adId, apelido: 'Lua', texto: 'Olá pendente', now: NOW })
+      const vis = await createComment(payload, { assinanteId: null, adId, apelido: 'Zé', texto: 'Visitante pendente', now: NOW, ip: '198.51.100.250' })
+      for (const id of [mine.id, vis.id]) expect((await rows({ id: { equals: id } }))[0].status).toBe('pendente')
+      expect(await listComments(payload, adId, { verContatos: true, now: NOW })).toEqual([])
+      expect((await countCommentsByAd(payload, [adId])).get(adId) ?? 0).toBe(0)
+      await approve(mine.id)
+      const thread = await listComments(payload, adId, { verContatos: true, now: NOW })
+      expect(thread?.map((c) => c.texto)).toEqual(['Olá pendente'])
+    })
+
+    it('não dá para responder a um comentário ainda em análise', async () => {
+      const root = await createComment(payload, { assinanteId: free.id, adId, apelido: 'Lua', texto: 'Raiz pendente', now: NOW })
+      await expect(
+        createComment(payload, { assinanteId: free.id, adId, parentId: root.id as number, apelido: 'Lua', texto: 'Resposta', now: NOW }),
+      ).rejects.toMatchObject({ status: 400 })
     })
   })
 

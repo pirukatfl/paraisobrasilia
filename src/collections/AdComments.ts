@@ -103,7 +103,7 @@ async function auditComment(
 
 const afterChange: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req, context }) => {
   expire(['ad-comments'])
-  if (operation === 'update' && !context?.skipAudit && auditActorOf(req).actorType === 'equipe' && previousDoc && doc.status !== previousDoc.status) {
+  if (operation === 'update' && !context?.skipAudit && auditActorOf(req).actorType === 'equipe' && previousDoc && doc.status !== previousDoc.status && (doc.status === 'oculto' || previousDoc.status === 'oculto')) {
     await auditComment(req, doc.status === 'oculto' ? 'comentario-ocultado' : 'comentario-reexibido', doc)
   }
   return doc
@@ -134,10 +134,10 @@ export const AdComments: CollectionConfig = {
   admin: {
     group: 'ClassiSex',
     useAsTitle: 'resumo',
-    defaultColumns: ['resumo', 'ad', 'semConta', 'status', 'createdAt'],
+    defaultColumns: ['resumo', 'ad', 'semConta', 'status', 'createdAt', 'aprovarNaLista'],
     listSearchableFields: ['resumo', 'apelido', 'texto'],
     description:
-      'Comentários dos anúncios. Qualquer pessoa pode comentar, com ou sem conta: quem não tem conta aparece como "Sem conta" e se identifica com o nome que digitou. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.',
+      'Comentários dos anúncios. Qualquer pessoa pode comentar, com ou sem conta: quem não tem conta aparece como "Sem conta" e se identifica com o nome que digitou. Os comentários novos entram como "Em análise" e só aparecem no site depois de aprovados (botão "Aprovar" na lista ou Situação "Publicado"). Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.',
   },
   defaultSort: '-createdAt',
   access: {
@@ -154,6 +154,13 @@ export const AdComments: CollectionConfig = {
     afterDelete: [afterDelete],
   },
   fields: [
+    {
+      // Quick "Aprovar" in each row of the list (comments waiting for approval); nothing on the edit screen
+      name: 'aprovarNaLista',
+      type: 'ui',
+      label: 'Aprovar',
+      admin: { components: { Cell: '/components/admin/classisex/AprovarComentarioCelula#AprovarComentarioCelula' } },
+    },
     {
       name: 'resumo',
       type: 'text',
@@ -234,10 +241,15 @@ export const AdComments: CollectionConfig = {
       index: true,
       label: 'Situação',
       options: [
+        { label: 'Em análise', value: 'pendente' },
         { label: 'Publicado', value: 'publicado' },
         { label: 'Oculto', value: 'oculto' },
       ],
-      admin: { position: 'sidebar', description: 'Oculto sai do site na hora. Dá para voltar a Publicado.' },
+      admin: {
+        position: 'sidebar',
+        description:
+          'Todo comentário novo entra como "Em análise" e só aparece no site depois de "Publicado". Oculto sai do site na hora. Dá para voltar a Publicado.',
+      },
     },
     { name: 'ocultadoEm', type: 'date', label: 'Ocultado em', admin: dateAdmin },
     {

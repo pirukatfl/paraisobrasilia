@@ -60,7 +60,7 @@ export type CreateCommentInput = {
   website?: string
 }
 
-/** Creates the comment. `id: null` for a honeypot hit (nothing created, the caller answers like a success). */
+/** Creates the comment, waiting for approval ("pendente"). `id: null` for a honeypot hit (nothing created, the caller answers like a success). */
 export async function createComment(payload: Payload, input: CreateCommentInput): Promise<{ id: number | null }> {
   const { now } = input
   const assinanteId = input.assinanteId ?? null
@@ -161,7 +161,8 @@ export async function createComment(payload: Payload, input: CreateCommentInput)
       apelido,
       texto,
       doAnunciante: !visitante && ad.author !== null && ad.author === assinanteId,
-      status: 'publicado',
+      // Moderation: nothing is public until staff approve it in the admin
+      status: 'pendente',
       createdAt: now.toISOString(),
     },
     overrideAccess: true,
