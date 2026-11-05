@@ -550,8 +550,9 @@ Se o DNS do domínio estiver em outro lugar (ex.: Cloudflare), os mesmos registr
 
 ## 12. Domínio oficial (swingbrasilia.com.br)
 
-Objetivo: o site novo passa a abrir em **https://swingbrasilia.com.br**. Os endereços **www.swingbrasilia.com.br** e
-**novo.swingbrasilia.com.br** continuam funcionando, mas só levam (redirecionam) para o endereço oficial. O site antigo
+Objetivo: o site novo passa a abrir em **https://swingbrasilia.com.br**. Os endereços **www.swingbrasilia.com.br**,
+**paraisobrasilia.com.br** e **www.paraisobrasilia.com.br** só levam (redirecionam) para o endereço oficial.
+O endereço de testes **novo.swingbrasilia.com.br** deixa de ser usado (decisão do cliente de 05/11/2026). O site antigo
 (WordPress) fica em **anterior.swingbrasilia.com.br**, na hospedagem antiga, e não é mexido por aqui.
 
 Faça os passos **nesta ordem**. É seguro fazer o passo C antes do DNS propagar: o Caddy (o "porteiro") só consegue o
@@ -572,13 +573,17 @@ cadeado HTTPS depois que o DNS aponta para o servidor, mas ele **fica tentando s
 |---|---|---|---|
 | A | `@` | `187.77.246.132` | endereço oficial, para o servidor novo |
 | A | `www` | `187.77.246.132` | (ou CNAME `www` → `swingbrasilia.com.br`) |
-| A | `novo` | `187.77.246.132` | já existe; mantenha |
+| A | `novo` | `187.77.246.132` | não é mais usado; pode apagar |
 | A | `anterior` | IP da hospedagem antiga | para o site antigo continuar acessível |
 
 - **Apague** qualquer registro **AAAA** de `@` e de `www` que aponte para a hospedagem antiga (senão quem tem IPv6 cai no site antigo).
 - **Não mexa** nos registros **MX** nem **TXT**: é por eles que o e-mail `suporte@swingbrasilia.com.br` continua funcionando.
 - Deixe o **TTL em 300** (5 minutos) e o **CDN da Hostinger desligado** para este domínio.
 - A mudança pode levar de minutos a algumas horas para valer em todo lugar.
+
+**paraisobrasilia.com.br** fica no **Registro.br** (registro.br → domínio → DNS → **Configurar zona DNS** / **Editar zona**):
+registro **A** com nome em branco → `187.77.246.132` e registro **A** `www` → `187.77.246.132`. Se o domínio usar
+servidores DNS de outro lugar (ex.: Hostinger), a mudança é feita lá. Apague registros **AAAA** antigos de `@` e `www`.
 
 ### C. Servidor: aplicar o domínio oficial
 
@@ -590,7 +595,7 @@ você digita; é o mesmo token da seção 7.3). As senhas, o banco e as fotos s�
 read -rsp 'Cole o token do GitHub e aperte Enter: ' GH_TOKEN; echo
 curl -fsSL -H "Authorization: token $GH_TOKEN" -o /root/bootstrap-vps.sh \
   https://raw.githubusercontent.com/pirukatfl/paraisobrasilia/main/scripts/deploy/bootstrap-vps.sh
-DOMAIN=swingbrasilia.com.br ALIAS_DOMAINS="www.swingbrasilia.com.br novo.swingbrasilia.com.br" SITE_ENV=production GHCR_USER=pirukatfl GHCR_TOKEN="$GH_TOKEN" bash /root/bootstrap-vps.sh
+DOMAIN=swingbrasilia.com.br ALIAS_DOMAINS="www.swingbrasilia.com.br paraisobrasilia.com.br www.paraisobrasilia.com.br" SITE_ENV=production GHCR_USER=pirukatfl GHCR_TOKEN="$GH_TOKEN" bash /root/bootstrap-vps.sh
 unset GH_TOKEN
 ```
 
@@ -603,7 +608,7 @@ No Terminal do servidor (ou de qualquer computador):
 ```bash
 curl -sI https://swingbrasilia.com.br/        | head -1    # HTTP/2 200
 curl -sI https://www.swingbrasilia.com.br/x?a=1 | grep -iE '^(HTTP|location)'   # 301 e location: https://swingbrasilia.com.br/x?a=1
-curl -sI https://novo.swingbrasilia.com.br/x?a=1 | grep -iE '^(HTTP|location)'  # 301 e location: https://swingbrasilia.com.br/x?a=1
+curl -sI https://paraisobrasilia.com.br/x?a=1 | grep -iE '^(HTTP|location)'    # 301 e location: https://swingbrasilia.com.br/x?a=1
 curl -s https://swingbrasilia.com.br/robots.txt              # mostra "Allow: /" e "Sitemap: https://swingbrasilia.com.br/sitemap.xml"
 ```
 

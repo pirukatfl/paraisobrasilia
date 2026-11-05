@@ -300,9 +300,9 @@ echo "OUT=$DOMAIN|$ALIAS_DOMAINS|$SITE_ENV"`
       expect(res.status).not.toBe(0)
     })
 
-    it('reloads Caddy after the rewritten Caddyfile (bind mount is not recreated by compose)', () => {
-      expect(script).toContain('caddy reload --config /etc/caddy/Caddyfile')
-      expect(script.indexOf('caddy reload')).toBeGreaterThan(script.indexOf('update.sh" --force'))
+    it('recreates Caddy after the rewritten Caddyfile and env (new domain needs a new container)', () => {
+      expect(script).toContain('up -d --force-recreate caddy')
+      expect(script.indexOf('--force-recreate caddy')).toBeGreaterThan(script.indexOf('update.sh" --force'))
     })
 
     it('re-login to ghcr.io happens when a token is passed, so GHCR_TOKEN on the command line is used', () => {
