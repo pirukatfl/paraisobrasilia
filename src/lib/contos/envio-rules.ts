@@ -18,6 +18,7 @@ export const CONTO_ENVIO_MESSAGES = {
   textoLongo: `O conto pode ter até ${TEXTO_MAX.toLocaleString('pt-BR')} caracteres.`,
   textoContato: 'O texto parece ter telefone, e-mail, @ ou link. Tire os contatos e envie de novo.',
   email: 'Informe um e-mail válido. Só a equipe vê.',
+  emailPromocao: 'Na promoção o e-mail é obrigatório: informe um e-mail válido. Só a equipe vê.',
   consent:
     'Confirme que você tem 18 anos ou mais, que o conto é seu e que a imagem (se houver) é sua ou autorizada, sem nudez explícita e sem contatos.',
   termos: 'Aceite os Termos de Uso e a Política de Privacidade para enviar.',
@@ -34,6 +35,8 @@ export type ContoEnvioInput = {
   email: string
   consent: boolean
   termos: boolean
+  /** Taking part in the promotion: the e-mail is required (the winner may get access to the platform) */
+  exigirEmail?: boolean
 }
 
 export type ContoEnvioValue = { title: string; assinadoComo: string | null; texto: string; email: string | null }
@@ -66,7 +69,10 @@ export function validateContoEnvio(
   if (texto.length < TEXTO_MIN) errors.texto = CONTO_ENVIO_MESSAGES.textoCurto
   else if (texto.length > TEXTO_MAX) errors.texto = CONTO_ENVIO_MESSAGES.textoLongo
   else if (hasContact(texto)) errors.texto = CONTO_ENVIO_MESSAGES.textoContato
-  if (email && (email.length > EMAIL_MAX || !VISITOR_EMAIL_RE.test(email))) errors.email = CONTO_ENVIO_MESSAGES.email
+  if (!email && input.exigirEmail) errors.email = CONTO_ENVIO_MESSAGES.emailPromocao
+  else if (email && (email.length > EMAIL_MAX || !VISITOR_EMAIL_RE.test(email))) {
+    errors.email = input.exigirEmail ? CONTO_ENVIO_MESSAGES.emailPromocao : CONTO_ENVIO_MESSAGES.email
+  }
   if (!input.consent) errors.consent = CONTO_ENVIO_MESSAGES.consent
   if (!input.termos) errors.termos = CONTO_ENVIO_MESSAGES.termos
 

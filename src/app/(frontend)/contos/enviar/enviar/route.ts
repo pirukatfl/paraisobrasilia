@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Open conto form for anyone, no account (client decision 2026-10-24): POST multipart with title, text,
- * optional nickname, e-mail and `imagem`, the declaration `consent`, `termos` and the honeypot `website`.
+ * optional nickname, e-mail and `imagem`, optionally `promocao=1` (take part in the promotion on right now: its title is read from the global, never from the form, and the e-mail becomes required), the declaration `consent`, `termos` and the honeypot `website`.
  * Same shape as /classisex/anunciar/enviar: no session is read, nothing that decides status or limits comes
  * from the browser (the conto is always a draft), CSRF is covered by src/proxy.ts, a body above one image
  * plus the text is refused before it is read. With JavaScript (`Accept: application/json`) the answer is
@@ -19,6 +19,7 @@ export const dynamic = 'force-dynamic'
 const MAX_BODY_BYTES = MAX_AD_PHOTO_BYTES + 1_000_000
 const ENVIADO = '/contos/enviado'
 const FORM = '/contos/enviar'
+const PROMOCAO = 'promocao=1'
 
 const noStore = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' }
 
@@ -52,10 +53,12 @@ function failureOf(err: unknown): Failure {
 
 export async function POST(request: Request) {
   const wantsJson = (request.headers.get('accept') ?? '').includes('application/json')
+  // Only a hint to keep the promotion on the next page; the server decides again from the global
+  let quisParticipar = false
   const respond = (failure: Failure) =>
     wantsJson
       ? Response.json({ ok: false, errors: failure.errors }, { status: failure.status, headers: noStore })
-      : new Response(null, { status: 303, headers: { ...noStore, Location: `${FORM}?erro=${encodeURIComponent(failure.code)}` } })
+      : new Response(null, { status: 303, headers: { ...noStore, Location: `${FORM}?erro=${encodeURIComponent(failure.code)}${quisParticipar ? `&${PROMOCAO}` : ''}` } })
   const succeed = () =>
     wantsJson
       ? Response.json({ ok: true, redirect: ENVIADO }, { headers: noStore })
@@ -71,6 +74,7 @@ export async function POST(request: Request) {
     return respond(failureOf(new ServiceError('tipo', UPLOAD_ERROR_MESSAGES.tipo, 400)))
   }
 
+  quisParticipar = text(form, 'promocao') === '1'
   const entries = form.getAll('imagem').filter((e): e is File => e instanceof File && e.size > 0)
   // One image only: a second file is refused, not silently dropped
   if (entries.length > 1) return respond(failureOf(new ServiceError('tipo', 'Envie uma única imagem.', 400)))
@@ -96,6 +100,7 @@ export async function POST(request: Request) {
       email: text(form, 'email'),
       consent: text(form, 'consent') === 'sim',
       termos: text(form, 'termos') === 'sim',
+      participarPromocao: quisParticipar,
       website: text(form, 'website'),
       file,
       ip,

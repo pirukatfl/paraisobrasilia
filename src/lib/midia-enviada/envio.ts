@@ -11,10 +11,12 @@ import { APIError } from 'payload'
 
 import { PHOTO_MIME_TYPES, VIDEO_MIME_TYPES, uploadCodeFor } from '../classisex/media-messages'
 import { ServiceError, type UploadFile } from '../classisex/service'
-import { tituloDaParticipacao, type PromocaoVigencia } from '../site/promocao'
+import { promocaoVigente } from '../site/promocao-vigente'
 import { allowAttempt } from '../email/rate-limit'
 import { ENVIO_MIDIA_MESSAGES, MAX_FOTO_BYTES, MAX_FOTOS, MAX_VIDEOS, MAX_VIDEO_BYTES, validarEnvioMidia } from './regras'
 import { criarToken } from './token'
+
+export { promocaoVigente }
 
 /** Max submissions that pass validation per IP and per contact in one hour. */
 export const MIDIA_MAX_POR_HORA = 5
@@ -72,7 +74,7 @@ export async function criarEnvioMidia(
   const promocao = params.participarPromocao ? await promocaoVigente(payload, now) : null
 
   // (2) form rules (the declarations are the proof of consent)
-  const checked = validarEnvioMidia({ ...params, dataFesta: promocao ? params.dataFesta : '' })
+  const checked = validarEnvioMidia({ ...params, dataFesta: promocao ? params.dataFesta : '', exigirEmail: promocao !== null })
   if (!checked.ok) throw new ServiceError('invalido', 'Confira os campos destacados.', 400, checked.errors as Record<string, string>)
   if (files.length === 0) {
     throw new ServiceError('invalido', 'Confira os campos destacados.', 400, { arquivos: ENVIO_MIDIA_MESSAGES.semArquivo })
@@ -111,21 +113,6 @@ export async function criarEnvioMidia(
     throw err
   }
   return { id: doc.id, token: criarToken(doc.id, now), promocao }
-}
-
-/** Title of the promotion on right now, straight from the database (not from a cache); null when off. */
-export async function promocaoVigente(payload: Payload, now: Date): Promise<string | null> {
-  const doc = await payload.findGlobal({ slug: 'promocao', depth: 0, overrideAccess: true }).catch(() => null)
-  if (!doc) return null
-  const vigencia: PromocaoVigencia = {
-    ativa: doc.ativa === true,
-    titulo: (doc.titulo ?? '').trim(),
-    texto: doc.texto && typeof doc.texto === 'object' ? (doc.texto as PromocaoVigencia['texto']) : null,
-    inicio: doc.inicio ?? null,
-    fim: doc.fim ?? null,
-    imagem: doc.imagem ? ({} as PromocaoVigencia['imagem']) : null,
-  }
-  return tituloDaParticipacao(vigencia, now)
 }
 
 /** Adds one more file to a submission (token already checked by the route). */

@@ -973,13 +973,14 @@ export interface Video {
   focalY?: number | null;
 }
 /**
- * Crie a festa, envie o flyer e clique em Publicar. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
+ * Crie a festa, envie o flyer e clique em Publicar. Para mudar a ordem, arraste as festas pela alça na lista. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "parties".
  */
 export interface Party {
   id: number;
+  _order?: string | null;
   /**
    * Nome da festa como aparece no site.
    */
@@ -1175,6 +1176,10 @@ export interface Conto {
    * Só a equipe vê.
    */
   emailVisitante?: string | null;
+  /**
+   * Preenchido pelo site quando a pessoa enviou o conto pela promoção da página inicial: é o título da promoção no momento do envio. Em branco: envio comum. O e-mail é obrigatório nesses envios.
+   */
+  promocao?: string | null;
   enviadoEm?: string | null;
   /**
    * Preenchido pela importação. Não mexa.
@@ -1292,7 +1297,7 @@ export interface SpaceItem {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e aparece na página.
+ * Nome artístico, descrição curta e de 1 a 30 fotos (a primeira é a capa). Sem nudez explícita: esta galeria é aberta ao público. O contato é opcional e só assinantes o veem.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "models".
@@ -1313,7 +1318,7 @@ export interface Model {
    */
   description?: string | null;
   /**
-   * Aparece na página da profissional, aberta ao público. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.
+   * Só assinantes com acesso ativo veem este contato, na página da profissional. Ex.: WhatsApp (61) 99999-0000 ou @instagram. Deixe vazio para não mostrar.
    */
   contact?: string | null;
   /**
@@ -2055,6 +2060,7 @@ export interface VideosSelect<T extends boolean = true> {
  * via the `definition` "parties_select".
  */
 export interface PartiesSelect<T extends boolean = true> {
+  _order?: T;
   title?: T;
   slug?: T;
   startsAt?: T;
@@ -2123,6 +2129,7 @@ export interface ContosSelect<T extends boolean = true> {
   enviadoPorVisitante?: T;
   assinadoComo?: T;
   emailVisitante?: T;
+  promocao?: T;
   enviadoEm?: T;
   wpId?: T;
   wpSlug?: T;
@@ -2393,7 +2400,7 @@ export interface MenuDoSite {
   createdAt?: string | null;
 }
 /**
- * Seção da página inicial, logo acima de "Como chegar" (não é mais pop-up nem item do menu). Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Quem quiser entrar na promoção clica em Participar e preenche o formulário.
+ * Seção da página inicial, logo acima de "Como chegar" (não é mais pop-up nem item do menu). Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Quem quiser entrar na promoção clica em "Envie seu conto" ou "Mande sua foto/vídeo" e preenche o formulário (o e-mail é obrigatório).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "promocao".
@@ -2409,7 +2416,7 @@ export interface Promocao {
    */
   titulo?: string | null;
   /**
-   * Aparece abaixo do título. No fim da seção já aparece o botão "Participar" (se estiver marcado).
+   * Aparece abaixo do título. No fim da seção já aparecem os botões de envio (se estiverem marcados).
    */
   texto?: {
     root: {
@@ -2427,10 +2434,11 @@ export interface Promocao {
     [k: string]: unknown;
   } | null;
   /**
-   * Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: a seção só informa, sem botão.
+   * Marcado: a seção mostra um botão para enviar conto e outro para enviar foto/vídeo, e quem clicar entra na promoção (o e-mail é obrigatório). Desmarcado: a seção só informa, sem botões.
    */
   participarAtivo?: boolean | null;
-  botaoParticipar?: string | null;
+  botaoConto?: string | null;
+  botaoMidia?: string | null;
   /**
    * Horário de Brasília. Em branco: vale desde já.
    */
@@ -10416,6 +10424,54 @@ export interface TextosEnviarConto {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Use {titulo} para o título da promoção (Configurações → Promoção).
+   */
+  promocaoQuadro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoEmailRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoEmailAjuda?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   obrigatorio?: {
     root: {
       type: string;
@@ -10938,6 +10994,36 @@ export interface TextosEnviarMidia {
     [k: string]: unknown;
   } | null;
   promocaoIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoContatoRotulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  promocaoContatoAjuda?: {
     root: {
       type: string;
       children: {
@@ -12852,7 +12938,8 @@ export interface PromocaoSelect<T extends boolean = true> {
   titulo?: T;
   texto?: T;
   participarAtivo?: T;
-  botaoParticipar?: T;
+  botaoConto?: T;
+  botaoMidia?: T;
   inicio?: T;
   fim?: T;
   imagem?: T;
@@ -13469,6 +13556,9 @@ export interface TextosEnviarContoSelect<T extends boolean = true> {
   topo?: T;
   titulo?: T;
   intro?: T;
+  promocaoQuadro?: T;
+  promocaoEmailRotulo?: T;
+  promocaoEmailAjuda?: T;
   obrigatorio?: T;
   tituloRotulo?: T;
   assinadoRotulo?: T;
@@ -13512,6 +13602,8 @@ export interface TextosEnviarMidiaSelect<T extends boolean = true> {
   intro?: T;
   promocaoQuadro?: T;
   promocaoIntro?: T;
+  promocaoContatoRotulo?: T;
+  promocaoContatoAjuda?: T;
   promocaoBotao?: T;
   dataFestaRotulo?: T;
   dataFestaAjuda?: T;

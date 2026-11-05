@@ -25,7 +25,16 @@ const field = (form: FormData, name: string) => {
  * (303 back with ?erro=); with JavaScript it posts with fetch and keeps what was typed when the server
  * refuses. The server decides every rule again.
  */
-export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Textos<'enviarConto'> }) {
+export function ContoEnvioForm({
+  erro,
+  textos: t,
+  participando = false,
+}: {
+  erro?: string
+  textos: Textos<'enviarConto'>
+  /** Arrived through "Envie seu conto" of the home promotion and it is on: the e-mail becomes required and the server is told (it checks again) */
+  participando?: boolean
+}) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [errors, setErrors] = useState<Record<string, string>>(erro ? { form: erro } : {})
@@ -91,6 +100,8 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
         </p>
       )}
 
+      {participando && <input type="hidden" name="promocao" value="1" />}
+
       {/* The key re-mounts the uncontrolled fields with the values the server just refused; the image picker sits outside it so the chosen file survives a refusal */}
       <div key={key} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
@@ -155,7 +166,13 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
 
         <div className="flex flex-col gap-2">
           <label htmlFor="email" className="type-label text-text">
-            <TextoRico valor={t.emailRotulo} linha />
+            <TextoRico valor={participando ? t.promocaoEmailRotulo : t.emailRotulo} linha />
+            {participando && (
+              <>
+                {' '}
+                <Required texto={<TextoRico valor={t.obrigatorio} linha />} />
+              </>
+            )}
           </label>
           <input
             id="email"
@@ -167,7 +184,7 @@ export function ContoEnvioForm({ erro, textos: t }: { erro?: string; textos: Tex
             className={inputClass}
           />
           <p id="ajuda-email" className="type-label text-muted">
-            <TextoRico valor={t.emailAjuda} linha />
+            <TextoRico valor={participando ? t.promocaoEmailAjuda : t.emailAjuda} linha />
           </p>
           <FieldError id="erro-email" message={errors.email} />
         </div>

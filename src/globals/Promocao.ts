@@ -19,7 +19,7 @@ export const Promocao: GlobalConfig = {
   admin: {
     group: 'Configurações',
     description:
-      'Seção da página inicial, logo acima de "Como chegar" (não é mais pop-up nem item do menu). Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Quem quiser entrar na promoção clica em Participar e preenche o formulário.',
+      'Seção da página inicial, logo acima de "Como chegar" (não é mais pop-up nem item do menu). Marque "Promoção ligada" para mostrar e desmarque para tirar do site. Quem quiser entrar na promoção clica em "Envie seu conto" ou "Mande sua foto/vídeo" e preenche o formulário (o e-mail é obrigatório).',
   },
   access: {
     read: () => true,
@@ -49,7 +49,7 @@ export const Promocao: GlobalConfig = {
       label: 'Texto',
       admin: {
         description:
-          'Aparece abaixo do título. No fim da seção já aparece o botão "Participar" (se estiver marcado).',
+          'Aparece abaixo do título. No fim da seção já aparecem os botões de envio (se estiverem marcados).',
       },
     },
     {
@@ -59,17 +59,23 @@ export const Promocao: GlobalConfig = {
           name: 'participarAtivo',
           type: 'checkbox',
           defaultValue: true,
-          label: 'Mostrar o botão Participar',
+          label: 'Mostrar os botões de envio',
           admin: {
             description:
-              'Marcado: quem clicar em Participar vai para o formulário (dados, fotos e vídeos). Desmarcado: a seção só informa, sem botão.',
+              'Marcado: a seção mostra um botão para enviar conto e outro para enviar foto/vídeo, e quem clicar entra na promoção (o e-mail é obrigatório). Desmarcado: a seção só informa, sem botões.',
           },
         },
         {
-          name: 'botaoParticipar',
+          name: 'botaoConto',
           type: 'text',
-          defaultValue: 'Participar',
-          label: 'Texto do botão Participar',
+          defaultValue: 'Envie seu conto',
+          label: 'Texto do botão de conto',
+        },
+        {
+          name: 'botaoMidia',
+          type: 'text',
+          defaultValue: 'Mande sua foto/vídeo',
+          label: 'Texto do botão de foto/vídeo',
         },
       ],
     },

@@ -218,6 +218,20 @@ export const Contos: CollectionConfig = {
       admin: { position: 'sidebar', readOnly: true, description: 'Só a equipe vê.' },
     },
     {
+      // Staff-only like the e-mail: set by the server when the visitor came from the home promotion
+      name: 'promocao',
+      type: 'text',
+      index: true,
+      label: 'Promoção',
+      access: staffOnlyField,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description:
+          'Preenchido pelo site quando a pessoa enviou o conto pela promoção da página inicial: é o título da promoção no momento do envio. Em branco: envio comum. O e-mail é obrigatório nesses envios.',
+      },
+    },
+    {
       name: 'enviadoEm',
       type: 'date',
       label: 'Enviado em',

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { TEXTO_MAX, TEXTO_MIN, textoToLexical, validateContoEnvio, type ContoEnvioInput } from '@/lib/contos/envio-rules'
+import { CONTO_ENVIO_MESSAGES, TEXTO_MAX, TEXTO_MIN, textoToLexical, validateContoEnvio, type ContoEnvioInput } from '@/lib/contos/envio-rules'
 import { plainTextOf, splitConto, type LexicalStateLike } from '@/lib/contos/excerpt'
 
 const TEXTO = 'Era uma vez uma festa muito animada no Paraíso. '.repeat(10)
@@ -25,6 +25,15 @@ describe('validateContoEnvio', () => {
     expect(bad({ texto: `${TEXTO} zap 61 99988-9772` })).toHaveProperty('texto')
     expect(bad({ texto: `${TEXTO} siga @casalbsb` })).toHaveProperty('texto')
     expect(bad({ texto: `${TEXTO} veja https://exemplo.com.br/x` })).toHaveProperty('texto')
+  })
+
+  it('the e-mail is optional, but required (and valid) when taking part in the promotion', () => {
+    expect(validateContoEnvio({ ...ok, email: '' }).ok).toBe(true)
+    const vazio = validateContoEnvio({ ...ok, email: '', exigirEmail: true })
+    expect(vazio.ok).toBe(false)
+    if (!vazio.ok) expect(vazio.errors.email).toBe(CONTO_ENVIO_MESSAGES.emailPromocao)
+    expect(validateContoEnvio({ ...ok, email: 'sem-arroba', exigirEmail: true }).ok).toBe(false)
+    expect(validateContoEnvio({ ...ok, exigirEmail: true }).ok).toBe(true)
   })
 
   it('requires the 18+/authorship declaration and the terms', () => {

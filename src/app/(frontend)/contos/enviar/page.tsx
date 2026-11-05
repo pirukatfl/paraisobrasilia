@@ -6,6 +6,9 @@ import { CONTO_ENVIO_MESSAGES } from '@/lib/contos/envio-rules'
 import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
 import { textoPuro } from '@/lib/textos/rico'
+import { ENVIO_PROMOCAO_PARAM } from '@/lib/site/links'
+import { tituloDaParticipacao } from '@/lib/site/promocao'
+import { getPromocao } from '@/lib/site/promocao-queries'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +36,11 @@ export default async function EnviarContoPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const t = await getTextos('enviarConto')
-  const raw = (await searchParams).erro
+  const params = await searchParams
+  const raw = params.erro
+  // ?promocao=1 only counts while the promotion is on and inside its period; otherwise it is ignored
+  const tituloPromocao =
+    params[ENVIO_PROMOCAO_PARAM] === '1' ? tituloDaParticipacao(await getPromocao(), new Date()) : null
   const erro = erroMessage(typeof raw === 'string' ? raw.slice(0, 40) : undefined)
   return (
     <section aria-labelledby="titulo-enviar-conto">
@@ -41,8 +48,17 @@ export default async function EnviarContoPage({
       <h1 id="titulo-enviar-conto" className="type-display mt-2">
         <TextoRico valor={t.titulo} linha />
       </h1>
+      {tituloPromocao !== null && (
+        <div
+          role="note"
+          data-promocao-quadro
+          className="mt-4 max-w-[680px] rounded-lg border border-gold/40 bg-surface px-4 py-3 font-bold text-text"
+        >
+          <TextoRico valor={t.promocaoQuadro} vars={{ titulo: tituloPromocao }} linha />
+        </div>
+      )}
       <TextoRico valor={t.intro} className="mt-4 max-w-[680px] text-body text-muted" />
-      <ContoEnvioForm erro={erro} textos={t} />
+      <ContoEnvioForm erro={erro} textos={t} participando={tituloPromocao !== null} />
     </section>
   )
 }

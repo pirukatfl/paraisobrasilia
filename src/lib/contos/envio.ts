@@ -14,6 +14,7 @@ import type { Payload } from 'payload'
 import { MAX_AD_PHOTO_BYTES, PHOTO_MIME_TYPES } from '../classisex/media-messages'
 import { ServiceError, type UploadFile } from '../classisex/service'
 import { allowAttempt } from '../email/rate-limit'
+import { promocaoVigente } from '../site/promocao-vigente'
 import { CONTO_ENVIO_MESSAGES, textoToLexical, validateContoEnvio } from './envio-rules'
 import { DEFAULT_OPEN_BLOCKS, SLUG_MAX, slugify } from './excerpt'
 
@@ -27,6 +28,8 @@ export type VisitorContoInput = {
   email: string
   consent: boolean
   termos: boolean
+  /** The visitor asked to take part in the promotion; the server checks the global and decides (the title is never taken from here) */
+  participarPromocao?: boolean
   /** Honeypot: real people leave it empty */
   website?: string
   file?: UploadFile | null
@@ -58,10 +61,13 @@ async function uniqueSlug(payload: Payload, title: string): Promise<string> {
 }
 
 /** Creates the draft conto (and its pending image). Returns `{ id: null }` for a honeypot hit (nothing created). */
-export async function createVisitorConto(payload: Payload, params: VisitorContoInput): Promise<{ id: number | null }> {
+export async function createVisitorConto(payload: Payload, params: VisitorContoInput): Promise<{ id: number | null; promocao: string | null }> {
   const { file, ip, now } = params
   // (1) honeypot: neutral success, nothing is created
-  if ((params.website ?? '').trim() !== '') return { id: null }
+  if ((params.website ?? '').trim() !== '') return { id: null, promocao: null }
+
+  // (1b) the promotion: its title is read from the global here, on the server, and only while it is on
+  const promocao = params.participarPromocao ? await promocaoVigente(payload, now) : null
 
   // (2) image rules, before anything is read or written
   if (file) {
@@ -70,7 +76,7 @@ export async function createVisitorConto(payload: Payload, params: VisitorContoI
   }
 
   // (3) text rules
-  const checked = validateContoEnvio(params)
+  const checked = validateContoEnvio({ ...params, exigirEmail: promocao !== null })
   if (!checked.ok) throw new ServiceError('invalido', 'Confira os campos destacados.', 400, checked.errors as Record<string, string>)
   const value = checked.value
 
@@ -114,12 +120,13 @@ export async function createVisitorConto(payload: Payload, params: VisitorContoI
         enviadoPorVisitante: true,
         assinadoComo: value.assinadoComo,
         emailVisitante: value.email,
+        ...(promocao ? { promocao } : {}),
         enviadoEm: now.toISOString(),
         _status: 'draft',
       } as never,
       overrideAccess: true,
     })
-    return { id: doc.id }
+    return { id: doc.id, promocao }
   } catch (err) {
     if (mediaId) await payload.delete({ collection: 'media', id: mediaId, overrideAccess: true }).catch(() => undefined)
     throw err

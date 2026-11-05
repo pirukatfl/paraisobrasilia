@@ -2,7 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { TextoRico } from '@/components/TextoRico'
-import { ENVIO_PROMOCAO_HREF } from '@/lib/site/links'
+import { ENVIO_CONTO_PROMOCAO_HREF, ENVIO_PROMOCAO_HREF } from '@/lib/site/links'
 import { estaOculto } from '@/lib/site/menu'
 import { promocaoNoAr } from '@/lib/site/promocao'
 import { getPromocao } from '@/lib/site/promocao-queries'
@@ -11,7 +11,8 @@ import { getTextos } from '@/lib/textos/queries'
 /**
  * Home section "Promoção", directly above "Como chegar": the staff-edited promotion (Configurações → Promoção).
  * Nothing while it is off, outside its period, or hidden in "Menu do site" (option "Promoção (seção da página inicial)").
- * Participar leads to the submission form with the promotion on top; without the button the section only informs.
+ * Two buttons lead to the submission forms (conto, photo/video) with the promotion on top and the e-mail required;
+ * without them the section only informs.
  */
 export async function PromocaoHome({ ocultos }: { ocultos: readonly string[] }) {
   if (estaOculto('promocao', ocultos)) return null
@@ -41,9 +42,14 @@ export async function PromocaoHome({ ocultos }: { ocultos: readonly string[] }) 
         </h2>
         {promocao.texto && <TextoRico valor={promocao.texto} className="mt-4 max-w-prose text-body" />}
         {promocao.participarAtivo && (
-          <Link href={ENVIO_PROMOCAO_HREF} className="btn-primary mt-6 self-start">
-            {promocao.botaoParticipar}
-          </Link>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link href={ENVIO_CONTO_PROMOCAO_HREF} className="btn-primary">
+              {promocao.botaoConto}
+            </Link>
+            <Link href={ENVIO_PROMOCAO_HREF} className="btn-secondary">
+              {promocao.botaoMidia}
+            </Link>
+          </div>
         )}
       </div>
     </section>

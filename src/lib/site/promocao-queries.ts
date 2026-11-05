@@ -6,7 +6,7 @@ import { getPayload } from 'payload'
 import type { Promocao } from '../../payload-types'
 import { cached } from '../cache/cached'
 import { toGalleryImage } from '../gallery/queries'
-import { BOTAO_PARTICIPAR_PADRAO, type PromocaoDTO } from './promocao'
+import { BOTAO_CONTO_PADRAO, BOTAO_MIDIA_PADRAO, type PromocaoDTO } from './promocao'
 
 export function toPromocaoDTO(doc: Partial<Promocao> | null | undefined): PromocaoDTO | null {
   if (!doc) return null
@@ -20,7 +20,8 @@ export function toPromocaoDTO(doc: Partial<Promocao> | null | undefined): Promoc
     fim: doc.fim ?? null,
     imagem: toGalleryImage(doc.imagem, titulo || 'Promoção do Paraíso Brasília'),
     participarAtivo: doc.participarAtivo !== false,
-    botaoParticipar: (doc.botaoParticipar ?? '').trim() || BOTAO_PARTICIPAR_PADRAO,
+    botaoConto: (doc.botaoConto ?? '').trim() || BOTAO_CONTO_PADRAO,
+    botaoMidia: (doc.botaoMidia ?? '').trim() || BOTAO_MIDIA_PADRAO,
     versao: doc.updatedAt ?? '',
   }
 }

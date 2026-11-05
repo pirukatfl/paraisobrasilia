@@ -14,14 +14,16 @@ export type PromocaoDTO = {
   inicio: string | null
   fim: string | null
   imagem: GalleryImage | null
-  /** false: the section is informative only (no button) */
+  /** false: the section is informative only (no buttons) */
   participarAtivo: boolean
-  botaoParticipar: string
+  botaoConto: string
+  botaoMidia: string
   /** Changes whenever staff save the promotion */
   versao: string
 }
 
-export const BOTAO_PARTICIPAR_PADRAO = 'Participar'
+export const BOTAO_CONTO_PADRAO = 'Envie seu conto'
+export const BOTAO_MIDIA_PADRAO = 'Mande sua foto/vídeo'
 
 /** What the "is it on" rule looks at (the DTO, or a global read straight from the database). */
 export type PromocaoVigencia = Pick<PromocaoDTO, 'ativa' | 'titulo' | 'texto' | 'inicio' | 'fim' | 'imagem'>

@@ -5,9 +5,11 @@
  */
 export const ENVIO_CONTOS_HREF = '/contos/enviar'
 export const ENVIO_MIDIA_HREF = '/enviar-fotos-e-videos'
-/** "Participar" of the home promotion section: the same form, with the promotion shown on top */
+/** The home promotion section buttons lead to the submission forms with ?promocao=1 (the server checks again). Photos/videos: */
 export const ENVIO_PROMOCAO_PARAM = 'promocao'
 export const ENVIO_PROMOCAO_HREF = `${ENVIO_MIDIA_HREF}?${ENVIO_PROMOCAO_PARAM}=1`
+/** "Envie seu conto" of the home promotion section: the conto form, with the promotion on top and the e-mail required */
+export const ENVIO_CONTO_PROMOCAO_HREF = `${ENVIO_CONTOS_HREF}?${ENVIO_PROMOCAO_PARAM}=1`
 
 /** Whole words only ("contos", not "contosa"); accents are letters, so "vídeos" never matches inside a word. */
 const PALAVRAS = /(?<![\p{L}\p{N}])(contos|fotos e v[ií]deos)(?![\p{L}\p{N}])/giu

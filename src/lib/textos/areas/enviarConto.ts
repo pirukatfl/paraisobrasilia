@@ -17,6 +17,20 @@ export const enviarConto = definirArea({
       secao: 'Página Enviar um conto',
     },
 
+    // Participação na promoção (quando a pessoa chega pelo botão "Envie seu conto" da seção na página inicial)
+    promocaoQuadro: {
+      rotulo: 'Quadro no topo da página',
+      padrao: 'Participando da promoção: {titulo}',
+      secao: 'Participação na promoção',
+      ajuda: 'Use {titulo} para o título da promoção (Configurações → Promoção).',
+    },
+    promocaoEmailRotulo: { rotulo: 'Campo: e-mail (obrigatório na promoção)', padrao: 'Seu e-mail', secao: 'Participação na promoção' },
+    promocaoEmailAjuda: {
+      rotulo: 'Ajuda do e-mail na promoção',
+      padrao: 'Obrigatório na promoção: é por ele que a equipe fala com você e libera o acesso à plataforma se você ganhar. Só a equipe vê.',
+      secao: 'Participação na promoção',
+    },
+
     // Formulário
     obrigatorio: { rotulo: 'Marca de campo obrigatório', padrao: '(obrigatório)', secao: 'Formulário' },
     tituloRotulo: { rotulo: 'Campo: Título', padrao: 'Título', secao: 'Formulário' },
