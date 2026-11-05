@@ -391,7 +391,7 @@ test.describe('contos and public previews', () => {
     await anon.dispose()
   })
 
-  test('when Ana\'s access ends nobody can send her a recado and her ad shows no Enviar recado', async ({
+  test('when Ana\'s access ends nobody can send her a recado and her ad shows no Comente', async ({
     request,
     browser,
     baseURL,
@@ -407,7 +407,7 @@ test.describe('contos and public previews', () => {
       beto.page.getByText('Esta pessoa está sem assinatura ativa e não recebe recados agora.'),
     ).toBeVisible()
     await beto.page.goto(`/area-do-assinante/classisex/${s.adId}`)
-    await expect(beto.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+    await expect(beto.page.getByRole('link', { name: 'Comente' })).toHaveCount(0)
     await expect(
       beto.page.getByText('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.'),
     ).toBeVisible()

@@ -215,7 +215,7 @@ export type MemberAdDTO = {
   }
   fotos: MemberPhotoDTO[]
   videos: MemberVideoDTO[]
-  /** Author is a free account: no "Enviar recado" (G-02). No author identity here. */
+  /** Author is a free account: no "Comente" (G-02). No author identity here. */
   autorGratuito: boolean
   /** Published comments (the card link "Comentários (N)"). */
   comentarios: number

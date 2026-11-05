@@ -647,13 +647,13 @@ Os campos da lateral ("Código no site antigo", "Endereço no site antigo", "Imp
 cada recado é uma conversa **privada** entre duas pessoas. Nada precisa de aprovação da equipe e não há fila de recados no
 painel.
 
-- **Quem manda:** só **assinante com acesso ativo**, a partir do botão **Enviar recado** no anúncio de **outro assinante
+- **Quem manda:** só **assinante com acesso ativo**, a partir do botão **Comente** no anúncio de **outro assinante
   que também está com acesso ativo** (pagante para pagante). No próprio anúncio e no anúncio de uma conta gratuita o botão
   não aparece; no anúncio de conta gratuita o assinante vê "Este anúncio é de uma conta gratuita e não recebe recados. Use os
   contatos do anúncio."
 - **Quem vê:** a página **Recados** da área do assinante lista **só as conversas que a pessoa começou ou recebeu**. Um
   terceiro assinante não vê nada e, se digitar o endereço de uma conversa alheia, cai na página "não encontrada".
-- **Conta gratuita:** não manda nem recebe. Na área aberta (ClassiSex) todo cartão mostra o botão **Enviar recado**
+- **Conta gratuita:** não manda nem recebe. Na área aberta (ClassiSex) todo cartão mostra o botão **Comente**
   trancado, que leva ao **Assine Já** (aparece em todos os cartões, para não revelar quem é assinante).
 - **Endereços antigos:** `/recados` leva ao Assine Já e `/area-do-assinante/recados` leva à página Recados.
 - **Recados do mural antigo:** os textos já guardados continuam no banco, sem tela e sem aparecer em lugar nenhum do site.
@@ -681,7 +681,7 @@ Suspender o envio a partir de uma denúncia não é mais possível no painel, po
 
 Crie dois assinantes de teste, libere 30 dias para os dois e publique (e aprove) um anúncio para cada. Entre com um numa
 **janela anônima** e com o outro em outra janela anônima de outro navegador (ou em outro celular). Abra o anúncio do outro e
-toque em **Enviar recado**, responda, veja o número de recados novos, bloqueie e denuncie. Libere 30 dias para um terceiro
+toque em **Comente**, responda, veja o número de recados novos, bloqueie e denuncie. Libere 30 dias para um terceiro
 assinante de teste e confira que a conversa dos dois **não aparece** na página Recados dele. Depois exclua os assinantes de
 teste (as conversas vão junto).
 
@@ -710,7 +710,7 @@ Liberar acesso). Esta parte do guia explica o que muda no dia a dia.
   outros com o **texto na íntegra, sem contatos**, e a foto de capa. Não vê contatos, as demais fotos nem vídeos, não
   abre o anúncio completo e não manda recados.
 - O assinante que vê o anúncio de uma conta gratuita enxerga o **WhatsApp e o Telegram** do anúncio, mas **não tem o botão
-  "Enviar recado"** (conta gratuita não recebe recados). Conta gratuita também não manda recados.
+  "Comente"** (conta gratuita não recebe recados). Conta gratuita também não manda recados.
 
 ### Cadastro pelo site
 

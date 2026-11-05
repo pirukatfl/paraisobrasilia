@@ -129,24 +129,24 @@ test('2. a third paying member (Caio) sees nothing: empty list, 404 for the thre
 
 test('3. button matrix on the ad page: only paying -> paying, never own, never a free advertiser', async ({ browser, baseURL }) => {
   const beto = await as(browser, baseURL!, BETO, `/area-do-assinante/classisex/${s.anaAd}`)
-  const link = beto.page.getByRole('main').getByRole('link', { name: 'Enviar recado' })
+  const link = beto.page.getByRole('main').getByRole('link', { name: 'Comente' })
   await expect(link).toHaveCount(1)
   await expect(link).toHaveAttribute('href', `${M}/nova?anuncio=${s.anaAd}`)
   await beto.page.goto(`/area-do-assinante/classisex/${s.gabiAd}`)
   await expect(beto.page.getByRole('heading', { level: 1 })).toContainText('GabiBSB')
-  await expect(beto.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+  await expect(beto.page.getByRole('link', { name: 'Comente' })).toHaveCount(0)
   await expect(beto.page.getByText(GRATIS_NOTE)).toBeVisible()
   await beto.context.close()
 
   const ana = await as(browser, baseURL!, ANA, `/area-do-assinante/classisex/${s.anaAd}`)
   await expect(ana.page.getByRole('heading', { level: 1 })).toContainText('AnaBSB')
-  await expect(ana.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+  await expect(ana.page.getByRole('link', { name: 'Comente' })).toHaveCount(0)
   await ana.context.close()
 
   const gabi = await as(browser, baseURL!, GABI, `/area-do-assinante/classisex/${s.anaAd}`)
   await expect(gabi.page.getByRole('heading', { name: 'Disponível para assinantes' })).toBeVisible()
   expect(await gabi.page.content()).not.toContain('sentinela-ana')
-  await expect(gabi.page.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+  await expect(gabi.page.getByRole('link', { name: 'Comente' })).toHaveCount(0)
   await gabi.context.close()
 })
 

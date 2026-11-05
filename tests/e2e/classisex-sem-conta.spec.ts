@@ -270,13 +270,13 @@ test('after approval the open board shows the redacted text and one sharp cover,
   await context.close()
 })
 
-test('an active subscriber sees the WhatsApp of the ad and no "Enviar recado"; a free account sees neither', async ({ browser, baseURL }) => {
+test('an active subscriber sees the WhatsApp of the ad and no "Comente"; a free account sees neither', async ({ browser, baseURL }) => {
   const pago = await visitor(browser, baseURL!)
   await loginAsAssinante(pago.page, PAGO.email, PAGO.password)
   await pago.page.goto(`/area-do-assinante/classisex/${adId}`)
   const main = pago.page.locator('main')
   await expect(main.getByRole('link', { name: /WhatsApp/ })).toBeVisible()
-  await expect(main.getByRole('link', { name: 'Enviar recado' })).toHaveCount(0)
+  await expect(main.getByRole('link', { name: 'Comente' })).toHaveCount(0)
   await pago.context.close()
 
   const livre = await visitor(browser, baseURL!)

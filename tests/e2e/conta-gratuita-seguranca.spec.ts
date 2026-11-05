@@ -283,7 +283,7 @@ test.describe('paying viewer', () => {
     await context.close()
   })
 
-  test('on a free advertiser’s ad: one photo, the contacts, no “Enviar recado”', async ({ browser, baseURL }) => {
+  test('on a free advertiser’s ad: one photo, the contacts, no “Comente”', async ({ browser, baseURL }) => {
     test.setTimeout(150_000)
     const { page, context } = await asSubscriber(browser, baseURL!, VIEWER)
     const detail = await fetchAs(page, 'GET', `/area-do-assinante/classisex/${s.ads.gratis}`)
@@ -295,11 +295,11 @@ test.describe('paying viewer', () => {
     expect(detail.body).toContain(`mailto:${CONTACTS.gratis.email}`)
     expect(detail.body).toContain(CONTACTS.gratis.links[0]!.url)
     expect(detail.body).toContain(CONTACTS.gratis.observacao)
-    expect(detail.body).not.toContain('Enviar recado')
+    expect(detail.body).not.toContain('Comente')
     expect(detail.body).toContain('Este anúncio é de uma conta gratuita e não recebe recados. Use os contatos do anúncio.')
     // control: a paying advertiser's ad does offer the button
     const paid = await fetchAs(page, 'GET', `/area-do-assinante/classisex/${s.ads.pago}`)
-    expect(paid.body).toContain('Enviar recado')
+    expect(paid.body).toContain('Comente')
     expect(mediaIdsIn(paid.body).length).toBe(3)
     await context.close()
   })

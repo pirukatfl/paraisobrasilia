@@ -80,7 +80,7 @@ export async function buildScenario(request: APIRequestContext, browser: Browser
 
   // Beto writes to Ana from her ad, through the button
   const beto = await loginPage(browser, baseURL, BETO, `/area-do-assinante/classisex/${anaAd}`)
-  await beto.page.getByRole('link', { name: 'Enviar recado' }).click()
+  await beto.page.getByRole('link', { name: 'Comente' }).click()
   await expect(beto.page).toHaveURL(new RegExp(`/mensagens/nova\\?anuncio=${anaAd}$`))
   const start = await captureStart(beto.page, SENT.conversa)
   await expect(beto.page).toHaveURL(/\/area-do-assinante\/mensagens\/\d+$/)

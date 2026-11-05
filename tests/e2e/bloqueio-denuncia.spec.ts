@@ -54,7 +54,7 @@ async function reply(page: Page, texto: string) {
 
 test('Beto starts a conversation from the ad; Ana blocks him from the thread', async ({ browser, baseURL }) => {
   const beto = await login(browser, baseURL!, BETO, `/area-do-assinante/classisex/${adId}`)
-  await beto.page.getByRole('link', { name: 'Enviar recado' }).click()
+  await beto.page.getByRole('link', { name: 'Comente' }).click()
   await beto.page.getByLabel('Seu apelido').fill('BetoDF')
   await beto.page.getByLabel('Recado', { exact: true }).fill('Oi, vi seu anúncio')
   await beto.page.getByRole('button', { name: 'Enviar' }).click()

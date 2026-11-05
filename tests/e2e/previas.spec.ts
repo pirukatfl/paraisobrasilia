@@ -3,7 +3,7 @@ import { expect, test, type Browser } from '@playwright/test'
 import { staffApi } from './helpers/api'
 
 // PREV-02 / PREV-04 / R-05 (quick recados-privados): the mural is gone, old URLs redirect, the open
-// ClassiSex carries a locked "Enviar recado" on every card, every preview has an "Assine Já" link.
+// ClassiSex carries a locked "Comente" on every card, every preview has an "Assine Já" link.
 test.describe.configure({ mode: 'serial' })
 
 const RITA = { email: 'rita.previa@teste.local', name: 'Rita Recado', password: 'senha-rita-12345' }
@@ -52,13 +52,13 @@ test('/recados answers 308 to /assine-ja and /area-do-assinante/recados to the R
   expect(members.headers()['location']).toMatch(/\/area-do-assinante\/mensagens$/)
 })
 
-test('the open ClassiSex shows a locked "Enviar recado" on every card, with no members URL', async ({ browser, baseURL }) => {
+test('the open ClassiSex shows a locked "Comente" on every card, with no members URL', async ({ browser, baseURL }) => {
   const { context, page } = await visitor(browser, baseURL!)
   await page.goto('/classisex')
   const cards = page.locator('main article')
   const count = await cards.count()
   expect(count).toBeGreaterThan(0)
-  const locked = page.locator('main').getByRole('link', { name: 'Enviar recado: só para assinantes' })
+  const locked = page.locator('main').getByRole('link', { name: 'Comente: só para assinantes' })
   await expect(locked).toHaveCount(count)
   for (let i = 0; i < count; i++) await expect(locked.nth(i)).toHaveAttribute('href', '/assine-ja')
   for (const headers of [{} as Record<string, string>, { RSC: '1' }]) {
