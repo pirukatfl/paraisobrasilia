@@ -11,9 +11,9 @@ export function podeAprovarNaLista(row: { status?: string; origemLegado?: string
 }
 
 /** POST JSON with the staff session cookie; failures become Errors with a clear Portuguese reason (server message, or one by status). */
-export async function postJson<T>(url: string, body: unknown): Promise<T> {
+export async function postJson<T>(url: string, body: unknown, method: 'POST' | 'PATCH' = 'POST'): Promise<T> {
   const res = await fetch(url, {
-    method: 'POST',
+    method,
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

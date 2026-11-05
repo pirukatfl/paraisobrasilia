@@ -46,7 +46,7 @@ export function ComentarioForm({
   respostaA?: number
   apelidoInicial: string
   textos: ComentarioFormTextos
-  onSent?: () => void
+  onSent?: (message: string) => void
   onCancel?: () => void
   /** Set only for a visitor: `/entrar?next=…`. Shows the "Tem conta?" line under the button of a new comment. */
   entrarHref?: string
@@ -58,11 +58,14 @@ export function ComentarioForm({
   const reply = respostaA !== undefined
   const visitante = entrarHref !== undefined
   const erro = state && !state.ok ? state.message : null
+  // The notice goes away once the person starts typing again (dismissed = the `sent` stamp it belonged to)
+  const [dispensado, setDispensado] = useState<number | null>(null)
+  const enviado = state?.ok && state.message && dispensado !== state.sent ? state.message : null
 
   useEffect(() => {
     if (state?.ok) {
       formRef.current?.reset()
-      onSent?.()
+      onSent?.(state.message)
     }
     // `sent` changes on every success; onSent is a stable closure of the parent
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,7 +110,10 @@ export function ComentarioForm({
           required
           maxLength={COMENTARIO_MAX}
           defaultValue={state?.values?.texto ?? ''}
-          onChange={(e) => setLength(e.target.value.length)}
+          onChange={(e) => {
+            setLength(e.target.value.length)
+            setDispensado(state?.sent ?? null)
+          }}
           aria-invalid={erro ? true : undefined}
           aria-describedby={erro ? `${uid}-erro` : undefined}
           className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text"
@@ -120,6 +126,11 @@ export function ComentarioForm({
       {erro && (
         <p id={`${uid}-erro`} role="alert" className="text-body text-danger">
           {erro}
+        </p>
+      )}
+      {enviado && (
+        <p role="status" className="rounded-lg border border-line bg-surface px-4 py-3 text-body text-text">
+          {enviado}
         </p>
       )}
       <div className="flex flex-wrap items-center gap-3">

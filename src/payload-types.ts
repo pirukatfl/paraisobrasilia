@@ -725,7 +725,7 @@ export interface AdComment {
   /**
    * Oculto sai do site na hora. Dá para voltar a Publicado.
    */
-  status: 'publicado' | 'oculto';
+  status: 'pendente' | 'publicado' | 'oculto';
   ocultadoEm?: string | null;
   ocultadoPor?: (number | null) | User;
   /**

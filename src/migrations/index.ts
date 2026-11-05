@@ -62,6 +62,7 @@ import * as migration_20261104_193000_festas_ordem from './20261104_193000_festa
 import * as migration_20261104_200500_festas_arrastar from './20261104_200500_festas_arrastar';
 import * as migration_20261105_130000_promocao_botoes_conto from './20261105_130000_promocao_botoes_conto';
 import * as migration_20261105_213000_promocao_sem_data_festa from './20261105_213000_promocao_sem_data_festa';
+import * as migration_20261105_223000_comentarios_moderacao from './20261105_223000_comentarios_moderacao';
 
 export const migrations = [
   {
@@ -383,5 +384,10 @@ export const migrations = [
     up: migration_20261105_213000_promocao_sem_data_festa.up,
     down: migration_20261105_213000_promocao_sem_data_festa.down,
     name: '20261105_213000_promocao_sem_data_festa',
+  },
+  {
+    up: migration_20261105_223000_comentarios_moderacao.up,
+    down: migration_20261105_223000_comentarios_moderacao.down,
+    name: '20261105_223000_comentarios_moderacao',
   },
 ];

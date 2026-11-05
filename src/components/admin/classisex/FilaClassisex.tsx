@@ -27,6 +27,10 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
     })
   ).totalDocs
   const semContaLink = `${adminRoute}/collections/ads?where[enviadoSemConta][equals]=true&where[status][equals]=pendente`
+  const comentariosPendentes = (
+    await payload.count({ collection: 'ad-comments', where: { status: { equals: 'pendente' } }, overrideAccess: true })
+  ).totalDocs
+  const comentariosLink = `${adminRoute}/collections/ad-comments?where[status][equals]=pendente&sort=createdAt`
   const queue = `${adminRoute}/collections/ads?where[status][equals]=pendente&sort=submittedAt`
 
   return (
@@ -49,6 +53,15 @@ export async function FilaClassisex({ payload, user }: Pick<ServerProps, 'payloa
           : pendentes === 1
             ? '1 anúncio para aprovar'
             : `${pendentes} anúncios para aprovar`}
+      </p>
+      <p style={{ margin: 'calc(var(--base) * 0.5) 0 0' }}>
+        {comentariosPendentes === 0 ? (
+          'Nenhum comentário para aprovar.'
+        ) : (
+          <a href={comentariosLink}>
+            {comentariosPendentes === 1 ? '1 comentário para aprovar' : `${comentariosPendentes} comentários para aprovar`}
+          </a>
+        )}
       </p>
       <p style={{ margin: 'calc(var(--base) * 0.5) 0 0' }}>
         {denunciasAbertas === 0

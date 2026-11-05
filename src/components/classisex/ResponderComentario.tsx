@@ -22,13 +22,22 @@ export function ResponderComentario({
   visitante?: boolean
 }) {
   const [aberto, setAberto] = useState(false)
+  const [enviado, setEnviado] = useState<string | null>(null)
   const painel = useId()
   return (
     <div>
-      {!aberto && (
+      {enviado && !aberto && (
+        <p role="status" className="type-label py-2 text-muted">
+          {enviado}
+        </p>
+      )}
+      {!aberto && !enviado && (
         <button
           type="button"
-          onClick={() => setAberto(true)}
+          onClick={() => {
+            setEnviado(null)
+            setAberto(true)
+          }}
           aria-expanded={false}
           aria-controls={painel}
           className="type-label inline-flex min-h-11 items-center text-muted underline underline-offset-4 hover:text-accent"
@@ -43,7 +52,10 @@ export function ResponderComentario({
             respostaA={comentarioId}
             apelidoInicial={apelidoInicial}
             textos={t}
-            onSent={() => setAberto(false)}
+            onSent={(message) => {
+              setEnviado(message || null)
+              setAberto(false)
+            }}
             onCancel={() => setAberto(false)}
             entrarHref={visitante ? '' : undefined}
           />
