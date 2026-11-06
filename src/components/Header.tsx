@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { HeaderShell } from '@/components/HeaderShell'
 import { MobileMenu } from '@/components/MobileMenu'
 import { Nav } from '@/components/Nav'
+import { SairBotao } from '@/components/SairBotao'
 import { getAssinante } from '@/lib/assinantes/session'
 import { getMenuConfig } from '@/lib/site/menu-queries'
 import { getMemberNavItems, getNavItems, VERSAO_ANTERIOR_ITEM } from '@/lib/site/nav'
@@ -43,8 +44,11 @@ export async function Header() {
             />
           </picture>
         </Link>
-        <Nav items={items} logado={logado} />
-        <MobileMenu items={items} logado={logado} />
+        <div className="flex items-center gap-2 xl:gap-4">
+          <Nav items={items} logado={logado} />
+          {logado && <SairBotao rotulo={t.menuSair} />}
+          <MobileMenu items={items} logado={logado} />
+        </div>
       </div>
     </HeaderShell>
   )

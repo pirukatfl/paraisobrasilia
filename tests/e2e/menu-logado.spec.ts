@@ -129,6 +129,17 @@ test('mobile: the menu button opens the same logged-in list', async ({ browser, 
   await context.close()
 })
 
+test('Sair button sits in the header bar, outside the menus, and logs out', async ({ browser, baseURL }) => {
+  const { context, page } = await freshPage(browser, baseURL!)
+  await loginAsAssinante(page, SUB.email, PASSWORD)
+  const sairNoTopo = page.locator('header > div > div').getByRole('button', { name: 'Sair' })
+  await expect(sairNoTopo).toBeVisible()
+  await sairNoTopo.click()
+  await expect(page).toHaveURL(baseURL! + '/')
+  await expect(page.getByRole('button', { name: 'Sair' })).toHaveCount(0)
+  await context.close()
+})
+
 test('Sair returns to the home page and the public menu is back without a reload', async ({ browser, baseURL }) => {
   const { context, page } = await freshPage(browser, baseURL!)
   await loginAsAssinante(page, SUB.email, PASSWORD)

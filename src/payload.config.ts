@@ -81,6 +81,8 @@ export default buildConfig({
       ],
       // Eye button on the login password field
       afterLogin: ['/components/admin/MostrarSenhaLogin'],
+      // Sair na barra do topo (celular: o menu lateral fica escondido)
+      actions: ['/components/admin/SairTopo#SairTopo'],
       graphics: {
         Logo: '/components/admin/Logo',
         Icon: '/components/admin/Icon',
