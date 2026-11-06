@@ -13,6 +13,7 @@ export const conta = definirArea({
     },
     campoEmail: { rotulo: 'Campo de e-mail', padrao: 'E-mail', secao: 'Comuns' },
     botaoWhatsapp: { rotulo: 'Botão "Chamar no WhatsApp"', padrao: 'Chamar no WhatsApp', secao: 'Comuns' },
+    botaoEmail: { rotulo: 'Botão "Enviar e-mail"', padrao: 'Enviar e-mail', secao: 'Comuns' },
 
     // Entrar
     entrarGoogleTitulo: { soTexto: true, rotulo: 'Título no Google', padrao: 'Entrar', secao: 'Entrar' },
@@ -134,13 +135,13 @@ export const conta = definirArea({
     esqueciGoogleDescricao: {
       soTexto: true,
       rotulo: 'Descrição no Google',
-      padrao: 'Peça um link para criar uma nova senha da área de assinantes do Paraíso Brasília.',
+      padrao: 'Fale com o suporte do Paraíso Brasília para recuperar o acesso à área de assinantes.',
       secao: 'Esqueci minha senha',
     },
     esqueciTitulo: { rotulo: 'Título da página', padrao: 'Esqueci minha senha', secao: 'Esqueci minha senha' },
     esqueciSemEmail: {
-      rotulo: 'Texto (envio de e-mail desligado)',
-      padrao: 'Fale com a equipe pelo WhatsApp: ela envia um link para você criar uma nova senha.',
+      rotulo: 'Texto principal',
+      padrao: 'Para recuperar o acesso, fale com o suporte pelo WhatsApp ou por e-mail. A equipe cria uma nova senha para você.',
       secao: 'Esqueci minha senha',
     },
     esqueciEnviado: {
