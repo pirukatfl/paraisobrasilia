@@ -9,6 +9,9 @@ import { getTextos } from '@/lib/textos/queries'
 import { TextoRico } from '@/components/TextoRico'
 import { textoPuro } from '@/lib/textos/rico'
 
+// Reads contact data from the database: render on request, the build has no database (like /entrar)
+export const dynamic = 'force-dynamic'
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTextos('conta')
   return {
