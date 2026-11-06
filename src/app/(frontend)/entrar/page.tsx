@@ -4,14 +4,11 @@ import { redirect } from 'next/navigation'
 
 import { FormField } from '@/components/assinantes/FormField'
 import { ResendForm } from '@/components/assinantes/ResendForm'
-import { ExternalLink } from '@/components/ExternalLink'
 import { emailEnabled } from '@/lib/email/config'
 import { entrar } from '@/lib/assinantes/actions'
 import { safeNext } from '@/lib/assinantes/redirect'
 import { getAssinante } from '@/lib/assinantes/session'
 import { buildPageMetadata } from '@/lib/seo/metadata'
-import { whatsappUrl } from '@/lib/site/contact'
-import { getContact } from '@/lib/site/queries'
 import { TextoRico } from '@/components/TextoRico'
 import { getTextos } from '@/lib/textos/queries'
 import { textoPuro } from '@/lib/textos/rico'
@@ -46,7 +43,7 @@ export default async function EntrarPage({
   const erro = typeof params.erro === 'string' ? ERRORS[params.erro] : undefined
   const naoConfirmado = params.erro === 'nao-confirmado' && emailEnabled()
   const confirmado = params.confirmado === '1'
-  const [contact, t] = await Promise.all([getContact(), getTextos('conta')])
+  const t = await getTextos('conta')
 
   return (
     <section aria-labelledby="titulo-entrar" className="max-w-[440px]">
@@ -74,31 +71,13 @@ export default async function EntrarPage({
           <TextoRico valor={t.entrarBotao} linha />
         </button>
       </form>
-      <p className="mt-6 text-body text-muted">
-        {emailEnabled() ? (
-          <>
-            <Link
-              href="/esqueci-senha"
-              className="type-label inline-flex min-h-11 items-center text-accent underline underline-offset-4"
-            >
-              <TextoRico valor={t.entrarEsqueci} linha />
-            </Link>
-            <br />
-            <TextoRico valor={t.entrarSemEmail} linha />{' '}
-          </>
-        ) : (
-          <>
-            <TextoRico valor={t.entrarEsqueciSemEmail} inline />{' '}
-          </>
-        )}
-        {contact.whatsapp && (
-          <ExternalLink
-            href={whatsappUrl(contact.whatsapp)}
-            className="text-accent underline underline-offset-4"
-          >
-            <TextoRico valor={t.botaoWhatsapp} linha />
-          </ExternalLink>
-        )}
+      <p className="mt-6">
+        <Link
+          href="/esqueci-senha"
+          className="type-label inline-flex min-h-11 items-center text-accent underline underline-offset-4"
+        >
+          <TextoRico valor={t.entrarEsqueci} linha />
+        </Link>
       </p>
       {emailEnabled() && (
         <p className="mt-4">
