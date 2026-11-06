@@ -6,7 +6,7 @@
  * 02-04 Modelos (always listed since quick menu-modelos; the page shows an empty state until a model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
  * Logged-in subscribers get getMemberNavItems() instead (quick menu-logado, 2026-10-24): Festas · Quem somos · Espaço ·
- * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha · link externo for subscribers (Menu do site, last) (+ Sair
+ * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Minha assinatura · Trocar senha · link externo for subscribers (Menu do site, last) (+ Sair
  * rendered by Nav/MobileMenu). The promotion is not a menu item: it is a home section above "Como chegar" (PromocaoHome). Items staff hide in "Menu do site" are filtered out by key (menu.ts). Header picks the list on the server; pinned by tests/e2e/menu-logado.spec.ts.
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
@@ -93,7 +93,6 @@ export function getMemberNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VA
     { key: 'contos', href: '/area-do-assinante/contos', label: t.menuContos },
     { key: 'dicas-hot', href: '/area-do-assinante/dicas-hot', label: t.menuDicasHot },
     pick('contato'),
-    { key: 'meus-anuncios', href: '/area-do-assinante/meus-anuncios', label: t.menuMeusAnuncios },
     { key: 'minha-assinatura', href: '/area-do-assinante', label: t.menuMinhaAssinatura, exact: true },
     { key: 'trocar-senha', href: '/area-do-assinante/senha', label: t.menuTrocarSenha },
   ]

@@ -20,14 +20,13 @@ const LABELS = [
   'Contos',
   'Dicas Hot',
   'Contato',
-  'Meus anúncios',
   'Minha assinatura',
   'Trocar senha',
   'Vídeos pornô grátis',
 ]
 // Desktop (xl+): one row; the account entries sit inside "Minha conta", after the external link
-const ACCOUNT = ['Meus anúncios', 'Minha assinatura', 'Trocar senha']
-const ACCOUNT_HREFS = ['/area-do-assinante/meus-anuncios', '/area-do-assinante', '/area-do-assinante/senha']
+const ACCOUNT = ['Minha assinatura', 'Trocar senha']
+const ACCOUNT_HREFS = ['/area-do-assinante', '/area-do-assinante/senha']
 const HREFS = [
   '/',
   '/quem-somos',
@@ -37,7 +36,6 @@ const HREFS = [
   '/area-do-assinante/contos',
   '/area-do-assinante/dicas-hot',
   '/contato',
-  '/area-do-assinante/meus-anuncios',
   '/area-do-assinante',
   '/area-do-assinante/senha',
   'https://www.redtube.com.br/', // link externo (Menu do site), só para assinante

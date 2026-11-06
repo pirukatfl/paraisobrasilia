@@ -73,7 +73,6 @@ test('the header menu has no Recados item; own content has no Comente', async ({
     'Contos',
     'Dicas Hot',
     'Contato',
-    'Meus anúncios',
     'Minha assinatura',
     'Trocar senha',
     'Vídeos pornô grátis',
