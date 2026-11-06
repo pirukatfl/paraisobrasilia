@@ -1,0 +1,37 @@
+// Painel no celular: o menu lateral (com o botão Sair no rodapé) usava 100vh, que no celular é
+// maior que a área visível (a barra do navegador cobre a parte de baixo) e escondia o Sair.
+// 100dvh acompanha a área realmente visível e o rodapé respeita a área segura do aparelho.
+.nav {
+  height: 100vh; // alternativa para navegadores sem dvh
+  height: 100dvh;
+}
+
+.nav__scroll {
+  padding-block-end: calc(var(--base) * 2 + env(safe-area-inset-bottom, 0px));
+}
+
+// Sair sempre visível: com o menu fechado ele fica na barra do topo, ao lado do botão do menu
+.paraiso-sair-topo {
+  display: none;
+}
+
+@media (max-width: 1440px) {
+  .paraiso-sair-topo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding-inline: 10px;
+    font-size: 14px;
+    color: var(--theme-text);
+    text-decoration: none;
+    border: 1px solid var(--theme-elevation-150);
+    border-radius: 6px;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--theme-elevation-100);
+    }
+  }
+}

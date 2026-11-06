@@ -5,6 +5,7 @@ import { AprovarCelula as AprovarCelula_10fb62e0be876840929f6ea26f5d5864 } from 
 import { ModeracaoPanel as ModeracaoPanel_ec761e6491e5a1911a27084fe817e462 } from '../../../components/admin/classisex/ModeracaoPanel'
 import { AprovarSelecionados as AprovarSelecionados_42dfd8d279800017a6cbfcc6c08cf494 } from '../../../components/admin/classisex/AprovarSelecionados'
 import { DenunciaPanel as DenunciaPanel_38859cfdaab329474f1feee2c26931b5 } from '../../../components/admin/classisex/DenunciaPanel'
+import { AprovarComentarioCelula as AprovarComentarioCelula_f5f6328585603d6c704ecd73764c282b } from '../../../components/admin/classisex/AprovarComentarioCelula'
 import { MensagemDenunciaPanel as MensagemDenunciaPanel_708efcad2e179bed32d5d707d9198ce3 } from '../../../components/admin/mensagens/MensagemDenunciaPanel'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -22,13 +23,14 @@ import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
-import { TrechoAbertoPanel as TrechoAbertoPanel_d1407765f506ff1813efd7276a9239fb } from '../../../components/admin/contos/TrechoAbertoPanel'
 import { StrikethroughFeatureClient as StrikethroughFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { HeadingFeatureClient as HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
+import { TrechoAbertoPanel as TrechoAbertoPanel_d1407765f506ff1813efd7276a9239fb } from '../../../components/admin/contos/TrechoAbertoPanel'
 import { default as default_dfe4008080d895d460898c3a6155e9ba } from '../../../components/admin/Icon'
 import { default as default_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
-import { default as default_e430a9520844866bb6a7969ae8ed2dfd } from '../../../components/admin/MostrarSenhaLogin'
+import { SairTopo as SairTopo_39aa86c6a6adb1a605542fd24d2c1de1 } from '../../../components/admin/SairTopo'
+import { default as default_e0638d0be6f3d8eeaaa296344b7c4700 } from '../../../components/admin/MostrarSenhaLogin'
 import { Vencimentos as Vencimentos_1f1ae1b3e16b6364b3c888af76c92816 } from '../../../components/admin/assinantes/Vencimentos'
 import { RevisarSiteAntigo as RevisarSiteAntigo_695020af97f38537beffe66d553edc6e } from '../../../components/admin/assinantes/RevisarSiteAntigo'
 import { FilaClassisex as FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2 } from '../../../components/admin/classisex/FilaClassisex'
@@ -43,6 +45,7 @@ export const importMap = {
   "/components/admin/classisex/ModeracaoPanel#ModeracaoPanel": ModeracaoPanel_ec761e6491e5a1911a27084fe817e462,
   "/components/admin/classisex/AprovarSelecionados#AprovarSelecionados": AprovarSelecionados_42dfd8d279800017a6cbfcc6c08cf494,
   "/components/admin/classisex/DenunciaPanel#DenunciaPanel": DenunciaPanel_38859cfdaab329474f1feee2c26931b5,
+  "/components/admin/classisex/AprovarComentarioCelula#AprovarComentarioCelula": AprovarComentarioCelula_f5f6328585603d6c704ecd73764c282b,
   "/components/admin/mensagens/MensagemDenunciaPanel#MensagemDenunciaPanel": MensagemDenunciaPanel_708efcad2e179bed32d5d707d9198ce3,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -60,13 +63,14 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
-  "/components/admin/contos/TrechoAbertoPanel#TrechoAbertoPanel": TrechoAbertoPanel_d1407765f506ff1813efd7276a9239fb,
   "@payloadcms/richtext-lexical/client#StrikethroughFeatureClient": StrikethroughFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#UnderlineFeatureClient": UnderlineFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "@payloadcms/richtext-lexical/client#HeadingFeatureClient": HeadingFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
+  "/components/admin/contos/TrechoAbertoPanel#TrechoAbertoPanel": TrechoAbertoPanel_d1407765f506ff1813efd7276a9239fb,
   "/components/admin/Icon#default": default_dfe4008080d895d460898c3a6155e9ba,
   "/components/admin/Logo#default": default_91a09b539d3c86b0aebf520e7564ce08,
-  "/components/admin/MostrarSenhaLogin#default": default_e430a9520844866bb6a7969ae8ed2dfd,
+  "/components/admin/SairTopo#SairTopo": SairTopo_39aa86c6a6adb1a605542fd24d2c1de1,
+  "/components/admin/MostrarSenhaLogin#default": default_e0638d0be6f3d8eeaaa296344b7c4700,
   "/components/admin/assinantes/Vencimentos#Vencimentos": Vencimentos_1f1ae1b3e16b6364b3c888af76c92816,
   "/components/admin/assinantes/RevisarSiteAntigo#RevisarSiteAntigo": RevisarSiteAntigo_695020af97f38537beffe66d553edc6e,
   "/components/admin/classisex/FilaClassisex#FilaClassisex": FilaClassisex_0f3095b04fd3b505ce5d0b55a54e46b2,
