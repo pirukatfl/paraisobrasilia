@@ -38,7 +38,7 @@ export default async function EsqueciSenhaPage() {
         {contact.email && (
           <a
             href={`mailto:${contact.email}?subject=${encodeURIComponent('Esqueci minha senha')}`}
-            className="btn-primary"
+            className={contact.whatsapp ? 'btn-secondary' : 'btn-primary'}
           >
             <TextoRico valor={t.botaoEmail} linha />
           </a>
