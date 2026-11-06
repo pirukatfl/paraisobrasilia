@@ -2,7 +2,6 @@ import { expect, test, type Browser, type Page } from '@playwright/test'
 
 import { staffApi } from './helpers/api'
 import { loginAsAssinante } from './helpers/assinante'
-import { abrirMinhaConta, headerMenu } from './helpers/menu'
 
 // CLAS-03 / CLAS-04 / D-01 / D-02 / D-03: subscribers write their own ads; every write waits for
 // staff approval; nobody but staff uses /api/ads (T-04-04); inactive owners list and delete only.
@@ -67,12 +66,10 @@ const call = (page: Page, method: string, path: string, data?: unknown) =>
     [method, path, data] as const,
   )
 
-test('Meus anúncios starts empty, with the header menu link', async ({ browser, baseURL }) => {
+test('Meus anúncios starts empty, reached from the member area', async ({ browser, baseURL }) => {
   const { page, context } = await asSubscriber(browser, baseURL!, BIA)
   await page.goto('/area-do-assinante')
-  const nav = await headerMenu(page)
-  await abrirMinhaConta(nav)
-  await nav.getByRole('link', { name: 'Meus anúncios' }).click()
+  await page.locator('main').getByRole('link', { name: 'Meus anúncios' }).first().click()
   await expect(page).toHaveURL(/\/area-do-assinante\/meus-anuncios$/)
   const main = page.locator('main')
   await expect(main).toContainText('Você ainda não tem anúncios.')

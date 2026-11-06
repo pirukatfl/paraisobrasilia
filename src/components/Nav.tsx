@@ -106,7 +106,7 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
 }
 
 /** Account entries of a logged-in subscriber, grouped under "Minha conta" on the desktop menu (the mobile menu lists them all). */
-const ACCOUNT_KEYS = ['meus-anuncios', 'minha-assinatura', 'trocar-senha']
+const ACCOUNT_KEYS = ['minha-assinatura', 'trocar-senha']
 
 /**
  * "Minha conta": a button-only trigger (the group has no page of its own; "Minha assinatura" is one of its entries),
