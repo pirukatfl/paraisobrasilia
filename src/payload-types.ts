@@ -973,7 +973,7 @@ export interface Video {
   focalY?: number | null;
 }
 /**
- * Crie a festa, envie o flyer e clique em Publicar. Para mudar a ordem, arraste as festas pela alça na lista. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
+ * Crie a festa, envie o flyer e clique em Publicar. No site as festas aparecem por data e hora de início (arrastar na lista só desempata festas no mesmo horário). Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "parties".

@@ -45,10 +45,10 @@ export const Parties: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'startsAt', '_status'],
-    // Arrastar e soltar na lista define a ordem no site (campo oculto _order)
+    // No site as festas seguem data e hora de início; arrastar na lista só desempata festas no mesmo horário (campo oculto _order)
     listSearchableFields: ['title'],
     description:
-      'Crie a festa, envie o flyer e clique em Publicar. Para mudar a ordem, arraste as festas pela alça na lista. Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.',
+      'Crie a festa, envie o flyer e clique em Publicar.  No site as festas aparecem por data e hora de início (a arrastada na lista só desempata festas no mesmo horário). Para tirar do site, use Despublicar. Festas saem da página inicial sozinhas depois do término.',
   },
   // Publicar / Despublicar + history (T-01-28)
   versions: { drafts: true, maxPerDoc: 20 },

@@ -50,7 +50,8 @@ async function fetchUpcomingParties(nowIso: string): Promise<PartyCardDTO[]> {
       and: [{ _status: { equals: 'published' } }, { endsAt: { greater_than: now.toISOString() } }],
     },
     draft: false,
-    sort: ['_order', 'startsAt'],
+    // Date and time of start decide the order (carousel and grid share it); the admin drag order only breaks ties
+    sort: ['startsAt', '_order'],
     depth: 1,
     limit: UPCOMING_LIMIT,
   })
