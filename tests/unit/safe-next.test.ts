@@ -15,6 +15,13 @@ describe('safeNext (T-03-08)', () => {
     }
   })
 
+  it('keeps the open Vídeos amadores page only as the exact path', () => {
+    expect(safeNext('/videos-amadores')).toBe('/videos-amadores')
+    for (const value of ['/videos-amadores/', '/videos-amadores/1/video', '/videos-amadores?x=1', '/videos-amadores//evil.com']) {
+      expect(safeNext(value)).toBe('/area-do-assinante')
+    }
+  })
+
   it.each([
     '//evil.com',
     'https://evil.com',

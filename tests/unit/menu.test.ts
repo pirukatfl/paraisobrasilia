@@ -32,6 +32,18 @@ describe('Menu do site: itens escondidos e link externo', () => {
     const semGaleria = keys(getNavItems(t, { ...MENU_VAZIO, ocultos: ['galeria'] }))
     expect(semGaleria).not.toContain('galeria')
     expect(semGaleria).not.toContain('galeria-amadoras')
+    expect(semGaleria).not.toContain('galeria-videos-amadores')
+  })
+
+  it('Galeria → Vídeos amadores is in the public and members menus, and can be hidden alone', () => {
+    const publico = getNavItems(t).find((i) => i.key === 'galeria')!
+    expect(publico.children?.map((c) => c.key)).toEqual(['galeria-profissionais', 'galeria-amadoras', 'galeria-videos-amadores'])
+    expect(publico.children?.find((c) => c.key === 'galeria-videos-amadores')?.href).toBe('/videos-amadores')
+    expect(keys(getMemberNavItems(t, MENU_VAZIO))).toContain('galeria-videos-amadores')
+    const sem = keys(getNavItems(t, { ...MENU_VAZIO, ocultos: ['galeria-videos-amadores'] }))
+    expect(sem).toContain('galeria')
+    expect(sem).toContain('galeria-amadoras')
+    expect(sem).not.toContain('galeria-videos-amadores')
   })
 
   it('applies to the members menu and the footer rule too', () => {
