@@ -33,6 +33,10 @@ export function headersDoAssinante(headers: Headers, payloadPrefix: string): Hea
 export const assinanteCookieStrategy: AuthStrategy = {
   name: 'assinante-cookie',
   authenticate: async (args) => {
+    // The admin UI authenticates without a request object (initReq). A subscriber must never count as a
+    // signed-in user there: the login screen would treat the browser as already logged in and refuse the
+    // staff login. Only REST/GraphQL/Local API calls (which carry `req`) may use the subscriber cookie.
+    if (!args.req) return { user: null }
     const swapped = headersDoAssinante(args.headers, args.payload.config.cookiePrefix)
     if (!swapped) return { user: null }
     const result = await JWTAuthentication({ ...args, headers: swapped, strategyName: 'assinante-cookie' })
