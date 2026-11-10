@@ -5,6 +5,7 @@ import { isStaff } from '../access/roles'
 import { AD_MEDIA_MESSAGES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from '../lib/classisex/media-messages'
 import { privateStorageConfigured } from '../lib/classisex/storage'
 import { ArquivoInvalido, limparArquivo } from '../lib/midia-enviada/limpar'
+import { revalidateAmadores, revalidateAmadoresAfterDelete } from '../lib/midia-enviada/revalidate'
 import { ENVIO_MIDIA_MESSAGES, MAX_FOTOS, MAX_VIDEOS } from '../lib/midia-enviada/regras'
 
 const fail = (message: string, status = 400) => new APIError(message, status, null, true)
@@ -70,6 +71,8 @@ const webp = { format: 'webp' as const, options: { quality: 82 } }
  * payload.config.ts), outside MEDIA_DIR and public/. Read is staff only, never `() => true`, or Payload's own file
  * route (/api/envios-midia-arquivos/file/…) would serve the originals to anyone. Staff see the preview and
  * download through the admin (same session, that route checks the staff cookie).
+ * The site never uses that route: files of an approved submission (and not `oculto`) are served by
+ * /amadores/foto/… and /videos-amadores/…/video, which re-check publication on every request.
  */
 export const EnviosMidiaArquivos: CollectionConfig = {
   slug: 'envios-midia-arquivos',
@@ -78,7 +81,7 @@ export const EnviosMidiaArquivos: CollectionConfig = {
     group: 'Envios do público',
     useAsTitle: 'filename',
     defaultColumns: ['filename', 'kind', 'envio', 'createdAt'],
-    description: 'Cada foto ou vídeo de um envio. Ficam fora da área pública: só a equipe abre.',
+    description: 'Cada foto ou vídeo de um envio. Só a equipe abre o original; o site mostra apenas os de envios aprovados que não estiverem marcados como "Não mostrar no site".',
   },
   access: {
     read: isStaff,
@@ -86,7 +89,11 @@ export const EnviosMidiaArquivos: CollectionConfig = {
     update: isStaff,
     delete: isStaff,
   },
-  hooks: { beforeOperation: [validateAndClean] },
+  hooks: {
+    beforeOperation: [validateAndClean],
+    afterChange: [revalidateAmadores],
+    afterDelete: [revalidateAmadoresAfterDelete],
+  },
   upload: {
     mimeTypes: [...PHOTO_MIME_TYPES, ...VIDEO_MIME_TYPES],
     formatOptions: webp,
@@ -108,6 +115,13 @@ export const EnviosMidiaArquivos: CollectionConfig = {
         { label: 'Vídeo', value: 'video' },
       ],
       admin: { readOnly: true },
+    },
+    {
+      name: 'oculto',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Não mostrar no site',
+      admin: { position: 'sidebar', description: 'Marque para esconder só este arquivo de um envio aprovado.' },
     },
     { name: 'durationSeconds', type: 'number', label: 'Duração (s)', admin: { readOnly: true } },
   ],

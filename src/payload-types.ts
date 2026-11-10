@@ -686,7 +686,7 @@ export interface AdReport {
   createdAt: string;
 }
 /**
- * Comentários dos anúncios. Qualquer pessoa pode comentar, com ou sem conta: quem não tem conta aparece como "Sem conta" e se identifica com o nome que digitou. Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.
+ * Comentários dos anúncios. Qualquer pessoa pode comentar, com ou sem conta: quem não tem conta aparece como "Sem conta" e se identifica com o nome que digitou. Os comentários novos entram como "Em análise" e só aparecem no site depois de aprovados (botão "Aprovar" na lista ou Situação "Publicado"). Para tirar um comentário do ar, mude a Situação para "Oculto" (dá para voltar a "Publicado"); para remover de vez, apague. Para impedir uma pessoa de comentar, marque "Comentários bloqueados" na conta dela.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "ad-comments".
@@ -723,7 +723,7 @@ export interface AdComment {
    */
   doAnunciante?: boolean | null;
   /**
-   * Oculto sai do site na hora. Dá para voltar a Publicado.
+   * Todo comentário novo entra como "Em análise" e só aparece no site depois de "Publicado". Oculto sai do site na hora. Dá para voltar a Publicado.
    */
   status: 'pendente' | 'publicado' | 'oculto';
   ocultadoEm?: string | null;
@@ -1355,7 +1355,7 @@ export interface Model {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Fotos e vídeos que o público mandou pelo site. Nada aparece no site sozinho: veja os arquivos aqui, baixe o que for usar e marque o envio como aprovado ou recusado.
+ * Fotos e vídeos que o público mandou pelo site. Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "envios-midia".
@@ -1363,7 +1363,7 @@ export interface Model {
 export interface EnviosMidia {
   id: number;
   /**
-   * Aprovar não publica nada: serve só para a equipe se organizar.
+   * Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.
    */
   status: 'novo' | 'aprovado' | 'recusado';
   apelido: string;
@@ -1400,7 +1400,7 @@ export interface EnviosMidia {
   createdAt: string;
 }
 /**
- * Cada foto ou vídeo de um envio. Ficam fora da área pública: só a equipe abre.
+ * Cada foto ou vídeo de um envio. Só a equipe abre o original; o site mostra apenas os de envios aprovados que não estiverem marcados como "Não mostrar no site".
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "envios-midia-arquivos".
@@ -1409,6 +1409,10 @@ export interface EnviosMidiaArquivo {
   id: number;
   envio: number | EnviosMidia;
   kind: 'foto' | 'video';
+  /**
+   * Marque para esconder só este arquivo de um envio aprovado.
+   */
+  oculto?: boolean | null;
   durationSeconds?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -2237,6 +2241,7 @@ export interface EnviosMidiaSelect<T extends boolean = true> {
 export interface EnviosMidiaArquivosSelect<T extends boolean = true> {
   envio?: T;
   kind?: T;
+  oculto?: T;
   durationSeconds?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2375,6 +2380,7 @@ export interface MenuDoSite {
         | 'galeria'
         | 'galeria-profissionais'
         | 'galeria-amadoras'
+        | 'galeria-videos-amadores'
         | 'classisex'
         | 'contos'
         | 'dicas-hot'
@@ -2691,6 +2697,21 @@ export interface TextosGeral {
     [k: string]: unknown;
   } | null;
   menuGaleriaAmadoras?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  menuGaleriaVideosAmadores?: {
     root: {
       type: string;
       children: {
@@ -4255,6 +4276,210 @@ export interface TextosModelo {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Seção que aparece em Galeria → Amadoras quando há fotos enviadas pelo público e aprovadas.
+   */
+  fotosFrequentadoresTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  fotosFrequentadoresTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  fotosFrequentadoresEnviar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também é o título que aparece no Google (lá, sem formatação).
+   */
+  videosTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Também é a descrição que aparece no Google (lá, sem formatação).
+   */
+  videosIntro?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosConviteTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosConviteTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosConviteTextoLogado?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosConviteAssine?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosConviteEntrar?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosVazioTitulo?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosVazioTexto?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  videosVazioBotao?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   vazioTitulo?: {
     root: {
       type: string;
@@ -5461,6 +5686,21 @@ export interface TextosConta {
     [k: string]: unknown;
   } | null;
   botaoWhatsapp?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  botaoEmail?: {
     root: {
       type: string;
       children: {
@@ -12936,6 +13176,7 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuGaleria?: T;
   menuGaleriaProfissionais?: T;
   menuGaleriaAmadoras?: T;
+  menuGaleriaVideosAmadores?: T;
   menuClassisex?: T;
   menuContos?: T;
   menuDicasHot?: T;
@@ -13065,6 +13306,19 @@ export interface TextosModelosSelect<T extends boolean = true> {
   introProfissionais?: T;
   tituloAmadoras?: T;
   introAmadoras?: T;
+  fotosFrequentadoresTitulo?: T;
+  fotosFrequentadoresTexto?: T;
+  fotosFrequentadoresEnviar?: T;
+  videosTitulo?: T;
+  videosIntro?: T;
+  videosConviteTitulo?: T;
+  videosConviteTexto?: T;
+  videosConviteTextoLogado?: T;
+  videosConviteAssine?: T;
+  videosConviteEntrar?: T;
+  videosVazioTitulo?: T;
+  videosVazioTexto?: T;
+  videosVazioBotao?: T;
   vazioTitulo?: T;
   vazioTexto?: T;
   vazioBotaoFestas?: T;
@@ -13175,6 +13429,7 @@ export interface TextosContaSelect<T extends boolean = true> {
   etiqueta?: T;
   campoEmail?: T;
   botaoWhatsapp?: T;
+  botaoEmail?: T;
   entrarGoogleTitulo?: T;
   entrarGoogleDescricao?: T;
   entrarTitulo?: T;

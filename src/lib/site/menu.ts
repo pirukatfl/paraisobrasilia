@@ -13,9 +13,10 @@ export const MENU_ITENS = [
   { value: 'regras', label: 'Quem somos → Regras' },
   { value: 'dicas', label: 'Quem somos → Dicas' },
   { value: 'espaco', label: 'Espaço' },
-  { value: 'galeria', label: 'Galeria (esconde também Profissionais e Amadoras)' },
+  { value: 'galeria', label: 'Galeria (esconde também Profissionais, Amadoras e Vídeos amadores)' },
   { value: 'galeria-profissionais', label: 'Galeria → Profissionais' },
   { value: 'galeria-amadoras', label: 'Galeria → Amadoras' },
+  { value: 'galeria-videos-amadores', label: 'Galeria → Vídeos amadores' },
   { value: 'classisex', label: 'ClassiSex' },
   { value: 'contos', label: 'Contos' },
   { value: 'dicas-hot', label: 'Dicas Hot' },
@@ -40,6 +41,7 @@ const PARENT: Partial<Record<MenuKey, MenuKey>> = {
   dicas: 'quem-somos',
   'galeria-profissionais': 'galeria',
   'galeria-amadoras': 'galeria',
+  'galeria-videos-amadores': 'galeria',
 }
 
 export const LINK_EXTERNO_PADRAO = {
