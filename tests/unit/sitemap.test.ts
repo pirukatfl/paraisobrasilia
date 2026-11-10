@@ -26,11 +26,12 @@ describe('sitemap (INST-06, T-02-13)', () => {
         '/classisex',
         '/contos',
         '/dicas-hot',
+        '/videos-amadores',
       ]),
     )
     expect(urls).not.toContain('/modelos')
     expect(urls).not.toContain('/recados') // mural removed 2026-10-20 (R-08)
-    expect(urls).toHaveLength(14)
+    expect(urls).toHaveLength(15)
   })
 
   it('includes /modelos and upcoming parties when present', () => {

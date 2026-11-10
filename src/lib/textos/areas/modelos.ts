@@ -46,6 +46,59 @@ export const modelos = definirArea({
       ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
     },
 
+    // Fotos enviadas pelo público e aprovadas (Galeria → Amadoras)
+    fotosFrequentadoresTitulo: {
+      rotulo: 'Título das fotos dos frequentadores',
+      padrao: 'Fotos dos frequentadores',
+      secao: 'Galeria: fotos dos frequentadores',
+      ajuda: 'Seção que aparece em Galeria → Amadoras quando há fotos enviadas pelo público e aprovadas.',
+    },
+    fotosFrequentadoresTexto: {
+      rotulo: 'Texto das fotos dos frequentadores',
+      padrao: 'Fotos enviadas por quem frequenta a casa, com autorização de uso de imagem.',
+      secao: 'Galeria: fotos dos frequentadores',
+    },
+    fotosFrequentadoresEnviar: {
+      rotulo: 'Link para enviar as suas fotos',
+      padrao: 'Envie as suas fotos',
+      secao: 'Galeria: fotos dos frequentadores',
+    },
+
+    // Página Vídeos amadores (/videos-amadores)
+    videosTitulo: {
+      rotulo: 'Título da página',
+      padrao: 'Vídeos amadores',
+      secao: 'Vídeos amadores',
+      ajuda: 'Também é o título que aparece no Google (lá, sem formatação).',
+    },
+    videosIntro: {
+      rotulo: 'Texto de abertura',
+      padrao: 'Vídeos enviados por quem frequenta a casa, aprovados pela equipe. Só assinantes dão o play.',
+      secao: 'Vídeos amadores',
+      ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
+    },
+    videosConviteTitulo: { rotulo: 'Aviso para quem não é assinante: título', padrao: 'Só assinantes dão o play', secao: 'Vídeos amadores' },
+    videosConviteTexto: {
+      rotulo: 'Aviso para visitantes: texto',
+      padrao: 'Assine para assistir aos vídeos amadores. Já é assinante? Entre na sua conta.',
+      secao: 'Vídeos amadores',
+    },
+    videosConviteTextoLogado: {
+      rotulo: 'Aviso para conta sem assinatura ativa: texto',
+      padrao: 'A sua conta não tem assinatura ativa. Assine ou renove para assistir aos vídeos amadores.',
+      secao: 'Vídeos amadores',
+    },
+    videosConviteAssine: { rotulo: 'Botão Assine já', padrao: 'Assine já', secao: 'Vídeos amadores' },
+    videosConviteEntrar: { rotulo: 'Botão Entrar', padrao: 'Entrar', secao: 'Vídeos amadores' },
+    videosVazioTitulo: { rotulo: 'Título quando não há vídeos', padrao: 'Ainda não há vídeos por aqui.', secao: 'Vídeos amadores' },
+    videosVazioTexto: {
+      bloco: true,
+      rotulo: 'Texto quando não há vídeos',
+      padrao: 'Os vídeos enviados pelo público aparecem aqui depois que a equipe aprova. Quer mandar o seu?',
+      secao: 'Vídeos amadores',
+    },
+    videosVazioBotao: { rotulo: 'Botão quando não há vídeos', padrao: 'Enviar o meu vídeo', secao: 'Vídeos amadores' },
+
     // Sem modelos
     vazioTitulo: {
       rotulo: 'Título quando não há modelos',

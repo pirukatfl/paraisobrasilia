@@ -1,6 +1,7 @@
 import type { CollectionBeforeDeleteHook, CollectionConfig } from 'payload'
 
 import { isStaff } from '../access/roles'
+import { revalidateAmadores, revalidateAmadoresAfterDelete } from '../lib/midia-enviada/revalidate'
 
 /** Deleting a submission deletes its files too (each one removes its own file from the private disk). */
 // (before the delete: the file rows point to the submission and cannot be left without it)
@@ -18,7 +19,10 @@ const deleteFiles: CollectionBeforeDeleteHook = async ({ id, req }) => {
  * Nothing here is ever public: read, create, update and delete are staff only, so neither the REST API
  * nor the contact (e-mail/WhatsApp) can be read without a staff session. The visitor form creates rows
  * with the Local API (overrideAccess) after its own validation.
- * Approving does NOT publish anything: staff use the files to build the galleries.
+ * Approving PUBLISHES (client decision 2026-11-10): the photos of an approved submission show in Galeria → Amadoras and
+ * the videos in Vídeos amadores (only subscribers can play them). Contact, message and note never leave the server;
+ * the public pages read the files through their own routes, which re-check the rule on every request. Refused or
+ * new: nothing is shown.
  */
 export const EnviosMidia: CollectionConfig = {
   slug: 'envios-midia',
@@ -29,7 +33,7 @@ export const EnviosMidia: CollectionConfig = {
     defaultColumns: ['apelido', 'status', 'promocao', 'contato', 'createdAt'],
     listSearchableFields: ['apelido', 'contato'],
     description:
-      'Fotos e vídeos que o público mandou pelo site. Nada aparece no site sozinho: veja os arquivos aqui, baixe o que for usar e marque o envio como aprovado ou recusado.',
+      'Fotos e vídeos que o público mandou pelo site. Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.',
   },
   access: {
     read: isStaff,
@@ -37,7 +41,7 @@ export const EnviosMidia: CollectionConfig = {
     update: isStaff,
     delete: isStaff,
   },
-  hooks: { beforeDelete: [deleteFiles] },
+  hooks: { beforeDelete: [deleteFiles], afterChange: [revalidateAmadores], afterDelete: [revalidateAmadoresAfterDelete] },
   fields: [
     {
       name: 'status',
@@ -51,7 +55,11 @@ export const EnviosMidia: CollectionConfig = {
         { label: 'Aprovado', value: 'aprovado' },
         { label: 'Recusado', value: 'recusado' },
       ],
-      admin: { position: 'sidebar', description: 'Aprovar não publica nada: serve só para a equipe se organizar.' },
+      admin: {
+        position: 'sidebar',
+        description:
+          'Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.',
+      },
     },
     { name: 'apelido', type: 'text', required: true, label: 'Apelido' },
     {

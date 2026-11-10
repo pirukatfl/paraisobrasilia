@@ -60,6 +60,7 @@ export function getNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): 
       children: [
         { key: 'galeria-profissionais', href: '/modelos?tipo=profissionais', label: t.menuGaleriaProfissionais },
         { key: 'galeria-amadoras', href: '/modelos?tipo=amadoras', label: t.menuGaleriaAmadoras },
+        { key: 'galeria-videos-amadores', href: '/videos-amadores', label: t.menuGaleriaVideosAmadores },
       ],
     },
     // PREV-01: open preview; the full board lives in the members area

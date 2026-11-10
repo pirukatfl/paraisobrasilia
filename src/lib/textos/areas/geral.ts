@@ -50,6 +50,7 @@ export const geral = definirArea({
       secao: 'Menu',
     },
     menuGaleriaAmadoras: { rotulo: 'Menu: Galeria → Amadoras', padrao: 'Amadoras', secao: 'Menu' },
+    menuGaleriaVideosAmadores: { rotulo: 'Menu: Galeria → Vídeos amadores', padrao: 'Vídeos amadores', secao: 'Menu' },
     menuClassisex: { rotulo: 'Menu: ClassiSex', padrao: 'ClassiSex', secao: 'Menu', ajuda: 'Também usado no rodapé.' },
     menuContos: { rotulo: 'Menu: Contos', padrao: 'Contos', secao: 'Menu', ajuda: 'Também usado no rodapé.' },
     menuDicasHot: { rotulo: 'Menu: Dicas Hot', padrao: 'Dicas Hot', secao: 'Menu', ajuda: 'Também usado no rodapé.' },

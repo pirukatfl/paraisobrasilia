@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 
 import { EmptyState } from '@/components/EmptyState'
+import { Gallery } from '@/components/Gallery'
 import { ModelGrid } from '@/components/ModelGrid'
 import { getPublishedModels } from '@/lib/gallery/queries'
+import { getFotosAmadoras } from '@/lib/midia-enviada/publico'
 import { filterByTipo, type ModelTipo, parseTipo } from '@/lib/gallery/tipo'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import type { Textos } from '@/lib/textos/areas'
@@ -35,7 +38,12 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 /** Always reachable from the menu (quick menu-modelos); empty state until a model is published. */
 export default async function ModelsPage({ searchParams }: Props) {
   const tipo = parseTipo((await searchParams).tipo)
-  const [all, t] = await Promise.all([getPublishedModels(), getTextos('modelos')])
+  // Photos sent by the public and approved by staff: only in Galeria → Amadoras (tag 'amadores')
+  const [all, t, fotos] = await Promise.all([
+    getPublishedModels(),
+    getTextos('modelos'),
+    tipo === 'amadoras' ? getFotosAmadoras() : Promise.resolve([]),
+  ])
   const models = filterByTipo(all, tipo)
   const { titulo, intro } = copyFor(t, tipo)
   return (
@@ -45,7 +53,7 @@ export default async function ModelsPage({ searchParams }: Props) {
         <TextoRico valor={titulo} linha />
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted"><TextoRico valor={intro} linha /></p>
-      {models.length === 0 ? (
+      {models.length === 0 && fotos.length === 0 ? (
         <EmptyState
           heading={<TextoRico valor={t.vazioTitulo} linha />}
           body={t.vazioTexto}
@@ -55,7 +63,25 @@ export default async function ModelsPage({ searchParams }: Props) {
           ]}
         />
       ) : (
-        <ModelGrid models={models} />
+        models.length > 0 && <ModelGrid models={models} />
+      )}
+      {fotos.length > 0 && (
+        <section aria-labelledby="titulo-fotos-frequentadores" className={models.length > 0 ? 'mt-16' : 'mt-10'}>
+          <h2 id="titulo-fotos-frequentadores" className="type-heading">
+            <TextoRico valor={t.fotosFrequentadoresTitulo} linha />
+          </h2>
+          <p className="mt-2 max-w-[680px] text-body text-muted">
+            <TextoRico valor={t.fotosFrequentadoresTexto} linha />
+          </p>
+          <Link
+            href="/enviar-fotos-e-videos"
+            className="type-label mt-1 inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent"
+          >
+            <TextoRico valor={t.fotosFrequentadoresEnviar} linha />
+          </Link>
+          {/* plainImages: a photo staff takes down must not linger in the Next image optimizer cache */}
+          <Gallery items={fotos} plainImages abaixoDaDobra={models.length > 0} label="Fotos dos frequentadores" />
+        </section>
       )}
     </section>
   )
