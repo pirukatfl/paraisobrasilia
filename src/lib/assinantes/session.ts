@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 import { cache } from 'react'
 
 import type { Assinante } from '../../payload-types'
+import { headersDoAssinante } from './cookie'
 import { type AccessStatus, getAccessStatus } from './access'
 
 export type AssinantePrincipal = Assinante & { collection: 'assinantes' }
@@ -18,7 +19,9 @@ export type AssinantePrincipal = Assinante & { collection: 'assinantes' }
  */
 export const getAssinante = cache(async (): Promise<AssinantePrincipal | null> => {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await headers() })
+  const swapped = headersDoAssinante(await headers(), payload.config.cookiePrefix)
+  if (!swapped) return null
+  const { user } = await payload.auth({ headers: swapped })
   return user?.collection === 'assinantes' ? (user as AssinantePrincipal) : null
 })
 

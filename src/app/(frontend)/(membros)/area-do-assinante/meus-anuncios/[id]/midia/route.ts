@@ -1,3 +1,4 @@
+import { headersDoAssinante } from '@/lib/assinantes/cookie'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -63,7 +64,8 @@ async function handle(request: Request, { params }: { params: Promise<{ id: stri
   const fail = (code: UploadErrorCode) => back(`midia=erro&codigo=${code}`)
 
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: request.headers })
+  const swapped = headersDoAssinante(request.headers, payload.config.cookiePrefix)
+  const { user } = swapped ? await payload.auth({ headers: swapped }) : { user: null }
   if (user?.collection !== 'assinantes') return seeOther(`/entrar?next=${encodeURIComponent(editar)}`)
   const assinanteId = Number(user.id)
 

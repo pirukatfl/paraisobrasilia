@@ -1,3 +1,4 @@
+import { headersDoAssinante } from '@/lib/assinantes/cookie'
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
@@ -18,7 +19,8 @@ const HEADERS = {
 
 export async function GET(request: Request) {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: request.headers })
+  const swapped = headersDoAssinante(request.headers, payload.config.cookiePrefix)
+  const { user } = swapped ? await payload.auth({ headers: swapped }) : { user: null }
   if (!user || user.collection !== 'assinantes') {
     return Response.json({ count: 0 }, { status: 401, headers: HEADERS })
   }
