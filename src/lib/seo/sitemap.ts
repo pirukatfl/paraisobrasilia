@@ -37,6 +37,7 @@ export function buildSitemap({ base, parties, pages, hasModels, contos = [], dic
           })),
         ]
       : []),
+    { url: `${root}/videos-amadores`, changeFrequency: 'weekly', priority: 0.4 },
     { url: `${root}/contato`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${root}/enviar-fotos-e-videos`, changeFrequency: 'monthly', priority: 0.4 },
     // Members (/area-do-assinante) and auth pages (/entrar, /nova-senha) are never listed (T-03-05)
