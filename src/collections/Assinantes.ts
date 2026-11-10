@@ -1,3 +1,4 @@
+import { assinanteCookieStrategy } from '../lib/assinantes/cookie'
 import {
   APIError,
   Forbidden,
@@ -321,6 +322,7 @@ export const Assinantes: CollectionConfig = {
     maxLoginAttempts: 5, // T-03-04
     lockTime: 600_000, // 10 minutes
     useSessions: true,
+    strategies: [assinanteCookieStrategy],
     cookies: { sameSite: 'Lax', secure: secureCookies },
     // Staff-generated "nova senha" link (D-04): 48 hours, single use
     forgotPassword: { expiration: 172_800_000 },

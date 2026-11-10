@@ -1,16 +1,16 @@
 'use server'
 
 import config from '@payload-config'
-import { logout } from '@payloadcms/next/auth'
 import { cookies, headers } from 'next/headers'
 import { redirect, unstable_rethrow } from 'next/navigation'
-import { AuthenticationError, createLocalReq, getPayload, LockedAuth, ValidationError } from 'payload'
+import { AuthenticationError, createLocalReq, getPayload, LockedAuth, logoutOperation, ValidationError } from 'payload'
 import { generatePayloadCookie } from 'payload/shared'
 
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
 import { mensagemAmigavel } from '../errors'
 import { registrarErro } from '../errors/server'
 import { writeAudit } from './audit'
+import { ASSINANTE_COOKIE, headersDoAssinante } from './cookie'
 import { loginWithLegacy } from './legacy-login'
 import { safeNext } from './redirect'
 import { requestPasswordEmail } from './reset-email'
@@ -37,7 +37,8 @@ async function setAuthCookie(token: string): Promise<void> {
     returnCookieAsObject: true,
     token,
   })
-  ;(await cookies()).set(cookie.name, cookie.value ?? '', {
+  // Own cookie name so a staff session in /admin (payload-token) is never overwritten
+  ;(await cookies()).set(ASSINANTE_COOKIE, cookie.value ?? '', {
     httpOnly: true,
     path: '/',
     sameSite: 'lax',
@@ -79,7 +80,17 @@ export async function entrar(formData: FormData): Promise<void> {
 
 /** Logout: revokes the session stored in the account and deletes the cookie. */
 export async function sair(): Promise<void> {
-  await logout({ config })
+  const payload = await getPayload({ config })
+  const swapped = headersDoAssinante(await headers(), payload.config.cookiePrefix)
+  if (swapped) {
+    const { user } = await payload.auth({ headers: swapped })
+    if (user?.collection === 'assinantes') {
+      const req = await createLocalReq({ user }, payload)
+      await logoutOperation({ allSessions: false, collection: payload.collections.assinantes, req })
+    }
+  }
+  // Only the subscriber cookie goes; a staff session in /admin stays signed in
+  ;(await cookies()).delete(ASSINANTE_COOKIE)
   redirect('/')
 }
 
