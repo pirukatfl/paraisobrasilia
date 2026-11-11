@@ -19,7 +19,7 @@ const deleteFiles: CollectionBeforeDeleteHook = async ({ id, req }) => {
  * Nothing here is ever public: read, create, update and delete are staff only, so neither the REST API
  * nor the contact (e-mail/WhatsApp) can be read without a staff session. The visitor form creates rows
  * with the Local API (overrideAccess) after its own validation.
- * Approving PUBLISHES (client decision 2026-11-10): the photos of an approved submission show in Galeria → Amadoras and
+ * Approving PUBLISHES (client decision 2026-11-10): the photos of an approved submission show as a card in Galeria → Amadoras and
  * the videos in Vídeos amadores (only subscribers can play them). Contact, message and note never leave the server;
  * the public pages read the files through their own routes, which re-check the rule on every request. Refused or
  * new: nothing is shown.
@@ -33,7 +33,7 @@ export const EnviosMidia: CollectionConfig = {
     defaultColumns: ['apelido', 'status', 'promocao', 'contato', 'createdAt'],
     listSearchableFields: ['apelido', 'contato'],
     description:
-      'Fotos e vídeos que o público mandou pelo site. Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.',
+      'Fotos e vídeos que o público mandou pelo site. Aprovado publica as fotos junto das Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.',
   },
   access: {
     read: isStaff,
@@ -58,7 +58,7 @@ export const EnviosMidia: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.',
+          'Aprovado publica as fotos junto das Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.',
       },
     },
     { name: 'apelido', type: 'text', required: true, label: 'Apelido' },

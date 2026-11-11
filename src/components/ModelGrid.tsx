@@ -29,7 +29,7 @@ export async function ModelGrid({ models, abaixoDaDobra = false }: { models: Mod
       {models.map((model, i) => (
         <li key={model.id} className={i < 2 ? undefined : 'reveal stagger'} style={i < 2 ? undefined : ({ '--i': i - 2 } as React.CSSProperties)}>
           <Link
-            href={`/modelos/${model.slug}`}
+            href={model.href ?? `/modelos/${model.slug}`}
             aria-label={`Ver fotos de ${model.name}`}
             className="group press block focus-visible:outline-none"
           >
@@ -40,6 +40,7 @@ export async function ModelGrid({ models, abaixoDaDobra = false }: { models: Mod
                 width={model.cover.thumbWidth}
                 height={model.cover.thumbHeight}
                 sizes={CARD_SIZES}
+                unoptimized={model.semOtimizador}
                 loading={!abaixoDaDobra && i < 2 ? 'eager' : 'lazy'}
                 className="h-full w-full object-cover transition-transform duration-[400ms] ease-out-expo group-hover:scale-[1.04]"
               />

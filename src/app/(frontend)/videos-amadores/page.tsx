@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * Videos sent by the public and approved by staff (client decision 2026-11-10). Everybody sees the list; only
- * staff and active subscribers get the player. The file itself is refused by /videos-amadores/{id}/video.
+ * active subscribers get the player (staff sessions do not). The file itself is refused by /videos-amadores/{id}/video.
  */
 export default async function VideosAmadoresPage() {
   const [t, videos, espectador] = await Promise.all([getTextos('modelos'), getVideosAmadores(), espectadorDeVideos()])

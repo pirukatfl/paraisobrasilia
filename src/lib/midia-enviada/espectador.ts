@@ -7,21 +7,20 @@ import { getPayload } from 'payload'
 import { accessStatusFor } from '../assinantes/status'
 
 export type EspectadorVideos = {
-  /** Staff or a subscriber with active access: the only ones the video route serves. */
+  /** Only a subscriber with active access (no staff exception, client decision 2026-11-11). */
   podeAssistir: boolean
-  /** Some account (subscriber or staff) is signed in: decides whether the invitation offers "Entrar". */
+  /** A subscriber account is signed in: decides whether the invitation offers "Entrar". A staff-only session counts as a visitor. */
   logado: boolean
 }
 
 /**
  * Who is looking at /videos-amadores, computed per request (never cached) with the same rule as the video route
- * (staff, or a subscriber whose access is `ativa`). The page only uses it to choose what the dialog shows; the
+ * (a subscriber whose access is `ativa`; staff sessions get no play). The page only uses it to choose what the dialog shows; the
  * route is what actually refuses the bytes.
  */
 export async function espectadorDeVideos(): Promise<EspectadorVideos> {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await headers() })
-  if (user?.collection === 'users') return { podeAssistir: true, logado: true }
   if (user?.collection === 'assinantes') {
     const ativa = (await accessStatusFor(payload, Number(user.id), new Date())).state === 'ativa'
     return { podeAssistir: ativa, logado: true }

@@ -179,3 +179,4 @@ Open items carried from Phase 1 (human checks / verifications, do not block Phas
 Last session: 2026-10-23T04:32:16.313Z
 Stopped at: Completed 06.1-03-PLAN.md
 Resume file: None
+| 2026-11-11 | amadoras-juntas | Fotos aprovadas viram cartões na grade das Amadoras (página /amadoras/{id}, sem seção separada); vídeos só "Vídeo amador" sem apelido; play só para assinante ativo (sem exceção da equipe); migração 20261111_120000_amadoras_juntas (textos novos sem sobrescrever edição, remove fotos_frequentadores_*) (see .planning/quick/2026-11-11-amadoras-juntas/) |

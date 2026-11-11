@@ -3,6 +3,7 @@ import type { MetadataRoute } from 'next'
 import { getPublishedModels } from '@/lib/gallery/queries'
 import { PAGE_KEYS } from '@/lib/pages/keys'
 import { getPageByKey, type PageDTO } from '@/lib/pages/queries'
+import { getAmadorasEnviadas } from '@/lib/midia-enviada/publico'
 import { getPublicContoSlugs } from '@/lib/contos/public'
 import { getPublicDicaSlugs } from '@/lib/dicas/public'
 import { getUpcomingParties } from '@/lib/parties/queries'
@@ -13,20 +14,22 @@ export const dynamic = 'force-dynamic'
 
 /** Public pages only: drafts, ended parties and an empty Modelos section are left out. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [parties, pages, models, contos, dicas] = await Promise.all([
+  const [parties, pages, models, contos, dicas, amadoras] = await Promise.all([
     getUpcomingParties(new Date()),
     Promise.all(PAGE_KEYS.map((key) => getPageByKey(key))),
     getPublishedModels(),
     getPublicContoSlugs(),
     getPublicDicaSlugs(),
+    getAmadorasEnviadas(),
   ])
   return buildSitemap({
     base: process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
     parties,
     pages: pages.filter((p): p is PageDTO => p !== null),
-    hasModels: models.length > 0,
+    hasModels: models.length > 0 || amadoras.length > 0,
     models: models.map(({ slug, updatedAt }) => ({ slug, updatedAt })),
     contos,
     dicas,
+    amadoras: amadoras.map((a) => ({ envioId: a.envioId, updatedAt: a.createdAt })),
   })
 }

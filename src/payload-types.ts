@@ -1355,7 +1355,7 @@ export interface Model {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Fotos e vídeos que o público mandou pelo site. Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.
+ * Fotos e vídeos que o público mandou pelo site. Aprovado publica as fotos junto das Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "envios-midia".
@@ -1363,7 +1363,7 @@ export interface Model {
 export interface EnviosMidia {
   id: number;
   /**
-   * Aprovado publica as fotos na Galeria → Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.
+   * Aprovado publica as fotos junto das Amadoras e os vídeos em Vídeos amadores (só assinantes dão o play). Recusado ou Novo: nada aparece.
    */
   status: 'novo' | 'aprovado' | 'recusado';
   apelido: string;
@@ -4262,54 +4262,6 @@ export interface TextosModelo {
    * Também é a descrição que aparece no Google (lá, sem formatação).
    */
   introAmadoras?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Seção que aparece em Galeria → Amadoras quando há fotos enviadas pelo público e aprovadas.
-   */
-  fotosFrequentadoresTitulo?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  fotosFrequentadoresTexto?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  fotosFrequentadoresEnviar?: {
     root: {
       type: string;
       children: {
@@ -13306,9 +13258,6 @@ export interface TextosModelosSelect<T extends boolean = true> {
   introProfissionais?: T;
   tituloAmadoras?: T;
   introAmadoras?: T;
-  fotosFrequentadoresTitulo?: T;
-  fotosFrequentadoresTexto?: T;
-  fotosFrequentadoresEnviar?: T;
   videosTitulo?: T;
   videosIntro?: T;
   videosConviteTitulo?: T;

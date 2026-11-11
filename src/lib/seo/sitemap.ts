@@ -14,6 +14,8 @@ export type SitemapInput = {
   dicas?: { slug: string; updatedAt: string }[]
   /** Published models (06.1) */
   models?: { slug: string; updatedAt: string }[]
+  /** Approved submissions from the public with published photos: /amadoras/{id} */
+  amadoras?: { envioId: number; updatedAt: string }[]
 }
 
 /**
@@ -21,7 +23,7 @@ export type SitemapInput = {
  * /modelos and /modelos/{slug} while a model is published, upcoming published parties, /assine-ja and the ClassiSex
  * preview /classisex (redacted, blurred; listing it is a client decision kept open in 04-RESEARCH Q2).
  */
-export function buildSitemap({ base, parties, pages, hasModels, contos = [], dicas = [], models = [] }: SitemapInput): MetadataRoute.Sitemap {
+export function buildSitemap({ base, parties, pages, hasModels, contos = [], dicas = [], models = [], amadoras = [] }: SitemapInput): MetadataRoute.Sitemap {
   const root = base.replace(/\/$/, '')
   return [
     { url: `${root}/`, changeFrequency: 'daily', priority: 1 },
@@ -37,6 +39,12 @@ export function buildSitemap({ base, parties, pages, hasModels, contos = [], dic
           })),
         ]
       : []),
+    ...amadoras.map((a) => ({
+      url: `${root}/amadoras/${a.envioId}`,
+      lastModified: a.updatedAt,
+      changeFrequency: 'weekly' as const,
+      priority: 0.4,
+    })),
     { url: `${root}/videos-amadores`, changeFrequency: 'weekly', priority: 0.4 },
     { url: `${root}/contato`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${root}/enviar-fotos-e-videos`, changeFrequency: 'monthly', priority: 0.4 },

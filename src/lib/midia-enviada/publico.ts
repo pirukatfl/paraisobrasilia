@@ -5,7 +5,7 @@ import { getPayload, type Payload } from 'payload'
 
 import type { EnviosMidia, EnviosMidiaArquivo } from '../../payload-types'
 import { cached } from '../cache/cached'
-import type { SpaceItemDTO } from '../gallery/types'
+import type { GalleryImage, SpaceItemDTO } from '../gallery/types'
 import { estaPublicado } from './publicacao'
 
 /**
@@ -22,7 +22,6 @@ export const VIDEO_AMADOR_URL = '/videos-amadores'
 
 export type VideoAmadorDTO = {
   id: number
-  apelido: string
   /** Seconds, when known. The file URL is not part of the DTO: the dialog builds it for allowed viewers only. */
   duracao: number | null
   createdAt: string
@@ -54,41 +53,65 @@ async function buscar(kind: 'foto' | 'video'): Promise<EnviosMidiaArquivo[]> {
   return docs as unknown as EnviosMidiaArquivo[]
 }
 
-async function fetchFotosAmadoras(): Promise<SpaceItemDTO[]> {
-  const out: SpaceItemDTO[] = []
-  for (const doc of await buscar('foto')) {
-    const apelido = apelidoDe(doc.envio)
-    if (!apelido) continue
-    const width = doc.width ?? 1080
-    const height = doc.height ?? 1080
-    const card = doc.sizes?.card
-    out.push({
-      id: String(doc.id),
-      kind: 'photo',
-      caption: apelido,
-      image: {
-        url: `${FOTO_AMADORA_URL}/${doc.id}/foto`,
-        width,
-        height,
-        alt: `Foto enviada por ${apelido}`,
-        thumbUrl: `${FOTO_AMADORA_URL}/${doc.id}/miniatura`,
-        thumbWidth: card?.width ?? width,
-        thumbHeight: card?.height ?? height,
-      },
-      video: null,
-    })
+/** One approved submission with at least one published photo: a card in Galeria → Amadoras and a page /amadoras/{id}. */
+export type AmadoraEnviadaDTO = {
+  envioId: number
+  apelido: string
+  capa: GalleryImage
+  fotos: SpaceItemDTO[]
+  fotoCount: number
+  createdAt: string
+}
+
+function fotoItem(doc: EnviosMidiaArquivo, apelido: string): SpaceItemDTO {
+  const width = doc.width ?? 1080
+  const height = doc.height ?? 1080
+  const card = doc.sizes?.card
+  return {
+    id: String(doc.id),
+    kind: 'photo',
+    caption: null,
+    image: {
+      url: `${FOTO_AMADORA_URL}/${doc.id}/foto`,
+      width,
+      height,
+      alt: `Foto de ${apelido}`,
+      thumbUrl: `${FOTO_AMADORA_URL}/${doc.id}/miniatura`,
+      thumbWidth: card?.width ?? width,
+      thumbHeight: card?.height ?? height,
+    },
+    video: null,
   }
-  return out
+}
+
+/** Groups published photos by submission (first sent = cover); submissions newest first. Exported for tests. */
+export function agruparFotos(docs: EnviosMidiaArquivo[]): AmadoraEnviadaDTO[] {
+  const porEnvio = new Map<number, { apelido: string; createdAt: string; docs: EnviosMidiaArquivo[] }>()
+  for (const doc of docs) {
+    const apelido = apelidoDe(doc.envio)
+    if (!apelido || typeof doc.envio !== 'object' || !doc.envio) continue
+    const grupo = porEnvio.get(doc.envio.id) ?? { apelido, createdAt: doc.envio.createdAt, docs: [] }
+    grupo.docs.push(doc)
+    porEnvio.set(doc.envio.id, grupo)
+  }
+  const out: AmadoraEnviadaDTO[] = []
+  for (const [envioId, g] of porEnvio) {
+    const fotos = g.docs.sort((a, b) => a.id - b.id).map((d) => fotoItem(d, g.apelido))
+    out.push({ envioId, apelido: g.apelido, capa: fotos[0].image, fotos, fotoCount: fotos.length, createdAt: g.createdAt })
+  }
+  return out.sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : b.envioId - a.envioId))
+}
+
+async function fetchAmadorasEnviadas(): Promise<AmadoraEnviadaDTO[]> {
+  return agruparFotos(await buscar('foto'))
 }
 
 async function fetchVideosAmadores(): Promise<VideoAmadorDTO[]> {
   const out: VideoAmadorDTO[] = []
   for (const doc of await buscar('video')) {
-    const apelido = apelidoDe(doc.envio)
-    if (!apelido) continue
+    if (!apelidoDe(doc.envio)) continue
     out.push({
       id: doc.id,
-      apelido,
       duracao: typeof doc.durationSeconds === 'number' ? doc.durationSeconds : null,
       createdAt: doc.createdAt,
     })
@@ -96,8 +119,13 @@ async function fetchVideosAmadores(): Promise<VideoAmadorDTO[]> {
   return out
 }
 
-/** Approved photos (newest first) for Galeria → Amadoras. Tag 'amadores'. */
-export const getFotosAmadoras = cached(fetchFotosAmadoras, ['amadores:fotos'], () => ['amadores'])
+/** Approved submissions with published photos (newest first), one card each. Tag 'amadores'. */
+export const getAmadorasEnviadas = cached(fetchAmadorasEnviadas, ['amadores:envios'], () => ['amadores'])
+
+/** One approved submission with its published photos, or null (404). Tag 'amadores'. */
+export async function getAmadoraEnviada(envioId: number): Promise<AmadoraEnviadaDTO | null> {
+  return (await getAmadorasEnviadas()).find((a) => a.envioId === envioId) ?? null
+}
 
 /** Approved videos (newest first) for /videos-amadores; no file URL. Tag 'amadores'. */
 export const getVideosAmadores = cached(fetchVideosAmadores, ['amadores:videos'], () => ['amadores'])
