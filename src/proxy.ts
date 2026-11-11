@@ -22,15 +22,23 @@ export function proxy(request: NextRequest) {
   const originHeader = request.headers.get('origin')
   if (originHeader === null) return NextResponse.next()
 
+  // The browser itself vouches that the request comes from this same site (header cannot be set by page scripts).
+  // Staff reaching the admin through an alternate host/port/proxy would otherwise be refused with a 403 that
+  // the panel shows as "sem permissão" while uploading media.
+  const fetchSite = request.headers.get('sec-fetch-site')
+  if (fetchSite === 'same-origin') return NextResponse.next()
+
   const origin = normalize(originHeader)
   const allowed = new Set<string>()
   const configured = normalize(process.env.NEXT_PUBLIC_SERVER_URL)
   if (configured) allowed.add(configured)
   // Same host the browser addressed (covers www/alternate hostnames served by the same app)
-  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host')
-  if (host && origin) {
-    const proto = request.headers.get('x-forwarded-proto') ?? request.nextUrl.protocol.replace(':', '')
-    allowed.add(`${proto.split(',')[0]!.trim()}://${host}`)
+  const proto = (request.headers.get('x-forwarded-proto') ?? request.nextUrl.protocol.replace(':', '')).split(',')[0]!.trim()
+  for (const hostHeader of [request.headers.get('x-forwarded-host'), request.headers.get('host')]) {
+    // x-forwarded-host may list several hosts (one per proxy hop)
+    for (const host of (hostHeader ?? '').split(',')) {
+      if (host.trim()) allowed.add(`${proto}://${host.trim()}`)
+    }
   }
 
   if (origin && allowed.has(origin)) return NextResponse.next()
