@@ -29,6 +29,9 @@ export function headersDoAssinante(headers: Headers, payloadPrefix: string): Hea
   return swapped
 }
 
+const temCookieDeEquipe = (headers: Headers, payloadPrefix: string): boolean =>
+  (headers.get('cookie') ?? '').split(';').some((p) => p.trim().startsWith(`${cookieNames(payloadPrefix).staff}=`))
+
 /** Payload auth strategy: authenticates a subscriber from its own cookie, alongside the stock staff one. */
 export const assinanteCookieStrategy: AuthStrategy = {
   name: 'assinante-cookie',
@@ -39,6 +42,13 @@ export const assinanteCookieStrategy: AuthStrategy = {
     if (!args.req) return { user: null }
     const swapped = headersDoAssinante(args.headers, args.payload.config.cookiePrefix)
     if (!swapped) return { user: null }
+    // Payload runs custom strategies BEFORE its stock JWT one. A team member who is also signed in on the site as a
+    // subscriber (both cookies) would be authenticated as the subscriber here and be refused everywhere in the admin
+    // ("sem permissão" / "não autorizado"). Staff wins: if the staff token is valid, hand over to it.
+    if (temCookieDeEquipe(args.headers, args.payload.config.cookiePrefix)) {
+      const equipe = await JWTAuthentication({ ...args, strategyName: 'local-jwt' })
+      if (equipe.user?.collection === 'users') return equipe
+    }
     const result = await JWTAuthentication({ ...args, headers: swapped, strategyName: 'assinante-cookie' })
     return result.user?.collection === 'assinantes' ? result : { user: null }
   },
