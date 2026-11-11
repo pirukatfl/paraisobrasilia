@@ -508,7 +508,7 @@ export interface Ad {
    */
   resumo?: string | null;
   /**
-   * Opcional. Assinante que escreveu o anúncio; não aparece no site. Fica vazio nos anúncios enviados sem conta ("Enviado sem conta"), e a equipe pode preencher. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios).
+   * Opcional. Preenchido e travado quando quem anunciou tinha conta. Vazio (e editável pela equipe) quando o anúncio foi enviado sem conta ("Enviado sem conta"); não aparece no site. Nos anúncios antigos da equipe, troque pelo dono certo (ele passa a ver o rascunho em Meus anúncios; as fotos acompanham).
    */
   author?: (number | null) | Assinante;
   /**
