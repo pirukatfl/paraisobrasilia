@@ -46,24 +46,6 @@ export const modelos = definirArea({
       ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
     },
 
-    // Fotos enviadas pelo público e aprovadas (Galeria → Amadoras)
-    fotosFrequentadoresTitulo: {
-      rotulo: 'Título das fotos dos frequentadores',
-      padrao: 'Fotos dos frequentadores',
-      secao: 'Galeria: fotos dos frequentadores',
-      ajuda: 'Seção que aparece em Galeria → Amadoras quando há fotos enviadas pelo público e aprovadas.',
-    },
-    fotosFrequentadoresTexto: {
-      rotulo: 'Texto das fotos dos frequentadores',
-      padrao: 'Fotos enviadas por quem frequenta a casa, com autorização de uso de imagem.',
-      secao: 'Galeria: fotos dos frequentadores',
-    },
-    fotosFrequentadoresEnviar: {
-      rotulo: 'Link para enviar as suas fotos',
-      padrao: 'Envie as suas fotos',
-      secao: 'Galeria: fotos dos frequentadores',
-    },
-
     // Página Vídeos amadores (/videos-amadores)
     videosTitulo: {
       rotulo: 'Título da página',
@@ -73,7 +55,7 @@ export const modelos = definirArea({
     },
     videosIntro: {
       rotulo: 'Texto de abertura',
-      padrao: 'Vídeos enviados por quem frequenta a casa, aprovados pela equipe. Só assinantes dão o play.',
+      padrao: 'Vídeos amadores aprovados pela equipe. Só assinantes dão o play.',
       secao: 'Vídeos amadores',
       ajuda: 'Também é a descrição que aparece no Google (lá, sem formatação).',
     },
@@ -94,7 +76,7 @@ export const modelos = definirArea({
     videosVazioTexto: {
       bloco: true,
       rotulo: 'Texto quando não há vídeos',
-      padrao: 'Os vídeos enviados pelo público aparecem aqui depois que a equipe aprova. Quer mandar o seu?',
+      padrao: 'Novos vídeos amadores aparecem aqui assim que a equipe aprova.',
       secao: 'Vídeos amadores',
     },
     videosVazioBotao: { rotulo: 'Botão quando não há vídeos', padrao: 'Enviar o meu vídeo', secao: 'Vídeos amadores' },

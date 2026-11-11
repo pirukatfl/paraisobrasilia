@@ -9,7 +9,7 @@ import { useHydrated } from '@/lib/gallery/use-hydrated'
 import { duracaoRotulo } from '@/lib/midia-enviada/publicacao'
 import type { TextoRico as EstadoRico } from '@/lib/textos/rico'
 
-export type VideoAmadorCard = { id: number; apelido: string; duracao: number | null }
+export type VideoAmadorCard = { id: number; duracao: number | null }
 
 export type ConviteVideos = {
   titulo: EstadoRico
@@ -23,8 +23,8 @@ const videoUrl = (id: number) => `/videos-amadores/${id}/video`
 
 /**
  * Grid of the approved videos sent by the public. There is no poster (the files are not processed on the
- * server), so each card is a dark tile with a play button, the nickname and the length. Clicking opens a dialog:
- * a player for staff and active subscribers, an invitation (subscribe / sign in) for everybody else. `podeAssistir`
+ * server), so each card is a dark tile with a play button, the label "Vídeo amador" and the length. Clicking opens a dialog:
+ * a player for active subscribers, an invitation (subscribe / sign in) for everybody else. `podeAssistir`
  * only chooses what the dialog shows; the bytes are refused by the video route whatever this component renders.
  * Before hydration (or without JavaScript) a card is a plain link: the video for who may watch, "Assine já" otherwise.
  */
@@ -72,7 +72,7 @@ export function VideosAmadoresGrid({
       <ul role="list" className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {videos.map((video, i) => {
           const duracao = duracaoRotulo(video.duracao)
-          const nome = `Assistir vídeo de ${video.apelido}${duracao ? `, duração ${duracao}` : ''}`
+          const nome = `Assistir vídeo amador${duracao ? `, duração ${duracao}` : ''}`
           const face = (
             <>
               <span
@@ -111,7 +111,7 @@ export function VideosAmadoresGrid({
                   {face}
                 </a>
               )}
-              <p className="type-label mt-2 line-clamp-1 text-text">{video.apelido}</p>
+              <p className="type-label mt-2 text-text">Vídeo amador</p>
             </li>
           )
         })}
@@ -131,7 +131,7 @@ export function VideosAmadoresGrid({
           <div>
             <div className="flex items-start justify-between gap-4">
               <h2 id="titulo-video-amador" className="type-heading">
-                {podeAssistir ? `Vídeo de ${ativo.apelido}` : <TextoRico valor={convite.titulo} linha />}
+                {podeAssistir ? 'Vídeo amador' : <TextoRico valor={convite.titulo} linha />}
               </h2>
               <button type="button" className={iconButton} onClick={() => dialogRef.current?.close()}>
                 <CloseIcon />
@@ -152,7 +152,7 @@ export function VideosAmadoresGrid({
                   preload="metadata"
                   controlsList="nodownload"
                   src={videoUrl(ativo.id)}
-                  title={`Vídeo de ${ativo.apelido}`}
+                  title="Vídeo amador"
                   onError={() => setFalhou(true)}
                   className="mt-4 aspect-video max-h-[70dvh] w-full rounded-lg bg-black"
                 />

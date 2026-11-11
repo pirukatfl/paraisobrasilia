@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Approved video sent by the public: GET /videos-amadores/{id}/video (client decision 2026-11-10).
- * Playing is for staff and subscribers with ACTIVE access only; the bytes are refused here (403), whatever the
+ * Playing is for subscribers with ACTIVE access only (no staff exception); the bytes are refused here (403), whatever the
  * page shows. Order matters: an unpublished file is 404 for everybody (it does not exist for the site), then a
  * viewer without the right gets 403 before any byte is read. Entitlement and publication are recomputed on every
  * request. `Cache-Control: private` + `Vary: Cookie`: no shared cache keeps these bytes.
@@ -41,8 +41,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const { user } = await payload.auth({ headers: request.headers })
   let allowed = false
-  if (user?.collection === 'users') allowed = true
-  else if (user?.collection === 'assinantes') {
+  // Subscribers with active access only; a staff session gets no play (client decision 2026-11-11)
+  if (user?.collection === 'assinantes') {
     allowed = (await accessStatusFor(payload, Number(user.id), new Date())).state === 'ativa'
   }
   if (!allowed) return denied(403)
