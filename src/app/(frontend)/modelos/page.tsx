@@ -1,11 +1,10 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 
 import { EmptyState } from '@/components/EmptyState'
-import { Gallery } from '@/components/Gallery'
 import { ModelGrid } from '@/components/ModelGrid'
 import { getPublishedModels } from '@/lib/gallery/queries'
-import { getFotosAmadoras } from '@/lib/midia-enviada/publico'
+import { getAmadorasEnviadas, type AmadoraEnviadaDTO } from '@/lib/midia-enviada/publico'
+import type { ModelCardDTO } from '@/lib/gallery/types'
 import { filterByTipo, type ModelTipo, parseTipo } from '@/lib/gallery/tipo'
 import { buildPageMetadata } from '@/lib/seo/metadata'
 import type { Textos } from '@/lib/textos/areas'
@@ -35,16 +34,33 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   })
 }
 
+/** A submission with published photos as a card of the same grid; the cover skips the image optimizer. */
+function cardDeEnvio(e: AmadoraEnviadaDTO): ModelCardDTO {
+  return {
+    id: `envio-${e.envioId}`,
+    slug: '',
+    name: e.apelido,
+    categoria: 'amadora',
+    description: null,
+    cover: e.capa,
+    photoCount: e.fotoCount,
+    videoCount: 0,
+    updatedAt: e.createdAt,
+    href: `/amadoras/${e.envioId}`,
+    semOtimizador: true,
+  }
+}
+
 /** Always reachable from the menu (quick menu-modelos); empty state until a model is published. */
 export default async function ModelsPage({ searchParams }: Props) {
   const tipo = parseTipo((await searchParams).tipo)
-  // Photos sent by the public and approved by staff: only in Galeria → Amadoras (tag 'amadores')
-  const [all, t, fotos] = await Promise.all([
+  // Submissions from the public approved by staff are amadoras too: cards next to the amateur models (tag 'amadores')
+  const [all, t, enviadas] = await Promise.all([
     getPublishedModels(),
     getTextos('modelos'),
-    tipo === 'amadoras' ? getFotosAmadoras() : Promise.resolve([]),
+    tipo === 'profissionais' ? Promise.resolve([]) : getAmadorasEnviadas(),
   ])
-  const models = filterByTipo(all, tipo)
+  const cards = [...filterByTipo(all, tipo), ...enviadas.map(cardDeEnvio)]
   const { titulo, intro } = copyFor(t, tipo)
   return (
     <section aria-labelledby="titulo-modelos">
@@ -53,7 +69,7 @@ export default async function ModelsPage({ searchParams }: Props) {
         <TextoRico valor={titulo} linha />
       </h1>
       <p className="mt-4 max-w-[680px] text-body text-muted"><TextoRico valor={intro} linha /></p>
-      {models.length === 0 && fotos.length === 0 ? (
+      {cards.length === 0 ? (
         <EmptyState
           heading={<TextoRico valor={t.vazioTitulo} linha />}
           body={t.vazioTexto}
@@ -63,25 +79,7 @@ export default async function ModelsPage({ searchParams }: Props) {
           ]}
         />
       ) : (
-        models.length > 0 && <ModelGrid models={models} />
-      )}
-      {fotos.length > 0 && (
-        <section aria-labelledby="titulo-fotos-frequentadores" className={models.length > 0 ? 'mt-16' : 'mt-10'}>
-          <h2 id="titulo-fotos-frequentadores" className="type-heading">
-            <TextoRico valor={t.fotosFrequentadoresTitulo} linha />
-          </h2>
-          <p className="mt-2 max-w-[680px] text-body text-muted">
-            <TextoRico valor={t.fotosFrequentadoresTexto} linha />
-          </p>
-          <Link
-            href="/enviar-fotos-e-videos"
-            className="type-label mt-1 inline-flex min-h-11 items-center text-gold underline underline-offset-4 hover:text-accent"
-          >
-            <TextoRico valor={t.fotosFrequentadoresEnviar} linha />
-          </Link>
-          {/* plainImages: a photo staff takes down must not linger in the Next image optimizer cache */}
-          <Gallery items={fotos} plainImages abaixoDaDobra={models.length > 0} label="Fotos dos frequentadores" />
-        </section>
+        <ModelGrid models={cards} />
       )}
     </section>
   )

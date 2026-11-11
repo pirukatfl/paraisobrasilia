@@ -34,6 +34,14 @@ describe('sitemap (INST-06, T-02-13)', () => {
     expect(urls).toHaveLength(15)
   })
 
+  it('lists /amadoras/{id} for approved submissions with published photos', () => {
+    const urls = paths(
+      buildSitemap({ base, parties: [], pages: [], hasModels: true, amadoras: [{ envioId: 7, updatedAt: '2026-11-11T12:00:00.000Z' }] }),
+    )
+    expect(urls).toContain('/amadoras/7')
+    expect(paths(buildSitemap({ base, parties: [], pages: [], hasModels: false }))).not.toContain('/amadoras/7')
+  })
+
   it('includes /modelos and upcoming parties when present', () => {
     const urls = paths(
       buildSitemap({ base, parties: [{ slug: 'festa-x', updatedAt: '2026-10-19T12:00:00.000Z' }], pages: [], hasModels: true }),

@@ -38,6 +38,10 @@ export type ModelCardDTO = {
   photoCount: number
   videoCount: number
   updatedAt: string
+  /** Own link when the card is not a model page (a submission from the public: /amadoras/{id}). */
+  href?: string
+  /** Cover skips the Next image optimizer (files that staff can unpublish at any time). */
+  semOtimizador?: boolean
 }
 
 /** /modelos/{slug} (UI-SPEC S12). */
