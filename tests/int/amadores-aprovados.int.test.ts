@@ -4,7 +4,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import type { UploadFile } from '@/lib/classisex/service'
 import { criarEnvioMidia } from '@/lib/midia-enviada/envio'
-import { arquivoPublicado, getFotosAmadoras, getVideosAmadores } from '@/lib/midia-enviada/publico'
+import { arquivoPublicado, getAmadoraEnviada, getAmadorasEnviadas, getVideosAmadores } from '@/lib/midia-enviada/publico'
 
 import { buildMp4 } from '../helpers/mp4-fixtures'
 import { getTestPayload, resetDatabase } from '../helpers/seed'
@@ -64,12 +64,12 @@ describe('fotos e vídeos aprovados no site', () => {
 
   it('shows nothing while the submission is new or refused', async () => {
     const a = await enviar()
-    expect(await getFotosAmadoras()).toEqual([])
+    expect(await getAmadorasEnviadas()).toEqual([])
     expect(await getVideosAmadores()).toEqual([])
     expect(await arquivoPublicado(payload, a.foto.id)).toBeNull()
     expect(await arquivoPublicado(payload, a.video.id)).toBeNull()
     await status(a.envio, 'recusado')
-    expect(await getFotosAmadoras()).toEqual([])
+    expect(await getAmadorasEnviadas()).toEqual([])
     expect(await getVideosAmadores()).toEqual([])
     expect(await arquivoPublicado(payload, a.foto.id)).toBeNull()
   })
@@ -78,29 +78,33 @@ describe('fotos e vídeos aprovados no site', () => {
     const a = await enviar()
     await status(a.envio, 'aprovado')
 
-    const fotos = await getFotosAmadoras()
-    expect(fotos).toHaveLength(1)
-    expect(fotos[0]).toMatchObject({
+    const amadoras = await getAmadorasEnviadas()
+    expect(amadoras).toHaveLength(1)
+    expect(amadoras[0]).toMatchObject({
+      envioId: a.envio,
+      apelido: 'Casal BSB',
+      fotoCount: 1,
+      capa: { thumbUrl: `/amadores/foto/${a.foto.id}/miniatura`, alt: 'Foto de Casal BSB' },
+    })
+    expect(amadoras[0].fotos[0]).toMatchObject({
       id: String(a.foto.id),
       kind: 'photo',
-      caption: 'Casal BSB',
       video: null,
-      image: {
-        url: `/amadores/foto/${a.foto.id}/foto`,
-        thumbUrl: `/amadores/foto/${a.foto.id}/miniatura`,
-        alt: 'Foto enviada por Casal BSB',
-      },
+      image: { url: `/amadores/foto/${a.foto.id}/foto`, alt: 'Foto de Casal BSB' },
     })
+    expect((await getAmadoraEnviada(a.envio))?.apelido).toBe('Casal BSB')
     const videos = await getVideosAmadores()
     expect(videos).toHaveLength(1)
-    expect(videos[0]).toMatchObject({ id: a.video.id, apelido: 'Casal BSB' })
+    expect(videos[0]).toMatchObject({ id: a.video.id })
+    expect(JSON.stringify(videos)).not.toContain('Casal BSB')
     expect(videos[0].duracao).toBeGreaterThan(0)
 
     expect((await arquivoPublicado(payload, a.foto.id))?.kind).toBe('foto')
     expect((await arquivoPublicado(payload, a.video.id))?.kind).toBe('video')
 
     await status(a.envio, 'novo')
-    expect(await getFotosAmadoras()).toEqual([])
+    expect(await getAmadorasEnviadas()).toEqual([])
+    expect(await getAmadoraEnviada(a.envio)).toBeNull()
     expect(await getVideosAmadores()).toEqual([])
     expect(await arquivoPublicado(payload, a.foto.id)).toBeNull()
     expect(await arquivoPublicado(payload, a.video.id)).toBeNull()
@@ -112,7 +116,12 @@ describe('fotos e vídeos aprovados no site', () => {
     await payload.update({ collection: 'envios-midia-arquivos', id: a.video.id, data: { oculto: true }, overrideAccess: true })
     expect(await getVideosAmadores()).toEqual([])
     expect(await arquivoPublicado(payload, a.video.id)).toBeNull()
-    expect(await getFotosAmadoras()).toHaveLength(1)
+    expect(await getAmadorasEnviadas()).toHaveLength(1)
+    // hiding the only photo leaves no card (a submission without a published photo is not listed)
+    await payload.update({ collection: 'envios-midia-arquivos', id: a.foto.id, data: { oculto: true }, overrideAccess: true })
+    expect(await getAmadorasEnviadas()).toEqual([])
+    expect(await getAmadoraEnviada(a.envio)).toBeNull()
+    await payload.update({ collection: 'envios-midia-arquivos', id: a.foto.id, data: { oculto: false }, overrideAccess: true })
     expect(await arquivoPublicado(payload, a.foto.id)).not.toBeNull()
   })
 
@@ -124,7 +133,7 @@ describe('fotos e vídeos aprovados no site', () => {
       data: { status: 'aprovado', observacao: 'observacao-interna-da-equipe' },
       overrideAccess: true,
     })
-    const publico = JSON.stringify([await getFotosAmadoras(), await getVideosAmadores()])
+    const publico = JSON.stringify([await getAmadorasEnviadas(), await getVideosAmadores()])
     for (const segredo of [CONTATO, 'segredo.contato', MENSAGEM, 'observacao-interna', 'filename', '.webp', '.mp4']) {
       expect(publico).not.toContain(segredo)
     }
@@ -134,7 +143,7 @@ describe('fotos e vídeos aprovados no site', () => {
     const a = await enviar()
     await status(a.envio, 'aprovado')
     await payload.delete({ collection: 'envios-midia', id: a.envio, overrideAccess: true })
-    expect(await getFotosAmadoras()).toEqual([])
+    expect(await getAmadorasEnviadas()).toEqual([])
     expect(await getVideosAmadores()).toEqual([])
     expect(await arquivoPublicado(payload, a.foto.id)).toBeNull()
   })
@@ -145,7 +154,7 @@ describe('fotos e vídeos aprovados no site', () => {
     await enviar('Terceiro') // stays new
     await status(antigo.envio, 'aprovado')
     await status(recente.envio, 'aprovado')
-    expect((await getFotosAmadoras()).map((f) => f.caption)).toEqual(['Segundo', 'Primeiro'])
-    expect((await getVideosAmadores()).map((v) => v.apelido)).toEqual(['Segundo', 'Primeiro'])
+    expect((await getAmadorasEnviadas()).map((f) => f.apelido)).toEqual(['Segundo', 'Primeiro'])
+    expect((await getVideosAmadores()).map((v) => v.id)).toEqual([recente.video.id, antigo.video.id])
   })
 })
