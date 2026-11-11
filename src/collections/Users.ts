@@ -20,6 +20,9 @@ export const Users: CollectionConfig = {
     useAsTitle: 'email',
   },
   auth: {
+    // Payload's default is 2 h: staff editing a festa (flyer, valores, texto) for longer than that got
+    // "Não autorizado" (401) on Save. 7 days; the admin keeps refreshing the token while it is open.
+    tokenExpiration: 7 * 24 * 60 * 60,
     maxLoginAttempts: 5,
     lockTime: 600000, // 10 minutes
     cookies: { sameSite: 'Lax', secure: secureCookies },
