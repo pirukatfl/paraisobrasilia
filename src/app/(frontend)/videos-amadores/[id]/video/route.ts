@@ -4,6 +4,7 @@ import path from 'path'
 import { getPayload } from 'payload'
 import { Readable } from 'stream'
 
+import { headersDoAssinante } from '@/lib/assinantes/cookie'
 import { accessStatusFor } from '@/lib/assinantes/status'
 import { parseRange } from '@/lib/classisex/range'
 import { privateMediaDir } from '@/lib/classisex/storage'
@@ -39,7 +40,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const arquivo = await arquivoPublicado(payload, fileId)
   if (!arquivo || arquivo.kind !== 'video') return denied(404)
 
-  const { user } = await payload.auth({ headers: request.headers })
+  // Subscriber session comes from its own cookie, so a staff session in the same browser neither grants nor blocks the play
+  const swapped = headersDoAssinante(request.headers, payload.config.cookiePrefix)
+  const { user } = swapped ? await payload.auth({ headers: swapped }) : { user: null }
   let allowed = false
   // Subscribers with active access only; a staff session gets no play (client decision 2026-11-11)
   if (user?.collection === 'assinantes') {

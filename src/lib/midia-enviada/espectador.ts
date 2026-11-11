@@ -4,6 +4,7 @@ import config from '@payload-config'
 import { headers } from 'next/headers'
 import { getPayload } from 'payload'
 
+import { headersDoAssinante } from '../assinantes/cookie'
 import { accessStatusFor } from '../assinantes/status'
 
 export type EspectadorVideos = {
@@ -20,7 +21,8 @@ export type EspectadorVideos = {
  */
 export async function espectadorDeVideos(): Promise<EspectadorVideos> {
   const payload = await getPayload({ config })
-  const { user } = await payload.auth({ headers: await headers() })
+  const swapped = headersDoAssinante(await headers(), payload.config.cookiePrefix)
+  const { user } = swapped ? await payload.auth({ headers: swapped }) : { user: null }
   if (user?.collection === 'assinantes') {
     const ativa = (await accessStatusFor(payload, Number(user.id), new Date())).state === 'ativa'
     return { podeAssistir: ativa, logado: true }
