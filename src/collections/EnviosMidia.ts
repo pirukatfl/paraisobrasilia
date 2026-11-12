@@ -114,7 +114,11 @@ export const EnviosMidia: CollectionConfig = {
       collection: 'envios-midia-arquivos',
       on: 'envio',
       label: 'Arquivos',
-      admin: { description: 'Clique em um arquivo para ver a prévia e baixar o original.', defaultColumns: ['filename', 'kind', 'createdAt'] },
+      admin: {
+        description:
+          'Clique em um arquivo para ver a prévia, baixar o original e escrever a Descrição que aparece no card do site. A coluna Descrição mostra o que já foi escrito.',
+        defaultColumns: ['filename', 'kind', 'descricao', 'createdAt'],
+      },
     },
   ],
 }

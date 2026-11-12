@@ -80,7 +80,7 @@ export const EnviosMidiaArquivos: CollectionConfig = {
   admin: {
     group: 'Envios do público',
     useAsTitle: 'filename',
-    defaultColumns: ['filename', 'kind', 'envio', 'createdAt'],
+    defaultColumns: ['filename', 'kind', 'descricao', 'envio', 'createdAt'],
     description: 'Cada foto ou vídeo de um envio. Só a equipe abre o original; o site mostra apenas os de envios aprovados que não estiverem marcados como "Não mostrar no site".',
   },
   access: {
