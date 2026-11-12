@@ -24,6 +24,8 @@ export type VideoAmadorDTO = {
   id: number
   /** Seconds, when known. The file URL is not part of the DTO: the dialog builds it for allowed viewers only. */
   duracao: number | null
+  /** Staff-written text shown on the card; null when empty. */
+  descricao: string | null
   createdAt: string
 }
 
@@ -31,6 +33,8 @@ const apelidoDe = (envio: unknown): string | null => {
   const apelido = typeof envio === 'object' && envio ? (envio as EnviosMidia).apelido?.trim() : ''
   return apelido || null
 }
+
+const descricaoDe = (doc: EnviosMidiaArquivo): string | null => doc.descricao?.trim() || null
 
 async function buscar(kind: 'foto' | 'video'): Promise<EnviosMidiaArquivo[]> {
   const payload = await getPayload({ config })
@@ -43,7 +47,7 @@ async function buscar(kind: 'foto' | 'video'): Promise<EnviosMidiaArquivo[]> {
         { 'envio.status': { equals: 'aprovado' } },
       ],
     },
-    select: { kind: true, oculto: true, envio: true, width: true, height: true, durationSeconds: true, sizes: true, createdAt: true },
+    select: { kind: true, oculto: true, descricao: true, envio: true, width: true, height: true, durationSeconds: true, sizes: true, createdAt: true },
     sort: '-createdAt',
     depth: 1,
     limit: LIMITE,
@@ -70,7 +74,7 @@ function fotoItem(doc: EnviosMidiaArquivo, apelido: string): SpaceItemDTO {
   return {
     id: String(doc.id),
     kind: 'photo',
-    caption: null,
+    caption: descricaoDe(doc),
     image: {
       url: `${FOTO_AMADORA_URL}/${doc.id}/foto`,
       width,
@@ -113,6 +117,7 @@ async function fetchVideosAmadores(): Promise<VideoAmadorDTO[]> {
     out.push({
       id: doc.id,
       duracao: typeof doc.durationSeconds === 'number' ? doc.durationSeconds : null,
+      descricao: descricaoDe(doc),
       createdAt: doc.createdAt,
     })
   }

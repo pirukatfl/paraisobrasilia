@@ -1413,6 +1413,10 @@ export interface EnviosMidiaArquivo {
    * Marque para esconder só este arquivo de um envio aprovado.
    */
   oculto?: boolean | null;
+  /**
+   * Aparece no card do vídeo ou da foto no site. Opcional. Não coloque contato nem nome verdadeiro.
+   */
+  descricao?: string | null;
   durationSeconds?: number | null;
   updatedAt: string;
   createdAt: string;
@@ -2242,6 +2246,7 @@ export interface EnviosMidiaArquivosSelect<T extends boolean = true> {
   envio?: T;
   kind?: T;
   oculto?: T;
+  descricao?: T;
   durationSeconds?: T;
   updatedAt?: T;
   createdAt?: T;
