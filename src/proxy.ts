@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
+import { tokenLegadoDeAssinante } from '@/lib/assinantes/legacy-token'
+
 // CSRF guard (replaces Payload's `csrf` allowlist, which dropped the session cookie on every
 // request lacking Origin and Sec-Fetch-Site — older Safari/WebViews/proxies — logging users out).
 // Auth cookies are SameSite=Lax; on top of that, a state-changing request that declares a foreign
@@ -16,7 +18,20 @@ const normalize = (value: string | null | undefined): string | null => {
   }
 }
 
+// Subscriber JWT left in the staff cookie by older logins: drop it so /admin shows the login screen
+const STAFF_COOKIE = 'payload-token'
+
 export function proxy(request: NextRequest) {
+  if (tokenLegadoDeAssinante(request.headers.get('cookie'))) {
+    // Strip it from this very request too (no redirect, so a browser that refuses the deletion cannot loop)
+    const headers = new Headers(request.headers)
+    const rest = (headers.get('cookie') ?? '').split(';').map((p) => p.trim()).filter((p) => p && !p.startsWith(`${STAFF_COOKIE}=`))
+    if (rest.length > 0) headers.set('cookie', rest.join('; '))
+    else headers.delete('cookie')
+    const res = NextResponse.next({ request: { headers } })
+    res.cookies.delete(STAFF_COOKIE)
+    return res
+  }
   if (SAFE_METHODS.has(request.method)) return NextResponse.next()
 
   const originHeader = request.headers.get('origin')
