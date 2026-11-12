@@ -9,7 +9,7 @@ import { useHydrated } from '@/lib/gallery/use-hydrated'
 import { duracaoRotulo } from '@/lib/midia-enviada/publicacao'
 import type { TextoRico as EstadoRico } from '@/lib/textos/rico'
 
-export type VideoAmadorCard = { id: number; duracao: number | null }
+export type VideoAmadorCard = { id: number; duracao: number | null; descricao: string | null }
 
 export type ConviteVideos = {
   titulo: EstadoRico
@@ -112,6 +112,7 @@ export function VideosAmadoresGrid({
                 </a>
               )}
               <p className="type-label mt-2 text-text">Vídeo amador</p>
+              {video.descricao && <p className="mt-1 line-clamp-3 whitespace-pre-line text-body text-muted">{video.descricao}</p>}
             </li>
           )
         })}
@@ -138,6 +139,7 @@ export function VideosAmadoresGrid({
                 <span className="sr-only">Fechar</span>
               </button>
             </div>
+            {ativo.descricao && <p className="mt-2 whitespace-pre-line text-body text-muted">{ativo.descricao}</p>}
             {podeAssistir ? (
               falhou ? (
                 <p role="alert" className="mt-4 text-body text-muted">

@@ -123,6 +123,15 @@ export const EnviosMidiaArquivos: CollectionConfig = {
       label: 'Não mostrar no site',
       admin: { position: 'sidebar', description: 'Marque para esconder só este arquivo de um envio aprovado.' },
     },
+    {
+      name: 'descricao',
+      type: 'textarea',
+      label: 'Descrição',
+      maxLength: 280,
+      admin: {
+        description: 'Aparece no card do vídeo ou da foto no site. Opcional. Não coloque contato nem nome verdadeiro.',
+      },
+    },
     { name: 'durationSeconds', type: 'number', label: 'Duração (s)', admin: { readOnly: true } },
   ],
 }
