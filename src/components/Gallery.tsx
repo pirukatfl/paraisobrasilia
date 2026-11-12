@@ -138,7 +138,7 @@ export function Gallery({ items, limite, abaixoDaDobra = false, contact, contact
                   {tile}
                 </a>
               )}
-              {item.caption && <p className="type-label mt-2 line-clamp-1 text-muted">{item.caption}</p>}
+              {item.caption && <p className="type-label mt-2 line-clamp-2 text-pretty text-muted">{item.caption}</p>}
             </li>
           )
         })}

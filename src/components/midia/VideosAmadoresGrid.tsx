@@ -20,10 +20,11 @@ export type ConviteVideos = {
 }
 
 const videoUrl = (id: number) => `/videos-amadores/${id}/video`
+const capaUrl = (id: number) => `/videos-amadores/${id}/capa`
 
 /**
- * Grid of the approved videos sent by the public. There is no poster (the files are not processed on the
- * server), so each card is a dark tile with a play button, the label "Vídeo amador" and the length. Clicking opens a dialog:
+ * Grid of the approved videos sent by the public. Each card shows a still frame of the video (/capa, open to everybody;
+ * a dark tile when the frame is unavailable) under a play button, the label "Vídeo amador" and the length. Clicking opens a dialog:
  * a player for active subscribers, an invitation (subscribe / sign in) for everybody else. `podeAssistir`
  * only chooses what the dialog shows; the bytes are refused by the video route whatever this component renders.
  * Before hydration (or without JavaScript) a card is a plain link: the video for who may watch, "Assine já" otherwise.
@@ -45,6 +46,7 @@ export function VideosAmadoresGrid({
   const openedFrom = useRef<number | null>(null)
   const [ativo, setAtivo] = useState<VideoAmadorCard | null>(null)
   const [falhou, setFalhou] = useState(false)
+  const [semCapa, setSemCapa] = useState<ReadonlySet<number>>(new Set())
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -75,9 +77,22 @@ export function VideosAmadoresGrid({
           const nome = `Assistir vídeo amador${duracao ? `, duração ${duracao}` : ''}`
           const face = (
             <>
+              {!semCapa.has(video.id) && (
+                // eslint-disable-next-line @next/next/no-img-element -- private route, never through the image optimizer
+                <img
+                  src={capaUrl(video.id)}
+                  alt=""
+                  width={640}
+                  height={360}
+                  loading={i < 3 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  onError={() => setSemCapa((atual) => new Set(atual).add(video.id))}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              )}
               <span
                 aria-hidden="true"
-                className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-text transition-colors duration-[var(--duration-fast)] group-hover:bg-primary-hover"
+                className="relative flex h-14 w-14 items-center justify-center rounded-full bg-primary text-text transition-colors duration-[var(--duration-fast)] group-hover:bg-primary-hover"
               >
                 <PlayIcon />
               </span>
@@ -112,7 +127,7 @@ export function VideosAmadoresGrid({
                 </a>
               )}
               <p className="type-label mt-2 text-text">Vídeo amador</p>
-              {video.descricao && <p className="mt-1 line-clamp-3 whitespace-pre-line text-body text-muted">{video.descricao}</p>}
+              {video.descricao && <p className="mt-1 line-clamp-2 whitespace-pre-line text-pretty text-muted">{video.descricao}</p>}
             </li>
           )
         })}
@@ -139,7 +154,7 @@ export function VideosAmadoresGrid({
                 <span className="sr-only">Fechar</span>
               </button>
             </div>
-            {ativo.descricao && <p className="mt-2 whitespace-pre-line text-body text-muted">{ativo.descricao}</p>}
+            {ativo.descricao && <p className="mt-2 max-w-prose whitespace-pre-line text-pretty text-body text-muted">{ativo.descricao}</p>}
             {podeAssistir ? (
               falhou ? (
                 <p role="alert" className="mt-4 text-body text-muted">

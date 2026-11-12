@@ -67,6 +67,9 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
     MEDIA_DIR=/app/media
 
+# ffmpeg: still frame of each approved amateur video (/videos-amadores/{id}/capa)
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
+
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --from=builder --chown=node:node /app/public ./public
