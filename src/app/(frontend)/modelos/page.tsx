@@ -54,13 +54,15 @@ function cardDeEnvio(e: AmadoraEnviadaDTO): ModelCardDTO {
 /** Always reachable from the menu (quick menu-modelos); empty state until a model is published. */
 export default async function ModelsPage({ searchParams }: Props) {
   const tipo = parseTipo((await searchParams).tipo)
+  // /modelos without ?tipo= is the professional gallery: amateur photos only show under ?tipo=amadoras.
+  const lista: ModelTipo = tipo ?? 'profissionais'
   // Submissions from the public approved by staff are amadoras too: cards next to the amateur models (tag 'amadores')
   const [all, t, enviadas] = await Promise.all([
     getPublishedModels(),
     getTextos('modelos'),
-    tipo === 'profissionais' ? Promise.resolve([]) : getAmadorasEnviadas(),
+    lista === 'amadoras' ? getAmadorasEnviadas() : Promise.resolve([]),
   ])
-  const cards = [...filterByTipo(all, tipo), ...enviadas.map(cardDeEnvio)]
+  const cards = [...filterByTipo(all, lista), ...enviadas.map(cardDeEnvio)]
   const { titulo, intro } = copyFor(t, tipo)
   return (
     <section aria-labelledby="titulo-modelos">
