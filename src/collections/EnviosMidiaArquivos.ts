@@ -132,7 +132,12 @@ export const EnviosMidiaArquivos: CollectionConfig = {
         description: 'Aparece no card do vídeo ou da foto no site. Opcional. Não coloque contato nem nome verdadeiro.',
       },
     },
-    // Filled by the upload hook (used by the site card); staff do not need to see it
-    { name: 'durationSeconds', type: 'number', label: 'Duração (s)', admin: { hidden: true } },
+    // Filled by the upload hook (used by the site card); only videos have a length, so photos do not show it
+    {
+      name: 'durationSeconds',
+      type: 'number',
+      label: 'Duração (s)',
+      admin: { readOnly: true, condition: (data) => data?.kind === 'video' },
+    },
   ],
 }
