@@ -1,6 +1,6 @@
 import type { ModelCardDTO, ModelCategoria } from './types'
 
-/** `?tipo=` values of /modelos (the Galeria submenus). Without it the page lists everyone. */
+/** `?tipo=` values of /modelos (the Galeria submenus). Without it the page lists the professionals only. */
 export type ModelTipo = 'profissionais' | 'amadoras'
 
 const TIPO_TO_CATEGORIA: Record<ModelTipo, ModelCategoria> = {
