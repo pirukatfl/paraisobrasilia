@@ -41,7 +41,29 @@ export function failureOf(err: unknown): Failure {
     if (FILE_CODES.has(err.code)) return { code: err.code, status: err.status, errors: { arquivos: uploadErrorMessage(err.code) } }
     return { code: err.code, status: err.status, errors: { form: err.message } }
   }
-  // Never log the body or the contact
-  console.error(`[midia-enviada] envio falhou: ${err instanceof Error ? err.name : 'erro'}`)
+  console.error(`[midia-enviada] envio falhou: ${describeError(err)}`)
   return { code: 'erro', status: 500, errors: { form: UPLOAD_ERROR_MESSAGES.erro } }
+}
+
+/**
+ * What to log for an unexpected failure, so the cause can be found in the server log (the visitor only sees the
+ * generic message). Never the body or the contact: only the error names/codes, the first line of the message
+ * (cut short; database errors put query parameters after it) and the stack frames (file:line, no values).
+ */
+export function describeError(err: unknown): string {
+  if (!(err instanceof Error)) return 'erro'
+  const parts: string[] = []
+  let current: unknown = err
+  for (let depth = 0; current instanceof Error && depth < 3; depth++) {
+    const code = (current as { code?: unknown }).code
+    const firstLine = current.message.split('\n')[0]!.slice(0, 160)
+    parts.push(`${current.name}${typeof code === 'string' ? ` [${code}]` : ''}: ${firstLine}`)
+    current = current.cause
+  }
+  const frames = (err.stack ?? '')
+    .split('\n')
+    .filter((line) => line.trim().startsWith('at '))
+    .slice(0, 6)
+    .map((line) => line.trim())
+  return [parts.join(' <- '), ...frames].join('\n  ')
 }
