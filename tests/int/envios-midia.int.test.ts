@@ -135,7 +135,7 @@ describe('fotos e vídeos enviados sem conta', () => {
     expect((bigVideo as ServiceError).code).toBe('grande')
     const broken = await send({ files: [{ data: Buffer.from('not an image'), mimetype: 'image/png', name: 'a.png', size: 12 }] }).catch((e: unknown) => e)
     expect((broken as ServiceError).code).toBe('foto-ilegivel')
-    const longVideo = await send({ files: [video(61)] }).catch((e: unknown) => e)
+    const longVideo = await send({ files: [video(181)] }).catch((e: unknown) => e)
     expect((longVideo as ServiceError).code).toBe('longo')
     const unreadable = await send({ files: [{ data: Buffer.from('isto não é vídeo'), mimetype: 'video/mp4', name: 'a.mp4', size: 16 }] }).catch((e: unknown) => e)
     expect((unreadable as ServiceError).code).toBe('video-ilegivel')

@@ -79,7 +79,7 @@ export const enviarMidia = definirArea({
       bloco: true,
       rotulo: 'Ajuda de Fotos e vídeos',
       padrao:
-        'Até {fotos} fotos (JPG, PNG ou WebP, até 15 MB cada) e até {videos} vídeos (MP4 ou MOV, até 100 MB e 60 segundos cada).',
+        'Até {fotos} fotos (JPG, PNG ou WebP, até 15 MB cada) e até {videos} vídeos (MP4 ou MOV, até 250 MB e 3 minutos cada).',
       secao: FORM,
       ajuda: 'Use {fotos} e {videos} para as quantidades máximas.',
     },

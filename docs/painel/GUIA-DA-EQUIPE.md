@@ -47,7 +47,7 @@ As fotos e vídeos aparecem na página **Espaço**. Na página inicial, "Conheç
 
 ### Enviar um vídeo
 
-1. Exporte o vídeo do celular em **MP4, 720p, até ~2 minutos** (fica abaixo do limite de **100 MB** e carrega rápido).
+1. Exporte o vídeo do celular em **MP4, 720p, até ~2 minutos** (fica abaixo do limite de **250 MB** e carrega rápido).
 2. **Site → Galeria do espaço** → **Criar novo** → **Tipo: Vídeo**.
 3. Em **Vídeo**, clique em **Criar novo**:
    - escolha o arquivo **.mp4**;
@@ -248,7 +248,7 @@ Qualquer pessoa pode mandar fotos e vídeos em **/enviar-fotos-e-videos** (sem c
 
 **Quem clica em Participar** na promoção cai no mesmo formulário, com o quadro "Participando da promoção: (título)" no topo e o campo **Festa / data que pretende ir**. Esses envios ficam marcados: na lista de **Fotos e vídeos enviados** há a coluna **Promoção** (o título da promoção no momento do envio, preenchido pelo site e que não dá para editar) e, em **Filtros**, você escolhe **Promoção** para ver só os participantes. A pessoa vê uma mensagem própria de "Recebemos a sua participação". Se a promoção estiver desligada ou fora do período, o formulário é o comum.
 
-Limites do formulário: até **10 fotos** (JPG, PNG ou WebP, até 15 MB) e **2 vídeos** (MP4 ou MOV, até 100 MB e 60 segundos) por envio. Os arquivos ficam em armazenamento privado, fora da área pública, e entram no backup junto com os arquivos do ClassiSex.
+Limites do formulário: até **10 fotos** (JPG, PNG ou WebP, até 15 MB) e **2 vídeos** (MP4 ou MOV, até 250 MB e 3 minutos) por envio. Os arquivos ficam em armazenamento privado, fora da área pública, e entram no backup junto com os arquivos do ClassiSex.
 Para **apagar** um envio (por exemplo, a pessoa pediu para retirar), use **Excluir**: os arquivos dele são apagados juntos.
 Os textos da página (título, avisos, texto da autorização) e os da participação na promoção (quadro, botão, campo de festa/data, mensagem de recebido) ficam em **Textos do site → Enviar fotos e vídeos**.
 
@@ -846,7 +846,7 @@ Todo erro do painel e do site agora diz o motivo em português. O que cada um qu
 - **"Este item ainda está ligado a outros registros"**: não dá para apagar enquanto houver anúncios, assinaturas ou mensagens ligados a ele. Remova ou encerre esses primeiro.
 - **"Sua sessão expirou. Entre de novo."**: faça login outra vez e repita a ação.
 - **"Você não tem permissão para fazer isso."**: seu usuário não pode essa ação; peça ao administrador.
-- **"O arquivo é grande demais"**: reduza a foto (até 15 MB) ou o vídeo (até 100 MB).
+- **"O arquivo é grande demais"**: reduza a foto (até 15 MB) ou o vídeo (até 250 MB).
 - **"Sem conexão com o servidor"**: confira a internet e tente de novo.
 - **"Erro inesperado no servidor"**: tente de novo em instantes. Se continuar, mande para o desenvolvedor o **horário** e, se aparecer, o **código** (no site, abaixo do aviso "Algo deu errado ao abrir esta página"), com um print da tela.
 

@@ -23,7 +23,7 @@ import {
   PHOTO_MIME_TYPES,
   VIDEO_MIME_TYPES,
 } from '../lib/classisex/media-messages'
-import { MAX_VIDEO_SECONDS, Mp4Error, readMp4Info, scrubMp4Metadata } from '../lib/classisex/mp4'
+import { MAX_VIDEO_SECONDS, isMp4Error, readMp4Info, scrubMp4Metadata } from '../lib/classisex/mp4'
 import { privateStorageConfigured } from '../lib/classisex/storage'
 
 export {
@@ -49,7 +49,7 @@ const relId = (value: unknown): number | null => {
  * both REST and Local API create; generateFileData reads req.file afterwards).
  * - kind and owner are decided here, never taken from the client
  * - photos: size cap, decodable by sharp (Payload then re-encodes to webp: EXIF/GPS gone, T-04-06)
- * - videos: size cap, duration ≤ 60 s, location boxes zero-filled (T-04-06)
+ * - videos: size cap, duration ≤ 3 min, location boxes zero-filled (T-04-06)
  * - per-ad limits by the author's tier (D-01, G-02, G-03; TIER_LIMITS)
  */
 const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation, req }) => {
@@ -92,7 +92,7 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
       if (file.tempFilePath) await fs.writeFile(file.tempFilePath, clean)
       data.durationSeconds = Math.round(info.durationSeconds)
     } catch (err) {
-      if (err instanceof Mp4Error) throw fail(err.message)
+      if (isMp4Error(err)) throw fail(err.message)
       throw err
     }
   } else {

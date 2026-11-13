@@ -156,8 +156,8 @@ export default buildConfig({
   sharp,
   upload: {
     limits: {
-      // 100 MB for venue videos; images are capped at 15 MB by the Media beforeOperation hook
-      fileSize: 104_857_600,
+      // 250 MB for videos; images are capped at 15 MB by the Media beforeOperation hook
+      fileSize: 272_629_760,
     },
   },
   plugins: [

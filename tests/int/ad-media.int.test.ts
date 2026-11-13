@@ -107,8 +107,8 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
 
     const other = (await seedAd(payload, { author: owner.id })).id
     adId = other
-    await expect(upload(buildMp4({ durationSeconds: 61 }), 'video/mp4', 'longo.mp4')).rejects.toThrow(
-      'O vídeo pode ter até 60 segundos.',
+    await expect(upload(buildMp4({ durationSeconds: 181 }), 'video/mp4', 'longo.mp4')).rejects.toThrow(
+      'O vídeo pode ter até 3 minutos.',
     )
     await expect(upload(Buffer.from('isto não é vídeo'), 'video/mp4', 'lixo.mp4')).rejects.toThrow(
       'Não conseguimos ler este vídeo. Envie um MP4 ou MOV gravado pelo celular.',
@@ -122,7 +122,7 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     const small = await jpegWithExif(50, 50)
     await expect(upload(small, 'image/jpeg', 'grande.jpg', {}, 16_000_000)).rejects.toThrow('A foto passa de 15 MB.')
     await expect(upload(buildMp4({ durationSeconds: 5 }), 'video/mp4', 'grande.mp4', {}, 105_000_000)).rejects.toThrow(
-      'O vídeo passa de 100 MB.',
+      'O vídeo passa de 250 MB.',
     )
     await expect(upload(Buffer.from('nao e jpeg nenhum'), 'image/jpeg', 'falso.jpg')).rejects.toThrow(
       'Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.',
@@ -134,7 +134,7 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     for (let i = 0; i < 10; i++) await upload(photo, 'image/jpeg', `f${i}.jpg`)
     await expect(upload(photo, 'image/jpeg', 'f11.jpg')).rejects.toThrow('Cada anúncio pode ter até 10 fotos.')
     await upload(buildMp4({ durationSeconds: 10 }), 'video/mp4', 'v1.mp4')
-    await upload(buildMp4({ durationSeconds: 60 }), 'video/mp4', 'v2.mp4')
+    await upload(buildMp4({ durationSeconds: 180 }), 'video/mp4', 'v2.mp4')
     await expect(upload(buildMp4({ durationSeconds: 10 }), 'video/mp4', 'v3.mp4')).rejects.toThrow(
       'Cada anúncio pode ter até 2 vídeos.',
     )
@@ -244,7 +244,7 @@ describe('owner media service (CLAS-03, D-01, D-03, T-04-04)', () => {
     expect(err.status).toBe(400)
     expect(err.code).toBe('limite-fotos')
     expect(err.message).toBe('Cada anúncio pode ter até 10 fotos.')
-    const long = buildMp4({ durationSeconds: 61 })
+    const long = buildMp4({ durationSeconds: 181 })
     const err2 = await attachMedia(payload, {
       assinanteId: owner.id,
       adId,

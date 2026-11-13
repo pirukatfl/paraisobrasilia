@@ -19,8 +19,8 @@ function mdatSlice(buf: Buffer): Buffer {
 }
 
 describe('readMp4Info (D-01)', () => {
-  it('exposes the 60 s limit', () => {
-    expect(MAX_VIDEO_SECONDS).toBe(60)
+  it('exposes the 3 minute limit', () => {
+    expect(MAX_VIDEO_SECONDS).toBe(180)
   })
 
   it('reads a version 0 mvhd', () => {

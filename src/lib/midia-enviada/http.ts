@@ -4,8 +4,8 @@ import { ServiceError, type UploadFile } from '../classisex/service'
 
 export const noStore = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' }
 
-/** One request carries at most one 100 MB video (Caddy caps the body at 110 MB too). */
-export const MAX_BODY_BYTES = 105 * 1024 * 1024
+/** One request carries at most one 250 MB video (Caddy caps the body at 260 MB too). */
+export const MAX_BODY_BYTES = 255 * 1024 * 1024
 
 const EXTENSION_TYPES: Record<string, string> = {
   jpg: 'image/jpeg',

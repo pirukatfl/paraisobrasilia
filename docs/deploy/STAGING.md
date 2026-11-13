@@ -180,8 +180,8 @@ guardado fora do servidor, com teste de restauração) entra na **Fase 7**, ante
 Desde a Fase 2 o volume `media` guarda também os **vídeos do espaço**, em `/app/media/videos` (dentro do container `app`).
 Vídeo ocupa muito mais espaço que foto, então:
 
-- **Limite por arquivo:** vídeo até **100 MB**; foto até **15 MB** (o painel recusa acima disso, com aviso em português).
-- **Como exportar o vídeo antes de enviar:** MP4 (H.264), **720p**, até ~2 minutos — fica bem abaixo de 100 MB e carrega
+- **Limite por arquivo:** vídeo até **250 MB**; foto até **15 MB** (o painel recusa acima disso, com aviso em português).
+- **Como exportar o vídeo antes de enviar:** MP4 (H.264), **720p**, até ~2 minutos — fica bem abaixo de 250 MB e carrega
   rápido no celular. Pelo celular, os apps de edição (ex.: CapCut, InShot) têm a opção "Exportar 720p".
 - **Conferir o espaço livre** de vez em quando (e antes de subir muitos vídeos), no Terminal do navegador:
 
@@ -225,7 +225,7 @@ Vídeo ocupa muito mais espaço que foto, então:
 - **Passo único (cliente): rodar o `bootstrap-vps.sh` mais uma vez.** O servidor foi preparado antes da Fase 4 e o
   `docker-compose.yml` dele ainda não tem o volume. O script pode rodar de novo sem risco: **mantém** as senhas do
   `.env.staging`, o banco (`pgdata`), as fotos do site (`media`) e os certificados; só reescreve o `docker-compose.yml` e o
-  `Caddyfile` (novo volume e limite de 110 MB por envio), reinicia o site e recarrega o Caddy. No Terminal do navegador
+  `Caddyfile` (novo volume e limite de 260 MB por envio), reinicia o site e recarrega o Caddy. No Terminal do navegador
   (hPanel → VPS → Terminal), cole **o bloco inteiro** e aperte Enter (o token não aparece enquanto você digita; use um token
   do GitHub com permissão de ler o repositório e `read:packages`):
 
@@ -255,7 +255,7 @@ Vídeo ocupa muito mais espaço que foto, então:
   ```
 
   Passou de ~80% do disco? Avise o desenvolvedor.
-- **Vídeos sem conversão:** o site guarda o vídeo como foi enviado (MP4 ou MOV, até 60 segundos e 100 MB). Não há
+- **Vídeos sem conversão:** o site guarda o vídeo como foi enviado (MP4 ou MOV, até 3 minutos e 250 MB). Não há
   conversão no servidor; se algum celular não tocar o vídeo de outro, conte ao desenvolvedor qual aparelho.
 - **Backup:** precisa copiar `pgdata`, `media` **e** `private_media` para fora do servidor (backup automatizado na Fase 7).
   Ative os backups e crie um snapshot da Hostinger agora.

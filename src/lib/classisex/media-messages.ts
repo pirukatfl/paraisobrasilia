@@ -2,10 +2,10 @@
  * Messages for ClassiSex photo/video uploads (D-01). Shared by the ad-media collection hooks,
  * the owner service, the upload route and the edit page. Pure module.
  */
-import { MAX_VIDEO_SECONDS } from './mp4'
+import { MAX_VIDEO_LABEL } from './mp4'
 
 export const MAX_AD_PHOTO_BYTES = 15_000_000
-export const MAX_AD_VIDEO_BYTES = 100_000_000
+export const MAX_AD_VIDEO_BYTES = 250_000_000
 export const MAX_AD_PHOTOS = 10
 export const MAX_AD_VIDEOS = 2
 
@@ -17,10 +17,10 @@ export const AD_MEDIA_MESSAGES = {
   indisponivel: 'Envio de fotos indisponível no momento.',
   tipo: 'Envie fotos JPG, PNG ou WebP, ou um vídeo MP4 ou MOV.',
   fotoGrande: 'A foto passa de 15 MB.',
-  videoGrande: 'O vídeo passa de 100 MB.',
+  videoGrande: 'O vídeo passa de 250 MB.',
   fotoIlegivel: 'Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.',
   videoIlegivel: 'Não conseguimos ler este vídeo. Envie um MP4 ou MOV gravado pelo celular.',
-  videoLongo: `O vídeo pode ter até ${MAX_VIDEO_SECONDS} segundos.`,
+  videoLongo: `O vídeo pode ter até ${MAX_VIDEO_LABEL}.`,
   fotos: 'Cada anúncio pode ter até 10 fotos.',
   videos: 'Cada anúncio pode ter até 2 vídeos.',
   fotosGratis: 'Conta gratuita: 1 foto por anúncio. Assine para enviar até 10 fotos e 2 vídeos.',
@@ -50,7 +50,7 @@ export type UploadErrorCode =
 
 /** Shown on the edit page from ?midia=erro&codigo=… (the URL carries only the code). */
 export const UPLOAD_ERROR_MESSAGES: Record<UploadErrorCode, string> = {
-  grande: 'O arquivo é grande demais (foto até 15 MB, vídeo até 100 MB).',
+  grande: 'O arquivo é grande demais (foto até 15 MB, vídeo até 250 MB).',
   longo: AD_MEDIA_MESSAGES.videoLongo,
   tipo: 'Envie fotos em JPG, PNG ou WebP e vídeos em MP4 ou MOV.',
   'limite-fotos': AD_MEDIA_MESSAGES.fotos,
@@ -117,8 +117,8 @@ export const CLIENT_MESSAGES = {
   fotoTipo: (name: string) => `"${name}" não é uma foto JPG, PNG ou WebP.`,
   videoTipo: (name: string) => `"${name}" não é um vídeo MP4 ou MOV.`,
   fotoGrande: (name: string) => `A foto "${name}" passa de 15 MB.`,
-  videoGrande: (name: string) => `O vídeo "${name}" passa de 100 MB.`,
-  videoLongo: (name: string) => `O vídeo "${name}" passa de ${MAX_VIDEO_SECONDS} segundos.`,
+  videoGrande: (name: string) => `O vídeo "${name}" passa de 250 MB.`,
+  videoLongo: (name: string) => `O vídeo "${name}" passa de ${MAX_VIDEO_LABEL}.`,
 } as const
 
 /** Edit-page notice after the create-with-files flow: ?midia=lote&ok=N&falhas=M&codigo=… */

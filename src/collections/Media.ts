@@ -3,7 +3,7 @@ import { APIError, type CollectionBeforeOperationHook, type CollectionConfig } f
 import { isStaff } from '../access/roles'
 import { revalidateGalleries, revalidateGalleriesAfterDelete } from '../lib/gallery/revalidate'
 
-/** Images stay capped at 15 MB although the global upload limit is 100 MB (videos). */
+/** Images stay capped at 15 MB although the global upload limit is 260 MB (videos). */
 export const MAX_IMAGE_BYTES = 15_000_000
 
 const rejectBigImages: CollectionBeforeOperationHook = ({ args, operation, req }) => {

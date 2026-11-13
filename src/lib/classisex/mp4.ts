@@ -8,8 +8,11 @@
  * Pure module: no Payload/Next/sharp imports.
  */
 
-/** D-01: subscriber videos are at most 60 seconds long. */
-export const MAX_VIDEO_SECONDS = 60
+/** Videos are at most 3 minutes long (client decision 2026-11-13; was 60 s, D-01). */
+export const MAX_VIDEO_SECONDS = 180
+
+/** The same limit as a phrase for messages. */
+export const MAX_VIDEO_LABEL = '3 minutos'
 
 const MAX_BOXES = 100_000
 
@@ -19,6 +22,10 @@ export class Mp4Error extends Error {
     this.name = 'Mp4Error'
   }
 }
+
+/** Also true for an Mp4Error from another copy of this module (production chunks can load it twice, breaking `instanceof`). */
+export const isMp4Error = (err: unknown): err is Mp4Error =>
+  err instanceof Mp4Error || (err instanceof Error && err.name === 'Mp4Error')
 
 type Box = { type: string; start: number; headerSize: number; end: number }
 

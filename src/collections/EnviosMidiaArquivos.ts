@@ -4,7 +4,7 @@ import { APIError, type CollectionBeforeOperationHook, type CollectionConfig } f
 import { isStaff } from '../access/roles'
 import { AD_MEDIA_MESSAGES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from '../lib/classisex/media-messages'
 import { privateStorageConfigured } from '../lib/classisex/storage'
-import { ArquivoInvalido, limparArquivo } from '../lib/midia-enviada/limpar'
+import { isArquivoInvalido, limparArquivo } from '../lib/midia-enviada/limpar'
 import { revalidateAmadores, revalidateAmadoresAfterDelete } from '../lib/midia-enviada/revalidate'
 import { ENVIO_MIDIA_MESSAGES, MAX_FOTOS, MAX_VIDEOS } from '../lib/midia-enviada/regras'
 
@@ -38,7 +38,7 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
   try {
     limpo = await limparArquivo(buffer, String(file.mimetype ?? ''), Number(file.size ?? 0))
   } catch (err) {
-    if (err instanceof ArquivoInvalido) throw fail(err.message)
+    if (isArquivoInvalido(err)) throw fail(err.message)
     throw err
   }
   if (limpo.kind === 'video') {
