@@ -14,7 +14,7 @@ export const Videos: CollectionConfig = {
   admin: {
     group: 'Arquivos',
     useAsTitle: 'title',
-    description: 'MP4 (H.264), até 100 MB e cerca de 2 minutos. Exporte em 720p para carregar rápido no celular.',
+    description: 'MP4 (H.264), até 250 MB e cerca de 2 minutos. Exporte em 720p para carregar rápido no celular.',
   },
   access: {
     read: () => true,

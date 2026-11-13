@@ -26,11 +26,11 @@ export const dynamic = 'force-dynamic'
  * 2. ad exists and belongs to this account, else 404 (T-04-04)
  * 3. tier limits before the body is decoded (G-02/G-03): a free account never sends a video, and
  *    never a second photo (the collection hook is the last line and counts again)
- * 4. Content-Length cap before reading the body (T-04-09; Caddy also caps at 110 MB)
+ * 4. Content-Length cap before reading the body (T-04-09; Caddy also caps at 260 MB)
  * 5. per-kind type and size, then the collection hooks (duration, decoding, limits, scrub)
  * Not a server action: the server-action body limit stays at its default.
  */
-const MAX_BODY_BYTES = 105 * 1024 * 1024
+const MAX_BODY_BYTES = 255 * 1024 * 1024
 
 const noStore = { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex, nofollow' }
 

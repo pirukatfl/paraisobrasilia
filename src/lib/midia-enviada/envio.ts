@@ -46,7 +46,7 @@ function conferirArquivos(files: UploadFile[], jaFotos = 0, jaVideos = 0): void 
       if (f.size > MAX_FOTO_BYTES) throw new ServiceError('grande', 'A foto passa de 15 MB.', 400)
       fotos += 1
     } else if (VIDEO_MIME_TYPES.includes(f.mimetype)) {
-      if (f.size > MAX_VIDEO_BYTES) throw new ServiceError('grande', 'O vídeo passa de 100 MB.', 400)
+      if (f.size > MAX_VIDEO_BYTES) throw new ServiceError('grande', 'O vídeo passa de 250 MB.', 400)
       videos += 1
     } else {
       throw new ServiceError('tipo', 'Envie fotos JPG, PNG ou WebP, ou vídeos MP4 ou MOV.', 400)

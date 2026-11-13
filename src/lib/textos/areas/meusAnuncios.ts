@@ -209,7 +209,7 @@ export const meusAnuncios = definirArea({
       bloco: true,
       rotulo: 'Ajuda (assinante)',
       padrao:
-        'Até {fotos} fotos JPG, PNG ou WebP (15 MB cada) e até {videos} vídeos MP4 ou MOV (100 MB e 3 minutos cada). A primeira foto é a capa. Na área aberta, só a foto de capa aparece. Você também pode adicionar depois, editando o anúncio.',
+        'Até {fotos} fotos JPG, PNG ou WebP (15 MB cada) e até {videos} vídeos MP4 ou MOV (250 MB e 3 minutos cada). A primeira foto é a capa. Na área aberta, só a foto de capa aparece. Você também pode adicionar depois, editando o anúncio.',
       secao: MIDIA,
       ajuda: 'Use {fotos}, {videos} e {segundos} para os limites.',
     },
@@ -241,7 +241,7 @@ export const meusAnuncios = definirArea({
     gerDicaAssinante: {
       bloco: true,
       rotulo: 'Dica (assinante)',
-      padrao: 'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 3 minutos.',
+      padrao: 'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 250 MB e 3 minutos.',
       secao: GERENCIAR,
     },
     gerDicaGratis: {

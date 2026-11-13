@@ -299,9 +299,9 @@ cat >Caddyfile <<'PARAISO_CADDY'
 # STAGING_DOMAIN comes from .env.staging (passed to the caddy container by compose).
 {$STAGING_DOMAIN} {
 	encode zstd gzip
-	# Outer guard for uploads (ClassiSex videos up to 100 MB, T-04-09)
+	# Outer guard for uploads (ClassiSex videos up to 250 MB, T-04-09)
 	request_body {
-		max_size 110MB
+		max_size 260MB
 	}
 	header Strict-Transport-Security "max-age=31536000"
 	reverse_proxy app:3000

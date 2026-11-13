@@ -122,7 +122,7 @@ describe('ad-media (CLAS-06, CLAS-03, D-01, T-04-02, T-04-06, T-04-10)', () => {
     const small = await jpegWithExif(50, 50)
     await expect(upload(small, 'image/jpeg', 'grande.jpg', {}, 16_000_000)).rejects.toThrow('A foto passa de 15 MB.')
     await expect(upload(buildMp4({ durationSeconds: 5 }), 'video/mp4', 'grande.mp4', {}, 105_000_000)).rejects.toThrow(
-      'O vídeo passa de 100 MB.',
+      'O vídeo passa de 250 MB.',
     )
     await expect(upload(Buffer.from('nao e jpeg nenhum'), 'image/jpeg', 'falso.jpg')).rejects.toThrow(
       'Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.',

@@ -85,7 +85,7 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   await expect(section.getByRole('heading', { name: 'Fotos e vídeos' })).toBeVisible()
   await expect(section).toContainText('Nenhuma foto ainda.')
   await expect(section).toContainText(
-    'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 3 minutos.',
+    'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 250 MB e 3 minutos.',
   )
   const fotoForm = section.getByRole('form', { name: 'Adicionar foto' })
   await expect(fotoForm.locator('input[type=file]')).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp')

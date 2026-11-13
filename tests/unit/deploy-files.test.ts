@@ -66,7 +66,7 @@ describe('Phase 2 runbook and staff guide (plan 02-06)', () => {
   it('the runbook covers videos on the media volume, the size cap and the disk check', () => {
     const runbook = read('docs/deploy/STAGING.md')
     expect(runbook).toContain('/app/media/videos')
-    expect(runbook).toContain('100 MB')
+    expect(runbook).toContain('250 MB')
     expect(runbook).toContain('df -h')
     expect(runbook).toContain('docker system df -v | grep media')
   })
@@ -144,8 +144,8 @@ describe('Phase 4 private media volume (plan 04-05, T-04-03, T-04-09, T-04-16)',
     expect(heredoc(bootstrap, 'PARAISO_CADDY')).toBe(read('Caddyfile'))
   })
 
-  it('Caddy caps request bodies at 110 MB', () => {
-    expect(read('Caddyfile')).toContain('max_size 110MB')
+  it('Caddy caps request bodies at 260 MB', () => {
+    expect(read('Caddyfile')).toContain('max_size 260MB')
   })
 
   it('the image creates /app/private-media for node but leaves PRIVATE_MEDIA_DIR to the compose', () => {

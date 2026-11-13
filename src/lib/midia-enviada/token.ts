@@ -1,6 +1,6 @@
 /**
  * Short-lived proof that a browser just created a submission, so it can add the remaining files one by one
- * (a 100 MB video cannot travel together with ten photos). HMAC over `id.expiry` with the site secret; it
+ * (a 250 MB video cannot travel together with ten photos). HMAC over `id.expiry` with the site secret; it
  * only lets the holder ADD files to that one submission, within the limits, until it expires.
  * No 'server-only' import: used by route handlers and int tests.
  */

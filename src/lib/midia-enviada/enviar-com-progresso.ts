@@ -31,7 +31,7 @@ export function enviarComProgresso(
 
 /** Message for an answer that is not the JSON the route handlers send (proxy/server page). */
 export function mensagemDeStatus(status: number): string {
-  if (status === 413) return 'O arquivo passa do tamanho aceito. Envie um vídeo de até 100 MB.'
+  if (status === 413) return 'O arquivo passa do tamanho aceito. Envie um vídeo de até 250 MB.'
   if (status === 408 || status === 504 || status === 524) return 'O envio demorou demais e foi cortado. Tente de novo com uma conexão melhor.'
   return 'Não foi possível enviar o arquivo por um erro inesperado no servidor. Tente de novo; se continuar, avise a equipe.'
 }

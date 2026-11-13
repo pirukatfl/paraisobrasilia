@@ -47,7 +47,7 @@ const field = (form: FormData, name: string) => {
 /**
  * Open form of /enviar-fotos-e-videos (client decision 2026-11-01). Without JavaScript it is a plain multipart
  * POST (303 back with ?erro=); with JavaScript the first file goes with the text and the rest one by one (a
- * 100 MB video cannot travel with ten photos), with progress. The server decides every rule again.
+ * 250 MB video cannot travel with ten photos), with progress. The server decides every rule again.
  */
 export function MidiaEnvioForm({
   erro,
