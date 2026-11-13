@@ -5,6 +5,7 @@ import { useRef, useState, type FormEvent } from 'react'
 
 import { FieldError, Required, inputClass } from '@/components/classisex/AdFormFields'
 import { TextoRico } from '@/components/TextoRico'
+import { Toast } from '@/components/Toast'
 import { CLIENT_MESSAGES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from '@/lib/classisex/media-messages'
 import {
   APELIDO_MAX,
@@ -16,6 +17,7 @@ import {
   MENSAGEM_MAX,
 } from '@/lib/midia-enviada/regras'
 import type { Textos } from '@/lib/textos/areas'
+import { enviarComProgresso, mensagemDeStatus } from '@/lib/midia-enviada/enviar-com-progresso'
 import { preencher } from '@/lib/textos/preencher'
 import { textoPuro } from '@/lib/textos/rico'
 
@@ -66,6 +68,8 @@ export function MidiaEnvioForm({
   const [note, setNote] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const [progress, setProgress] = useState<string | null>(null)
+  const [percent, setPercent] = useState(0)
+  const [toast, setToast] = useState<string | null>(null)
 
   const key = JSON.stringify(values)
 
@@ -115,12 +119,14 @@ export function MidiaEnvioForm({
     setPending(true)
     setProgress(preencher(textoPuro(t.progresso), { n: 1, total: files.length }))
     try {
-      const response = await fetch('/enviar-fotos-e-videos/enviar', {
-        method: 'POST',
-        body: data,
-        headers: { Accept: 'application/json' },
-      })
-      const json = (await response.json()) as { ok: boolean; token?: string | null; redirect?: string; errors?: Record<string, string> }
+      setPercent(0)
+      const response = await enviarComProgresso('/enviar-fotos-e-videos/enviar', data, (f) => setPercent(Math.round(f * 100)))
+      const json = (response.json ?? { ok: false, errors: { form: mensagemDeStatus(response.status) } }) as {
+        ok: boolean
+        token?: string | null
+        redirect?: string
+        errors?: Record<string, string>
+      }
       if (!json.ok || !json.redirect) {
         setValues({
           apelido: field(data, 'apelido'),
@@ -129,6 +135,7 @@ export function MidiaEnvioForm({
         })
         const next = json.errors ?? { form: 'Não foi possível enviar agora. Tente de novo.' }
         setErrors(next)
+        setToast(Object.values(next).find(Boolean) ?? null)
         requestAnimationFrame(() => {
           const first = Object.keys(next)[0]
           const target =
@@ -144,22 +151,29 @@ export function MidiaEnvioForm({
       if (json.token) {
         for (let i = 1; i < files.length; i += 1) {
           setProgress(preencher(textoPuro(t.progresso), { n: i + 1, total: files.length }))
+          setPercent(0)
           const part = new FormData()
           part.append('token', json.token)
           part.append('arquivo', files[i]!)
           try {
-            const res = await fetch('/enviar-fotos-e-videos/arquivo', { method: 'POST', body: part, headers: { Accept: 'application/json' } })
-            const body = (await res.json()) as { ok: boolean }
-            if (!body.ok) failures += 1
+            const res = await enviarComProgresso('/enviar-fotos-e-videos/arquivo', part, (f) => setPercent(Math.round(f * 100)))
+            const body = res.json as { ok?: boolean; errors?: Record<string, string> } | null
+            if (!body?.ok) {
+              failures += 1
+              setToast(Object.values(body?.errors ?? {}).find(Boolean) ?? mensagemDeStatus(res.status))
+            }
           } catch {
             failures += 1
+            setToast('Sem conexão. Confira a internet e tente de novo.')
           }
         }
       }
       const separador = json.redirect.includes('?') ? '&' : '?'
       router.push(failures > 0 ? `${json.redirect}${separador}falhas=${Math.min(failures, 99)}` : json.redirect)
     } catch {
-      setErrors({ form: 'Sem conexão. Confira a internet e tente de novo.' })
+      const offline = 'Sem conexão. Confira a internet e tente de novo.'
+      setErrors({ form: offline })
+      setToast(offline)
     } finally {
       setPending(false)
       setProgress(null)
@@ -332,14 +346,27 @@ export function MidiaEnvioForm({
       <TextoRico valor={t.aviso} role="note" className="rounded-lg border border-line px-4 py-2 text-body" />
 
       {progress && (
-        <p role="status" className="type-label text-text">
-          {progress}
-        </p>
+        <div role="status" className="flex flex-col gap-2">
+          <p className="type-label text-text">
+            {progress} <span className="tabular-nums text-muted">{percent}%</span>
+          </p>
+          <div
+            role="progressbar"
+            aria-label="Progresso do envio"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={percent}
+            className="h-2 w-full overflow-hidden rounded-full bg-line"
+          >
+            <div className="h-full rounded-full bg-accent transition-[width] duration-200 ease-out motion-reduce:transition-none" style={{ width: `${percent}%` }} />
+          </div>
+        </div>
       )}
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? <TextoRico valor={t.botaoEnviando} linha /> : <TextoRico valor={participando ? t.promocaoBotao : t.botao} linha />}
       </button>
+      <Toast message={toast} onClose={() => setToast(null)} />
     </form>
   )
 }

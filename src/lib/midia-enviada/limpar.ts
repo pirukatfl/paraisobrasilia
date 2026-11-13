@@ -1,7 +1,7 @@
 /**
  * Checks and cleans one photo or video sent through the open form, before Payload stores it.
  * Same rules as the ClassiSex media (sizes, decodable photo re-encoded by Payload so EXIF/GPS goes away, video
- * up to 60 s with location boxes zero-filled). Pure of Payload; used by the arquivos collection hook.
+ * up to 3 minutes with location boxes zero-filled). Pure of Payload; used by the arquivos collection hook.
  */
 import sharp from 'sharp'
 
@@ -12,7 +12,7 @@ import { MAX_FOTO_BYTES, MAX_VIDEO_BYTES } from './regras'
 export class ArquivoInvalido extends Error {
   /**
    * Marker checked by `isArquivoInvalido`: in the production bundle this module can be loaded twice (route chunk and
-   * Payload config chunk), and then `instanceof` fails and a plain "o vídeo pode ter até 60 segundos" became a 500.
+   * Payload config chunk), and then `instanceof` fails and a plain "o vídeo pode ter até 3 minutos" became a 500.
    */
   readonly arquivoInvalido = true as const
   constructor(message: string) {

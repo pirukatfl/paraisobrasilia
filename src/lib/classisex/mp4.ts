@@ -8,8 +8,11 @@
  * Pure module: no Payload/Next/sharp imports.
  */
 
-/** D-01: subscriber videos are at most 60 seconds long. */
-export const MAX_VIDEO_SECONDS = 60
+/** Videos are at most 3 minutes long (client decision 2026-11-13; was 60 s, D-01). */
+export const MAX_VIDEO_SECONDS = 180
+
+/** The same limit as a phrase for messages. */
+export const MAX_VIDEO_LABEL = '3 minutos'
 
 const MAX_BOXES = 100_000
 

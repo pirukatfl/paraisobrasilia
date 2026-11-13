@@ -139,7 +139,7 @@ test('the server keeps refusing an 11th photo and a 3rd video, and the ad stays 
   // A rejected file keeps the ad and explains why (notice built from fixed codes only)
   await page.goto(`/area-do-assinante/meus-anuncios/${adId}/editar?midia=lote&ok=2&falhas=1&codigo=longo`)
   await expect(main.getByRole('alert')).toContainText('1 arquivo não foi aceito')
-  await expect(main.getByRole('alert')).toContainText('O vídeo pode ter até 60 segundos.')
+  await expect(main.getByRole('alert')).toContainText('O vídeo pode ter até 3 minutos.')
   await expect(main.getByRole('region', { name: 'Fotos e vídeos' })).toBeVisible()
 
   const api2 = await staffApi(request)

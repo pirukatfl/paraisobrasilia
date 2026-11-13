@@ -49,7 +49,7 @@ const relId = (value: unknown): number | null => {
  * both REST and Local API create; generateFileData reads req.file afterwards).
  * - kind and owner are decided here, never taken from the client
  * - photos: size cap, decodable by sharp (Payload then re-encodes to webp: EXIF/GPS gone, T-04-06)
- * - videos: size cap, duration ≤ 60 s, location boxes zero-filled (T-04-06)
+ * - videos: size cap, duration ≤ 3 min, location boxes zero-filled (T-04-06)
  * - per-ad limits by the author's tier (D-01, G-02, G-03; TIER_LIMITS)
  */
 const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation, req }) => {

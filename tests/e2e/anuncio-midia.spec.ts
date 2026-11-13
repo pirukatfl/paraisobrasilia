@@ -85,7 +85,7 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   await expect(section.getByRole('heading', { name: 'Fotos e vídeos' })).toBeVisible()
   await expect(section).toContainText('Nenhuma foto ainda.')
   await expect(section).toContainText(
-    'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 60 segundos.',
+    'Fotos JPG, PNG ou WebP até 15 MB (até 10). Até 2 vídeos MP4 ou MOV, cada um com até 100 MB e 3 minutos.',
   )
   const fotoForm = section.getByRole('form', { name: 'Adicionar foto' })
   await expect(fotoForm.locator('input[type=file]')).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp')
@@ -118,10 +118,10 @@ test('the owner adds, orders and removes photos and the video', async ({ browser
   const longo = testInfo.outputPath('longo.mp4')
   const falso = testInfo.outputPath('texto.jpg')
   fs.mkdirSync(path.dirname(longo), { recursive: true })
-  fs.writeFileSync(longo, buildMp4({ durationSeconds: 61 }))
+  fs.writeFileSync(longo, buildMp4({ durationSeconds: 181 }))
   fs.writeFileSync(falso, 'isto é só um texto, não uma foto')
   await enviar(page, 'video', longo)
-  await expect(main.getByRole('alert')).toContainText('O vídeo pode ter até 60 segundos.')
+  await expect(main.getByRole('alert')).toContainText('O vídeo pode ter até 3 minutos.')
   await enviar(page, 'foto', falso)
   await expect(main.getByRole('alert')).toContainText('Não conseguimos ler esta foto. Envie JPG, PNG ou WebP.')
 

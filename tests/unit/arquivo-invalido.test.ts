@@ -5,7 +5,7 @@ import { ArquivoInvalido, isArquivoInvalido } from '@/lib/midia-enviada/limpar'
 
 describe('detecção de erros de arquivo sem depender de instanceof', () => {
   it('reconhece ArquivoInvalido e Mp4Error, inclusive de outra cópia do módulo', () => {
-    expect(isArquivoInvalido(new ArquivoInvalido('O vídeo pode ter até 60 segundos.'))).toBe(true)
+    expect(isArquivoInvalido(new ArquivoInvalido('O vídeo pode ter até 3 minutos.'))).toBe(true)
     const outraCopia = Object.assign(new Error('x'), { arquivoInvalido: true })
     expect(isArquivoInvalido(outraCopia)).toBe(true)
     expect(isArquivoInvalido(new Error('x'))).toBe(false)
