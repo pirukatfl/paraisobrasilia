@@ -6,10 +6,23 @@
 import sharp from 'sharp'
 
 import { AD_MEDIA_MESSAGES, PHOTO_MIME_TYPES, VIDEO_MIME_TYPES } from '../classisex/media-messages'
-import { MAX_VIDEO_SECONDS, Mp4Error, readMp4Info, scrubMp4Metadata } from '../classisex/mp4'
+import { MAX_VIDEO_SECONDS, isMp4Error, readMp4Info, scrubMp4Metadata } from '../classisex/mp4'
 import { MAX_FOTO_BYTES, MAX_VIDEO_BYTES } from './regras'
 
-export class ArquivoInvalido extends Error {}
+export class ArquivoInvalido extends Error {
+  /**
+   * Marker checked by `isArquivoInvalido`: in the production bundle this module can be loaded twice (route chunk and
+   * Payload config chunk), and then `instanceof` fails and a plain "o vídeo pode ter até 60 segundos" became a 500.
+   */
+  readonly arquivoInvalido = true as const
+  constructor(message: string) {
+    super(message)
+    this.name = 'ArquivoInvalido'
+  }
+}
+
+export const isArquivoInvalido = (err: unknown): err is ArquivoInvalido =>
+  err instanceof ArquivoInvalido || (err instanceof Error && (err as { arquivoInvalido?: unknown }).arquivoInvalido === true)
 
 export type Limpo = { kind: 'foto' | 'video'; data: Buffer; durationSeconds?: number }
 
@@ -32,7 +45,7 @@ export async function limparArquivo(buffer: Buffer, mimetype: string, size: numb
       if (info.durationSeconds > MAX_VIDEO_SECONDS + 0.5) throw new ArquivoInvalido(AD_MEDIA_MESSAGES.videoLongo)
       return { kind: 'video', data: scrubMp4Metadata(buffer).data, durationSeconds: Math.round(info.durationSeconds) }
     } catch (err) {
-      if (err instanceof Mp4Error) throw new ArquivoInvalido(err.message)
+      if (isMp4Error(err)) throw new ArquivoInvalido(err.message)
       throw err
     }
   }

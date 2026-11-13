@@ -20,6 +20,10 @@ export class Mp4Error extends Error {
   }
 }
 
+/** Also true for an Mp4Error from another copy of this module (production chunks can load it twice, breaking `instanceof`). */
+export const isMp4Error = (err: unknown): err is Mp4Error =>
+  err instanceof Mp4Error || (err instanceof Error && err.name === 'Mp4Error')
+
 type Box = { type: string; start: number; headerSize: number; end: number }
 
 function readBoxes(buf: Buffer, start: number, end: number, counter: { n: number }): Box[] {

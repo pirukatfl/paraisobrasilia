@@ -23,7 +23,7 @@ import {
   PHOTO_MIME_TYPES,
   VIDEO_MIME_TYPES,
 } from '../lib/classisex/media-messages'
-import { MAX_VIDEO_SECONDS, Mp4Error, readMp4Info, scrubMp4Metadata } from '../lib/classisex/mp4'
+import { MAX_VIDEO_SECONDS, isMp4Error, readMp4Info, scrubMp4Metadata } from '../lib/classisex/mp4'
 import { privateStorageConfigured } from '../lib/classisex/storage'
 
 export {
@@ -92,7 +92,7 @@ const validateAndClean: CollectionBeforeOperationHook = async ({ args, operation
       if (file.tempFilePath) await fs.writeFile(file.tempFilePath, clean)
       data.durationSeconds = Math.round(info.durationSeconds)
     } catch (err) {
-      if (err instanceof Mp4Error) throw fail(err.message)
+      if (isMp4Error(err)) throw fail(err.message)
       throw err
     }
   } else {
