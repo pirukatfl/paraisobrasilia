@@ -11,7 +11,7 @@ import { useTextosGerais } from '@/lib/textos/TextosGeraisProvider'
 import { TextoRico } from '@/components/TextoRico'
 
 // Without JavaScript the panel is shown inline (UI-SPEC: no-JS fallback).
-const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:static!important}[data-mobile-menu-button]{display:none!important}'
+const NOSCRIPT_CSS = '[data-mobile-menu-panel]{display:block!important;position:static!important;max-height:none!important}[data-mobile-menu-button]{display:none!important}'
 
 // Entries rise in one after another (--i, capped at 240ms of delay) when the panel opens
 const itemMotion =
@@ -72,7 +72,7 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
         id={panelId}
         data-mobile-menu-panel
         hidden={!open}
-        className="absolute inset-x-0 top-full z-40 border-b border-line bg-surface px-4 py-2 transition-[clip-path,opacity] duration-[240ms] ease-[var(--ease-out-expo)] [clip-path:inset(0)] starting:opacity-0 starting:[clip-path:inset(0_0_100%_0)] motion-reduce:starting:[clip-path:inset(0)]"
+        className="absolute inset-x-0 top-full z-40 max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain pb-[max(0.5rem,env(safe-area-inset-bottom))] border-b border-line bg-surface px-4 py-2 transition-[clip-path,opacity] duration-[240ms] ease-[var(--ease-out-expo)] [clip-path:inset(0)] starting:opacity-0 starting:[clip-path:inset(0_0_100%_0)] motion-reduce:starting:[clip-path:inset(0)]"
       >
         <nav aria-label="Menu">
           <ul className="divide-y divide-line">
