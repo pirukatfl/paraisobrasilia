@@ -16,7 +16,9 @@ export const MENU_ITENS = [
   { value: 'galeria', label: 'Galeria (esconde também Profissionais e Amadoras)' },
   { value: 'galeria-profissionais', label: 'Galeria → Profissionais' },
   { value: 'galeria-amadoras', label: 'Galeria → Amadoras' },
-    { value: 'classisex', label: 'ClassiSex' },
+    { value: 'videos', label: 'Vídeos (esconde também Pornô grátis e Amadores)' },
+  { value: 'galeria-videos-amadores', label: 'Vídeos → Amadores' },
+  { value: 'classisex', label: 'ClassiSex' },
   { value: 'contos', label: 'Contos' },
   { value: 'dicas-hot', label: 'Dicas Hot' },
   { value: 'contato', label: 'Contato' },
@@ -26,8 +28,7 @@ export const MENU_ITENS = [
   { value: 'meus-anuncios', label: 'Menu do assinante → Meus anúncios' },
   { value: 'minha-assinatura', label: 'Menu do assinante → Minha assinatura' },
   { value: 'trocar-senha', label: 'Menu do assinante → Trocar senha' },
-  { value: 'link-externo', label: 'Menu do assinante → Link externo (esconde também Amadores)' },
-  { value: 'galeria-videos-amadores', label: 'Menu do assinante → Link externo → Amadores' },
+  { value: 'link-externo', label: 'Vídeos → Pornô grátis (link externo, só assinantes)' },
 ] as const
 
 export type MenuKey = (typeof MENU_ITENS)[number]['value']
@@ -41,12 +42,13 @@ const PARENT: Partial<Record<MenuKey, MenuKey>> = {
   dicas: 'quem-somos',
   'galeria-profissionais': 'galeria',
   'galeria-amadoras': 'galeria',
-  'galeria-videos-amadores': 'link-externo',
+  'galeria-videos-amadores': 'videos',
+  'link-externo': 'videos',
 }
 
 export const LINK_EXTERNO_PADRAO = {
   ativo: true,
-  rotulo: 'Vídeos pornô grátis',
+  rotulo: 'Pornô grátis',
   url: 'https://www.redtube.com.br/',
 } as const
 
@@ -105,4 +107,5 @@ export function filtrarItens(items: NavItem[], ocultos: readonly string[]): NavI
   return items
     .filter((item) => !estaOculto(item.key, ocultos))
     .map((item) => (item.children ? { ...item, children: filtrarItens(item.children, ocultos) } : item))
+    .filter((item) => !item.semLink || item.children?.length)
 }

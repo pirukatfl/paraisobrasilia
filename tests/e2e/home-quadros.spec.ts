@@ -6,7 +6,7 @@ import { staffApi } from './helpers/api'
 // Dicas Hot. A frame goes away with its menu item (Menu do site).
 test.describe.configure({ mode: 'serial' })
 
-const RESET = { itensOcultos: [], linkExterno: { ativo: true, rotulo: 'Vídeos pornô grátis', url: 'https://www.redtube.com.br/' } }
+const RESET = { itensOcultos: [], linkExterno: { ativo: true, rotulo: 'Pornô grátis', url: 'https://www.redtube.com.br/' } }
 const PARAGRAFOS = ['Primeiro parágrafo aberto.', 'Segundo parágrafo aberto.', 'Terceiro parágrafo.']
 
 test.beforeAll(async ({ request }) => {

@@ -76,8 +76,7 @@ test('the header menu has no Recados item; own content has no Comente', async ({
     'Meus anúncios',
     'Minha assinatura',
     'Trocar senha',
-    'Vídeos pornô grátis',
-  ]))
+    ]))
   await expect(ana.page.getByRole('heading', { name: /AnaBSB/, level: 1 })).toBeVisible()
   await expect(ana.page.getByRole('link', { name: 'Comente' })).toHaveCount(0)
   await ana.page.goto(`${BASE}/nova?anuncio=${adId}`)

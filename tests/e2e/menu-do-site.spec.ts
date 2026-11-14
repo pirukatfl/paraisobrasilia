@@ -12,7 +12,7 @@ test.describe.configure({ mode: 'serial' })
 const PASSWORD = 'senha-provisoria-1'
 const SUB = { email: 'menu-site@teste.local', name: 'Menu Site' }
 const EXTERNAL = 'https://www.redtube.com.br/'
-const RESET = { itensOcultos: [], linkExterno: { ativo: true, rotulo: 'Vídeos pornô grátis', url: EXTERNAL } }
+const RESET = { itensOcultos: [], linkExterno: { ativo: true, rotulo: 'Pornô grátis', url: EXTERNAL } }
 
 test.beforeAll(async ({ request }) => {
   const api = await staffApi(request)
@@ -48,9 +48,9 @@ test('logged out: the external link is nowhere (menu, footer, HTML, sitemap)', a
   await page.goto('/')
   const menu = await headerMenu(page, isMobile)
   await expect(menu.getByRole('link', { name: 'Contato' })).toBeVisible()
-  await expect(menu.getByRole('link', { name: /Vídeos pornô/ })).toHaveCount(0)
+  await expect(menu.getByRole('link', { name: /Pornô grátis/ })).toHaveCount(0)
   await expect(page.locator('a[href*="redtube"]')).toHaveCount(0)
-  await expect(page.locator('footer').getByText(/Vídeos pornô/)).toHaveCount(0)
+  await expect(page.locator('footer').getByText(/Pornô grátis/)).toHaveCount(0)
 
   for (const path of ['/', '/contato', '/modelos', '/assine-ja']) {
     const html = await (await request.get(path, { headers: { Cookie: 'pb_age_ok=1' } })).text()
@@ -60,21 +60,21 @@ test('logged out: the external link is nowhere (menu, footer, HTML, sitemap)', a
   expect(sitemap.toLowerCase()).not.toContain('redtube')
 })
 
-test('logged in: the external link is the last item before Sair, opens a new tab with safe rel', async ({
+test('logged in: Pornô grátis sits in the Vídeos group (no link), opens a new tab with safe rel, above Amadores', async ({
   page,
   isMobile,
 }) => {
   await loginAsAssinante(page, SUB.email, PASSWORD)
   const menu = await headerMenu(page, isMobile)
-  const link = menu.getByRole('link', { name: 'Vídeos pornô grátis' })
+  await expect(menu.getByRole('link', { name: 'Vídeos', exact: true })).toHaveCount(0)
+  if (!isMobile) await menu.getByRole('button', { name: 'Vídeos', exact: true }).click()
+  const link = menu.getByRole('link', { name: 'Pornô grátis' })
   await expect(link).toHaveAttribute('href', EXTERNAL)
   await expect(link).toHaveAttribute('target', '_blank')
   const rel = (await link.getAttribute('rel')) ?? ''
   for (const token of ['noopener', 'noreferrer', 'nofollow']) expect(rel).toContain(token)
+  await expect(menu.getByRole('link', { name: 'Amadores', exact: true })).toHaveAttribute('href', '/videos-amadores')
 
-  // last top-level link; Sair (a button, inside Minha conta on desktop) comes after it
-  const hrefs = await menu.locator(':scope > ul > li > a').evaluateAll((els) => els.map((el) => el.getAttribute('href')))
-  expect(hrefs[hrefs.length - 1]).toBe(EXTERNAL)
   await abrirMinhaConta(menu)
   await expect(menu.getByRole('button', { name: 'Sair' })).toBeVisible()
   // still not in the footer
@@ -90,7 +90,7 @@ test('staff turn the external link off and it leaves the logged-in menu at once'
   const menu = await headerMenu(page, isMobile)
   await abrirMinhaConta(menu)
   await expect(menu.getByRole('button', { name: 'Sair' })).toBeVisible()
-  await expect(menu.getByRole('link', { name: /Vídeos pornô/ })).toHaveCount(0)
+  await expect(menu.getByRole('link', { name: /Pornô grátis/ })).toHaveCount(0)
   await expect(page.locator('a[href*="redtube"]')).toHaveCount(0)
 
   const again = await staffApi(request)

@@ -34,21 +34,28 @@ describe('Menu do site: itens escondidos e link externo', () => {
     expect(semGaleria).not.toContain('galeria-amadoras')
   })
 
-  it('Amadores is a submenu of the external link (members menu only), not of Galeria, and can be hidden alone', () => {
+  it('Vídeos has no link of its own: Amadores for everyone, Pornô grátis (external) first for subscribers', () => {
     const cfg = toMenuConfig(null)
-    const galeria = getNavItems(t, cfg).find((i) => i.key === 'galeria')!
-    expect(galeria.children?.map((c) => c.key)).toEqual(['galeria-profissionais', 'galeria-amadoras'])
-    const logado = getMemberNavItems(t, cfg)
-    expect(logado.find((i) => i.key === 'galeria')?.children?.map((c) => c.key)).not.toContain('galeria-videos-amadores')
-    const externo = logado.find((i) => i.key === 'link-externo')!
-    expect(externo.children?.map((c) => c.key)).toEqual(['galeria-videos-amadores'])
-    expect(externo.children?.[0].href).toBe('/videos-amadores')
-    expect(textoPuro(externo.children![0].label)).toBe('Amadores')
-    const sem = getMemberNavItems(t, { ...cfg, ocultos: ['galeria-videos-amadores'] }).find((i) => i.key === 'link-externo')!
-    expect(sem.children).toEqual([])
-    const semPai = keys(getMemberNavItems(t, { ...cfg, ocultos: ['link-externo'] }))
-    expect(semPai).not.toContain('link-externo')
-    expect(semPai).not.toContain('galeria-videos-amadores')
+    const publico = getNavItems(t, cfg).find((i) => i.key === 'videos')!
+    expect(publico.semLink).toBe(true)
+    expect(textoPuro(publico.label)).toBe('Vídeos')
+    expect(publico.children?.map((c) => c.key)).toEqual(['galeria-videos-amadores'])
+    expect(publico.children?.[0].href).toBe('/videos-amadores')
+    expect(textoPuro(publico.children![0].label)).toBe('Amadores')
+    expect(getNavItems(t, cfg).find((i) => i.key === 'galeria')?.children?.map((c) => c.key)).toEqual(['galeria-profissionais', 'galeria-amadoras'])
+    const logado = getMemberNavItems(t, cfg).find((i) => i.key === 'videos')!
+    expect(logado.children?.map((c) => c.key)).toEqual(['link-externo', 'galeria-videos-amadores'])
+    expect(logado.children?.[0]).toMatchObject({ href: LINK_EXTERNO_PADRAO.url, external: true })
+    expect(textoPuro(logado.children![0].label)).toBe('Pornô grátis')
+  })
+
+  it('hiding Pornô grátis or Amadores leaves the other; hiding Vídeos (or both) removes the group', () => {
+    const cfg = toMenuConfig(null)
+    const so = (ocultos: string[]) => getMemberNavItems(t, { ...cfg, ocultos }).find((i) => i.key === 'videos')?.children?.map((c) => c.key)
+    expect(so(['link-externo'])).toEqual(['galeria-videos-amadores'])
+    expect(so(['galeria-videos-amadores'])).toEqual(['link-externo'])
+    expect(so(['videos'])).toBeUndefined()
+    expect(so(['link-externo', 'galeria-videos-amadores'])).toBeUndefined()
   })
 
   it('applies to the members menu and the footer rule too', () => {
@@ -81,11 +88,12 @@ describe('Menu do site: itens escondidos e link externo', () => {
     expect(cfg.linkExterno).toEqual({ rotulo: LINK_EXTERNO_PADRAO.rotulo, url: LINK_EXTERNO_PADRAO.url })
     const publico = getNavItems(t, cfg)
     expect(JSON.stringify(publico)).not.toContain('redtube')
-    expect(publico.some((i) => i.external)).toBe(false)
+    expect(keys(publico)).not.toContain('link-externo')
     const logado = getMemberNavItems(t, cfg)
     const last = logado[logado.length - 1]
-    expect(last).toMatchObject({ key: 'link-externo', href: 'https://www.redtube.com.br/', external: true })
-    expect(textoPuro(last.label)).toBe('Vídeos pornô grátis')
+    expect(last).toMatchObject({ key: 'videos', semLink: true })
+    expect(last.children?.[0]).toMatchObject({ key: 'link-externo', href: 'https://www.redtube.com.br/', external: true })
+    expect(textoPuro(last.children![0].label)).toBe('Pornô grátis')
   })
 
   it('the external link can be turned off, hidden by key, or replaced', () => {

@@ -78,7 +78,11 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
           <ul className="divide-y divide-line">
             {items.map((item, i) => (
               <li key={item.key} className={itemMotion} style={stagger(i)}>
-                {item.external ? (
+                {item.semLink ? (
+                  <p className="type-eyebrow flex min-h-11 items-center text-text">
+                    <TextoRico valor={item.label} linha />
+                  </p>
+                ) : item.external ? (
                   <a
                     href={item.href}
                     target="_blank"
@@ -106,14 +110,26 @@ export function MobileMenu({ items, logado = false }: { items: NavItem[]; logado
                   <ul className="pb-2 pl-4">
                     {item.children.map((child) => (
                       <li key={child.key}>
-                        <Link
-                          href={child.href}
-                          aria-current={pathname === child.href ? 'page' : undefined}
-                          className={`type-label flex min-h-11 items-center ${pathname === child.href ? 'text-accent' : 'text-muted'} hover:text-accent`}
-                          onClick={() => setOpen(false)}
-                        >
-                          <TextoRico valor={child.label} linha />
-                        </Link>
+                        {child.external ? (
+                          <a
+                            href={child.href}
+                            target="_blank"
+                            rel="noopener noreferrer nofollow"
+                            className="type-label flex min-h-11 items-center text-muted hover:text-accent"
+                            onClick={() => setOpen(false)}
+                          >
+                            <TextoRico valor={child.label} linha />
+                          </a>
+                        ) : (
+                          <Link
+                            href={child.href}
+                            aria-current={pathname === child.href ? 'page' : undefined}
+                            className={`type-label flex min-h-11 items-center ${pathname === child.href ? 'text-accent' : 'text-muted'} hover:text-accent`}
+                            onClick={() => setOpen(false)}
+                          >
+                            <TextoRico valor={child.label} linha />
+                          </Link>
+                        )}
                       </li>
                     ))}
                   </ul>
