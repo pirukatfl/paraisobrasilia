@@ -68,9 +68,15 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         if (!event.currentTarget.contains(event.relatedTarget)) setState(null)
       }}
     >
-      <Link href={item.href} aria-current={active ? 'page' : undefined} className={linkClasses(active)}>
-        <TextoRico valor={item.label} linha />
-      </Link>
+      {item.external ? (
+        <a href={item.href} target="_blank" rel={EXTERNAL_REL} className={linkClasses(false)}>
+          <TextoRico valor={item.label} linha />
+        </a>
+      ) : (
+        <Link href={item.href} aria-current={active ? 'page' : undefined} className={linkClasses(active)}>
+          <TextoRico valor={item.label} linha />
+        </Link>
+      )}
       <button
         ref={buttonRef}
         type="button"

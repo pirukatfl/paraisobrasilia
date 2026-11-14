@@ -32,18 +32,23 @@ describe('Menu do site: itens escondidos e link externo', () => {
     const semGaleria = keys(getNavItems(t, { ...MENU_VAZIO, ocultos: ['galeria'] }))
     expect(semGaleria).not.toContain('galeria')
     expect(semGaleria).not.toContain('galeria-amadoras')
-    expect(semGaleria).not.toContain('galeria-videos-amadores')
   })
 
-  it('Galeria → Vídeos amadores is in the public and members menus, and can be hidden alone', () => {
-    const publico = getNavItems(t).find((i) => i.key === 'galeria')!
-    expect(publico.children?.map((c) => c.key)).toEqual(['galeria-profissionais', 'galeria-amadoras', 'galeria-videos-amadores'])
-    expect(publico.children?.find((c) => c.key === 'galeria-videos-amadores')?.href).toBe('/videos-amadores')
-    expect(keys(getMemberNavItems(t, MENU_VAZIO))).toContain('galeria-videos-amadores')
-    const sem = keys(getNavItems(t, { ...MENU_VAZIO, ocultos: ['galeria-videos-amadores'] }))
-    expect(sem).toContain('galeria')
-    expect(sem).toContain('galeria-amadoras')
-    expect(sem).not.toContain('galeria-videos-amadores')
+  it('Amadores is a submenu of the external link (members menu only), not of Galeria, and can be hidden alone', () => {
+    const cfg = toMenuConfig(null)
+    const galeria = getNavItems(t, cfg).find((i) => i.key === 'galeria')!
+    expect(galeria.children?.map((c) => c.key)).toEqual(['galeria-profissionais', 'galeria-amadoras'])
+    const logado = getMemberNavItems(t, cfg)
+    expect(logado.find((i) => i.key === 'galeria')?.children?.map((c) => c.key)).not.toContain('galeria-videos-amadores')
+    const externo = logado.find((i) => i.key === 'link-externo')!
+    expect(externo.children?.map((c) => c.key)).toEqual(['galeria-videos-amadores'])
+    expect(externo.children?.[0].href).toBe('/videos-amadores')
+    expect(textoPuro(externo.children![0].label)).toBe('Amadores')
+    const sem = getMemberNavItems(t, { ...cfg, ocultos: ['galeria-videos-amadores'] }).find((i) => i.key === 'link-externo')!
+    expect(sem.children).toEqual([])
+    const semPai = keys(getMemberNavItems(t, { ...cfg, ocultos: ['link-externo'] }))
+    expect(semPai).not.toContain('link-externo')
+    expect(semPai).not.toContain('galeria-videos-amadores')
   })
 
   it('applies to the members menu and the footer rule too', () => {

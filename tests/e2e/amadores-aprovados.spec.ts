@@ -362,31 +362,17 @@ test('refusing the submission takes everything down at once', async ({ page, req
   expect((await request.get(`/amadoras/${envio}`)).status()).toBe(404)
 })
 
-test('the Galeria menu has Vídeos amadores (desktop dropdown, mobile list) and staff can hide it', async ({ page, request, isMobile }) => {
+test('Vídeos amadores is no longer in the public Galeria menu (it is "Amadores" under the subscribers\' external link)', async ({ page, isMobile }) => {
   await page.goto('/')
   if (isMobile) {
     await page.getByRole('button', { name: 'Abrir menu' }).click()
     const menu = page.getByRole('navigation', { name: 'Menu' })
-    await expect(menu.getByRole('link', { name: 'Vídeos amadores', exact: true })).toHaveAttribute('href', '/videos-amadores')
-  } else {
-    const nav = page.getByRole('navigation', { name: 'Principal' })
-    await nav.getByRole('link', { name: 'Galeria', exact: true }).hover()
-    await expect(nav.getByRole('link', { name: 'Vídeos amadores', exact: true })).toHaveAttribute('href', '/videos-amadores')
-  }
-
-  const api = await staffApi(request)
-  await api.updateGlobal('menu-do-site', { itensOcultos: ['galeria-videos-amadores'] })
-  await page.goto('/')
-  if (isMobile) {
-    await page.getByRole('button', { name: 'Abrir menu' }).click()
-    await expect(page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Amadoras', exact: true })).toBeVisible()
-    await expect(page.getByRole('navigation', { name: 'Menu' }).getByRole('link', { name: 'Vídeos amadores' })).toHaveCount(0)
+    await expect(menu.getByRole('link', { name: 'Amadoras', exact: true })).toBeVisible()
+    await expect(menu.getByRole('link', { name: 'Vídeos amadores' })).toHaveCount(0)
   } else {
     const nav = page.getByRole('navigation', { name: 'Principal' })
     await nav.getByRole('link', { name: 'Galeria', exact: true }).hover()
     await expect(nav.getByRole('link', { name: 'Amadoras', exact: true })).toBeVisible()
     await expect(nav.getByRole('link', { name: 'Vídeos amadores' })).toHaveCount(0)
   }
-  await api.updateGlobal('menu-do-site', { itensOcultos: [] })
-  await api.dispose()
 })

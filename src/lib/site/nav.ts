@@ -6,7 +6,7 @@
  * 02-04 Modelos (always listed since quick menu-modelos; the page shows an empty state until a model is published), 03-01 Área do assinante, 03-02 Assine Já,
  * 04-07 ClassiSex (public preview).
  * Logged-in subscribers get getMemberNavItems() instead (quick menu-logado, 2026-10-24): Festas · Quem somos · Espaço ·
- * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha · link externo for subscribers (Menu do site, last) (+ Sair
+ * Galeria · ClassiSex · Contos (no Recados: client request, the inbox stays at /area-do-assinante/mensagens) · Dicas Hot · Contato · Meus anúncios · Minha assinatura · Trocar senha · link externo for subscribers (Menu do site, last; its submenu holds Amadores → /videos-amadores) (+ Sair
  * rendered by Nav/MobileMenu). The promotion is not a menu item: it is a home section above "Como chegar" (PromocaoHome). Items staff hide in "Menu do site" are filtered out by key (menu.ts). Header picks the list on the server; pinned by tests/e2e/menu-logado.spec.ts.
  */
 // Header: with 10 items the inline menu needs >= 1280 px (xl); below that the mobile menu is used.
@@ -60,7 +60,6 @@ export function getNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): 
       children: [
         { key: 'galeria-profissionais', href: '/modelos?tipo=profissionais', label: t.menuGaleriaProfissionais },
         { key: 'galeria-amadoras', href: '/modelos?tipo=amadoras', label: t.menuGaleriaAmadoras },
-        { key: 'galeria-videos-amadores', href: '/videos-amadores', label: t.menuGaleriaVideosAmadores },
       ],
     },
     // PREV-01: open preview; the full board lives in the members area
@@ -104,6 +103,8 @@ export function getMemberNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VA
       href: menu.linkExterno.url,
       label: textoParaRico(menu.linkExterno.rotulo),
       external: true,
+      // Amadores lives under the external link ("Pornô grátis"), no longer under Galeria (client request, 2026-11-14)
+      children: [{ key: 'galeria-videos-amadores', href: '/videos-amadores', label: t.menuGaleriaVideosAmadores }],
     })
   }
   return filtrarItens(items, menu.ocultos)
