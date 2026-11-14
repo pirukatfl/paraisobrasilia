@@ -362,17 +362,17 @@ test('refusing the submission takes everything down at once', async ({ page, req
   expect((await request.get(`/amadoras/${envio}`)).status()).toBe(404)
 })
 
-test('Vídeos amadores is no longer in the public Galeria menu (it is "Amadores" under the subscribers\' external link)', async ({ page, isMobile }) => {
+test('the Vídeos menu has no link and holds Amadores (desktop dropdown, mobile list); Galeria no longer does', async ({ page, isMobile }) => {
   await page.goto('/')
   if (isMobile) {
     await page.getByRole('button', { name: 'Abrir menu' }).click()
     const menu = page.getByRole('navigation', { name: 'Menu' })
-    await expect(menu.getByRole('link', { name: 'Amadoras', exact: true })).toBeVisible()
-    await expect(menu.getByRole('link', { name: 'Vídeos amadores' })).toHaveCount(0)
+    await expect(menu.getByRole('link', { name: 'Vídeos', exact: true })).toHaveCount(0)
+    await expect(menu.getByRole('link', { name: 'Amadores', exact: true })).toHaveAttribute('href', '/videos-amadores')
   } else {
     const nav = page.getByRole('navigation', { name: 'Principal' })
-    await nav.getByRole('link', { name: 'Galeria', exact: true }).hover()
-    await expect(nav.getByRole('link', { name: 'Amadoras', exact: true })).toBeVisible()
-    await expect(nav.getByRole('link', { name: 'Vídeos amadores' })).toHaveCount(0)
+    await expect(nav.getByRole('link', { name: 'Vídeos', exact: true })).toHaveCount(0)
+    await nav.getByRole('button', { name: 'Vídeos', exact: true }).hover()
+    await expect(nav.getByRole('link', { name: 'Amadores', exact: true })).toHaveAttribute('href', '/videos-amadores')
   }
 })

@@ -68,11 +68,7 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         if (!event.currentTarget.contains(event.relatedTarget)) setState(null)
       }}
     >
-      {item.external ? (
-        <a href={item.href} target="_blank" rel={EXTERNAL_REL} className={linkClasses(false)}>
-          <TextoRico valor={item.label} linha />
-        </a>
-      ) : (
+      {item.semLink ? null : (
         <Link href={item.href} aria-current={active ? 'page' : undefined} className={linkClasses(active)}>
           <TextoRico valor={item.label} linha />
         </Link>
@@ -82,12 +78,17 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         type="button"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
-        aria-label={`Submenu de ${textoPuro(item.label)}`}
+        aria-label={item.semLink ? undefined : `Submenu de ${textoPuro(item.label)}`}
         onClick={() =>
           setState((cur) => (cur?.path === pathname && cur.mode === 'pinned' ? null : { path: pathname, mode: 'pinned' }))
         }
-        className="inline-flex min-h-11 min-w-6 cursor-pointer items-center justify-center text-muted hover:text-accent focus-visible:text-accent"
+        className={
+          item.semLink
+            ? `${linkClasses(active)} cursor-pointer gap-1`
+            : 'inline-flex min-h-11 min-w-6 cursor-pointer items-center justify-center text-muted hover:text-accent focus-visible:text-accent'
+        }
       >
+        {item.semLink && <TextoRico valor={item.label} linha />}
         <ChevronDownIcon size={16} className={`transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
@@ -97,12 +98,24 @@ function NavDropdown({ item, pathname }: { item: NavItem; pathname: string }) {
         >
           {children.map((child) => (
             <li key={child.key}>
-              <Link
-                href={child.href}
-                className="type-label flex min-h-11 items-center whitespace-nowrap px-4 text-text hover:text-accent focus-visible:text-accent"
-              >
-                <TextoRico valor={child.label} linha />
-              </Link>
+              {child.external ? (
+                <a
+                  href={child.href}
+                  target="_blank"
+                  rel={EXTERNAL_REL}
+                  className="type-label flex min-h-11 items-center whitespace-nowrap px-4 text-text hover:text-accent focus-visible:text-accent"
+                >
+                  <TextoRico valor={child.label} linha />
+                </a>
+              ) : (
+                <Link
+                  href={child.href}
+                  aria-current={pathname === child.href ? 'page' : undefined}
+                  className="type-label flex min-h-11 items-center whitespace-nowrap px-4 text-text hover:text-accent focus-visible:text-accent"
+                >
+                  <TextoRico valor={child.label} linha />
+                </Link>
+              )}
             </li>
           ))}
         </ul>

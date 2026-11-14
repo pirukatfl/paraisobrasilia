@@ -2386,6 +2386,7 @@ export interface MenuDoSite {
         | 'galeria-profissionais'
         | 'galeria-amadoras'
         | 'galeria-videos-amadores'
+        | 'videos'
         | 'classisex'
         | 'contos'
         | 'dicas-hot'

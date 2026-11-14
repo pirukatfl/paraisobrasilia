@@ -23,9 +23,8 @@ const LABELS = [
   'Meus anúncios',
   'Minha assinatura',
   'Trocar senha',
-  'Vídeos pornô grátis',
 ]
-// Desktop (xl+): one row; the account entries sit inside "Minha conta", after the external link
+// Desktop (xl+): one row; the account entries sit inside "Minha conta", after the Vídeos group (no link of its own)
 const ACCOUNT = ['Meus anúncios', 'Minha assinatura', 'Trocar senha']
 const ACCOUNT_HREFS = ['/area-do-assinante/meus-anuncios', '/area-do-assinante', '/area-do-assinante/senha']
 const HREFS = [
@@ -40,7 +39,6 @@ const HREFS = [
   '/area-do-assinante/meus-anuncios',
   '/area-do-assinante',
   '/area-do-assinante/senha',
-  'https://www.redtube.com.br/', // link externo (Menu do site), só para assinante
 ]
 
 test.beforeAll(async ({ request }) => {
@@ -164,9 +162,9 @@ for (const width of [1280, 1440]) {
     const tops = await nav.locator(':scope > ul > li').evaluateAll((els) => els.map((el) => Math.round(el.getBoundingClientRect().top)))
     expect(tops.length).toBe(10)
     expect(new Set(tops).size).toBe(1)
-    // the external link is inline, right before Minha conta, and Sair is not on the main row
+    // the Vídeos group (a button, no link) is inline, right before Minha conta, and Sair is not on the main row
     const lis = nav.locator(':scope > ul > li')
-    await expect(lis.nth(8).getByRole('link', { name: 'Vídeos pornô grátis' })).toBeVisible()
+    await expect(lis.nth(8).getByRole('button', { name: 'Vídeos' })).toBeVisible()
     await expect(lis.nth(9).getByRole('button', { name: 'Minha conta' })).toBeVisible()
     await expect(nav.getByRole('button', { name: 'Sair' })).toHaveCount(0)
     for (const label of ACCOUNT) await expect(nav.getByRole('link', { name: label })).toHaveCount(0)

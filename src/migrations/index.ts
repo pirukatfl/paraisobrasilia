@@ -65,6 +65,7 @@ import * as migration_20261105_213000_promocao_sem_data_festa from './20261105_2
 import * as migration_20261105_223000_comentarios_moderacao from './20261105_223000_comentarios_moderacao';
 import * as migration_20261110_120000_amadores_aprovados from './20261110_120000_amadores_aprovados';
 import * as migration_20261111_120000_amadoras_juntas from './20261111_120000_amadoras_juntas';
+import * as migration_20261114_120000_menu_videos from './20261114_120000_menu_videos';
 import * as migration_20261112_120000_descricao_amadores from './20261112_120000_descricao_amadores';
 
 export const migrations = [
@@ -407,5 +408,10 @@ export const migrations = [
     up: migration_20261112_120000_descricao_amadores.up,
     down: migration_20261112_120000_descricao_amadores.down,
     name: '20261112_120000_descricao_amadores',
+  },
+  {
+    up: migration_20261114_120000_menu_videos.up,
+    down: migration_20261114_120000_menu_videos.down,
+    name: '20261114_120000_menu_videos',
   },
 ];

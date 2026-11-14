@@ -80,8 +80,7 @@ test('1. Ana and Beto see the conversation in Recados; there is no Recados menu 
     'Meus anúncios',
     'Minha assinatura',
     'Trocar senha',
-    'Vídeos pornô grátis',
-  ]))
+    ]))
   // no Recados item in the menu (client request): the inbox is opened by its address
   await ana.page.goto(M)
   await expect(ana.page.getByRole('heading', { name: 'Recados', level: 1 })).toBeVisible()

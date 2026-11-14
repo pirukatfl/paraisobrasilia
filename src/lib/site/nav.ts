@@ -19,6 +19,7 @@ import { filtrarItens, MENU_VAZIO, type MenuConfig } from './menu'
  * `key`: stable name of the item (see MENU_ITENS in menu.ts), what staff hide in "Menu do site".
  * `exact`: active only on the exact path (e.g. /area-do-assinante).
  * `external`: opens another site in a new tab (only the subscribers' external link).
+ * `semLink`: group title with no page of its own (only a button that opens the submenu).
  */
 export type NavItem = {
   key: string
@@ -27,6 +28,7 @@ export type NavItem = {
   children?: NavItem[]
   exact?: boolean
   external?: boolean
+  semLink?: boolean
 }
 
 /** Link to the previous (WordPress) site: always the last menu item, public and logged-in, new tab. Not hideable in "Menu do site". */
@@ -35,6 +37,17 @@ export const VERSAO_ANTERIOR_ITEM: NavItem = {
   href: 'https://anterior.swingbrasilia.com.br/',
   label: textoParaRico('Acessar versão anterior'),
   external: true,
+}
+
+/** "Vídeos": no link of its own; the submenu holds Amadores (the external "Pornô grátis" link joins it for subscribers). */
+function videosGrupo(t: Textos<'geral'>, externo?: NavItem): NavItem {
+  return {
+    key: 'videos',
+    href: '#',
+    label: t.menuVideos,
+    semLink: true,
+    children: [...(externo ? [externo] : []), { key: 'galeria-videos-amadores', href: '/videos-amadores', label: t.menuGaleriaVideosAmadores }],
+  }
 }
 
 export function getNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): NavItem[] {
@@ -68,6 +81,7 @@ export function getNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VAZIO): 
     { key: 'contos', href: '/contos', label: t.menuContos },
     // quick dicas-hot-menu: client asked for the open Dicas Hot section in the main menu (also stays in the footer)
     { key: 'dicas-hot', href: '/dicas-hot', label: t.menuDicasHot },
+    videosGrupo(t),
     { key: 'contato', href: '/contato', label: t.menuContato },
     // Phase 3: plans page (03-02) and members area
     { key: 'assine-ja', href: '/assine-ja', label: t.menuAssineJa },
@@ -97,16 +111,14 @@ export function getMemberNavItems(t: Textos<'geral'>, menu: MenuConfig = MENU_VA
     { key: 'minha-assinatura', href: '/area-do-assinante', label: t.menuMinhaAssinatura, exact: true },
     { key: 'trocar-senha', href: '/area-do-assinante/senha', label: t.menuTrocarSenha },
   ]
-  if (menu.linkExterno) {
-    items.push({
-      key: 'link-externo',
-      href: menu.linkExterno.url,
-      label: textoParaRico(menu.linkExterno.rotulo),
-      external: true,
-      // Amadores lives under the external link ("Pornô grátis"), no longer under Galeria (client request, 2026-11-14)
-      children: [{ key: 'galeria-videos-amadores', href: '/videos-amadores', label: t.menuGaleriaVideosAmadores }],
-    })
-  }
+  items.push(
+    videosGrupo(
+      t,
+      menu.linkExterno
+        ? { key: 'link-externo', href: menu.linkExterno.url, label: textoParaRico(menu.linkExterno.rotulo), external: true }
+        : undefined,
+    ),
+  )
   return filtrarItens(items, menu.ocultos)
 }
 
