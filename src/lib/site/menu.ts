@@ -13,11 +13,10 @@ export const MENU_ITENS = [
   { value: 'regras', label: 'Quem somos → Regras' },
   { value: 'dicas', label: 'Quem somos → Dicas' },
   { value: 'espaco', label: 'Espaço' },
-  { value: 'galeria', label: 'Galeria (esconde também Profissionais, Amadoras e Vídeos amadores)' },
+  { value: 'galeria', label: 'Galeria (esconde também Profissionais e Amadoras)' },
   { value: 'galeria-profissionais', label: 'Galeria → Profissionais' },
   { value: 'galeria-amadoras', label: 'Galeria → Amadoras' },
-  { value: 'galeria-videos-amadores', label: 'Galeria → Vídeos amadores' },
-  { value: 'classisex', label: 'ClassiSex' },
+    { value: 'classisex', label: 'ClassiSex' },
   { value: 'contos', label: 'Contos' },
   { value: 'dicas-hot', label: 'Dicas Hot' },
   { value: 'contato', label: 'Contato' },
@@ -27,7 +26,8 @@ export const MENU_ITENS = [
   { value: 'meus-anuncios', label: 'Menu do assinante → Meus anúncios' },
   { value: 'minha-assinatura', label: 'Menu do assinante → Minha assinatura' },
   { value: 'trocar-senha', label: 'Menu do assinante → Trocar senha' },
-  { value: 'link-externo', label: 'Menu do assinante → Link externo' },
+  { value: 'link-externo', label: 'Menu do assinante → Link externo (esconde também Amadores)' },
+  { value: 'galeria-videos-amadores', label: 'Menu do assinante → Link externo → Amadores' },
 ] as const
 
 export type MenuKey = (typeof MENU_ITENS)[number]['value']
@@ -41,7 +41,7 @@ const PARENT: Partial<Record<MenuKey, MenuKey>> = {
   dicas: 'quem-somos',
   'galeria-profissionais': 'galeria',
   'galeria-amadoras': 'galeria',
-  'galeria-videos-amadores': 'galeria',
+  'galeria-videos-amadores': 'link-externo',
 }
 
 export const LINK_EXTERNO_PADRAO = {
