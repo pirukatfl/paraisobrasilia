@@ -9,7 +9,12 @@ import {
   ParagraphFeature,
   UnorderedListFeature,
 } from '@payloadcms/richtext-lexical'
-import type { CollectionBeforeChangeHook, CollectionConfig, FieldHook } from 'payload'
+import type {
+  CollectionBeforeChangeHook,
+  CollectionBeforeValidateHook,
+  CollectionConfig,
+  FieldHook,
+} from 'payload'
 
 import { isStaff, staffOrPublished } from '../access/roles'
 import { revalidatePartyAfterChange, revalidatePartyAfterDelete } from '../lib/parties/revalidate'
@@ -25,10 +30,39 @@ export function slugify(input: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+/** Slug vazio vira o título em slug; slug digitado é só normalizado. */
 const fillSlugFromTitle: FieldHook = ({ value, data }) => {
-  if (typeof value === 'string' && value.trim()) return slugify(value)
-  if (typeof data?.title === 'string') return slugify(data.title)
+  if (typeof value === 'string' && value.trim()) return slugify(value) || undefined
+  if (typeof data?.title === 'string') return slugify(data.title) || undefined
   return value
+}
+
+/** Garante endereço único: se já existe outra festa com o mesmo slug, acrescenta -2, -3... */
+const ensureUniqueSlug: CollectionBeforeValidateHook = async ({ data, req, originalDoc }) => {
+  if (!data || typeof data.slug !== 'string' || !data.slug) return data
+  // Slug de uma festa já existente que não foi alterado não precisa de nova checagem
+  if (originalDoc?.slug === data.slug) return data
+  const base = data.slug
+  let candidate = base
+  for (let n = 2; n < 1000; n++) {
+    const found = await req.payload.find({
+      collection: 'parties',
+      where: {
+        slug: { equals: candidate },
+        ...(originalDoc?.id ? { id: { not_equals: originalDoc.id } } : {}),
+      },
+      limit: 1,
+      depth: 0,
+      draft: true,
+      overrideAccess: true,
+      pagination: false,
+      req,
+    })
+    if (found.docs.length === 0) break
+    candidate = `${base}-${n}`
+  }
+  data.slug = candidate
+  return data
 }
 
 const fillDefaultEnd: CollectionBeforeChangeHook = ({ data }) => {
@@ -60,6 +94,7 @@ export const Parties: CollectionConfig = {
     delete: isStaff,
   },
   hooks: {
+    beforeValidate: [ensureUniqueSlug],
     beforeChange: [fillDefaultEnd],
     // Publish, edit and unpublish (updates of _status) show up on the site at once
     afterChange: [revalidatePartyAfterChange],
@@ -76,12 +111,11 @@ export const Parties: CollectionConfig = {
     {
       name: 'slug',
       type: 'text',
-      required: true,
       unique: true,
       index: true,
       label: 'Endereço da página (slug)',
       admin: {
-        description: 'Gerado a partir do título. Só altere se souber o que está fazendo.',
+        description: 'Opcional. Deixe em branco que o site cria a partir do título. Só altere se souber o que está fazendo.',
         position: 'sidebar',
       },
       hooks: { beforeValidate: [fillSlugFromTitle] },

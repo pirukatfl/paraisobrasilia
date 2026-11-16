@@ -986,9 +986,9 @@ export interface Party {
    */
   title: string;
   /**
-   * Gerado a partir do título. Só altere se souber o que está fazendo.
+   * Opcional. Deixe em branco que o site cria a partir do título. Só altere se souber o que está fazendo.
    */
-  slug: string;
+  slug?: string | null;
   /**
    * Horário de Brasília.
    */

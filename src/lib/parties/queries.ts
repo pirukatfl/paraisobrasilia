@@ -32,7 +32,7 @@ function toFlyerImage(flyer: Party['flyer'], title: string): FlyerImage {
 export function toPartyCard(doc: Party): PartyCardDTO {
   return {
     id: String(doc.id),
-    slug: doc.slug,
+    slug: doc.slug ?? '',
     title: doc.title,
     startsAt: doc.startsAt,
     endsAt: doc.endsAt ?? doc.startsAt,
@@ -125,7 +125,7 @@ async function fetchAllPartySlugs(): Promise<string[]> {
     limit: 200,
     select: { slug: true },
   })
-  return docs.map((d) => d.slug)
+  return docs.map((d) => d.slug).filter((s): s is string => Boolean(s))
 }
 
 /** All published slugs (not used at build time: party pages are generated on first request). */
