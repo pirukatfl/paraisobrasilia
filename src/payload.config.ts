@@ -72,6 +72,13 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     components: {
+      // Novo assinante: conta + plano + link de senha em uma etapa
+      views: {
+        novoAssinante: {
+          Component: '/components/admin/assinantes/NovoAssinanteView#NovoAssinanteView',
+          path: '/novo-assinante',
+        },
+      },
       // PAINEL-06: who expires this week, first thing staff see
       // PAINEL-07: ClassiSex moderation queue
       beforeDashboard: [
