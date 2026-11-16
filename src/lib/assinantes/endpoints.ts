@@ -4,11 +4,13 @@ import { isStaff } from '../../access/roles'
 import { respostaDeErroInesperado } from '../errors/endpoint'
 import { whatsappUrl } from '../site/contact'
 import { dismissSemDataAviso } from './site-antigo'
-import { createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError, setEmailConfirmed } from './service'
+import { createAssinanteCompleto, createPasswordLink, endAccess, getSituacao, grantOrRenew, ServiceError, setEmailConfirmed } from './service'
 
 /**
  * Staff-only actions on a subscriber, used by the "Assinatura" panel in /admin:
  *   GET  /api/assinantes/:id/situacao
+ *   POST /api/assinantes/cadastro-completo { name, email, whatsapp?, planId?, durationDays?, amount?, method?, paidAt?, note? }
+ *     (account + plan + password link in one step)
  *   POST /api/assinantes/:id/liberar   { planId, durationDays?, amount?, method, paidAt?, note? }
  *   POST /api/assinantes/:id/encerrar  { reason }
  *   POST /api/assinantes/:id/email-confirmado { confirmado }
@@ -44,6 +46,32 @@ const num = (value: unknown) => (value === null || value === undefined || value 
 const text = (value: unknown) => (typeof value === 'string' ? value : null)
 
 export const assinanteEndpoints: Endpoint[] = [
+  {
+    path: '/cadastro-completo',
+    method: 'post',
+    handler: async (req) => {
+      if (!isStaff({ req })) return forbidden()
+      const body = await readBody(req)
+      return run(() =>
+        createAssinanteCompleto(
+          req.payload,
+          {
+            name: text(body.name) ?? '',
+            email: text(body.email) ?? '',
+            whatsapp: text(body.whatsapp),
+            planId: num(body.planId),
+            durationDays: num(body.durationDays),
+            amount: num(body.amount),
+            method: body.method as never,
+            paidAt: text(body.paidAt),
+            note: text(body.note),
+            req,
+          },
+          whatsappUrl,
+        ),
+      )
+    },
+  },
   {
     path: '/:id/situacao',
     method: 'get',

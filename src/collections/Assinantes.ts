@@ -256,7 +256,9 @@ const auditAccount: CollectionAfterChangeHook = async ({ doc, previousDoc, opera
       summary:
         req.context?.selfSignup === true
           ? `Conta criada pelo cadastro do site: ${assinanteLabel(doc)}`
-          : `Conta criada${passwordSetBy === 'equipe' ? ' com senha provisória' : ''}: ${assinanteLabel(doc)}`,
+          : req.context?.cadastroCompleto === true
+            ? `Conta criada pela equipe (senha definida pelo link): ${assinanteLabel(doc)}`
+            : `Conta criada${passwordSetBy === 'equipe' ? ' com senha provisória' : ''}: ${assinanteLabel(doc)}`,
       details,
     })
     return doc
@@ -315,7 +317,8 @@ export const Assinantes: CollectionConfig = {
     defaultColumns: ['name', 'email', 'contaTipo', 'origem', 'emailStatus', 'updatedAt'],
     listSearchableFields: ['name', 'email', 'whatsapp'],
     description:
-      'Crie a conta depois de conferir o comprovante. A conta pode existir sem acesso; o acesso é liberado em "Assinatura".',
+      'Para um assinante novo, use "Novo assinante" (conta, plano e link de senha em uma etapa). A conta pode existir sem acesso; o acesso é liberado em "Assinatura".',
+    components: { beforeListTable: ['/components/admin/assinantes/NovoAssinanteLink#NovoAssinanteLink'] },
   },
   auth: {
     tokenExpiration: ASSINANTE_TOKEN_SECONDS,

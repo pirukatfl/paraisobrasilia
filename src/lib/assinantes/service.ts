@@ -4,6 +4,8 @@
  * nothing date-related is accepted from the browser (T-03-15).
  * No 'server-only' import: loaded through the Payload config in plain Node too.
  */
+import { randomBytes } from 'node:crypto'
+
 import type { Payload, PayloadRequest } from 'payload'
 
 import { PAYMENT_METHODS, type PaymentMethod } from '../../collections/Subscriptions'
@@ -341,4 +343,102 @@ export async function getExpiringSoon(payload: Payload, now: Date, days = RENEWA
       validUntilLabel: validUntilLabel(d.accessUntil),
       daysLeft: daysLeft(d.accessUntil, now),
     }))
+}
+
+export type CadastroCompletoInput = {
+  name: string
+  email: string
+  whatsapp?: string | null
+  /** Empty plan and no days: the account is created without access. */
+  planId?: number | string | null
+  durationDays?: number | null
+  amount?: number | null
+  method?: PaymentMethod | null
+  paidAt?: string | null
+  note?: string | null
+  req: PayloadRequest
+}
+
+export type CadastroCompletoResult = {
+  assinante: { id: number; name: string; email: string }
+  access: { validUntilLabel: string } | null
+  link: { url: string; expiresAt: string; whatsappUrl: string | null }
+}
+
+/**
+ * "Novo assinante em uma etapa": creates the account (random password nobody sees), releases the
+ * chosen plan with the payment record and mints the 48 h password link. The plan is checked before
+ * the account exists; if the release still fails, the new account is removed so staff can retry
+ * without hitting "e-mail já cadastrado".
+ */
+export async function createAssinanteCompleto(
+  payload: Payload,
+  input: CadastroCompletoInput,
+  buildWhatsappUrl: (phone: string, message: string) => string,
+): Promise<CadastroCompletoResult> {
+  const { req } = input
+  const name = input.name.trim()
+  const email = input.email.trim().toLowerCase()
+  const whatsapp = input.whatsapp?.replace(/\D/g, '') || null
+  if (!name) throw new ServiceError('Informe o nome ou apelido.')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new ServiceError('Informe um e-mail válido.')
+  if (whatsapp && !/^55\d{10,11}$/.test(whatsapp)) {
+    throw new ServiceError('WhatsApp: use só números, com 55 e DDD (ex.: 5561999998888).')
+  }
+
+  const hasPlan = input.planId !== null && input.planId !== undefined && input.planId !== ''
+  const hasDays = input.durationDays !== null && input.durationDays !== undefined
+  const grant = hasPlan || hasDays
+  if (grant) {
+    if (!isMethod(input.method)) throw new ServiceError('Escolha a forma de pagamento.')
+    if (!hasPlan && !(Number.isInteger(Number(input.durationDays)) && Number(input.durationDays) >= 1)) {
+      throw new ServiceError('Informe quantos dias de acesso.')
+    }
+    if (input.amount !== null && input.amount !== undefined && !(Number.isFinite(input.amount) && input.amount >= 0)) {
+      throw new ServiceError('Informe um valor válido.')
+    }
+  }
+
+  const password = randomBytes(24).toString('hex')
+  const created = await withRequestState(req, () =>
+    payload.create({
+      collection: 'assinantes',
+      data: { name, email, password, ...(whatsapp ? { whatsapp } : {}) },
+      overrideAccess: false,
+      user: req.user,
+      context: { cadastroCompleto: true },
+      req,
+    }),
+  )
+
+  try {
+    const granted = grant
+      ? await grantOrRenew(payload, {
+          assinanteId: created.id,
+          planId: hasPlan ? (input.planId as number | string) : null,
+          durationDays: hasPlan ? null : Number(input.durationDays),
+          amount: input.amount,
+          method: input.method as PaymentMethod,
+          paidAt: input.paidAt,
+          note: input.note,
+          req,
+        })
+      : null
+    const link = await createPasswordLink(payload, { assinanteId: created.id, req })
+    const message = `Olá, ${link.assinante.name}! Este é o link para criar sua senha no site do Paraíso (vale por 48 horas): ${link.url}`
+    return {
+      assinante: { id: created.id, name, email },
+      access: granted ? { validUntilLabel: granted.validUntilLabel } : null,
+      link: {
+        url: link.url,
+        expiresAt: link.expiresAt,
+        whatsappUrl: link.assinante.whatsapp ? buildWhatsappUrl(link.assinante.whatsapp, message) : null,
+      },
+    }
+  } catch (err) {
+    await withRequestState(req, () =>
+      payload.delete({ collection: 'assinantes', id: created.id, overrideAccess: true, req }),
+    ).catch(() => undefined)
+    throw err
+  }
 }
