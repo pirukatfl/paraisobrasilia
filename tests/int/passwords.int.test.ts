@@ -122,6 +122,12 @@ describe('passwords without e-mail (ASS-02 substitute, D-04, T-03-04, T-03-11)',
     expect(expires - before).toBeLessThan(48.1 * 3600_000)
     const token1 = new URL(first.url).searchParams.get('token')!
     expect(await passwordLinkIsValid(payload, token1)).toBe(true)
+    // O prazo gravado no banco (o que de fato vale) também é de 48 h, não só o que a tela mostra
+    const stored = (await payload.db.findOne({
+      collection: 'assinantes',
+      where: { resetPasswordToken: { equals: token1 } },
+    })) as unknown as { resetPasswordExpiration: string }
+    expect(new Date(stored.resetPasswordExpiration).getTime() - before).toBeGreaterThan(47.9 * 3600_000)
 
     const rows = await log('link-de-senha-gerado')
     expect(rows).toHaveLength(1)

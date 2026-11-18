@@ -222,7 +222,12 @@ export function AssinaturaPanel() {
     try {
       const result = await post('link-senha', {})
       setLink({ url: String(result.url), whatsappUrl: (result.whatsappUrl as string | null) ?? null })
-      setLinkStatus('Link gerado. Links anteriores deixaram de valer.')
+      const ate = new Date(String(result.expiresAt)).toLocaleString('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        dateStyle: 'short',
+        timeStyle: 'short',
+      })
+      setLinkStatus(`Link gerado, vale até ${ate} (horário de Brasília). Links anteriores deixaram de valer.`)
     } catch (err) {
       setLinkError(mensagemDeExcecao(err))
     } finally {

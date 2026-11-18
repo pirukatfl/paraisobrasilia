@@ -1,5 +1,6 @@
 import type { Payload } from 'payload'
 
+import { findActiveResetToken } from './reset-token'
 import { emailEnabled } from '../email/config'
 import { allowAttempt } from '../email/rate-limit'
 import { buildResetEmail, resetUrl } from '../email/password-reset'
@@ -38,12 +39,14 @@ export async function requestPasswordEmail(
 
 /** Mints the Payload token (replacing any older one) and mails the link; no-op for unknown e-mails. */
 export async function deliver(payload: Payload, email: string): Promise<boolean> {
-  const token = await payload.forgotPassword({
-    collection: 'assinantes',
-    data: { email },
-    disableEmail: true,
-    context: { emailedPasswordLink: true },
-  })
+  const token =
+    (await findActiveResetToken(payload, email)) ??
+    (await payload.forgotPassword({
+      collection: 'assinantes',
+      data: { email },
+      disableEmail: true,
+      context: { emailedPasswordLink: true },
+    }))
   if (!token) return false
   const found = await payload.find({
     collection: 'assinantes',

@@ -12,6 +12,7 @@ import { PAYMENT_METHODS, type PaymentMethod } from '../../collections/Subscript
 import { isStaff } from '../../access/roles'
 import { assinanteLabel, writeAudit } from './audit'
 import { withRequestState } from './context'
+import { ensureLinkExpiration, LINK_HOURS } from './reset-token'
 import { daysLeft, renewalWindow, validUntilLabel } from './periods'
 import { RENEWAL_WARNING_DAYS } from './renewal'
 import { accessStatusFor, accessStatusOf, findPeriods, type AccessStatus } from './status'
@@ -247,7 +248,6 @@ export async function getSituacao(payload: Payload, assinanteId: number | string
   }
 }
 
-const LINK_HOURS = 48
 
 const siteBase = () => (process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000').replace(/\/$/, '')
 
@@ -273,7 +273,7 @@ export async function createPasswordLink(
     }),
   )
   if (!token) throw new ServiceError('Não foi possível gerar o link.')
-  const expiresAt = new Date(Date.now() + LINK_HOURS * 3600_000).toISOString()
+  const expiresAt = await ensureLinkExpiration(payload, token)
   await writeAudit(req, {
     action: 'link-de-senha-gerado',
     assinante: account,

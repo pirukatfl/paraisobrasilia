@@ -264,7 +264,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Crie a conta depois de conferir o comprovante. A conta pode existir sem acesso; o acesso é liberado em "Assinatura".
+ * Para um assinante novo, use "Novo assinante" (conta, plano e link de senha em uma etapa). A conta pode existir sem acesso; o acesso é liberado em "Assinatura".
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "assinantes".
@@ -945,7 +945,7 @@ export interface Media {
   };
 }
 /**
- * MP4 (H.264), até 100 MB e cerca de 2 minutos. Exporte em 720p para carregar rápido no celular.
+ * MP4 (H.264), até 250 MB e cerca de 2 minutos. Exporte em 720p para carregar rápido no celular.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "videos".
@@ -1389,7 +1389,7 @@ export interface EnviosMidia {
    */
   observacao?: string | null;
   /**
-   * Clique em um arquivo para ver a prévia e baixar o original.
+   * Clique em um arquivo para ver a prévia, baixar o original e escrever a Descrição que aparece no card do site. A coluna Descrição mostra o que já foi escrito.
    */
   arquivos?: {
     docs?: (number | EnviosMidiaArquivo)[];
@@ -2385,8 +2385,8 @@ export interface MenuDoSite {
         | 'galeria'
         | 'galeria-profissionais'
         | 'galeria-amadoras'
-        | 'galeria-videos-amadores'
         | 'videos'
+        | 'galeria-videos-amadores'
         | 'classisex'
         | 'contos'
         | 'dicas-hot'
@@ -2703,6 +2703,24 @@ export interface TextosGeral {
     [k: string]: unknown;
   } | null;
   menuGaleriaAmadoras?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Só abre o submenu: não tem link.
+   */
+  menuVideos?: {
     root: {
       type: string;
       children: {
@@ -13134,6 +13152,7 @@ export interface TextosGeralSelect<T extends boolean = true> {
   menuGaleria?: T;
   menuGaleriaProfissionais?: T;
   menuGaleriaAmadoras?: T;
+  menuVideos?: T;
   menuGaleriaVideosAmadores?: T;
   menuClassisex?: T;
   menuContos?: T;

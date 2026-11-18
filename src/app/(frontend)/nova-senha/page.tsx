@@ -23,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const ERRORS: Record<string, string> = {
   curta: 'A nova senha precisa ter pelo menos 8 caracteres.',
   diferente: 'As senhas não conferem.',
+  falha: 'Não conseguimos salvar a senha agora. O link continua valendo: tente de novo.',
 }
 
 export default async function NovaSenhaPage({
