@@ -5,6 +5,7 @@
  * errors stay exactly as for any account. Payload Local API only: no Next imports.
  */
 // T-06-16: never logs the password, the hash or the reset token
+import { findActiveResetToken } from './reset-token'
 import { AuthenticationError, createLocalReq, LockedAuth, UnverifiedEmail, ValidationError, type Payload } from 'payload'
 
 import { MIN_PASSWORD_LENGTH } from '../../collections/Assinantes'
@@ -52,12 +53,14 @@ export async function tryLegacyPassword(payload: Payload, input: Input): Promise
   if (input.password.length < MIN_PASSWORD_LENGTH) {
     // The old password is right but too short for the new site: single-use link to create a new one.
     // The hash stays until the new password is saved (T-06-17: the flag exists only in server code).
-    const token = await payload.forgotPassword({
-      collection: 'assinantes',
-      data: { email },
-      disableEmail: true,
-      context: { legacyPasswordUpgrade: true },
-    })
+    const token =
+      (await findActiveResetToken(payload, email)) ??
+      (await payload.forgotPassword({
+        collection: 'assinantes',
+        data: { email },
+        disableEmail: true,
+        context: { legacyPasswordUpgrade: true },
+      }))
     return { kind: 'senha-curta', token }
   }
 

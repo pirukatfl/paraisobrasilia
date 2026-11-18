@@ -13,6 +13,7 @@ import { writeAudit } from './audit'
 import { ASSINANTE_COOKIE, headersDoAssinante } from './cookie'
 import { loginWithLegacy } from './legacy-login'
 import { safeNext } from './redirect'
+import { passwordLinkIsValid } from './service'
 import { requestPasswordEmail } from './reset-email'
 import { requireAssinante } from './session'
 import { confirmEmail, resendVerification, signUp } from './signup'
@@ -152,6 +153,8 @@ export async function definirNovaSenha(formData: FormData): Promise<void> {
   if (nova !== confirmacao) redirect(novaSenhaUrl(token, 'diferente'))
 
   const payload = await getPayload({ config })
+  // Confere antes de gastar o token: só "expirou" quando o banco diz que expirou
+  if (!(await passwordLinkIsValid(payload, token))) redirect('/nova-senha?erro=expirado')
   let result: Awaited<ReturnType<typeof payload.resetPassword>> | null = null
   try {
     result = await payload.resetPassword({
@@ -159,10 +162,12 @@ export async function definirNovaSenha(formData: FormData): Promise<void> {
       data: { token, password: nova },
       overrideAccess: true,
     })
-  } catch {
-    result = null
+  } catch (err) {
+    // Falha ao salvar não é link vencido: o token continua valendo, a pessoa tenta de novo
+    registrarErro('definirNovaSenha', err)
+    redirect(novaSenhaUrl(token, 'falha'))
   }
-  if (!result?.token || !result.user) redirect('/nova-senha?erro=expirado')
+  if (!result?.token || !result.user) redirect(novaSenhaUrl(token, 'falha'))
 
   await setAuthCookie(result.token)
   const user = result.user as unknown as { id: number; name: string; email: string }
