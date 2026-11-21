@@ -290,7 +290,30 @@ describe('comentários dos anúncios (quick classisex-comentarios)', () => {
       expect(countOf(pub.items, adId)).toBe(2)
       expect(countOf(pub.items, second.ad.id)).toBe(0)
       expect(countOf(mem.items, adId)).toBe(2)
-      expect(JSON.stringify(pub.items)).not.toContain('Resposta')
+      // Hidden comments never travel; the approved ones now do (shown under the card)
+      expect(JSON.stringify(pub.items)).not.toContain('Escondido')
+      expect(JSON.stringify(mem.items)).not.toContain('Escondido')
+    })
+
+    it('o quadro traz a conversa aprovada sob cada anúncio; contatos só para assinante ativo', async () => {
+      const root = await comment({ texto: 'Me chama no zap (61) 99988-9772 ou fulano@gmail.com' })
+      await comment({ assinanteId: paying.id, parentId: root.id, texto: 'Resposta simples' })
+      const pending = await createComment(payload, { assinanteId: free.id, adId, apelido: 'Lua', texto: 'Ainda em análise', now: NOW })
+      expect(pending.id).not.toBeNull()
+      const pub = await findPublicAds(payload, { page: 1 }, NOW)
+      const mem = await findMemberAds(payload, { page: 1 }, NOW)
+      const pubAd = pub.items.find((i) => i.id === adId)!
+      const memAd = mem.items.find((i) => i.id === adId)!
+      expect(pubAd.conversa).toHaveLength(1)
+      expect(pubAd.conversa[0].respostas.map((r) => r.texto)).toEqual(['Resposta simples'])
+      expect(pubAd.conversa[0].texto).toContain(REDACTED_LABEL)
+      const pubJson = JSON.stringify(pub.items)
+      expect(pubJson).not.toContain('99988')
+      expect(pubJson).not.toContain('fulano@gmail.com')
+      expect(pubJson).not.toContain('Ainda em análise')
+      expect(memAd.conversa[0].texto).toContain('99988-9772')
+      expect(memAd.conversa[0].texto).toContain('fulano@gmail.com')
+      expect(JSON.stringify(mem.items)).not.toContain('Ainda em análise')
     })
   })
 

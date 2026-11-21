@@ -260,3 +260,40 @@ export async function countCommentsByAd(payload: Payload, adIds: number[]): Prom
   }
   return out
 }
+
+/** Roots shown under each card of the boards (the newest ones); the rest is read on the ad page. */
+export const COMENTARIOS_NO_CARD = 3
+
+/**
+ * Newest published comments of a whole page of ads, with their replies, for the boards (one query,
+ * no N+1). `verContatos` is decided by the caller from the session: false redacts every contact on
+ * the server. `meu` is always false here (deleting happens on the ad page).
+ */
+export async function threadsByAd(
+  payload: Payload,
+  adIds: number[],
+  { verContatos, now }: { verContatos: boolean; now: Date },
+): Promise<Map<number, ComentarioDTO[]>> {
+  const out = new Map<number, ComentarioDTO[]>()
+  if (adIds.length === 0) return out
+  const { docs } = await payload.find({
+    collection: 'ad-comments',
+    where: { and: [{ ad: { in: adIds } }, { status: { equals: 'publicado' } }] },
+    select: { ad: true, apelido: true, texto: true, doAnunciante: true, semConta: true, parent: true, createdAt: true },
+    sort: ['createdAt', 'id'] as unknown as string,
+    depth: 0,
+    pagination: false,
+    limit: 0,
+    overrideAccess: true,
+  })
+  const byAd = new Map<number, ComentarioDocLike[]>()
+  for (const doc of docs as unknown as (ComentarioDocLike & { ad?: unknown })[]) {
+    const adId = relId(doc.ad)
+    if (adId !== null) byAd.set(adId, [...(byAd.get(adId) ?? []), doc])
+  }
+  for (const [adId, list] of byAd) {
+    const thread = toComentarioDTOs(list, { verContatos, now })
+    out.set(adId, thread.slice(-COMENTARIOS_NO_CARD))
+  }
+  return out
+}

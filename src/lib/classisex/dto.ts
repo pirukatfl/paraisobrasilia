@@ -5,6 +5,7 @@
 import { coverOf, visibleMediaFor, type Tier } from '../assinantes/tier'
 import { formatShortDate } from '../format/date'
 import { whatsappUrl } from '../site/contact'
+import type { ComentarioDTO } from './comentarios/dto'
 import { redactContacts } from './redact'
 import { platformLabel, type AdStatus } from './rules'
 
@@ -219,6 +220,8 @@ export type MemberAdDTO = {
   autorGratuito: boolean
   /** Published comments (the card link "Comentários (N)"). */
   comentarios: number
+  /** Newest approved comments (with replies) shown under the card; contacts only for active subscribers. */
+  conversa: ComentarioDTO[]
 }
 
 export const WHATSAPP_GREETING = 'Olá! Vi seu anúncio no ClassiSex do Paraíso.'
@@ -230,7 +233,8 @@ export function toMemberAdDTO(
     media = [],
     authorTier,
     comentarios = 0,
-  }: { euSouLabel: string; media?: AdMediaDocLike[]; authorTier: Tier; comentarios?: number },
+    conversa = [],
+  }: { euSouLabel: string; media?: AdMediaDocLike[]; authorTier: Tier; comentarios?: number; conversa?: ComentarioDTO[] },
 ): MemberAdDTO {
   const c = contatoOf(doc)
   const shown = visibleMediaFor(authorTier, media)
@@ -266,6 +270,7 @@ export function toMemberAdDTO(
     videos,
     autorGratuito: authorTier === 'gratis',
     comentarios,
+    conversa,
   }
 }
 
@@ -287,6 +292,8 @@ export type PublicAdDTO = {
   foto: { previewUrl: string } | null
   /** Published comments (the card link "Comentários (N)"); only the count, never the text. */
   comentarios: number
+  /** Newest approved comments (with replies) shown under the card, contacts redacted on the server. */
+  conversa: ComentarioDTO[]
 }
 
 export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
@@ -300,7 +307,12 @@ export const previewUrl = (mediaId: number) => `/classisex/previa/${mediaId}`
  */
 export function toPublicAdDTO(
   doc: AdDocLike,
-  { euSouLabel, media = [], comentarios = 0 }: { euSouLabel: string; media?: AdMediaDocLike[]; comentarios?: number },
+  {
+    euSouLabel,
+    media = [],
+    comentarios = 0,
+    conversa = [],
+  }: { euSouLabel: string; media?: AdMediaDocLike[]; comentarios?: number; conversa?: ComentarioDTO[] },
 ): PublicAdDTO {
   // The same file as the members board and the media route (coverOf)
   const cover = coverOf(media)
@@ -313,5 +325,6 @@ export function toPublicAdDTO(
     texto: redactContacts(doc.texto ?? '').text,
     foto: cover ? { previewUrl: previewUrl(cover.id) } : null,
     comentarios,
+    conversa,
   }
 }

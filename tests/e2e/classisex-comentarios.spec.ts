@@ -147,10 +147,16 @@ test('visitante vê o comentário sem contato e sem dados da autora, no HTML e n
   const raw = await (await request.get(`/classisex/anuncio/${adId}`)).text()
   for (const body of [html, raw]) for (const secret of SECRETS) expect(body, secret).not.toContain(secret)
 
-  // o cartão do quadro mostra a contagem e aponta para a conversa
+  // o cartão do quadro já mostra o comentário aprovado (sem clicar), sem contato, e aponta para a conversa
   await page.goto('/classisex')
-  const link = page.getByRole('article').filter({ hasText: APELIDO_ANUNCIO }).getByRole('link', { name: 'Comentários (1)' })
-  await expect(link).toHaveAttribute('href', `/classisex/anuncio/${adId}#comentarios`)
+  const cartao = page.getByRole('article').filter({ hasText: APELIDO_ANUNCIO })
+  const conversa = cartao.locator('[data-comentarios-card]')
+  await expect(conversa).toContainText('Gratis Lua')
+  await expect(conversa).toContainText(REDIGIDO)
+  await expect(conversa.getByRole('heading', { name: /Comentários/ })).toContainText('(1)')
+  const quadro = await (await request.get('/classisex')).text()
+  for (const secret of SECRETS) expect(quadro, secret).not.toContain(secret)
+  await expect(cartao.getByRole('link', { name: 'Comentar ou responder' })).toHaveAttribute('href', `/classisex/anuncio/${adId}#comentarios`)
   await context.close()
 })
 
@@ -171,7 +177,10 @@ test('assinante ativo vê o contato escrito no comentário, na área do assinant
 
   // cartão do quadro dos assinantes
   await page.goto('/area-do-assinante/classisex')
-  await expect(page.getByRole('link', { name: 'Comentários (2)' })).toHaveAttribute('href', `/area-do-assinante/classisex/${adId}#comentarios`)
+  const cartaoAssinante = page.getByRole('article').filter({ hasText: APELIDO_ANUNCIO })
+  await expect(cartaoAssinante.locator('[data-comentarios-card]')).toContainText(CONTATO_RAW)
+  await expect(cartaoAssinante.locator('[data-comentarios-card]')).toContainText('Oi! Também gostei.')
+  await expect(cartaoAssinante.getByRole('link', { name: 'Comentar ou responder' })).toHaveAttribute('href', `/area-do-assinante/classisex/${adId}#comentarios`)
 
   // a página aberta: o mesmo assinante vê o contato e o link para o anúncio completo
   await page.goto(`/classisex/anuncio/${adId}`)
@@ -199,7 +208,9 @@ test('a equipe oculta o comentário no painel e ele some do site; reexibir traz 
   await expect(secao(page)).not.toContainText('Gratis Lua')
   await expect(secao(page)).toContainText('Pago Sol')
   await page.goto('/classisex')
-  await expect(page.getByRole('article').filter({ hasText: APELIDO_ANUNCIO }).getByRole('link', { name: 'Comentários (1)' })).toBeVisible()
+  const cartaoOculto = page.getByRole('article').filter({ hasText: APELIDO_ANUNCIO }).locator('[data-comentarios-card]')
+  await expect(cartaoOculto).not.toContainText('Gratis Lua')
+  await expect(cartaoOculto).toContainText('(1)')
 
   await staff.page.locator('#field-status').click()
   await staff.page.getByRole('option', { name: 'Publicado' }).click()

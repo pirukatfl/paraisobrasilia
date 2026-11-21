@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { CONVERSA_NA_AREA_ABERTA } from '@/lib/classisex/comentarios/rules'
 import type { PublicAdDTO } from '@/lib/classisex/dto'
 import type { Textos } from '@/lib/textos/areas'
+import { ComentariosCard } from '@/components/classisex/ComentariosCard'
 import { TextoRico } from '@/components/TextoRico'
 
 /**
@@ -39,19 +40,16 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
         {ad.cidade ? ` · ${ad.cidade}` : ''}
       </p>
       {ad.texto && <p className="mt-3 whitespace-pre-line break-words text-body">{ad.texto}</p>}
+      {CONVERSA_NA_AREA_ABERTA && (
+        <ComentariosCard
+          adId={ad.id}
+          conversa={ad.conversa}
+          total={ad.comentarios}
+          href={`/classisex/anuncio/${ad.id}#comentarios`}
+          textos={t}
+        />
+      )}
       <div className="mt-4 flex flex-1 flex-col justify-end gap-2">
-        {CONVERSA_NA_AREA_ABERTA && (
-          <Link
-            href={`/classisex/anuncio/${ad.id}#comentarios`}
-            className="type-label self-start text-accent underline underline-offset-4"
-          >
-            {ad.comentarios > 0 ? (
-              <TextoRico valor={t.comentarioCardVer} vars={{ n: ad.comentarios }} linha />
-            ) : (
-              <TextoRico valor={t.comentarioCardComentar} linha />
-            )}
-          </Link>
-        )}
         <Link href="/assine-ja" className="btn-primary text-center">
           <TextoRico valor={t.cardPublicoAssine} linha />
         </Link>
