@@ -9,7 +9,7 @@ import { authorTiersByAd } from './board'
 import { relId, type AdDocLike, type AdMediaDocLike } from './dto'
 import { MAX_AD_PHOTOS } from './media-messages'
 import { visibleAdsWhere } from './visibility'
-import { adsToGalleryCards, type GaleriaAdDoc } from './galeria-cards'
+import { adsToAnuncios, anuncioToCard, type AnuncioAmadoraDTO, type GaleriaAdDoc } from './galeria-cards'
 
 /** Bounded list: the newest approved ads that go into Galeria → Amadoras. */
 const LIMITE = 200
@@ -36,14 +36,14 @@ async function photosByAd(payload: Payload, adIds: number[]): Promise<Map<number
 }
 
 /**
- * Every approved ClassiSex ad with at least one photo, as a card of Galeria → Amadoras (client
- * decision 2026-11-22). Same visibility as the open board (approved only); the only image is the
- * cover served by /classisex/previa/{id}. Only id, apelido, dates and media sizes are selected:
- * contact, text, city, age and author never reach the DTO. Tag 'ads' expires it with moderation,
- * owner edits and media changes.
+ * Every approved ClassiSex ad with at least one public photo (client decision 2026-11-22: all photos
+ * open to everybody, limited to what members see: all for a paying author, the cover otherwise). Same
+ * visibility as the open board (approved only); images go through /amadoras/anuncio/foto/{id}, which
+ * re-checks on every request. Only id, apelido, dates and media sizes are selected: contact, text,
+ * city, age and author never reach the DTO. Tag 'ads' expires it with moderation, owner edits and media changes.
  */
-export const getAnunciosAmadoras = cached(
-  async (): Promise<ModelCardDTO[]> => {
+export const getAnunciosAmadorasLista = cached(
+  async (): Promise<AnuncioAmadoraDTO[]> => {
     const payload = await getPayload({ config })
     const { docs } = await payload.find({
       collection: 'ads',
@@ -62,8 +62,18 @@ export const getAnunciosAmadoras = cached(
       photosByAd(payload, ads.map((a) => a.id)),
       authorTiersByAd(payload, ads as unknown as AdDocLike[], now),
     ])
-    return adsToGalleryCards(ads, media, tiers)
+    return adsToAnuncios(ads, media, tiers)
   },
-  ['classisex-galeria-amadoras'],
+  ['classisex-galeria-amadoras-v2'],
   () => ['ads'],
 )
+
+/** Cards of Galeria → Amadoras. */
+export async function getAnunciosAmadoras(): Promise<ModelCardDTO[]> {
+  return (await getAnunciosAmadorasLista()).map(anuncioToCard)
+}
+
+/** One approved ad with its public photos, or null (404). Looked up in the bounded cached list (newest 200). */
+export async function getAnuncioAmadora(adId: number): Promise<AnuncioAmadoraDTO | null> {
+  return (await getAnunciosAmadorasLista()).find((a) => a.adId === adId) ?? null
+}
