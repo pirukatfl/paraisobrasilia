@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { EmptyState } from '@/components/EmptyState'
 import { ModelGrid } from '@/components/ModelGrid'
+import { getAnunciosAmadoras } from '@/lib/classisex/galeria'
 import { getPublishedModels } from '@/lib/gallery/queries'
 import { getAmadorasEnviadas, type AmadoraEnviadaDTO } from '@/lib/midia-enviada/publico'
 import type { ModelCardDTO } from '@/lib/gallery/types'
@@ -56,13 +57,15 @@ export default async function ModelsPage({ searchParams }: Props) {
   const tipo = parseTipo((await searchParams).tipo)
   // /modelos without ?tipo= is the professional gallery: amateur photos only show under ?tipo=amadoras.
   const lista: ModelTipo = tipo ?? 'profissionais'
-  // Submissions from the public approved by staff are amadoras too: cards next to the amateur models (tag 'amadores')
-  const [all, t, enviadas] = await Promise.all([
+  // Amadoras also include submissions from the public approved by staff (tag 'amadores') and every approved
+  // ClassiSex ad with a photo (tag 'ads'; cover only, the card opens the open ad page): cards next to the amateur models
+  const [all, t, enviadas, anuncios] = await Promise.all([
     getPublishedModels(),
     getTextos('modelos'),
     lista === 'amadoras' ? getAmadorasEnviadas() : Promise.resolve([]),
+    lista === 'amadoras' ? getAnunciosAmadoras() : Promise.resolve([] as ModelCardDTO[]),
   ])
-  const cards = [...filterByTipo(all, lista), ...enviadas.map(cardDeEnvio)]
+  const cards = [...filterByTipo(all, lista), ...enviadas.map(cardDeEnvio), ...anuncios]
   const { titulo, intro } = copyFor(t, tipo)
   return (
     <section aria-labelledby="titulo-modelos">
