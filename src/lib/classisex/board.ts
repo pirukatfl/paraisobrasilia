@@ -6,7 +6,7 @@
 import type { Payload, Where } from 'payload'
 
 import { tierFromAccessUntil, type Tier } from '../assinantes/tier'
-import { countCommentsByAd } from './comentarios/service'
+import { countCommentsByAd, threadsByAd } from './comentarios/service'
 import { MAX_AD_PHOTOS, MAX_AD_VIDEOS } from './media-messages'
 import {
   relId,
@@ -123,7 +123,7 @@ export async function authorTiersByAd(payload: Payload, docs: AdDocLike[], now: 
 export async function findMemberAds(payload: Payload, filters: BoardFilters, now: Date): Promise<BoardPage<MemberAdDTO>> {
   const { items, labels, ...rest } = await findVisibleAdDocs(payload, filters, now)
   // One query for the media of the whole page (no N+1)
-  const [media, tiers, comentarios] = await Promise.all([
+  const [media, tiers, comentarios, conversas] = await Promise.all([
     mediaByAd(
       payload,
       items.map((d) => d.id),
@@ -132,6 +132,12 @@ export async function findMemberAds(payload: Payload, filters: BoardFilters, now
     countCommentsByAd(
       payload,
       items.map((d) => d.id),
+    ),
+    // Members board: only active subscribers get here, so comments carry contacts as written
+    threadsByAd(
+      payload,
+      items.map((d) => d.id),
+      { verContatos: true, now },
     ),
   ])
   return {
@@ -142,6 +148,7 @@ export async function findMemberAds(payload: Payload, filters: BoardFilters, now
         media: media.get(doc.id),
         authorTier: tiers.get(doc.id) ?? 'gratis',
         comentarios: comentarios.get(doc.id) ?? 0,
+        conversa: conversas.get(doc.id) ?? [],
       }),
     ),
   }
@@ -208,7 +215,12 @@ export async function findPublicAds(payload: Payload, filters: BoardFilters, now
   // City and age are members-only: the open area never filters by them
   const { items, labels, ...rest } = await findVisibleAdDocs(payload, { ...filters, cidade: undefined, idade: undefined }, now)
   const ids = items.map((d) => d.id)
-  const [comentarios, byAd] = await Promise.all([countCommentsByAd(payload, ids), publicMediaByAd(payload, ids)])
+  const [comentarios, byAd, conversas] = await Promise.all([
+    countCommentsByAd(payload, ids),
+    publicMediaByAd(payload, ids),
+    // Open area: contacts written in comments are removed on the server
+    threadsByAd(payload, ids, { verContatos: false, now }),
+  ])
   return {
     ...rest,
     items: items.map((doc) =>
@@ -216,6 +228,7 @@ export async function findPublicAds(payload: Payload, filters: BoardFilters, now
         euSouLabel: labels.get(relId(doc.euSou) ?? -1) ?? '',
         media: byAd.get(doc.id),
         comentarios: comentarios.get(doc.id) ?? 0,
+        conversa: conversas.get(doc.id) ?? [],
       }),
     ),
   }

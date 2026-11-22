@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { ComentariosCard } from '@/components/classisex/ComentariosCard'
 import type { MemberAdDTO } from '@/lib/classisex/dto'
 import type { Textos } from '@/lib/textos/areas'
 import { juntarComPonto, TextoRico } from '@/components/TextoRico'
@@ -52,16 +53,13 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
           <TextoRico valor={t.cardVerAnuncio} linha />
         </Link>
       </div>
-      <Link
+      <ComentariosCard
+        adId={ad.id}
+        conversa={ad.conversa}
+        total={ad.comentarios}
         href={`/area-do-assinante/classisex/${ad.id}#comentarios`}
-        className="type-label mt-3 self-start text-accent underline underline-offset-4"
-      >
-        {ad.comentarios > 0 ? (
-          <TextoRico valor={t.comentarioCardVer} vars={{ n: ad.comentarios }} linha />
-        ) : (
-          <TextoRico valor={t.comentarioCardComentar} linha />
-        )}
-      </Link>
+        textos={t}
+      />
     </article>
   )
 }

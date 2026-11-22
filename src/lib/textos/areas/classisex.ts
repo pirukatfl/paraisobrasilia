@@ -238,6 +238,8 @@ export const classisex = definirArea({
     comentarioSoAssinantes: { rotulo: 'Aviso: só assinantes comentam', padrao: 'Só assinantes com acesso ativo podem comentar.', secao: 'Comentários' },
     comentarioCardVer: { rotulo: 'Cartão: link com a contagem', padrao: 'Comentários ({n})', secao: 'Comentários', ajuda: 'Mantenha {n}: é o número de comentários.' },
     comentarioCardComentar: { rotulo: 'Cartão: link quando ainda não há comentários', padrao: 'Comentar', secao: 'Comentários' },
+    comentarioCardVerTodos: { rotulo: 'Cartão: link para ver todos e responder (quando há mais do que aparece)', padrao: 'Ver todos os {n} comentários e responder', secao: 'Comentários', ajuda: 'Mantenha {n}: é o número de comentários.' },
+    comentarioCardResponder: { rotulo: 'Cartão: link para comentar ou responder (quando todos já aparecem)', padrao: 'Comentar ou responder', secao: 'Comentários' },
     comentarioPaginaGoogleTitulo: { rotulo: 'Título no Google (anúncio na área aberta)', padrao: 'Anúncio do ClassiSex', secao: 'Comentários', soTexto: true },
     comentarioVerCompleto: { rotulo: 'Anúncio da área aberta: link para assinantes', padrao: 'Ver anúncio completo', secao: 'Comentários' },
 
