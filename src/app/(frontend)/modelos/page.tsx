@@ -58,7 +58,7 @@ export default async function ModelsPage({ searchParams }: Props) {
   // /modelos without ?tipo= is the professional gallery: amateur photos only show under ?tipo=amadoras.
   const lista: ModelTipo = tipo ?? 'profissionais'
   // Amadoras also include submissions from the public approved by staff (tag 'amadores') and every approved
-  // ClassiSex ad with a photo (tag 'ads'; cover only, the card opens the open ad page): cards next to the amateur models
+  // ClassiSex ad with a photo (tag 'ads'; client decision 2026-11-22: all photos public, the card opens /amadoras/anuncio/{id}): cards next to the amateur models
   const [all, t, enviadas, anuncios] = await Promise.all([
     getPublishedModels(),
     getTextos('modelos'),
