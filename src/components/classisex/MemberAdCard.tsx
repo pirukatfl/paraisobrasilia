@@ -15,7 +15,7 @@ const mediaBadge = (t: Textos<'classisex'>, fotos: number, videos: number) =>
 
 /**
  * One ad in the members list (CLAS-01): cover photo (plain <img> through the protected route,
- * never the Next image optimizer: T-04-07) or a "Sem foto" block.
+ * never the Next image optimizer: T-04-07) shown only when there is one, otherwise the card is text only.
  */
 export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Textos<'classisex'> }) {
   const excerpt = ad.texto.length > EXCERPT ? `${ad.texto.slice(0, EXCERPT).trimEnd()}…` : ad.texto
@@ -24,7 +24,7 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
   const badge = mediaBadge(t, ad.fotos.length, ad.videos.length)
   return (
     <article aria-labelledby={titleId} className="group card-lift flex flex-col rounded-xl border border-line bg-surface p-5">
-      {cover ? (
+      {cover && (
         // eslint-disable-next-line @next/next/no-img-element -- private media (T-04-07)
         <img
           src={cover.miniatura}
@@ -35,10 +35,6 @@ export function MemberAdCard({ ad, textos: t }: { ad: MemberAdDTO; textos: Texto
           decoding="async"
           className="mb-4 aspect-[4/3] w-full rounded-lg object-cover"
         />
-      ) : (
-        <div className="type-label mb-4 flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-line text-muted">
-          <TextoRico valor={t.cardSemFoto} linha />
-        </div>
       )}
       <h2 id={titleId} className="type-heading transition-colors duration-[var(--duration-fast)] group-hover:text-accent">
         {ad.apelido} · {ad.euSou}

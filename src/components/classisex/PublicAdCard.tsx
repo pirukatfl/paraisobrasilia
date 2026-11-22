@@ -16,7 +16,7 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
   const titleId = `previa-${ad.id}`
   return (
     <article aria-labelledby={titleId} className="group card-lift flex flex-col rounded-xl border border-line bg-surface p-5">
-      {ad.foto ? (
+      {ad.foto && (
         // eslint-disable-next-line @next/next/no-img-element -- cover card, served as is
         <img
           src={ad.foto.previewUrl}
@@ -27,12 +27,8 @@ export function PublicAdCard({ ad, textos: t }: { ad: PublicAdDTO; textos: Texto
           decoding="async"
           className="aspect-[4/3] w-full rounded-lg object-cover"
         />
-      ) : (
-        <div className="type-label flex aspect-[4/3] w-full items-center justify-center rounded-lg border border-line text-muted">
-          <TextoRico valor={t.cardSemFoto} linha />
-        </div>
       )}
-      <h2 id={titleId} className="type-heading mt-4 transition-colors duration-[var(--duration-fast)] group-hover:text-accent">
+      <h2 id={titleId} className={`type-heading ${ad.foto ? 'mt-4 ' : ''}transition-colors duration-[var(--duration-fast)] group-hover:text-accent`}>
         {ad.apelido}
       </h2>
       <p className="type-label mt-1 text-muted">

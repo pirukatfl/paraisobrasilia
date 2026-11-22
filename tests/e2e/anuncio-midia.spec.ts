@@ -215,7 +215,7 @@ test('members see the cover in the list, the gallery and the video in the full a
   expect(await card.locator('img').getAttribute('src')).toMatch(/^\/area-do-assinante\/midia\/\d+\/miniatura$/)
   await expect(card).toContainText('2 fotos')
   const semFoto = main.getByRole('article').filter({ hasText: 'Noa ainda sem fotos.' })
-  await expect(semFoto).toContainText('Sem foto')
+  await expect(semFoto).not.toContainText('Sem foto')
   await expect(semFoto.locator('img')).toHaveCount(0)
 
   await page.goto(`/area-do-assinante/classisex/${galeria}`)
