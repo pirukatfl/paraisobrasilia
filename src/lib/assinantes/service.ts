@@ -366,8 +366,7 @@ export type CadastroCompletoResult = {
 }
 
 /**
- * Payload's ValidationError keeps the real reason per field (for example "Já existe um assinante com
- * o e-mail ...") in `data.errors`, but its own `message` is only "The following field is invalid:
+ * Payload's ValidationError keeps the real reason per field (for example "Este e-mail já está cadastrado ...") in `data.errors`, but its own `message` is only "The following field is invalid:
  * email", which the panel showed as if a valid e-mail had been refused. Bring the field messages up.
  */
 function fieldErrorToServiceError(err: unknown): unknown {

@@ -67,7 +67,7 @@ describe('createAssinanteCompleto — novo assinante em uma etapa', () => {
     await seedAssinante(payload, { email: 'dup@teste.local', password: 'senha-dup-12345', name: 'Dup' })
     await expect(
       createAssinanteCompleto(payload, { name: 'X', email: 'dup@teste.local', req: await reqOf() }, wa),
-    ).rejects.toThrow(/Já existe um assinante com o e-mail dup@teste\.local \(Dup\)/)
+    ).rejects.toThrow(/Este e-mail já está cadastrado em nome de Dup \(dup@teste\.local\)/)
     await expect(
       createAssinanteCompleto(payload, { name: 'X', email: 'x@teste.local', durationDays: 5, req: await reqOf() }, wa),
     ).rejects.toThrow(/forma de pagamento/)

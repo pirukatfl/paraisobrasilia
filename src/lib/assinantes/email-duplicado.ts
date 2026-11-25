@@ -6,7 +6,7 @@ import { withRequestState } from './context'
 const normalise = (value: string) => value.trim().toLowerCase()
 
 export const emailEmUsoMessage = (name: string | null | undefined, email: string) =>
-  `Já existe um assinante com o e-mail ${email}${name ? ` (${name})` : ''}. Procure por ele na lista de Assinantes e edite o cadastro existente em vez de criar outro.`
+  `Este e-mail já está cadastrado${name ? ` em nome de ${name}` : ''} (${email}). Procure por ele na lista de Assinantes e edite o cadastro existente em vez de criar outro.`
 
 /**
  * Staff-only (the public sign-up answers neutrally and never reaches this message, T-CG-04):
