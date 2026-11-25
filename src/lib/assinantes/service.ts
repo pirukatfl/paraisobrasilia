@@ -371,7 +371,8 @@ export type CadastroCompletoResult = {
  */
 function fieldErrorToServiceError(err: unknown): unknown {
   const e = err as { name?: unknown; data?: { errors?: unknown } } | null
-  if (e?.name !== 'ValidationError' || !Array.isArray(e.data?.errors)) return err
+  // Duck-typed on purpose: a minified production build can rename the class, so `name` is not reliable
+  if (!e || e.name === 'ServiceError' || !Array.isArray(e.data?.errors)) return err
   const messages = (e.data.errors as Array<{ message?: unknown }>)
     .map((x) => (typeof x?.message === 'string' ? x.message.trim() : ''))
     .filter(Boolean)
