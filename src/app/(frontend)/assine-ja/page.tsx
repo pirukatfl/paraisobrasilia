@@ -74,25 +74,6 @@ export default async function AssineJaPage() {
 
       <PlanComparison signupLink={emailEnabled()} assineLink={false} id="comparativo-assine" />
 
-      {plans.length === 0 ? (
-        <EmptyState
-          heading={<TextoRico valor={t.semPlanosTitulo} linha />}
-          body={t.semPlanosTexto}
-          actions={[{ href: '/contato', label: <TextoRico valor={t.semPlanosBotao} linha />, variant: 'primary' }]}
-        />
-      ) : (
-        <section aria-labelledby="titulo-planos" className="mt-8">
-          <h2 id="titulo-planos" className="sr-only">
-            Planos
-          </h2>
-          <ul role="list" className="flex flex-wrap justify-center gap-4">
-            {plans.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} whatsapp={contact.whatsapp} t={t} />
-            ))}
-          </ul>
-        </section>
-      )}
-
       <section aria-labelledby="titulo-como" className="mt-12 max-w-[680px]">
         <h2 id="titulo-como" className="type-heading">
           <TextoRico valor={t.comoTitulo} linha />
@@ -127,6 +108,25 @@ export default async function AssineJaPage() {
           </Link>
         </div>
       </section>
+
+      {plans.length === 0 ? (
+        <EmptyState
+          heading={<TextoRico valor={t.semPlanosTitulo} linha />}
+          body={t.semPlanosTexto}
+          actions={[{ href: '/contato', label: <TextoRico valor={t.semPlanosBotao} linha />, variant: 'primary' }]}
+        />
+      ) : (
+        <section aria-labelledby="titulo-planos" className="mt-8">
+          <h2 id="titulo-planos" className="sr-only">
+            Planos
+          </h2>
+          <ul role="list" className="flex flex-wrap justify-center gap-4">
+            {plans.map((plan) => (
+              <PlanCard key={plan.id} plan={plan} whatsapp={contact.whatsapp} t={t} />
+            ))}
+          </ul>
+        </section>
+      )}
     </section>
   )
 }
