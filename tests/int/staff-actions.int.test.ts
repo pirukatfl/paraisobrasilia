@@ -225,6 +225,6 @@ describe('e-mail já cadastrado (equipe)', () => {
         user: staffReq.user,
         overrideAccess: false,
       }),
-    ).rejects.toMatchObject({ data: { errors: [{ path: 'email', message: expect.stringContaining('Já existe um assinante') }] } })
+    ).rejects.toMatchObject({ data: { errors: [{ path: 'email', message: expect.stringContaining('Este e-mail já está cadastrado') }] } })
   })
 })

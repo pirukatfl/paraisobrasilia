@@ -366,6 +366,19 @@ export type CadastroCompletoResult = {
 }
 
 /**
+ * Payload's ValidationError keeps the real reason per field (for example "Este e-mail já está cadastrado ...") in `data.errors`, but its own `message` is only "The following field is invalid:
+ * email", which the panel showed as if a valid e-mail had been refused. Bring the field messages up.
+ */
+function fieldErrorToServiceError(err: unknown): unknown {
+  const e = err as { name?: unknown; data?: { errors?: unknown } } | null
+  if (e?.name !== 'ValidationError' || !Array.isArray(e.data?.errors)) return err
+  const messages = (e.data.errors as Array<{ message?: unknown }>)
+    .map((x) => (typeof x?.message === 'string' ? x.message.trim() : ''))
+    .filter(Boolean)
+  return messages.length ? new ServiceError(messages.join(' ')) : err
+}
+
+/**
  * "Novo assinante em uma etapa": creates the account (random password nobody sees), releases the
  * chosen plan with the payment record and mints the 48 h password link. The plan is checked before
  * the account exists; if the release still fails, the new account is removed so staff can retry
@@ -409,7 +422,9 @@ export async function createAssinanteCompleto(
       context: { cadastroCompleto: true },
       req,
     }),
-  )
+  ).catch((err: unknown) => {
+    throw fieldErrorToServiceError(err)
+  })
 
   try {
     const granted = grant
